@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core network
 
 QT       -= gui
 
@@ -14,5 +14,15 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+HEADERS += \
+	AMDSBuffer.h \
+	AMDSTcpDataServer.h \
+	AMDSThreadedTcpDataServer.h \
+    AMDSCentralServer.h \
+    AMDSBufferGroup.h
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+	AMDSTcpDataServer.cpp \
+	AMDSThreadedTcpDataServer.cpp \
+    AMDSCentralServer.cpp \
+    AMDSBufferGroup.cpp
