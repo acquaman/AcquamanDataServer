@@ -23,6 +23,8 @@ signals:
 	/// Starts the server listening on the given interfaceName and port
 	void startServer(const QString& interfaceName, quint16 port);
 
+	void requestBufferGroupInfo();
+
 protected slots:
 	/// Slot which handles the thread having successfully started
 	void onThreadStarted();
