@@ -59,7 +59,7 @@ public:
 
 
 	/// Index-based read-only access:
-	inline quint32 at(int dimIndex) const;
+	inline quint32 at(quint8 dimIndex) const;
 
 	/// Lots of C math / data handling libraries often need a plain array of quint32s to use as multi-dimension indexes. The pointer returned by this function is only valid while the AMDSnDIndex still exists.
 	inline const quint32* constData() const;
@@ -165,5 +165,196 @@ protected:
 #include <QMetaType>
 Q_DECLARE_METATYPE(AMDSnDIndex)
 
+#include "AMDSLikely.h"
+
+quint32 AMDSnDIndex::at(quint8 dimIndex) const {
+	if(AMDS_LIKELY(dimIndex < 8))
+		return dims_[dimIndex];
+	else
+		return extras_->at(dimIndex);
+}
+
+const quint32* AMDSnDIndex::constData() const {
+	if(AMDS_LIKELY(rank_ <= 8))
+		return dims_;
+	else {
+		// copy first 8 elements from dims_ into extras_, before we return extras_. [Most of the time, the first 8 elements of extras_ are ignored/garbage.]
+		memcpy(extras_->data(), dims_, 8*sizeof(quint32));
+		return extras_->constData();
+	}
+}
+
+quint32& AMDSnDIndex::operator[](quint8 dimIndex) {
+	if(AMDS_LIKELY(dimIndex < 8))
+		return dims_[dimIndex];
+	else
+		return extras_->operator[](dimIndex);
+}
+
+void AMDSnDIndex::setRank(quint8 newRank) {
+	rank_ = newRank;
+	if(rank_ < 9) {
+		if(extras_) {
+			delete extras_;
+			extras_ = 0;
+		}
+	}
+	else {	// rank > 8. need extra space
+		if(!extras_)
+			extras_ = new QVector<quint32>(rank_);
+		else
+			extras_->resize(rank_);
+	}
+}
+
+void AMDSnDIndex::setAll(quint32 value) {
+	for(int mu=0; mu<rank_; ++mu)
+		operator[](mu) = value;
+}
+
+void AMDSnDIndex::append(const AMDSnDIndex& another) {
+	quint8 originalRank = rank_;
+	quint8 combinedRank = rank_+another.rank_;
+	setRank(combinedRank);
+	for(quint8 mu=originalRank; mu<combinedRank; mu++)
+		operator[](mu) = another.at(mu-originalRank);
+}
+
+bool AMDSnDIndex::dimensionsMatch(const AMDSnDIndex& other){
+	if( rank_ != other.rank_ )
+		return false;
+	return true;
+}
+
+bool AMDSnDIndex::inBounds(const AMDSnDIndex& other){
+	for(quint8 x=0; x < rank_; x++)
+		if( other.at(x) >= at(x) )
+			return false;
+	return true;
+}
+
+bool AMDSnDIndex::validInArrayOfSize(const AMDSnDIndex& fullSize) const {
+	for(quint8 mu=0; mu<rank_; ++mu)
+		if(at(mu) >= fullSize.at(mu))
+			return false;
+	return true;
+}
+
+bool AMDSnDIndex::operator==(const AMDSnDIndex& other) const {
+	if(other.rank_ != rank_)
+		return false;
+	for(quint8 i=0; i<rank_; i++) {
+		if(other.at(i) != at(i))
+			return false;
+	}
+	return true;
+}
+
+bool AMDSnDIndex::operator!=(const AMDSnDIndex& other) const {
+	return !(*this == other);
+}
+
+quint32 AMDSnDIndex::product() const {
+	quint32 rv = 1;
+	for(quint8 mu=rank_-1; mu>=0; --mu)
+		rv *= at(mu);
+	return rv;
+}
+
+quint32 AMDSnDIndex::totalPointsTo(const AMDSnDIndex& toIndex) const {
+	quint32 rv = 1;
+	for(quint8 mu = rank_-1; mu >= 0; --mu)
+		rv *= (toIndex.at(mu) - at(mu) + 1);
+	return rv;
+}
+
+quint32 AMDSnDIndex::flatIndexInArrayOfSize(const AMDSnDIndex& fullSize) const {
+	quint32 rv;
+
+	switch(rank_) {
+	case 0:
+		rv =  0; break;
+	case 1:
+		rv = i();
+		break;
+	case 2:
+		rv = i()*fullSize.at(1)
+				+ j();
+		break;
+	case 3: {
+		rv = i()*fullSize.at(1)*fullSize.at(2)
+				+ j()*fullSize.at(2)
+				+ k();
+		break; }
+
+	case 4: {
+		rv = i()*fullSize.at(1)*fullSize.at(2)*fullSize.at(3)
+				+ j()*fullSize.at(2)*fullSize.at(3)
+				+ k()*fullSize.at(3)
+				+ l();
+		break; }
+
+	default: {
+		rv = 0;
+		for(quint8 mu=0; mu<rank_; ++mu) {
+			quint32 multiplier = 1;
+			for(quint8 nu=mu+1; nu<rank_; ++nu)
+				multiplier *= fullSize.at(nu);
+			rv += at(mu)*multiplier;
+		}
+		break; }
+	}
+
+	return rv;
+}
+
+
+AMDSnDIndex& AMDSnDIndex::operator+=(const AMDSnDIndex& other) {
+	for(quint8 mu=0; mu<rank_; ++mu)
+		(*this)[mu] += other.at(mu);
+	return *this;
+}
+
+AMDSnDIndex AMDSnDIndex::operator+(const AMDSnDIndex& other) const {
+	AMDSnDIndex rv(*this);
+	rv += other;
+	return rv;
+}
+
+AMDSnDIndex& AMDSnDIndex::operator-=(const AMDSnDIndex& other) {
+	for(quint8 mu=0; mu<rank_; ++mu)
+		(*this)[mu] -= other.at(mu);
+	return *this;
+}
+
+AMDSnDIndex AMDSnDIndex::operator-(const AMDSnDIndex& other) const {
+	AMDSnDIndex rv(*this);
+	rv -= other;
+	return rv;
+}
+
+AMDSnDIndex& AMDSnDIndex::operator+=(quint32 offset) {
+	for(quint8 mu=0; mu<rank_; ++mu)
+		(*this)[mu] += offset;
+	return *this;
+}
+
+AMDSnDIndex AMDSnDIndex::operator+(quint32 offset) const {
+	AMDSnDIndex rv(*this);
+	rv += offset;
+	return rv;
+}
+
+AMDSnDIndex& AMDSnDIndex::operator-=(quint32 offset) {
+	for(quint8 mu=0; mu<rank_; ++mu)
+		(*this)[mu] -= offset;
+	return *this;
+}
+
+AMDSnDIndex AMDSnDIndex::operator-(quint32 offset) const {
+	AMDSnDIndex rv(*this);
+	rv -= offset;
+	return rv;
+}
 
 #endif // AMDSNDINDEX_H

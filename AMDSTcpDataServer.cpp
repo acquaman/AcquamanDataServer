@@ -1,8 +1,10 @@
 #include "AMDSTcpDataServer.h"
 
-//#include "ClientDataRequest.h"
+#include "AMDSClientDataRequest.h"
 
 #include <QTime>
+
+#include "AMDSDataStream.h"
 
 AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
 	QObject(parent)
@@ -51,6 +53,9 @@ void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
 {
 	interfaceName_ = interfaceName;
 	port_ = port;
+
+	qDebug() << "InterfaceName and port " << interfaceName_ << port_;
+
 	clientDisconnectSignalMapper_ = new QSignalMapper(this);
 	clientRequestSignalMapper_ = new QSignalMapper(this);
 	continuousDataRequestSignalMapper_ = new QSignalMapper(this);
@@ -62,6 +67,8 @@ void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
 		const QString id = settings.value("DefaultSessionConfig").toString();
 		settings.endGroup();
 
+		qDebug() << "What's the id right now" << id;
+
 		QNetworkConfiguration config = manager.configurationFromIdentifier(id);
 		if((config.state() & QNetworkConfiguration::Discovered) != QNetworkConfiguration::Discovered)
 		{
@@ -70,10 +77,12 @@ void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
 
 		session_ = new QNetworkSession(config, this);
 		connect(session_, SIGNAL(opened()), this, SLOT(sessionOpened()));
+		qDebug() << "Trying to open session";
 		session_->open();
 	}
 	else
 	{
+		qDebug() << "Just call session opened";
 		sessionOpened();
 	}
 	connect(clientDisconnectSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onClientDisconnect(QString)));
@@ -106,11 +115,51 @@ void AMDSTcpDataServer::stop()
 }
 
 
-//void AMDSTcpDataServer::dataRequestReady(ClientDataRequest *data)
-//{
-//	QTcpSocket* requestingSocket = clientSockets_.value(data->socketKey(), 0);
-//	if(requestingSocket != 0)
-//	{
+void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequest *data)
+{
+	QTcpSocket* requestingSocket = clientSockets_.value(data->socketKey(), 0);
+	if(requestingSocket != 0)
+	{
+		QByteArray block;
+		//QDataStream output(&block, QIODevice::WriteOnly);
+		AMDSDataStream output(&block, QIODevice::WriteOnly);
+		output.setVersion(QDataStream::Qt_4_0);
+		output << (quint32)0;
+
+//		output << (quint8)data->requestType();
+
+		QString outputString;
+		if(data->responseType() == AMDSClientDataRequest::Error)
+			outputString = data->lastError();
+//		else if(data->requestType() == AMDSClientDataRequest::Introspection){
+//			qDebug() << "Introspection request";
+//			//output.write(data->bufferGroupInfos().at(0).axes().at(0));
+//			output << (quint16)data->bufferGroupInfos().count();
+//			for(int x = 0, size = data->bufferGroupInfos().count(); x < size; x++)
+//				output.write(data->bufferGroupInfos().at(x));
+//			outputString.append("Another part of the message");
+//		}
+		outputString.append("Fake message");
+
+		output.write(*data);
+
+		output << outputString;
+		output.device()->seek(0);
+		output << (quint32)(block.size() - sizeof(quint32));
+		requestingSocket->write(block);
+
+		if(data->requestType() == AMDSClientDataRequest::Continuous && data->responseType() != AMDSClientDataRequest::Error)
+		{
+//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
+//			data->histogramData()->clear();
+			data->startContinuousRequestTimer(500);
+		}
+		else
+		{
+			data->deleteLater();
+			requestingSocket->disconnectFromHost();
+		}
+
 //		QByteArray block;
 //		QDataStream output(&block, QIODevice::WriteOnly);
 //		output.setVersion(QDataStream::Qt_4_0);
@@ -152,16 +201,17 @@ void AMDSTcpDataServer::stop()
 //			requestingSocket->disconnectFromHost();
 //		}
 
-//	}
-//	else
-//	{
-//		data->deleteLater();
-//		requestingSocket->disconnectFromHost();
-//	}
-//}
+	}
+	else
+	{
+		data->deleteLater();
+		requestingSocket->disconnectFromHost();
+	}
+}
 
 void AMDSTcpDataServer::sessionOpened()
 {
+	qDebug() << "Session has been opened";
 	QSettings settings;
 	if(session_)
 	{
@@ -182,6 +232,8 @@ void AMDSTcpDataServer::sessionOpened()
 	QString interfaceWithoutSuffix = interfaceName_;
 	int interfaceOffset = 0;
 
+	qDebug() << "Interface name here is " << interfaceName_;
+
 	if(interfaceName_.contains(":"))
 	{
 		QStringList nameParts = interfaceName_.split(':');
@@ -193,10 +245,20 @@ void AMDSTcpDataServer::sessionOpened()
 		interfaceOffset++;
 	}
 
+	qDebug() << "We will check against " << interfaceWithoutSuffix;
+
 	QList<QNetworkAddressEntry> associatedAddresses = QNetworkInterface::interfaceFromName(interfaceWithoutSuffix).addressEntries();
 
+	QList<QNetworkAddressEntry> associatedIPV4Addresses;
+	for(int x = 0, size = associatedAddresses.count(); x < size; x++){
+		qDebug() << "At " << x << associatedAddresses.at(x).ip() << associatedAddresses.at(x).ip().toIPv4Address();
+		if(associatedAddresses.at(x).ip().toIPv4Address())
+			associatedIPV4Addresses.append(associatedAddresses.at(x));
+	}
+
 	if(interfaceOffset < associatedAddresses.count())
-		address = associatedAddresses.at(interfaceOffset).ip();
+		address = associatedIPV4Addresses.at(interfaceOffset).ip();
+		//address = associatedAddresses.at(interfaceOffset).ip();
 
 	server_ = new QTcpServer(this);
 	connect(server_, SIGNAL(newConnection()), this, SLOT(onNewClientConnected()));
@@ -291,12 +353,23 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	bool includeStatusData; // Does the client want us to include the status data in the response
 	incoming >> includeStatusData;
 
+	qDebug() << "Received request with " << requestType << responseTypeId << indexOfAmptek << includeStatusData;
+
 	QTime time1;
 	QTime time2;
 	int count1;
 	int count2;
-//	ClientDataRequest::ResponseType responseRequestType;
-//	responseRequestType = (ClientDataRequest::ResponseType)responseTypeId;
+
+	AMDSClientDataRequest::ResponseType responseRequestType;
+	responseRequestType = (AMDSClientDataRequest::ResponseType)responseTypeId;
+
+	if(requestType == 5){
+		qDebug() << "Request for introspection";
+
+		AMDSClientDataRequest *introspectionRequest = new AMDSClientDataRequest(responseRequestType, clientKey);
+		emit requestData(introspectionRequest);
+	}
+
 
 //	if(requestType == 0)
 //	{

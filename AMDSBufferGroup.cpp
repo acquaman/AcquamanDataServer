@@ -8,23 +8,24 @@ AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &des
 	axes_ = axes;
 }
 
-AMDSnDIndex AMDSBufferGroupInfo::size() const {
-	quint8 rank = axes_.count();
-	AMDSnDIndex s(rank, AMDSnDIndex::DoNotInit);
-	for(quint8 i=0; i<rank; ++i)
-		s[i] = axes_.at(i).size();
-	return s;
+AMDSBufferGroupInfo::AMDSBufferGroupInfo(const AMDSBufferGroupInfo &other) {
+	name_ = other.name();
+	description_ = other.description();
+	units_ = other.units();
+	axes_ = other.axes();
 }
 
+AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& other) {
+	name_ = other.name();
+	description_ = other.description();
+	units_ = other.units();
+	axes_ = other.axes();
 
-quint64 AMDSBufferGroupInfo::spanSize() const {
-	quint64 aSize = 1;
-	for(quint8 i=axes_.count()-1; i>=0; --i)
-		aSize *= axes_.at(i).size();
-	return aSize;
+	return *this;
 }
 
-AMDSBufferGroup::AMDSBufferGroup(QObject *parent) :
+AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo info, QObject *parent) :
 	QObject(parent)
 {
+	info_ = info;
 }

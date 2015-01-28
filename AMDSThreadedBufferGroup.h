@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QThread>
 
-class AMDSBufferGroup;
+#include "AMDSBufferGroup.h"
+
+class AMDSClientDataRequest;
 
 class AMDSThreadedBufferGroup : public QObject
 {
@@ -12,7 +14,10 @@ Q_OBJECT
 public:
 	AMDSThreadedBufferGroup(AMDSBufferGroup *bufferGroup, QObject *parent = 0);
 
-	AMDSBufferGroup* bufferGroup();
+	AMDSBufferGroupInfo bufferGroupInfo() const;
+
+public slots:
+	void requestData(AMDSClientDataRequest *dataRequest);
 
 signals:
 	void bufferGroupReady();
@@ -22,7 +27,9 @@ protected slots:
 
 protected:
 	AMDSBufferGroup *bufferGroup_;
+
 	QThread *bufferGroupThread_;
+	mutable QReadWriteLock lock_;
 };
 
 #endif // AMDSTHREADEDBUFFERGROUP_H

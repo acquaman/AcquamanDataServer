@@ -12,8 +12,13 @@ AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroup *bufferGroup, Q
 	bufferGroupThread_->start();
 }
 
-AMDSBufferGroup* AMDSThreadedBufferGroup::bufferGroup(){
-	return bufferGroup_;
+AMDSBufferGroupInfo AMDSThreadedBufferGroup::bufferGroupInfo() const{
+	QReadLocker readLock(&lock_);
+	return bufferGroup_->info();
+}
+
+void AMDSThreadedBufferGroup::requestData(AMDSClientDataRequest *dataRequest){
+
 }
 
 void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){

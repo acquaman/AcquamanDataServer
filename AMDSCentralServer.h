@@ -6,6 +6,7 @@
 
 class AMDSThreadedBufferGroup;
 class AMDSThreadedTcpDataServer;
+class AMDSClientDataRequest;
 
 class AMDSCentralServer : public QObject
 {
@@ -13,8 +14,12 @@ Q_OBJECT
 public:
 	AMDSCentralServer(QObject *parent = 0);
 
+signals:
+	void dataRequestReady(AMDSClientDataRequest *dataRequest);
+
 protected slots:
-	void onDataServerBufferGroupInfoRequested();
+//	void onDataServerBufferGroupInfoRequested();
+	void onDataServerDataRequested(AMDSClientDataRequest *dataRequest);
 
 protected:
 	AMDSThreadedTcpDataServer *dataServer_;
