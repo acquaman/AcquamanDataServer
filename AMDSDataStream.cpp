@@ -33,11 +33,11 @@ void AMDSDataStream::read(AMDSAxisInfo &axisInfo){
 	qint16 start;
 	quint16 increment;
 
-	qDebug() << "Reading an axisInfo";
+//	qDebug() << "Reading an axisInfo";
 	*this >> name;
 	if(status() != QDataStream::Ok)
 		return;
-	qDebug() << "Named: " << name;
+//	qDebug() << "Named: " << name;
 	*this >> description;
 	if(status() != QDataStream::Ok)
 		return;
@@ -73,11 +73,11 @@ void AMDSDataStream::read(AMDSBufferGroupInfo &bufferGroupInfo){
 	quint8 axesCount;
 	QList<AMDSAxisInfo> axes;
 
-	qDebug() << "Reading a bufferGroupInfo";
+//	qDebug() << "Reading a bufferGroupInfo";
 	*this >> name;
 	if(status() != QDataStream::Ok)
 		return;
-	qDebug() << "Named: " << name;
+//	qDebug() << "Named: " << name;
 	*this >> description;
 	if(status() != QDataStream::Ok)
 		return;
@@ -151,7 +151,7 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 }
 
 void AMDSDataStream::write(const AMDSAxisInfo &axisInfo){
-	qDebug() << "Writing an axisInfo named " << axisInfo.name();
+//	qDebug() << "Writing an axisInfo named " << axisInfo.name();
 	*this << axisInfo.name();
 	*this << axisInfo.description();
 	*this << axisInfo.units();
@@ -162,14 +162,14 @@ void AMDSDataStream::write(const AMDSAxisInfo &axisInfo){
 }
 
 void AMDSDataStream::write(const AMDSBufferGroupInfo &bufferGroupInfo){
-	qDebug() << "Writing a bufferGroupInfo named " << bufferGroupInfo.name();
+//	qDebug() << "Writing a bufferGroupInfo named " << bufferGroupInfo.name();
 	*this << bufferGroupInfo.name();
 	*this << bufferGroupInfo.description();
 	*this << bufferGroupInfo.units();
 	QDataStream::operator <<((quint8)(bufferGroupInfo.axes().count()));
-	qDebug() << "This bufferGroupInfo has " << (quint8)(bufferGroupInfo.axes().count()) << " axes";
+//	qDebug() << "This bufferGroupInfo has " << (quint8)(bufferGroupInfo.axes().count()) << " axes";
 	for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++){
-		qDebug() << "Attempting axis " << x << " as " << bufferGroupInfo.axes().at(x).name();
+//		qDebug() << "Attempting axis " << x << " as " << bufferGroupInfo.axes().at(x).name();
 		write(bufferGroupInfo.axes().at(x));
 	}
 }

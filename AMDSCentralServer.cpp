@@ -5,6 +5,7 @@
 #include "AMDSThreadedTcpDataServer.h"
 #include "AMDSThreadedBufferGroup.h"
 #include "AMDSBufferGroup.h"
+#include "AMDSBufferGroupInfo.h"
 #include "AMDSClientDataRequest.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
@@ -12,23 +13,25 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 {
 	dataServer_ = new AMDSThreadedTcpDataServer(this);
 
+	quint64 maxCountSize = 1000*60*60*10; // 10 hours of 1kHz signal
+
 	QList<AMDSAxisInfo> mcpBufferGroupAxes;
 	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
 	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
 	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", mcpBufferGroupAxes);
-	AMDSBufferGroup *mcpBufferGroup = new AMDSBufferGroup(mcpBufferGroupInfo);
+	AMDSBufferGroup *mcpBufferGroup = new AMDSBufferGroup(mcpBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroup);
 	bufferGroups_.insert(mcpThreadedBufferGroup->bufferGroupInfo().name(), mcpThreadedBufferGroup);
 
 	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
 	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
 	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", amptek1BufferGroupAxes);
-	AMDSBufferGroup *amptek1BufferGroup = new AMDSBufferGroup(amptek1BufferGroupInfo);
+	AMDSBufferGroup *amptek1BufferGroup = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup);
 	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
 
 	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV");
-	AMDSBufferGroup *energyBufferGroup = new AMDSBufferGroup(energyBufferGroupInfo);
+	AMDSBufferGroup *energyBufferGroup = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup);
 	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
 

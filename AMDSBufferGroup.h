@@ -4,75 +4,103 @@
 #include <QObject>
 
 #include "AMDSBuffer.h"
-#include "AMDSAxisInfo.h"
-#include "AMDSnDIndex.h"
+#include "AMDSBufferGroupInfo.h"
+#include "AMDSDataHolder.h"
+#include "AMDSClientDataRequest.h"
 
-class AMDSBufferGroupInfo
-{
-public:
-	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
-	/// Copy constructor
-	AMDSBufferGroupInfo(const AMDSBufferGroupInfo& other);
-	/// Assignment operator
-	AMDSBufferGroupInfo& operator=(const AMDSBufferGroupInfo& other);
-
-	inline QString name() const { return name_; }
-	inline QString description() const { return description_; }
-	inline QString units() const { return units_; }
-
-	inline QList<AMDSAxisInfo> axes() const { return axes_; }
-
-	inline quint8 rank() const { return axes_.count(); }
-
-	/// Returns the length of all the axes
-	inline AMDSnDIndex size() const;
-
-	/// Returns the length of the specified axis \c axisId.  (\c axisId is assumed to be >= 0 and < rank().)
-	inline quint32 size(int axisId) const { return axes_.at(axisId).size(); }
-
-	/// Returns the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
-	inline quint64 spanSize() const;
-
-	void setName(const QString &name) { name_ = name; }
-	void setDescription(const QString &description) { description_ = description; }
-	void setUnits(const QString &units) { units_ = units; }
-
-	void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
-
-protected:
-	QString name_;
-	QString description_;
-	QString units_;
-
-	QList<AMDSAxisInfo> axes_;
-};
-
-AMDSnDIndex AMDSBufferGroupInfo::size() const {
-	quint8 rank = axes_.count();
-	AMDSnDIndex s(rank, AMDSnDIndex::DoNotInit);
-	for(quint8 i=0; i<rank; ++i)
-		s[i] = axes_.at(i).size();
-	return s;
-}
-
-
-quint64 AMDSBufferGroupInfo::spanSize() const {
-	quint64 aSize = 1;
-	for(quint8 i=axes_.count()-1; i>=0; --i)
-		aSize *= axes_.at(i).size();
-	return aSize;
-}
-
+/**
+  * Class representing a large buffer of data to store AMDSDataHolders in, of a given size. Once the buffer
+  * reaches its maxSize, it will automatically start removing its oldest members. Members are accessible
+  * by subscript [int], giving members in order from the oldest added at [0] to the newest at [count()-1].
+  */
 class AMDSBufferGroup : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-	AMDSBufferGroup(AMDSBufferGroupInfo info, QObject *parent = 0);
+	/// Creates a new buffer group with a maximum capacity maxSize and data dimensions based on the bufferGroupInfo
+	AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent = 0);
+	/// Copy constructor
+	AMDSBufferGroup(const AMDSBufferGroup& other);
 
-	AMDSBufferGroupInfo info() const { return info_; }
+	/// Returns the data dimension and other information included in the bufferGroupInfo
+	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
+
+	/// Subscript operator for use in lhs assignment (ie b[i] = 5)
+	/// Returns the pointer at provided index
+	inline AMDSDataHolder* operator[](int index);
+	/// Subscript operator for use in rhs assignment (ie x = b[i])
+	/// Returns the pointer at provided index
+	inline const AMDSDataHolder* operator[](int index) const;
+	/// The total capacity of the buffer
+	inline quint64 maxSize() const;
+	/// Adds a new AMDSDataHolder pointer to the end of the buffer. The buffer group takes ownership
+	/// of the passed AMDSDataHolder, becoming responsible for its destruction
+	inline void append(AMDSDataHolder* value);
+	/// Clears the buffer of all its members, and frees their resources
+	inline void clear();
+	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will always return maxSize)
+	inline int count() const;
+
+public slots:
+	/// Slot which handles a request for data. The buffer group will attempt to populate the request
+	/// based on the instructions it includes. When the data request is ready the dataRequestReady signal is emitted
+	void requestData(AMDSClientDataRequest* request);
+signals:
+	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
+	void dataRequestReady(AMDSClientDataRequest* request);
 
 protected:
-	AMDSBufferGroupInfo info_;
+	/// Helper functions which populate request data based on the parameters passed:
+	/// Fills the request with all data acquired after lastFetch
+	void populateData(AMDSClientDataRequest* request, const QDateTime& lastFetch);
+	/// Fills the request with count number of spectra after (and including) startTime
+	void populateData(AMDSClientDataRequest* request, const QDateTime& startTime, int count);
+	/// Fills the request with count number of spectra either side of the entry relativeCount ago
+	void populateData(AMDSClientDataRequest* request, int relativeCount, int count);
+	/// Fills the request with all data between (and including) startTime and endTime
+	void populateData(AMDSClientDataRequest* request, const QDateTime& startTime, const QDateTime& endTime);
+	/// Fills the request with countBefore entries before middleTime to countAfter entries after.
+	void populateData(AMDSClientDataRequest* request, const QDateTime& middleTime, int countBefore, int countAfter);
+	/// Helper function that returns the index in the buffer 1 before the given dwellTime, or at the point at
+	/// which the given dwellTime would occur within the buffer, if an exact match is not found.
+	int lowerBound(const QDateTime& dwellTime);
+
+protected:
+	AMDSBufferGroupInfo bufferGroupInfo_;
+	mutable QReadWriteLock lock_;
+	/// A buffer which contains histogram data collection, sorted by the startDwellTime
+	AMDSBuffer<AMDSDataHolder*> dataHolders_;
 };
+
+quint64 AMDSBufferGroup::maxSize() const
+{
+	QReadLocker readLock(&lock_);
+	return dataHolders_.maxSize();
+}
+
+void AMDSBufferGroup::append(AMDSDataHolder *value)
+{
+	QWriteLocker writeLock(&lock_);
+	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(value);
+	if(dataHolderRemoved)
+		delete dataHolderRemoved;
+	//		dataHolderRemoved->deleteLater();
+}
+
+void AMDSBufferGroup::clear()
+{
+	QWriteLocker writeLock(&lock_);
+	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++)
+		delete dataHolders_[iElement];
+	//		dataHolders_[iElement]->deleteLater();
+
+	dataHolders_.clear();
+}
+
+int AMDSBufferGroup::count() const
+{
+	QReadLocker readLock(&lock_);
+	return dataHolders_.count();
+}
 
 #endif // AMDSBUFFERGROUP_H

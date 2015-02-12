@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <QTime>
 
-#include "AMDSBufferGroup.h"
+#include "AMDSBufferGroupInfo.h"
 
 /**
   * Class representing a single request for data. Includes information regarding the nature of the request, an
@@ -38,7 +38,7 @@ public:
 	explicit AMDSClientDataRequest(QObject* parent = 0);
 
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(const QTime& startTime,
+	explicit AMDSClientDataRequest(const QDateTime& startTime,
 				   int count,
 				   bool includeStatusData,
 				   ResponseType responseType,
@@ -55,8 +55,8 @@ public:
 				   QObject *parent = 0);
 
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(const QTime& startTime,
-				   const QTime& endTime,
+	explicit AMDSClientDataRequest(const QDateTime& startTime,
+				   const QDateTime& endTime,
 				   bool includeStatusData,
 				   ResponseType responseType,
 				   const QString& socketKey,
@@ -64,7 +64,7 @@ public:
 				   QObject* parent = 0);
 
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(const QTime& middleTime,
+	explicit AMDSClientDataRequest(const QDateTime& middleTime,
 				   int countBefore,
 				   int countAfter,
 				   bool includeStatusData,
@@ -74,7 +74,7 @@ public:
 				   QObject* parent = 0);
 
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(const QTime& lastFetch,
+	explicit AMDSClientDataRequest(const QDateTime& lastFetch,
 				   bool includeStatusData,
 				   ResponseType responseType,
 				   const QString& socketKey,
@@ -100,8 +100,8 @@ public:
 	/// These values are used differently, depending on the requestType. The number relates to the
 	/// order of the parameter in function arguments. I.e. for StartTimePlusCount time1 is used for
 	/// the startTime, and count1 is used for the count - all others are ignored
-	QTime time1() const;
-	QTime time2() const;
+	QDateTime time1() const;
+	QDateTime time2() const;
 	int count1() const;
 	int count2() const;
 	/// The index of the amptek detector the request is being made to
@@ -124,7 +124,7 @@ public:
 
 	void setRequestType(RequestType requestType);
 	void setResponseType(ResponseType responseType);
-	void setTime1(const QTime& time);
+	void setTime1(const QDateTime& time);
 
 	//void setBufferGroupInfo(AMDSBufferGroupInfo bufferGroupInfo);
 	void appendBufferGroupInfo(AMDSBufferGroupInfo bufferGroupInfo);
@@ -141,8 +141,8 @@ protected:
 	RequestType requestType_;
 	ResponseType responseType_;
 	bool includeStatusData_;
-	QTime time1_;
-	QTime time2_;
+	QDateTime time1_;
+	QDateTime time2_;
 	int count1_;
 	int count2_;
 	int indexOfAmptek_;

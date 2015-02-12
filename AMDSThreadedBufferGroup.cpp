@@ -14,7 +14,7 @@ AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroup *bufferGroup, Q
 
 AMDSBufferGroupInfo AMDSThreadedBufferGroup::bufferGroupInfo() const{
 	QReadLocker readLock(&lock_);
-	return bufferGroup_->info();
+	return bufferGroup_->bufferGroupInfo();
 }
 
 void AMDSThreadedBufferGroup::requestData(AMDSClientDataRequest *dataRequest){

@@ -3,7 +3,7 @@
 AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	QObject(parent) {}
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QTime& startTime,
+AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& startTime,
 					     int count,
 					     bool includeStatusData,
 					     ResponseType responseType,
@@ -39,8 +39,8 @@ AMDSClientDataRequest::AMDSClientDataRequest(int relativeCount,
 	indexOfAmptek_ = amptekIndex;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QTime& startTime,
-					     const QTime& endTime,
+AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& startTime,
+					     const QDateTime& endTime,
 					     bool includeStatusData,
 					     ResponseType responseType,
 					     const QString& socketKey,
@@ -57,7 +57,7 @@ AMDSClientDataRequest::AMDSClientDataRequest(const QTime& startTime,
 	indexOfAmptek_ = amptekIndex;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QTime& middleTime,
+AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& middleTime,
 					     int countBefore,
 					     int countAfter,
 					     bool includeStatusData,
@@ -77,7 +77,7 @@ AMDSClientDataRequest::AMDSClientDataRequest(const QTime& middleTime,
 	indexOfAmptek_ = amptekIndex;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QTime& lastFetch,
+AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& lastFetch,
 					     bool includeStatusData,
 					     ResponseType responseType,
 					     const QString& socketKey,
@@ -128,12 +128,12 @@ bool AMDSClientDataRequest::includeStatusData() const
 	return includeStatusData_;
 }
 
-QTime AMDSClientDataRequest::time1() const
+QDateTime AMDSClientDataRequest::time1() const
 {
 	return time1_;
 }
 
-QTime AMDSClientDataRequest::time2() const
+QDateTime AMDSClientDataRequest::time2() const
 {
 	return time2_;
 }
@@ -196,7 +196,7 @@ void AMDSClientDataRequest::startContinuousRequestTimer(int msecs)
 	continuousDataRequestTimer_.singleShot(msecs, this, SIGNAL(sendNewContinuousDataRequest()));
 }
 
-void AMDSClientDataRequest::setTime1(const QTime &time)
+void AMDSClientDataRequest::setTime1(const QDateTime &time)
 {
 	time1_ = time;
 }
