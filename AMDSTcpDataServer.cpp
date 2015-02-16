@@ -1,8 +1,7 @@
 #include "AMDSTcpDataServer.h"
 
-#include "AMDSClientDataRequest.h"
-
-#include <QTime>
+#include <QDateTime>
+#include <QTimer>
 
 #include "AMDSDataStream.h"
 
@@ -14,6 +13,26 @@ AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
 	port_ = 0;
 	clientDisconnectSignalMapper_ = 0;
 	clientRequestSignalMapper_ = 0;
+
+	tenMillisecondsStats_.setName("TenMilliseconds");
+	hundredMillisecondsStats_.setName("HundredMilliseconds");
+	oneSecondsStats_.setName("OneSecond");
+	tenSecondsStats_.setName("TenSeconds");
+
+	tenMillisecondStatsTimer_ = new QTimer();
+	hundredMillisecondStatsTimer_ = new QTimer();
+	oneSecondStatsTimer_ = new QTimer();
+	tenSecondStatsTimer_ = new QTimer();
+
+	connect(tenMillisecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onTenMillisecondStatsTimerTimeout()));
+	connect(hundredMillisecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondStatsTimerTimeout()));
+	connect(oneSecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onOneSecondStatsTimerTimeout()));
+	connect(tenSecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onTenSecondStatsTimerTimeout()));
+
+	tenMillisecondStatsTimer_->start(10);
+	hundredMillisecondStatsTimer_->start(100);
+	oneSecondStatsTimer_->start(1000);
+	tenSecondStatsTimer_->start(10000);
 }
 
 AMDSTcpDataServer::~AMDSTcpDataServer()
@@ -147,6 +166,12 @@ void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequest *data)
 		output.device()->seek(0);
 		output << (quint32)(block.size() - sizeof(quint32));
 		requestingSocket->write(block);
+
+		qint64 outboundBytes = block.size();
+		tenMillisecondsStats_.setOutboundBytes(tenMillisecondsStats_.outboundBytes()+outboundBytes);
+		hundredMillisecondsStats_.setOutboundBytes(hundredMillisecondsStats_.outboundBytes()+outboundBytes);
+		oneSecondsStats_.setOutboundBytes(oneSecondsStats_.outboundBytes()+outboundBytes);
+		tenSecondsStats_.setOutboundBytes(tenSecondsStats_.outboundBytes()+outboundBytes);
 
 		if(data->requestType() == AMDSClientDataRequest::Continuous && data->responseType() != AMDSClientDataRequest::Error)
 		{
@@ -307,7 +332,8 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	if(requestingSocket == 0)
 		return;
 
-	QDataStream incoming(requestingSocket);
+//	QDataStream incoming(requestingSocket);
+	AMDSDataStream incoming(requestingSocket);
 
 	incoming.setVersion(QDataStream::Qt_4_0);
 
@@ -329,6 +355,7 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 		incoming >> blockSize;
 	}
 
+
 	// At this stage enough bytes have come through in order to determine the size of the full data block, but not necessarily
 	// the full block itself. If we don't have all the data we add a reference to the request into clientSocketDataInProgress
 	// containing the size of the block, keyed on the clientKey (ip:port) and wait until more comes through. Otherwise the full
@@ -340,20 +367,35 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	}
 	clientSocketDataInProgress_.remove(clientKey);
 
+	qint64 inboundBytes = requestingSocket->bytesAvailable();
+	tenMillisecondsStats_.setInboundBytes(tenMillisecondsStats_.inboundBytes()+inboundBytes);
+	hundredMillisecondsStats_.setInboundBytes(hundredMillisecondsStats_.inboundBytes()+inboundBytes);
+	oneSecondsStats_.setInboundBytes(oneSecondsStats_.inboundBytes()+inboundBytes);
+	tenSecondsStats_.setInboundBytes(tenSecondsStats_.inboundBytes()+inboundBytes);
+
+	AMDSClientDataRequest clientDataRequest;
+	qDebug() << "About to read the CDR from stream";
+	incoming.read(clientDataRequest);
+
 	// Process request
-	qint8 requestType;  // see enum ClientDataRequest::RequestType for code
+	quint8 requestType;  // see enum ClientDataRequest::RequestType for code
 	incoming >> requestType;
 
-	qint8 responseTypeId;   // see enum ClientDataRequest::ResponseType for code
+	quint8 responseTypeId;   // see enum ClientDataRequest::ResponseType for code
 	incoming >> responseTypeId;
 
-	qint8 indexOfAmptek;    // which Amptek we wish to obtain data from
-	incoming >> indexOfAmptek;
+//	quint8 indexOfAmptek;    // which Amptek we wish to obtain data from
+//	incoming >> indexOfAmptek;
+
+	QString bufferName;
+	incoming >> bufferName;
 
 	bool includeStatusData; // Does the client want us to include the status data in the response
 	incoming >> includeStatusData;
 
-	qDebug() << "Received request with " << requestType << responseTypeId << indexOfAmptek << includeStatusData;
+//	qDebug() << "Received request with " << requestType << responseTypeId << indexOfAmptek << includeStatusData;
+	qDebug() << "Received request with " << requestType << responseTypeId << bufferName << includeStatusData;
+	qDebug() << "Versus CDR with " << clientDataRequest.requestType() << clientDataRequest.responseType() << clientDataRequest.bufferName() << clientDataRequest.includeStatusData();
 
 	QTime time1;
 	QTime time2;
@@ -363,11 +405,30 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	AMDSClientDataRequest::ResponseType responseRequestType;
 	responseRequestType = (AMDSClientDataRequest::ResponseType)responseTypeId;
 
-	if(requestType == 5){
+	if(requestType == AMDSClientDataRequest::Introspection){
 		qDebug() << "Request for introspection";
 
-		AMDSClientDataRequest *introspectionRequest = new AMDSClientDataRequest(responseRequestType, clientKey);
+		AMDSClientDataRequest *introspectionRequest = new AMDSClientDataRequest(responseRequestType, clientKey, bufferName);
 		emit requestData(introspectionRequest);
+	}
+	else if(requestType == AMDSClientDataRequest::Continuous){
+		qDebug() << "Request for continuous on " << bufferName;
+	}
+	else if(requestType == AMDSClientDataRequest::StartTimePlusCount){
+		qDebug() << "Request for startTimePlusCount on " << bufferName;
+
+	}
+	else if(requestType == AMDSClientDataRequest::Statistics){
+		qDebug() << "Request for statistics";
+
+		AMDSClientDataRequest *statisticsRequest = new AMDSClientDataRequest(responseRequestType, clientKey);
+		statisticsRequest->setRequestType(AMDSClientDataRequest::Statistics);
+		statisticsRequest->appendPacketStats(tenMillisecondsStats_);
+		statisticsRequest->appendPacketStats(hundredMillisecondsStats_);
+		statisticsRequest->appendPacketStats(oneSecondsStats_);
+		statisticsRequest->appendPacketStats(tenSecondsStats_);
+
+		onDataRequestReady(statisticsRequest);
 	}
 
 
@@ -418,10 +479,57 @@ void AMDSTcpDataServer::onContinuousDataRequestTimer(const QString &clientKey)
 
 }
 
+void AMDSTcpDataServer::onTenMillisecondStatsTimerTimeout(){
+	if(tenMillisecondsStats_.inboundBytes() > tenMillisecondsStats_.maxInboundBytes())
+		tenMillisecondsStats_.setMaxInboundBytes(tenMillisecondsStats_.inboundBytes());
+	if(tenMillisecondsStats_.outboundBytes() > tenMillisecondsStats_.maxOutboundBytes())
+		tenMillisecondsStats_.setMaxOutboundBytes(tenMillisecondsStats_.outboundBytes());
+	if( (tenMillisecondsStats_.inboundBytes() + tenMillisecondsStats_.outboundBytes()) > tenMillisecondsStats_.maxTotalBytes())
+		tenMillisecondsStats_.setMaxTotalBytes(tenMillisecondsStats_.inboundBytes() + tenMillisecondsStats_.outboundBytes());
 
+	tenMillisecondsStats_.setInboundBytes(0);
+	tenMillisecondsStats_.setOutboundBytes(0);
+}
 
+void AMDSTcpDataServer::onHundredMillisecondStatsTimerTimeout(){
+	if(hundredMillisecondsStats_.inboundBytes() > hundredMillisecondsStats_.maxInboundBytes())
+		hundredMillisecondsStats_.setMaxInboundBytes(hundredMillisecondsStats_.inboundBytes());
+	if(hundredMillisecondsStats_.outboundBytes() > hundredMillisecondsStats_.maxOutboundBytes())
+		hundredMillisecondsStats_.setMaxOutboundBytes(hundredMillisecondsStats_.outboundBytes());
+	if( (hundredMillisecondsStats_.inboundBytes() + hundredMillisecondsStats_.outboundBytes()) > hundredMillisecondsStats_.maxTotalBytes())
+		hundredMillisecondsStats_.setMaxTotalBytes(hundredMillisecondsStats_.inboundBytes() + hundredMillisecondsStats_.outboundBytes());
 
+	hundredMillisecondsStats_.setInboundBytes(0);
+	hundredMillisecondsStats_.setOutboundBytes(0);
+}
 
+void AMDSTcpDataServer::onOneSecondStatsTimerTimeout(){
+	if(oneSecondsStats_.inboundBytes() > oneSecondsStats_.maxInboundBytes())
+		oneSecondsStats_.setMaxInboundBytes(oneSecondsStats_.inboundBytes());
+	if(oneSecondsStats_.outboundBytes() > oneSecondsStats_.maxOutboundBytes())
+		oneSecondsStats_.setMaxOutboundBytes(oneSecondsStats_.outboundBytes());
+	if( (oneSecondsStats_.inboundBytes() + oneSecondsStats_.outboundBytes()) > oneSecondsStats_.maxTotalBytes())
+		oneSecondsStats_.setMaxTotalBytes(oneSecondsStats_.inboundBytes() + oneSecondsStats_.outboundBytes());
 
+	oneSecondsStats_.setInboundBytes(0);
+	oneSecondsStats_.setOutboundBytes(0);
 
+//	QString updateString;
+//	updateString.append(QString("\n10ms: %1").arg(tenMillisecondsStats_.allStats()));
+//	updateString.append(QString("\n100ms: %1").arg(hundredMillisecondsStats_.allStats()));
+//	updateString.append(QString("\n1s: %1").arg(oneSecondsStats_.allStats()));
+//	updateString.append(QString("\n10s: %1").arg(tenSecondsStats_.allStats()));
+//	qDebug() << "One second update " << updateString;
+}
 
+void AMDSTcpDataServer::onTenSecondStatsTimerTimeout(){
+	if(tenSecondsStats_.inboundBytes() > tenSecondsStats_.maxInboundBytes())
+		tenSecondsStats_.setMaxInboundBytes(tenSecondsStats_.inboundBytes());
+	if(tenSecondsStats_.outboundBytes() > tenSecondsStats_.maxOutboundBytes())
+		tenSecondsStats_.setMaxOutboundBytes(tenSecondsStats_.outboundBytes());
+	if( (tenSecondsStats_.inboundBytes() + tenSecondsStats_.outboundBytes()) > tenSecondsStats_.maxTotalBytes())
+		tenSecondsStats_.setMaxTotalBytes(tenSecondsStats_.inboundBytes() + tenSecondsStats_.outboundBytes());
+
+	tenSecondsStats_.setInboundBytes(0);
+	tenSecondsStats_.setOutboundBytes(0);
+}

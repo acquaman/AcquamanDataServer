@@ -42,7 +42,7 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest *request, const QDateTi
 	int startIndex = lowerBound(lastFetch);
 
 	if(startIndex == -1)
-		request->setError(QString("Could not locate data for time %1").arg(lastFetch.toString()));
+		request->setErrorMessage(QString("Could not locate data for time %1").arg(lastFetch.toString()));
 	else
 	{
 		// Since the last fetch actually included the data at the given time, we need to increment the index
@@ -61,7 +61,7 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTi
 	int startIndex = lowerBound(startTime);
 
 	if(startIndex == -1)
-		request->setError(QString("Could not locate data for time %1").arg(startTime.toString()));
+		request->setErrorMessage(QString("Could not locate data for time %1").arg(startTime.toString()));
 	else
 	{
 		count = startIndex + count;
@@ -95,9 +95,9 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTi
 	int endIndex = lowerBound(endTime);
 
 	if(startIndex == -1)
-		request->setError(QString("Could not locate data for time %1").arg(startTime.toString()));
+		request->setErrorMessage(QString("Could not locate data for time %1").arg(startTime.toString()));
 	else if(endIndex == -1)
-		request->setError(QString("Could not locate data for time %1").arg(endTime.toString()));
+		request->setErrorMessage(QString("Could not locate data for time %1").arg(endTime.toString()));
 	else
 	{
 		for (int iCurrent = startIndex; iCurrent < endIndex; iCurrent++)
@@ -112,7 +112,7 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTi
 {
 	int middleIndex = lowerBound(middleTime);
 	if(middleIndex == -1)
-		request->setError(QString("Could not locate data for time %1").arg(middleTime.toString()));
+		request->setErrorMessage(QString("Could not locate data for time %1").arg(middleTime.toString()));
 	else
 	{
 		int startIndex = middleIndex - countBefore;

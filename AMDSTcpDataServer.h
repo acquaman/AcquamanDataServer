@@ -12,7 +12,9 @@
 #include <QNetworkConfigurationManager>
 #include <QSettings>
 
-class AMDSClientDataRequest;
+#include "AMDSClientDataRequest.h"
+
+class QTimer;
 
 /**
  *  A class which handles incoming client connections, and handles requests from them for data
@@ -47,7 +49,7 @@ public slots:
 	/// within data to respond to the request
 	void onDataRequestReady(AMDSClientDataRequest* data);
 
-private slots:
+protected slots:
 	/// Slot which sets the server to be listening. Automatically called from within the start() function, or
 	/// if a session is required, when the session is opened
 	void sessionOpened();
@@ -63,7 +65,12 @@ private slots:
 	/// Slot which handles the timeout which signals a continuous data request needs a new aggregate of data.
 	void onContinuousDataRequestTimer(const QString& clientKey);
 
-private:
+	void onTenMillisecondStatsTimerTimeout();
+	void onHundredMillisecondStatsTimerTimeout();
+	void onOneSecondStatsTimerTimeout();
+	void onTenSecondStatsTimerTimeout();
+
+protected:
 	/// The name of the interface on which the server will attempt to listen
 	QString interfaceName_;
 	/// The port number on which the server will attempt to listen
@@ -91,6 +98,15 @@ private:
 
 	QSignalMapper* continuousDataRequestSignalMapper_;
 
+	QTimer *tenMillisecondStatsTimer_;
+	QTimer *hundredMillisecondStatsTimer_;
+	QTimer *oneSecondStatsTimer_;
+	QTimer *tenSecondStatsTimer_;
+
+	AMDSPacketStats tenMillisecondsStats_;
+	AMDSPacketStats hundredMillisecondsStats_;
+	AMDSPacketStats oneSecondsStats_;
+	AMDSPacketStats tenSecondsStats_;
 };
 
 #endif // AMDSTCPDATASERVER_H

@@ -18,11 +18,13 @@ public:
 
 	void write(const AMDSAxisInfo &axisInfo);
 	void write(const AMDSBufferGroupInfo &bufferGroupInfo);
+	void write(const AMDSPacketStats &packetStat);
 	void write(const AMDSClientDataRequest &clientDataRequest);
 
 	/// If the axis info was not readable, then the passed in reference is left unchanged.
 	void read(AMDSAxisInfo &axisInfo);
 	void read(AMDSBufferGroupInfo &bufferGroupInfo);
+	void read(AMDSPacketStats &packetStat);
 	void read(AMDSClientDataRequest &clientDataRequest);
 };
 

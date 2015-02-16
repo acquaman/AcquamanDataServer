@@ -53,13 +53,20 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 
 void AMDSCentralServer::onDataServerDataRequested(AMDSClientDataRequest *dataRequest){
 	if(dataRequest->requestType() == AMDSClientDataRequest::Introspection){
-		QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroups_.constBegin();
-		while (i != bufferGroups_.constEnd()) {
-			AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
-			qDebug() << i.key() << " is " << oneInfo.name() << oneInfo.description() << oneInfo.units() << oneInfo.size().toString();
-			dataRequest->appendBufferGroupInfo(oneInfo);
-			++i;
+
+		if(dataRequest->bufferName() == "All"){
+			QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroups_.constBegin();
+			while (i != bufferGroups_.constEnd()) {
+				AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
+				qDebug() << i.key() << " is " << oneInfo.name() << oneInfo.description() << oneInfo.units() << oneInfo.size().toString();
+				dataRequest->appendBufferGroupInfo(oneInfo);
+				++i;
+			}
 		}
+		else if(bufferGroups_.contains(dataRequest->bufferName()))
+			dataRequest->appendBufferGroupInfo(bufferGroups_.value(dataRequest->bufferName())->bufferGroupInfo());
+		else
+			dataRequest->setErrorMessage(QString("No buffer named %1, cannot introspect").arg(dataRequest->bufferName()));
 
 		emit dataRequestReady(dataRequest);
 	}
