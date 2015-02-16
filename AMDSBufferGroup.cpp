@@ -58,6 +58,8 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest *request, const QDateTi
 
 void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTime& startTime, int count)
 {
+	qDebug() << "Received request to populate data for start time plus count as " << startTime << count;
+
 	int startIndex = lowerBound(startTime);
 
 	if(startIndex == -1)
@@ -65,9 +67,14 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTi
 	else
 	{
 		count = startIndex + count;
+		request->clearData();
+		request->clearBufferGroupInfos();
+		request->appendBufferGroupInfo(bufferGroupInfo_);
+		qDebug() << "Located data starting at index " << startIndex << " going to index " << count;
 		for (int iCurrent = startIndex, limit = dataHolders_.count(); iCurrent < count && iCurrent < limit; iCurrent++)
 		{
 			AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
+			request->appendData(dataHolder);
 //			request->histogramData()->append(dataHolders_[iCurrent]);
 		}
 	}
@@ -90,7 +97,7 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, int relativeC
 }
 
 void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTime& startTime, const QDateTime& endTime)
-{
+{	
 	int startIndex = lowerBound(startTime);
 	int endIndex = lowerBound(endTime);
 

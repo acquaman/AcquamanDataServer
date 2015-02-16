@@ -7,6 +7,7 @@
 
 #include "AMDSBufferGroupInfo.h"
 
+class AMDSDataHolder;
 
 class AMDSPacketStats
 {
@@ -148,6 +149,7 @@ public:
 
 	inline QList<AMDSBufferGroupInfo> bufferGroupInfos() const { return bufferGroupInfos_; }
 	inline QList<AMDSPacketStats> packetStats() const { return packetStats_; }
+	inline QList<AMDSDataHolder*> data() const { return data_; }
 
 	/// The last error message encountered attempting to fullfil the data request.
 	inline QString lastError() const { return errorMessage_; }
@@ -177,6 +179,9 @@ public:
 	inline void appendPacketStats(AMDSPacketStats packetStat) { packetStats_.append(packetStat); }
 	inline void clearPacketStats() { packetStats_.clear(); }
 
+	inline void appendData(AMDSDataHolder *dataHolder) { data_.append(dataHolder); }
+	inline void clearData() { data_.clear(); }
+
 signals:
 	void sendNewContinuousDataRequest();
 
@@ -198,6 +203,7 @@ protected:
 
 	QList<AMDSBufferGroupInfo> bufferGroupInfos_;
 	QList<AMDSPacketStats> packetStats_;
+	QList<AMDSDataHolder*> data_;
 };
 
 void AMDSClientDataRequest::setErrorMessage(const QString &errorMessage)

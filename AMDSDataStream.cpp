@@ -137,6 +137,8 @@ void AMDSDataStream::read(AMDSPacketStats &packetStat){
 	packetStat.setMaxTotalBytes(maxTotalBytes);
 }
 
+#include "AMDSScalarDataHolder.h"
+
 void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 	QString socketKey;
 	QString errorMessage;
@@ -150,6 +152,9 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 	QString bufferName;
 	QList<AMDSBufferGroupInfo> bufferGroupInfos;
 	QList<AMDSPacketStats> packetStats;
+	QList<AMDSDataHolder*> data;
+	quint16 dataCount;
+	QVector<double> totalVector;
 
 	*this >> socketKey;
 	if(status() != QDataStream::Ok)
@@ -185,8 +190,34 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 	switch(requestType){
 	case AMDSClientDataRequest::Continuous:
 		break;
-	case AMDSClientDataRequest::StartTimePlusCount:
-		break;
+	case AMDSClientDataRequest::StartTimePlusCount:{
+
+		quint16 bufferGroupCount;
+
+		QDataStream::operator >>(bufferGroupCount);
+		if(status() != QDataStream::Ok)
+			return;
+		for(int x = 0, size = bufferGroupCount; x < size; x++){
+			AMDSBufferGroupInfo oneBufferGroupInfo("Invalid");
+			read(oneBufferGroupInfo);
+			if(oneBufferGroupInfo.name() == "Invalid")
+				return;
+			bufferGroupInfos.append(oneBufferGroupInfo);
+		}
+
+		if(bufferGroupInfos.count() > 0){
+			QDataStream::operator >>(dataCount);
+			if(status() != QDataStream::Ok)
+				return;
+
+			quint64 totalSize = bufferGroupInfos.at(0).spanSize()*dataCount;
+			totalVector = QVector<double>(totalSize);
+			for(quint16 x = 0; x < totalSize; x++)
+				QDataStream::operator >>(totalVector[x]);
+
+		}
+
+		break;}
 	case AMDSClientDataRequest::RelativeCountPlusCount:
 		break;
 	case AMDSClientDataRequest::StartTimeToEndTime:
@@ -239,8 +270,25 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 	switch(requestType){
 	case AMDSClientDataRequest::Continuous:
 		break;
-	case AMDSClientDataRequest::StartTimePlusCount:
-		break;
+	case AMDSClientDataRequest::StartTimePlusCount:{
+		qDebug() << "Going to fill the actual data in star time plus count";
+
+		for(int x = 0, size = bufferGroupInfos.count(); x < size; x++)
+			clientDataRequest.appendBufferGroupInfo(bufferGroupInfos.at(x));
+
+		int totalCounter = 0;
+		clientDataRequest.clearData();
+		for(quint16 x = 0; x < dataCount; x++){
+			AMDSScalarDataHolder *oneScalerDataHolder = new AMDSScalarDataHolder();
+			oneScalerDataHolder->setSingleValue(totalVector.at(totalCounter++));
+
+			clientDataRequest.appendData(oneScalerDataHolder);
+			double oneStoredValue;
+			oneScalerDataHolder->data(&oneStoredValue);
+			qDebug() << "One value was " << oneStoredValue;
+		}
+
+		break;}
 	case AMDSClientDataRequest::RelativeCountPlusCount:
 		break;
 	case AMDSClientDataRequest::StartTimeToEndTime:
@@ -310,6 +358,24 @@ void AMDSDataStream::write(const AMDSClientDataRequest &clientDataRequest){
 	case AMDSClientDataRequest::Continuous:
 		break;
 	case AMDSClientDataRequest::StartTimePlusCount:
+		qDebug() << "Processing a start time plus count CDR with data count " << clientDataRequest.data().count() << " and BGI count " << clientDataRequest.bufferGroupInfos().count();
+
+		QDataStream::operator <<((quint16)(clientDataRequest.bufferGroupInfos().count()));
+		if( (clientDataRequest.data().count() > 0) && (clientDataRequest.data().at(0)->axesStyle() == AMDSDataHolder::UniformAxes) && (clientDataRequest.bufferGroupInfos().count() > 0) ){
+			write(clientDataRequest.bufferGroupInfos().at(0));
+
+			qDebug() << "We have uniform axes, so the total count should be the count " << clientDataRequest.data().count();
+			qDebug() << " multiplied by the spanSize " << clientDataRequest.bufferGroupInfos().at(0).spanSize();
+
+			QDataStream::operator <<((quint16)(clientDataRequest.data().count()));
+			for(int x = 0, xSize = clientDataRequest.data().count(); x < xSize; x++){
+				QVector<double> oneClientDataRequestVector = QVector<double>(clientDataRequest.bufferGroupInfos().at(0).spanSize());
+				clientDataRequest.data().at(x)->data(oneClientDataRequestVector.data());
+				for(int y = 0, ySize = clientDataRequest.bufferGroupInfos().at(0).spanSize(); y < ySize; y++)
+					QDataStream::operator <<(oneClientDataRequestVector[y]);
+			}
+		}
+
 		break;
 	case AMDSClientDataRequest::RelativeCountPlusCount:
 		break;

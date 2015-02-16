@@ -136,6 +136,8 @@ void AMDSTcpDataServer::stop()
 
 void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequest *data)
 {
+	qDebug() << "Trying to process in onDataRequestReady";
+
 	QTcpSocket* requestingSocket = clientSockets_.value(data->socketKey(), 0);
 	if(requestingSocket != 0)
 	{
@@ -172,6 +174,15 @@ void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequest *data)
 		hundredMillisecondsStats_.setOutboundBytes(hundredMillisecondsStats_.outboundBytes()+outboundBytes);
 		oneSecondsStats_.setOutboundBytes(oneSecondsStats_.outboundBytes()+outboundBytes);
 		tenSecondsStats_.setOutboundBytes(tenSecondsStats_.outboundBytes()+outboundBytes);
+
+		if(data->requestType() == AMDSClientDataRequest::StartTimePlusCount){
+			qDebug() << "Sending out a start time plus count with data count " << data->data().count();
+			QVector<double> values = QVector<double>(data->data().count());
+			for(int x = 0, size = data->data().count(); x < size; x++){
+				data->data().at(x)->data(values.data()+x);
+				qDebug() << "Data point at " << x << values.at(x);
+			}
+		}
 
 		if(data->requestType() == AMDSClientDataRequest::Continuous && data->responseType() != AMDSClientDataRequest::Error)
 		{
@@ -416,6 +427,9 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	}
 	else if(requestType == AMDSClientDataRequest::StartTimePlusCount){
 		qDebug() << "Request for startTimePlusCount on " << bufferName;
+
+		AMDSClientDataRequest *startTimePlusCountRequest = new AMDSClientDataRequest(clientDataRequest.time1(), clientDataRequest.count1(), clientDataRequest.includeStatusData(), clientDataRequest.responseType(), clientKey, clientDataRequest.bufferName());
+		emit requestData(startTimePlusCountRequest);
 
 	}
 	else if(requestType == AMDSClientDataRequest::Statistics){

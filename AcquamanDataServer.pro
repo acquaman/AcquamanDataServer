@@ -34,7 +34,8 @@ HEADERS *= \
     AMDSDataStream.h \
     AMDSEventData.h \
     AMDSBufferGroupInfo.h \
-    AMDSDataHolder.h
+    AMDSDataHolder.h \
+    AMDSScalarDataHolder.h
 
 SOURCES *= main.cpp \
 	AMDSTcpDataServer.cpp \
@@ -48,4 +49,5 @@ SOURCES *= main.cpp \
     AMDSDataStream.cpp \
     AMDSEventData.cpp \
     AMDSBufferGroupInfo.cpp \
-    AMDSDataHolder.cpp
+    AMDSDataHolder.cpp \
+    AMDSScalarDataHolder.cpp
