@@ -1,51 +1,20 @@
-#ifndef AMDSCLIENTDATAREQUEST_H
-#define AMDSCLIENTDATAREQUEST_H
+#ifndef AMDSClientDataRequestV1_H
+#define AMDSClientDataRequestV1_H
 
 #include <QString>
 #include <QTimer>
 #include <QTime>
 
 #include "AMDSBufferGroupInfo.h"
+#include "AMDSPacketStats.h"
 
 class AMDSDataHolder;
-
-class AMDSPacketStats
-{
-public:
-	AMDSPacketStats(const QString &name = QString(), quint64 inboundBytes = 0, quint64 outboundBytes = 0, quint64 maxInboundBytes = 0, quint64 maxOutboundBytes = 0, quint64 maxTotalBytes = 0);
-
-	inline QString name() const { return name_; }
-
-	inline quint64 inboundBytes() const { return inboundBytes_; }
-	inline quint64 outboundBytes() const { return outboundBytes_; }
-	inline quint64 maxInboundBytes() const { return maxInboundBytes_; }
-	inline quint64 maxOutboundBytes() const { return maxOutboundBytes_; }
-	inline quint64 maxTotalBytes() const { return maxTotalBytes_; }
-
-	inline void setName(const QString &name) { name_ = name; }
-
-	inline void setInboundBytes(quint64 inboundBytes) { inboundBytes_ = inboundBytes; }
-	inline void setOutboundBytes(quint64 outboundBytes) { outboundBytes_ = outboundBytes; }
-	inline void setMaxInboundBytes(quint64 maxInboundBytes) { maxInboundBytes_ = maxInboundBytes; }
-	inline void setMaxOutboundBytes(quint64 maxOutboundBytes) { maxOutboundBytes_ = maxOutboundBytes; }
-	inline void setMaxTotalBytes(quint64 maxTotalBytes) { maxTotalBytes_ = maxTotalBytes; }
-
-	inline QString allStats() const { return QString("%1 %2 %3 %4 %5").arg(inboundBytes_).arg(outboundBytes_).arg(maxInboundBytes_).arg(maxOutboundBytes_).arg(maxTotalBytes_); }
-
-protected:
-	QString name_;
-	quint64 inboundBytes_;
-	quint64 outboundBytes_;
-	quint64 maxInboundBytes_;
-	quint64 maxOutboundBytes_;
-	quint64 maxTotalBytes_;
-};
 
 /**
   * Class representing a single request for data. Includes information regarding the nature of the request, an
   * identifier for the client socket through which the request was made, as well as a store to put the data in.
   */
-class AMDSClientDataRequest : public QObject
+class AMDSClientDataRequestV1 : public QObject
 {
 	Q_OBJECT
 public:
@@ -69,12 +38,12 @@ public:
 		Json = 2
 	};
 
-	/// Default constructor. Should never really be called. Is needed only because passing a AMDSClientDataRequest across
+	/// Default constructor. Should never really be called. Is needed only because passing a AMDSClientDataRequestV1 across
 	/// thread boundaries requires qRegisterMetaType, which in turn requires a default constructor
-	explicit AMDSClientDataRequest(QObject* parent = 0);
+	explicit AMDSClientDataRequestV1(QObject* parent = 0);
 
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(const QDateTime& startTime,
+	explicit AMDSClientDataRequestV1(const QDateTime& startTime,
 				   quint64 count,
 				   bool includeStatusData,
 				   ResponseType responseType,
@@ -82,7 +51,7 @@ public:
 				   const QString &bufferName,
 				   QObject *parent = 0);
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(int relativeCount,
+	explicit AMDSClientDataRequestV1(int relativeCount,
 				   quint64 count,
 				   bool includeStatusData,
 				   ResponseType responseType,
@@ -91,7 +60,7 @@ public:
 				   QObject *parent = 0);
 
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(const QDateTime& startTime,
+	explicit AMDSClientDataRequestV1(const QDateTime& startTime,
 				   const QDateTime& endTime,
 				   bool includeStatusData,
 				   ResponseType responseType,
@@ -100,7 +69,7 @@ public:
 				   QObject* parent = 0);
 
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(const QDateTime& middleTime,
+	explicit AMDSClientDataRequestV1(const QDateTime& middleTime,
 				   quint64 countBefore,
 				   quint64 countAfter,
 				   bool includeStatusData,
@@ -110,28 +79,28 @@ public:
 				   QObject* parent = 0);
 
 	/// Constructs a data request using the provided arguments
-	explicit AMDSClientDataRequest(const QDateTime& lastFetch,
+	explicit AMDSClientDataRequestV1(const QDateTime& lastFetch,
 				   bool includeStatusData,
 				   ResponseType responseType,
 				   const QString& socketKey,
 				   const QString &bufferName,
 				   QObject* parent = 0);
 
-	explicit AMDSClientDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, QObject *parent = 0);
+	explicit AMDSClientDataRequestV1(ResponseType responseType, const QString &socketKey, const QString &bufferName, QObject *parent = 0);
 
-	explicit AMDSClientDataRequest(ResponseType responseType, const QString &socketKey, QObject *parent = 0);
+	explicit AMDSClientDataRequestV1(ResponseType responseType, const QString &socketKey, QObject *parent = 0);
 
 	/// Copy constructor
-	AMDSClientDataRequest(const AMDSClientDataRequest& other);
+	AMDSClientDataRequestV1(const AMDSClientDataRequestV1& other);
 
 
 	/// A key used to identify the client socket on which the request was made
 	inline QString socketKey() const { return socketKey_; }
 	/// The type of request. This is set by the constructor, depending on the arguments passed
-	inline AMDSClientDataRequest::RequestType requestType() const { return requestType_; }
+	inline AMDSClientDataRequestV1::RequestType requestType() const { return requestType_; }
 	/// The response type the client has specified. If an error is encountered, this will be changed
 	/// to Error
-	inline AMDSClientDataRequest::ResponseType responseType() const { return responseType_; }
+	inline AMDSClientDataRequestV1::ResponseType responseType() const { return responseType_; }
 	/// Whether or not the client has requested that the statusData is included in the response
 	inline bool includeStatusData() const { return includeStatusData_; }
 
@@ -157,7 +126,7 @@ public:
 
 
 	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
-	AMDSClientDataRequest& operator=(const AMDSClientDataRequest& other);
+	AMDSClientDataRequestV1& operator=(const AMDSClientDataRequestV1& other);
 	void startContinuousRequestTimer(int msecs);
 
 
@@ -206,10 +175,10 @@ protected:
 	QList<AMDSDataHolder*> data_;
 };
 
-void AMDSClientDataRequest::setErrorMessage(const QString &errorMessage)
+void AMDSClientDataRequestV1::setErrorMessage(const QString &errorMessage)
 {
-	responseType_ = AMDSClientDataRequest::Error;
+	responseType_ = AMDSClientDataRequestV1::Error;
 	errorMessage_ = errorMessage;
 }
 
-#endif // AMDSCLIENTDATAREQUEST_H
+#endif // AMDSClientDataRequestV1_H

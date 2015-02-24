@@ -12,7 +12,7 @@
 #include <QNetworkConfigurationManager>
 #include <QSettings>
 
-#include "AMDSClientDataRequest.h"
+#include "AMDSClientDataRequestV1.h"
 
 class QTimer;
 
@@ -31,7 +31,7 @@ public:
 
 signals:
 	void requestInfo();
-	void requestData(AMDSClientDataRequest*);
+	void requestData(AMDSClientDataRequestV1*);
 
 public slots:
 	/// Outputs to console a list of the currently connected clients' IP and ports. If no clients are connected
@@ -47,7 +47,7 @@ public slots:
 	void stop();
 	/// Slot which handles a data request being passed back as ready. Uses the information contained
 	/// within data to respond to the request
-	void onDataRequestReady(AMDSClientDataRequest* data);
+	void onDataRequestReady(AMDSClientDataRequestV1* data);
 
 protected slots:
 	/// Slot which sets the server to be listening. Automatically called from within the start() function, or

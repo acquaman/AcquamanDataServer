@@ -6,7 +6,7 @@
 #include "AMDSThreadedBufferGroup.h"
 #include "AMDSBufferGroup.h"
 #include "AMDSBufferGroupInfo.h"
-#include "AMDSClientDataRequest.h"
+#include "AMDSClientDataRequestV1.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
@@ -39,15 +39,15 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	simpleCounter_ = 0;
 	fiftyMillisecondTimer_ = new QTimer(this);
 
-	connect(dataServer_->server(), SIGNAL(requestData(AMDSClientDataRequest*)), this, SLOT(onDataServerDataRequested(AMDSClientDataRequest*)));
-	connect(this, SIGNAL(dataRequestReady(AMDSClientDataRequest*)), dataServer_->server(), SLOT(onDataRequestReady(AMDSClientDataRequest*)));
+	connect(dataServer_->server(), SIGNAL(requestData(AMDSClientDataRequestV1*)), this, SLOT(onDataServerDataRequested(AMDSClientDataRequestV1*)));
+	connect(this, SIGNAL(dataRequestReady(AMDSClientDataRequestV1*)), dataServer_->server(), SLOT(onDataRequestReady(AMDSClientDataRequestV1*)));
 
 	connect(fiftyMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onFiftyMillisecondTimerUpdate()));
 	fiftyMillisecondTimer_->start(50);
 }
 
-void AMDSCentralServer::onDataServerDataRequested(AMDSClientDataRequest *dataRequest){
-	if(dataRequest->requestType() == AMDSClientDataRequest::Introspection){
+void AMDSCentralServer::onDataServerDataRequested(AMDSClientDataRequestV1 *dataRequest){
+	if(dataRequest->requestType() == AMDSClientDataRequestV1::Introspection){
 
 		if(dataRequest->bufferName() == "All"){
 			QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroups_.constBegin();
@@ -65,10 +65,10 @@ void AMDSCentralServer::onDataServerDataRequested(AMDSClientDataRequest *dataReq
 
 		emit dataRequestReady(dataRequest);
 	}
-	else if(dataRequest->requestType() == AMDSClientDataRequest::StartTimePlusCount){
+	else if(dataRequest->requestType() == AMDSClientDataRequestV1::StartTimePlusCount){
 		qDebug() << "Got the start time plus count request on " << dataRequest->bufferName();
 		if(dataRequest->bufferName() == "Energy"){
-			connect(energyBufferGroup_, SIGNAL(dataRequestReady(AMDSClientDataRequest*)), dataServer_->server(), SLOT(onDataRequestReady(AMDSClientDataRequest*)));
+			connect(energyBufferGroup_, SIGNAL(dataRequestReady(AMDSClientDataRequestV1*)), dataServer_->server(), SLOT(onDataRequestReady(AMDSClientDataRequestV1*)));
 			energyBufferGroup_->requestData(dataRequest);
 		}
 	}

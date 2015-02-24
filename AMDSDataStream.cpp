@@ -139,7 +139,7 @@ void AMDSDataStream::read(AMDSPacketStats &packetStat){
 
 #include "AMDSScalarDataHolder.h"
 
-void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
+void AMDSDataStream::read(AMDSClientDataRequestV1 &clientDataRequest){
 	QString socketKey;
 	QString errorMessage;
 	quint8 requestType;
@@ -188,9 +188,9 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 		return;
 
 	switch(requestType){
-	case AMDSClientDataRequest::Continuous:
+	case AMDSClientDataRequestV1::Continuous:
 		break;
-	case AMDSClientDataRequest::StartTimePlusCount:{
+	case AMDSClientDataRequestV1::StartTimePlusCount:{
 
 		quint16 bufferGroupCount;
 
@@ -218,13 +218,13 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 		}
 
 		break;}
-	case AMDSClientDataRequest::RelativeCountPlusCount:
+	case AMDSClientDataRequestV1::RelativeCountPlusCount:
 		break;
-	case AMDSClientDataRequest::StartTimeToEndTime:
+	case AMDSClientDataRequestV1::StartTimeToEndTime:
 		break;
-	case AMDSClientDataRequest::MiddleTimePlusCountBeforeAndAfter:
+	case AMDSClientDataRequestV1::MiddleTimePlusCountBeforeAndAfter:
 		break;
-	case AMDSClientDataRequest::Introspection:{
+	case AMDSClientDataRequestV1::Introspection:{
 		quint16 bufferGroupCount;
 
 		QDataStream::operator >>(bufferGroupCount);
@@ -238,7 +238,7 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 			bufferGroupInfos.append(oneBufferGroupInfo);
 		}
 		break;}
-	case AMDSClientDataRequest::Statistics:{
+	case AMDSClientDataRequestV1::Statistics:{
 		quint16 packetStatsCount;
 
 		QDataStream::operator >>(packetStatsCount);
@@ -258,8 +258,8 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 
 	clientDataRequest.setSocketKey(socketKey);
 	clientDataRequest.setErrorMessage(errorMessage);
-	clientDataRequest.setRequestType((AMDSClientDataRequest::RequestType)requestType);
-	clientDataRequest.setResponseType((AMDSClientDataRequest::ResponseType)responseType);
+	clientDataRequest.setRequestType((AMDSClientDataRequestV1::RequestType)requestType);
+	clientDataRequest.setResponseType((AMDSClientDataRequestV1::ResponseType)responseType);
 	clientDataRequest.setIncludeStatusData(includeStatusData);
 	clientDataRequest.setTime1(time1);
 	clientDataRequest.setTime2(time2);
@@ -268,9 +268,9 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 	clientDataRequest.setBufferName(bufferName);
 
 	switch(requestType){
-	case AMDSClientDataRequest::Continuous:
+	case AMDSClientDataRequestV1::Continuous:
 		break;
-	case AMDSClientDataRequest::StartTimePlusCount:{
+	case AMDSClientDataRequestV1::StartTimePlusCount:{
 		qDebug() << "Going to fill the actual data in star time plus count";
 
 		for(int x = 0, size = bufferGroupInfos.count(); x < size; x++)
@@ -289,18 +289,18 @@ void AMDSDataStream::read(AMDSClientDataRequest &clientDataRequest){
 		}
 
 		break;}
-	case AMDSClientDataRequest::RelativeCountPlusCount:
+	case AMDSClientDataRequestV1::RelativeCountPlusCount:
 		break;
-	case AMDSClientDataRequest::StartTimeToEndTime:
+	case AMDSClientDataRequestV1::StartTimeToEndTime:
 		break;
-	case AMDSClientDataRequest::MiddleTimePlusCountBeforeAndAfter:
+	case AMDSClientDataRequestV1::MiddleTimePlusCountBeforeAndAfter:
 		break;
-	case AMDSClientDataRequest::Introspection:{
+	case AMDSClientDataRequestV1::Introspection:{
 		for(int x = 0, size = bufferGroupInfos.count(); x < size; x++)
 			clientDataRequest.appendBufferGroupInfo(bufferGroupInfos.at(x));
 
 		break;}
-	case AMDSClientDataRequest::Statistics:{
+	case AMDSClientDataRequestV1::Statistics:{
 		for(int x = 0, size = packetStats.count(); x < size; x++)
 			clientDataRequest.appendPacketStats(packetStats.at(x));
 		break;}
@@ -342,7 +342,7 @@ void AMDSDataStream::write(const AMDSPacketStats &packetStat){
 	QDataStream::operator <<((quint64)(packetStat.maxTotalBytes()));
 }
 
-void AMDSDataStream::write(const AMDSClientDataRequest &clientDataRequest){
+void AMDSDataStream::write(const AMDSClientDataRequestV1 &clientDataRequest){
 	*this << clientDataRequest.socketKey();
 	*this << clientDataRequest.lastError();
 	QDataStream::operator <<((quint8)(clientDataRequest.requestType()));
@@ -355,9 +355,9 @@ void AMDSDataStream::write(const AMDSClientDataRequest &clientDataRequest){
 	*this << clientDataRequest.bufferName();
 
 	switch(clientDataRequest.requestType()){
-	case AMDSClientDataRequest::Continuous:
+	case AMDSClientDataRequestV1::Continuous:
 		break;
-	case AMDSClientDataRequest::StartTimePlusCount:
+	case AMDSClientDataRequestV1::StartTimePlusCount:
 		qDebug() << "Processing a start time plus count CDR with data count " << clientDataRequest.data().count() << " and BGI count " << clientDataRequest.bufferGroupInfos().count();
 
 		QDataStream::operator <<((quint16)(clientDataRequest.bufferGroupInfos().count()));
@@ -377,18 +377,18 @@ void AMDSDataStream::write(const AMDSClientDataRequest &clientDataRequest){
 		}
 
 		break;
-	case AMDSClientDataRequest::RelativeCountPlusCount:
+	case AMDSClientDataRequestV1::RelativeCountPlusCount:
 		break;
-	case AMDSClientDataRequest::StartTimeToEndTime:
+	case AMDSClientDataRequestV1::StartTimeToEndTime:
 		break;
-	case AMDSClientDataRequest::MiddleTimePlusCountBeforeAndAfter:
+	case AMDSClientDataRequestV1::MiddleTimePlusCountBeforeAndAfter:
 		break;
-	case AMDSClientDataRequest::Introspection:
+	case AMDSClientDataRequestV1::Introspection:
 		QDataStream::operator <<((quint16)(clientDataRequest.bufferGroupInfos().count()));
 		for(int x = 0, size = clientDataRequest.bufferGroupInfos().count(); x < size; x++)
 			write(clientDataRequest.bufferGroupInfos().at(x));
 		break;
-	case AMDSClientDataRequest::Statistics:
+	case AMDSClientDataRequestV1::Statistics:
 		QDataStream::operator <<((quint16)(clientDataRequest.packetStats().count()));
 		for(int x = 0, size = clientDataRequest.packetStats().count(); x < size; x++)
 			write(clientDataRequest.packetStats().at(x));
@@ -396,4 +396,60 @@ void AMDSDataStream::write(const AMDSClientDataRequest &clientDataRequest){
 	default:
 		break;
 	}
+}
+
+void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequest){
+	QDataStream::operator <<((quint8)clientRequest.requestType());
+}
+
+void AMDSDataStream::write(const AMDSClientRequest &clientRequest){
+	qDebug() << "In write for an AMDSClientRequest";
+	qDebug() << "Actual type is " << clientRequest.metaObject()->className();
+
+	qDebug() << "About to call writeToStream";
+	clientRequest.writeToDataStream(this);
+}
+
+AMDSClientRequest* AMDSDataStream::decodeAndInstantiateClientRequestType(){
+	quint8 clientRequestTypeAsInt;
+	QDataStream::operator >>(clientRequestTypeAsInt);
+	if(status() != QDataStream::Ok)
+		return 0;
+
+	AMDSClientRequest::RequestType clientRequestType = (AMDSClientRequest::RequestType)clientRequestTypeAsInt;
+	AMDSClientRequest *clientRequest = 0;
+	switch(clientRequestType){
+	case AMDSClientRequest::Introspection:
+		clientRequest = new AMDSClientIntrospectionRequest();
+		break;
+	case AMDSClientRequest::Statistics:
+		clientRequest = new AMDSClientStatisticsRequest();
+		break;
+	case AMDSClientRequest::StartTimePlusCount:
+		clientRequest = new AMDSClientStartTimePlusCountDataRequest();
+		break;
+	case AMDSClientRequest::RelativeCountPlusCount:
+		break;
+	case AMDSClientRequest::StartTimeToEndTime:
+		break;
+	case AMDSClientRequest::MiddleTimePlusCountBeforeAndAfter:
+		break;
+	case AMDSClientRequest::Continuous:
+		clientRequest = new AMDSClientContinuousDataRequest();
+		break;
+	case AMDSClientRequest::InvalidRequest:
+		break;
+	default:
+		break;
+	}
+
+	return clientRequest;
+}
+
+void AMDSDataStream::read(AMDSClientRequest &clientRequest){
+	qDebug() << "In read for AMDSClientRequest";
+	qDebug() << "Actual type is " << clientRequest.metaObject()->className();
+
+	qDebug() << "About to call readFromStream";
+	clientRequest.readFromDataStream(this);
 }

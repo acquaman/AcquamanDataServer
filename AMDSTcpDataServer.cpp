@@ -134,7 +134,7 @@ void AMDSTcpDataServer::stop()
 }
 
 
-void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequest *data)
+void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequestV1 *data)
 {
 	qDebug() << "Trying to process in onDataRequestReady";
 
@@ -150,9 +150,9 @@ void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequest *data)
 //		output << (quint8)data->requestType();
 
 		QString outputString;
-		if(data->responseType() == AMDSClientDataRequest::Error)
+		if(data->responseType() == AMDSClientDataRequestV1::Error)
 			outputString = data->lastError();
-//		else if(data->requestType() == AMDSClientDataRequest::Introspection){
+//		else if(data->requestType() == AMDSClientDataRequestV1::Introspection){
 //			qDebug() << "Introspection request";
 //			//output.write(data->bufferGroupInfos().at(0).axes().at(0));
 //			output << (quint16)data->bufferGroupInfos().count();
@@ -169,13 +169,17 @@ void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequest *data)
 		output << (quint32)(block.size() - sizeof(quint32));
 		requestingSocket->write(block);
 
+		qDebug() << "About to try a new AMDSClientRequest";
+		AMDSClientRequest *introspectionRequest = new AMDSClientIntrospectionRequest();
+		output.write(*introspectionRequest);
+
 		qint64 outboundBytes = block.size();
 		tenMillisecondsStats_.setOutboundBytes(tenMillisecondsStats_.outboundBytes()+outboundBytes);
 		hundredMillisecondsStats_.setOutboundBytes(hundredMillisecondsStats_.outboundBytes()+outboundBytes);
 		oneSecondsStats_.setOutboundBytes(oneSecondsStats_.outboundBytes()+outboundBytes);
 		tenSecondsStats_.setOutboundBytes(tenSecondsStats_.outboundBytes()+outboundBytes);
 
-		if(data->requestType() == AMDSClientDataRequest::StartTimePlusCount){
+		if(data->requestType() == AMDSClientDataRequestV1::StartTimePlusCount){
 			qDebug() << "Sending out a start time plus count with data count " << data->data().count();
 			QVector<double> values = QVector<double>(data->data().count());
 			for(int x = 0, size = data->data().count(); x < size; x++){
@@ -184,7 +188,7 @@ void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequest *data)
 			}
 		}
 
-		if(data->requestType() == AMDSClientDataRequest::Continuous && data->responseType() != AMDSClientDataRequest::Error)
+		if(data->requestType() == AMDSClientDataRequestV1::Continuous && data->responseType() != AMDSClientDataRequestV1::Error)
 		{
 //			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
 //			data->histogramData()->clear();
@@ -384,9 +388,22 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	oneSecondsStats_.setInboundBytes(oneSecondsStats_.inboundBytes()+inboundBytes);
 	tenSecondsStats_.setInboundBytes(tenSecondsStats_.inboundBytes()+inboundBytes);
 
-	AMDSClientDataRequest clientDataRequest;
+	AMDSClientDataRequestV1 clientDataRequest;
 	qDebug() << "About to read the CDR from stream";
 	incoming.read(clientDataRequest);
+
+//	quint8 incomingRequestTypeAsInt;
+//	incoming >> incomingRequestTypeAsInt;
+//	AMDSClientRequest *clientRequest;
+//	AMDSClientRequest::RequestType incomingRequestType = (AMDSClientRequest::RequestType)incomingRequestTypeAsInt;
+//	switch(incomingRequestType){
+//	case AMDSClientRequest::Introspection:
+//		clientRequest = new AMDSClientIntrospectionRequest();
+//		break;
+//	}
+	qDebug() << "About to call polymorphic read";
+	AMDSClientRequest *clientRequest = incoming.decodeAndInstantiateClientRequestType();
+	incoming.read(*clientRequest);
 
 	// Process request
 	quint8 requestType;  // see enum ClientDataRequest::RequestType for code
@@ -413,30 +430,30 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	int count1;
 	int count2;
 
-	AMDSClientDataRequest::ResponseType responseRequestType;
-	responseRequestType = (AMDSClientDataRequest::ResponseType)responseTypeId;
+	AMDSClientDataRequestV1::ResponseType responseRequestType;
+	responseRequestType = (AMDSClientDataRequestV1::ResponseType)responseTypeId;
 
-	if(requestType == AMDSClientDataRequest::Introspection){
+	if(requestType == AMDSClientDataRequestV1::Introspection){
 		qDebug() << "Request for introspection";
 
-		AMDSClientDataRequest *introspectionRequest = new AMDSClientDataRequest(responseRequestType, clientKey, bufferName);
+		AMDSClientDataRequestV1 *introspectionRequest = new AMDSClientDataRequestV1(responseRequestType, clientKey, bufferName);
 		emit requestData(introspectionRequest);
 	}
-	else if(requestType == AMDSClientDataRequest::Continuous){
+	else if(requestType == AMDSClientDataRequestV1::Continuous){
 		qDebug() << "Request for continuous on " << bufferName;
 	}
-	else if(requestType == AMDSClientDataRequest::StartTimePlusCount){
+	else if(requestType == AMDSClientDataRequestV1::StartTimePlusCount){
 		qDebug() << "Request for startTimePlusCount on " << bufferName;
 
-		AMDSClientDataRequest *startTimePlusCountRequest = new AMDSClientDataRequest(clientDataRequest.time1(), clientDataRequest.count1(), clientDataRequest.includeStatusData(), clientDataRequest.responseType(), clientKey, clientDataRequest.bufferName());
+		AMDSClientDataRequestV1 *startTimePlusCountRequest = new AMDSClientDataRequestV1(clientDataRequest.time1(), clientDataRequest.count1(), clientDataRequest.includeStatusData(), clientDataRequest.responseType(), clientKey, clientDataRequest.bufferName());
 		emit requestData(startTimePlusCountRequest);
 
 	}
-	else if(requestType == AMDSClientDataRequest::Statistics){
+	else if(requestType == AMDSClientDataRequestV1::Statistics){
 		qDebug() << "Request for statistics";
 
-		AMDSClientDataRequest *statisticsRequest = new AMDSClientDataRequest(responseRequestType, clientKey);
-		statisticsRequest->setRequestType(AMDSClientDataRequest::Statistics);
+		AMDSClientDataRequestV1 *statisticsRequest = new AMDSClientDataRequestV1(responseRequestType, clientKey);
+		statisticsRequest->setRequestType(AMDSClientDataRequestV1::Statistics);
 		statisticsRequest->appendPacketStats(tenMillisecondsStats_);
 		statisticsRequest->appendPacketStats(hundredMillisecondsStats_);
 		statisticsRequest->appendPacketStats(oneSecondsStats_);

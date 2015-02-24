@@ -17,7 +17,7 @@ AMDSBufferGroupInfo AMDSThreadedBufferGroup::bufferGroupInfo() const{
 	return bufferGroup_->bufferGroupInfo();
 }
 
-void AMDSThreadedBufferGroup::requestData(AMDSClientDataRequest *dataRequest){
+void AMDSThreadedBufferGroup::requestData(AMDSClientDataRequestV1 *dataRequest){
 
 }
 

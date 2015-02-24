@@ -1,19 +1,9 @@
-#include "AMDSClientDataRequest.h"
+#include "AMDSClientDataRequestV1.h"
 
-AMDSPacketStats::AMDSPacketStats(const QString &name, quint64 inboundBytes, quint64 outboundBytes, quint64 maxInboundBytes, quint64 maxOutboundBytes, quint64 maxTotalBytes)
-{
-	name_ = name;
-	inboundBytes_ = inboundBytes;
-	outboundBytes_ = outboundBytes;
-	maxInboundBytes_ = maxInboundBytes;
-	maxOutboundBytes_ = maxOutboundBytes;
-	maxTotalBytes_ = maxTotalBytes;
-}
-
-AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(QObject *parent) :
 	QObject(parent) {}
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& startTime,
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(const QDateTime& startTime,
 					     quint64 count,
 					     bool includeStatusData,
 					     ResponseType responseType,
@@ -32,7 +22,7 @@ AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& startTime,
 	bufferName_ = bufferName;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(int relativeCount,
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(int relativeCount,
 					     quint64 count,
 					     bool includeStatusData,
 					     ResponseType responseType,
@@ -51,7 +41,7 @@ AMDSClientDataRequest::AMDSClientDataRequest(int relativeCount,
 	bufferName_ = bufferName;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& startTime,
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(const QDateTime& startTime,
 					     const QDateTime& endTime,
 					     bool includeStatusData,
 					     ResponseType responseType,
@@ -70,7 +60,7 @@ AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& startTime,
 	bufferName_ = bufferName;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& middleTime,
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(const QDateTime& middleTime,
 					     quint64 countBefore,
 					     quint64 countAfter,
 					     bool includeStatusData,
@@ -91,7 +81,7 @@ AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& middleTime,
 	bufferName_ = bufferName;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& lastFetch,
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(const QDateTime& lastFetch,
 					     bool includeStatusData,
 					     ResponseType responseType,
 					     const QString& socketKey,
@@ -109,91 +99,91 @@ AMDSClientDataRequest::AMDSClientDataRequest(const QDateTime& lastFetch,
 	connect(&continuousDataRequestTimer_, SIGNAL(timeout()), this, SIGNAL(sendNewContinuousDataRequest()));
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, QObject *parent) :
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(ResponseType responseType, const QString &socketKey, const QString &bufferName, QObject *parent) :
 	QObject(parent)
 {
 	responseType_ = responseType;
 	socketKey_ = socketKey;
-	requestType_ = AMDSClientDataRequest::Introspection;
+	requestType_ = AMDSClientDataRequestV1::Introspection;
 	bufferName_ = bufferName;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(ResponseType responseType, const QString &socketKey, QObject *parent) :
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(ResponseType responseType, const QString &socketKey, QObject *parent) :
 	QObject(parent)
 {
 	responseType_ = responseType;
 	socketKey_ = socketKey;
-	requestType_ = AMDSClientDataRequest::Statistics;
+	requestType_ = AMDSClientDataRequestV1::Statistics;
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const AMDSClientDataRequest& other) :
+AMDSClientDataRequestV1::AMDSClientDataRequestV1(const AMDSClientDataRequestV1& other) :
 	QObject(0)
 {
 	(*this) = other;
 }
 
-//QString AMDSClientDataRequest::socketKey() const
+//QString AMDSClientDataRequestV1::socketKey() const
 //{
 //	return socketKey_;
 //}
 
-//AMDSClientDataRequest::RequestType AMDSClientDataRequest::requestType() const
+//AMDSClientDataRequestV1::RequestType AMDSClientDataRequestV1::requestType() const
 //{
 //	return requestType_;
 //}
 
-//AMDSClientDataRequest::ResponseType AMDSClientDataRequest::responseType() const
+//AMDSClientDataRequestV1::ResponseType AMDSClientDataRequestV1::responseType() const
 //{
 //	return responseType_;
 //}
 
-//bool AMDSClientDataRequest::includeStatusData() const
+//bool AMDSClientDataRequestV1::includeStatusData() const
 //{
 //	return includeStatusData_;
 //}
 
-//QDateTime AMDSClientDataRequest::time1() const
+//QDateTime AMDSClientDataRequestV1::time1() const
 //{
 //	return time1_;
 //}
 
-//QDateTime AMDSClientDataRequest::time2() const
+//QDateTime AMDSClientDataRequestV1::time2() const
 //{
 //	return time2_;
 //}
 
-//quint64 AMDSClientDataRequest::count1() const
+//quint64 AMDSClientDataRequestV1::count1() const
 //{
 //	return count1_;
 //}
 
-//quint64 AMDSClientDataRequest::count2() const
+//quint64 AMDSClientDataRequestV1::count2() const
 //{
 //	return count2_;
 //}
 
-//int AMDSClientDataRequest::indexOfAmptek() const
+//int AMDSClientDataRequestV1::indexOfAmptek() const
 //{
 //	return indexOfAmptek_;
 //}
 
-//AmptekSDD123DwellHistogramGroup* AMDSClientDataRequest::histogramData()
+//AmptekSDD123DwellHistogramGroup* AMDSClientDataRequestV1::histogramData()
 //{
 //    return &histogramData_;
 //}
 
-//QList<AMDSBufferGroupInfo> AMDSClientDataRequest::bufferGroupInfos() const{
+//QList<AMDSBufferGroupInfo> AMDSClientDataRequestV1::bufferGroupInfos() const{
 //	return bufferGroupInfos_;
 //}
 
-//void AMDSClientDataRequest::setError(const QString &errorMessage)
+//void AMDSClientDataRequestV1::setError(const QString &errorMessage)
 //{
 //	responseType_ = Error;
 //	errorMessage_ = errorMessage;
 //}
 
 
-AMDSClientDataRequest & AMDSClientDataRequest::operator =(const AMDSClientDataRequest &other)
+AMDSClientDataRequestV1 & AMDSClientDataRequestV1::operator =(const AMDSClientDataRequestV1 &other)
 {
 	socketKey_ = other.socketKey();
 	requestType_ = other.requestType();
@@ -211,37 +201,37 @@ AMDSClientDataRequest & AMDSClientDataRequest::operator =(const AMDSClientDataRe
 	return (*this);
 }
 
-//QString AMDSClientDataRequest::lastError() const
+//QString AMDSClientDataRequestV1::lastError() const
 //{
 //	return errorMessage_;
 //}
 
-void AMDSClientDataRequest::startContinuousRequestTimer(int msecs)
+void AMDSClientDataRequestV1::startContinuousRequestTimer(int msecs)
 {
 	continuousDataRequestTimer_.singleShot(msecs, this, SIGNAL(sendNewContinuousDataRequest()));
 }
 
-//void AMDSClientDataRequest::setTime1(const QDateTime &time)
+//void AMDSClientDataRequestV1::setTime1(const QDateTime &time)
 //{
 //	time1_ = time;
 //}
 
-//void AMDSClientDataRequest::setRequestType(RequestType requestType){
+//void AMDSClientDataRequestV1::setRequestType(RequestType requestType){
 //	requestType_ = requestType;
 //}
 
-//void AMDSClientDataRequest::setResponseType(ResponseType responseType){
+//void AMDSClientDataRequestV1::setResponseType(ResponseType responseType){
 //	responseType_ = responseType;
 //}
 
-//void AMDSClientDataRequest::setBufferGroupInfo(AMDSBufferGroupInfo bufferGroupInfo){
+//void AMDSClientDataRequestV1::setBufferGroupInfo(AMDSBufferGroupInfo bufferGroupInfo){
 //	bufferGroupInfo_ = bufferGroupInfo;
 //}
 
-//void AMDSClientDataRequest::appendBufferGroupInfo(AMDSBufferGroupInfo bufferGroupInfo){
+//void AMDSClientDataRequestV1::appendBufferGroupInfo(AMDSBufferGroupInfo bufferGroupInfo){
 //	bufferGroupInfos_.append(bufferGroupInfo);
 //}
 
-//void AMDSClientDataRequest::clearBufferGroupInfos(){
+//void AMDSClientDataRequestV1::clearBufferGroupInfos(){
 //	bufferGroupInfos_.clear();
 //}

@@ -11,33 +11,33 @@ AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
 {
 }
 
-void AMDSBufferGroup::requestData(AMDSClientDataRequest *request)
+void AMDSBufferGroup::requestData(AMDSClientDataRequestV1 *request)
 {
 	QReadLocker readLock(&lock_);
 	switch(request->requestType()){
-	case AMDSClientDataRequest::Introspection:
+	case AMDSClientDataRequestV1::Introspection:
 		//something here
 		break;
-	case AMDSClientDataRequest::Continuous:
+	case AMDSClientDataRequestV1::Continuous:
 		populateData(request, request->time1());
 		break;
-	case AMDSClientDataRequest::StartTimePlusCount:
+	case AMDSClientDataRequestV1::StartTimePlusCount:
 		populateData(request, request->time1(), request->count1());
 		break;
-	case AMDSClientDataRequest::RelativeCountPlusCount:
+	case AMDSClientDataRequestV1::RelativeCountPlusCount:
 		populateData(request, request->count1(), request->count2());
 		break;
-	case AMDSClientDataRequest::StartTimeToEndTime:
+	case AMDSClientDataRequestV1::StartTimeToEndTime:
 		populateData(request, request->time1(), request->time2());
 		break;
-	case AMDSClientDataRequest::MiddleTimePlusCountBeforeAndAfter:
+	case AMDSClientDataRequestV1::MiddleTimePlusCountBeforeAndAfter:
 		populateData(request, request->time1(), request->count1(), request->count2());
 		break;
 	}
 	emit dataRequestReady(request);
 }
 
-void AMDSBufferGroup::populateData(AMDSClientDataRequest *request, const QDateTime &lastFetch)
+void AMDSBufferGroup::populateData(AMDSClientDataRequestV1 *request, const QDateTime &lastFetch)
 {
 	int startIndex = lowerBound(lastFetch);
 
@@ -56,7 +56,7 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest *request, const QDateTi
 	}
 }
 
-void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTime& startTime, int count)
+void AMDSBufferGroup::populateData(AMDSClientDataRequestV1* request, const QDateTime& startTime, int count)
 {
 	qDebug() << "Received request to populate data for start time plus count as " << startTime << count;
 
@@ -79,7 +79,7 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTi
 		}
 	}
 }
-void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, int relativeCount, int count)
+void AMDSBufferGroup::populateData(AMDSClientDataRequestV1* request, int relativeCount, int count)
 {
 	int startIndex = dataHolders_.count() - 1 - relativeCount - count;
 	int endIndex = dataHolders_.count() - 1 - relativeCount + count;
@@ -96,7 +96,7 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, int relativeC
 	}
 }
 
-void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTime& startTime, const QDateTime& endTime)
+void AMDSBufferGroup::populateData(AMDSClientDataRequestV1* request, const QDateTime& startTime, const QDateTime& endTime)
 {	
 	int startIndex = lowerBound(startTime);
 	int endIndex = lowerBound(endTime);
@@ -115,7 +115,7 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTi
 	}
 }
 
-void AMDSBufferGroup::populateData(AMDSClientDataRequest* request, const QDateTime& middleTime, int countBefore, int countAfter)
+void AMDSBufferGroup::populateData(AMDSClientDataRequestV1* request, const QDateTime& middleTime, int countBefore, int countAfter)
 {
 	int middleIndex = lowerBound(middleTime);
 	if(middleIndex == -1)

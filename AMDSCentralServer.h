@@ -8,7 +8,7 @@ class QTimer;
 
 class AMDSThreadedBufferGroup;
 class AMDSThreadedTcpDataServer;
-class AMDSClientDataRequest;
+class AMDSClientDataRequestV1;
 class AMDSBufferGroup;
 
 class AMDSCentralServer : public QObject
@@ -18,10 +18,10 @@ public:
 	AMDSCentralServer(QObject *parent = 0);
 
 signals:
-	void dataRequestReady(AMDSClientDataRequest *dataRequest);
+	void dataRequestReady(AMDSClientDataRequestV1 *dataRequest);
 
 protected slots:
-	void onDataServerDataRequested(AMDSClientDataRequest *dataRequest);
+	void onDataServerDataRequested(AMDSClientDataRequestV1 *dataRequest);
 
 	void onFiftyMillisecondTimerUpdate();
 
