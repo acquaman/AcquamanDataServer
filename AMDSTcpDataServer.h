@@ -15,6 +15,7 @@
 #include "AMDSClientDataRequestV1.h"
 
 class QTimer;
+class AMDSClientRequest;
 
 /**
  *  A class which handles incoming client connections, and handles requests from them for data
@@ -32,6 +33,7 @@ public:
 signals:
 	void requestInfo();
 	void requestData(AMDSClientDataRequestV1*);
+	void clientRequestRead(AMDSClientRequest*);
 
 public slots:
 	/// Outputs to console a list of the currently connected clients' IP and ports. If no clients are connected
@@ -48,6 +50,8 @@ public slots:
 	/// Slot which handles a data request being passed back as ready. Uses the information contained
 	/// within data to respond to the request
 	void onDataRequestReady(AMDSClientDataRequestV1* data);
+
+	void onClientRequestProcessed(AMDSClientRequest *processedRequest);
 
 protected slots:
 	/// Slot which sets the server to be listening. Automatically called from within the start() function, or

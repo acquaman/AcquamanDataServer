@@ -1,5 +1,7 @@
 #include "AMDSDataStream.h"
 
+#include "ClientRequest/AMDSClientRequestSupport.h"
+
 AMDSDataStream::AMDSDataStream() :
 	QDataStream()
 {
@@ -399,6 +401,7 @@ void AMDSDataStream::write(const AMDSClientDataRequestV1 &clientDataRequest){
 }
 
 void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequest){
+	qDebug() << "About to encode " << (quint8)clientRequest.requestType();
 	QDataStream::operator <<((quint8)clientRequest.requestType());
 }
 
@@ -410,40 +413,24 @@ void AMDSDataStream::write(const AMDSClientRequest &clientRequest){
 	clientRequest.writeToDataStream(this);
 }
 
-AMDSClientRequest* AMDSDataStream::decodeAndInstantiateClientRequestType(){
+AMDSClientRequestDefinitions::RequestType AMDSDataStream::decodeRequestType(){
 	quint8 clientRequestTypeAsInt;
+	qDebug() << "Try to decode";
 	QDataStream::operator >>(clientRequestTypeAsInt);
 	if(status() != QDataStream::Ok)
+		return AMDSClientRequestDefinitions::InvalidRequest;
+
+	AMDSClientRequestDefinitions::RequestType clientRequestType = (AMDSClientRequestDefinitions::RequestType)clientRequestTypeAsInt;
+	qDebug() << "Decoded as " << clientRequestType;
+	return clientRequestType;
+}
+
+AMDSClientRequest* AMDSDataStream::decodeAndInstantiateClientRequestType(){
+	AMDSClientRequestDefinitions::RequestType clientRequestType = decodeRequestType();
+	qDebug() << "Request type decoded as " << clientRequestType;
+	if(clientRequestType >= AMDSClientRequestDefinitions::InvalidRequest)
 		return 0;
-
-	AMDSClientRequest::RequestType clientRequestType = (AMDSClientRequest::RequestType)clientRequestTypeAsInt;
-	AMDSClientRequest *clientRequest = 0;
-	switch(clientRequestType){
-	case AMDSClientRequest::Introspection:
-		clientRequest = new AMDSClientIntrospectionRequest();
-		break;
-	case AMDSClientRequest::Statistics:
-		clientRequest = new AMDSClientStatisticsRequest();
-		break;
-	case AMDSClientRequest::StartTimePlusCount:
-		clientRequest = new AMDSClientStartTimePlusCountDataRequest();
-		break;
-	case AMDSClientRequest::RelativeCountPlusCount:
-		break;
-	case AMDSClientRequest::StartTimeToEndTime:
-		break;
-	case AMDSClientRequest::MiddleTimePlusCountBeforeAndAfter:
-		break;
-	case AMDSClientRequest::Continuous:
-		clientRequest = new AMDSClientContinuousDataRequest();
-		break;
-	case AMDSClientRequest::InvalidRequest:
-		break;
-	default:
-		break;
-	}
-
-	return clientRequest;
+	return AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 }
 
 void AMDSDataStream::read(AMDSClientRequest &clientRequest){

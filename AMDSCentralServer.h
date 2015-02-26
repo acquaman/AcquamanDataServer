@@ -10,6 +10,7 @@ class AMDSThreadedBufferGroup;
 class AMDSThreadedTcpDataServer;
 class AMDSClientDataRequestV1;
 class AMDSBufferGroup;
+class AMDSClientRequest;
 
 class AMDSCentralServer : public QObject
 {
@@ -20,8 +21,12 @@ public:
 signals:
 	void dataRequestReady(AMDSClientDataRequestV1 *dataRequest);
 
+	void clientRequestProcessed(AMDSClientRequest *processedRequest);
+
 protected slots:
 	void onDataServerDataRequested(AMDSClientDataRequestV1 *dataRequest);
+
+	void onDataServerClientRequestReady(AMDSClientRequest *clientRequest);
 
 	void onFiftyMillisecondTimerUpdate();
 

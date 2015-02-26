@@ -29,15 +29,22 @@ HEADERS *= \
 	AMDSThreadedBufferGroup.h \
 	AMDSAxisInfo.h \
 	AMDSnDIndex.h \
-    AMDSLikely.h \
-    AMDSClientDataRequestV1.h \
-    AMDSDataStream.h \
-    AMDSEventData.h \
-    AMDSBufferGroupInfo.h \
-    AMDSDataHolder.h \
-    AMDSScalarDataHolder.h \
-    AMDSClientRequest.h \
-    AMDSPacketStats.h
+	AMDSLikely.h \
+	AMDSClientDataRequestV1.h \
+	AMDSDataStream.h \
+	AMDSEventData.h \
+	AMDSBufferGroupInfo.h \
+	AMDSDataHolder.h \
+	AMDSScalarDataHolder.h \
+	AMDSPacketStats.h \
+	ClientRequest/AMDSClientRequest.h \
+	ClientRequest/AMDSClientRequestSupport.h \
+	ClientRequest/AMDSClientRequestDefinitions.h \
+	ClientRequest/AMDSClientDataRequest.h \
+	ClientRequest/AMDSClientIntrospectionRequest.h \
+	ClientRequest/AMDSClientStatisticsRequest.h \
+	ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
+	ClientRequest/AMDSClientContinuousDataRequest.h
 
 SOURCES *= main.cpp \
 	AMDSTcpDataServer.cpp \
@@ -47,11 +54,17 @@ SOURCES *= main.cpp \
 	AMDSThreadedBufferGroup.cpp \
 	AMDSAxisInfo.cpp \
 	AMDSnDIndex.cpp \
-    AMDSClientDataRequestV1.cpp \
-    AMDSDataStream.cpp \
-    AMDSEventData.cpp \
-    AMDSBufferGroupInfo.cpp \
-    AMDSDataHolder.cpp \
-    AMDSScalarDataHolder.cpp \
-    AMDSClientRequest.cpp \
-    AMDSPacketStats.cpp
+	AMDSClientDataRequestV1.cpp \
+	AMDSDataStream.cpp \
+	AMDSEventData.cpp \
+	AMDSBufferGroupInfo.cpp \
+	AMDSDataHolder.cpp \
+	AMDSScalarDataHolder.cpp \
+	AMDSPacketStats.cpp \
+	ClientRequest/AMDSClientRequest.cpp \
+	ClientRequest/AMDSClientRequestSupport.cpp \
+	ClientRequest/AMDSClientDataRequest.cpp \
+	ClientRequest/AMDSClientIntrospectionRequest.cpp \
+	ClientRequest/AMDSClientStatisticsRequest.cpp \
+	ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
+	ClientRequest/AMDSClientContinuousDataRequest.cpp

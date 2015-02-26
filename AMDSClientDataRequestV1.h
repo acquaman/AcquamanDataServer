@@ -21,13 +21,13 @@ public:
 
 	/// The type of request made. This is automatically set by the constructor depending on the passed arguments
 	enum RequestType{
-		Continuous = 0,
-		StartTimePlusCount = 1,
-		RelativeCountPlusCount = 2,
-		StartTimeToEndTime = 3,
-		MiddleTimePlusCountBeforeAndAfter = 4,
-		Introspection = 5,
-		Statistics = 6,
+		Introspection = 0,
+		Statistics = 1,
+		StartTimePlusCount = 2,
+		RelativeCountPlusCount = 3,
+		StartTimeToEndTime = 4,
+		MiddleTimePlusCountBeforeAndAfter = 5,
+		Continuous = 6,
 		Invalid = 7
 	};
 

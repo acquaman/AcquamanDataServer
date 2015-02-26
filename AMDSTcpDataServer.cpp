@@ -4,10 +4,25 @@
 #include <QTimer>
 
 #include "AMDSDataStream.h"
+#include "ClientRequest/AMDSClientRequestSupport.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "ClientRequest/AMDSClientStatisticsRequest.h"
+#include "ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
 
 AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
 	QObject(parent)
 {
+	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Introspection))
+		AMDSClientRequestSupport::registerClass<AMDSClientIntrospectionRequest>(AMDSClientRequestDefinitions::Introspection);
+	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Statistics))
+		AMDSClientRequestSupport::registerClass<AMDSClientStatisticsRequest>(AMDSClientRequestDefinitions::Statistics);
+	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::StartTimePlusCount))
+		AMDSClientRequestSupport::registerClass<AMDSClientStartTimePlusCountDataRequest>(AMDSClientRequestDefinitions::StartTimePlusCount);
+	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
+		AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
+
 	session_ = 0;
 	server_ = 0;
 	port_ = 0;
@@ -147,19 +162,10 @@ void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequestV1 *data)
 		output.setVersion(QDataStream::Qt_4_0);
 		output << (quint32)0;
 
-//		output << (quint8)data->requestType();
-
 		QString outputString;
 		if(data->responseType() == AMDSClientDataRequestV1::Error)
 			outputString = data->lastError();
-//		else if(data->requestType() == AMDSClientDataRequestV1::Introspection){
-//			qDebug() << "Introspection request";
-//			//output.write(data->bufferGroupInfos().at(0).axes().at(0));
-//			output << (quint16)data->bufferGroupInfos().count();
-//			for(int x = 0, size = data->bufferGroupInfos().count(); x < size; x++)
-//				output.write(data->bufferGroupInfos().at(x));
-//			outputString.append("Another part of the message");
-//		}
+
 		outputString.append("Fake message");
 
 		output.write(*data);
@@ -199,52 +205,70 @@ void AMDSTcpDataServer::onDataRequestReady(AMDSClientDataRequestV1 *data)
 			data->deleteLater();
 			requestingSocket->disconnectFromHost();
 		}
-
-//		QByteArray block;
-//		QDataStream output(&block, QIODevice::WriteOnly);
-//		output.setVersion(QDataStream::Qt_4_0);
-//		output << (quint32)0;
-
-//		QString outputString;
-
-//		if(data->responseType() == ClientDataRequest::Error)
-//			outputString = data->lastError();
-//		else
-//		{
-//			// Todo: Standardize response mechanism, dependent on data->responseType()
-//			for(int iDwell = 0, dwellSize = data->histogramData()->count(); iDwell < dwellSize; iDwell++)
-//			{
-//				outputString.append(data->histogramData()->at(iDwell)->dwellStartTime().toString("HH:mm:ss.zzz"));
-//				outputString.append("\n");
-//				for(int iDataPoint = 0, dataPointSize = data->histogramData()->at(iDwell)->spectrum().count(); iDataPoint< dataPointSize; iDataPoint++)
-//				{
-//					outputString.append(QString("%1").arg(data->histogramData()->at(iDwell)->spectrum().at(iDataPoint)));
-//					outputString.append(", ");
-//				}
-//				outputString.append("\n");
-//			}
-//		}
-
-//		output << outputString;
-//		output.device()->seek(0);
-//		output << (quint32)(block.size() - sizeof(quint32));
-//		requestingSocket->write(block);
-//		if(data->requestType() == ClientDataRequest::Continuous && data->responseType() != ClientDataRequest::Error)
-//		{
-//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
-//			data->histogramData()->clear();
-//			data->startContinuousRequestTimer(500);
-//		}
-//		else
-//		{
-//			data->deleteLater();
-//			requestingSocket->disconnectFromHost();
-//		}
-
 	}
 	else
 	{
 		data->deleteLater();
+		requestingSocket->disconnectFromHost();
+	}
+}
+
+void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
+{
+	qDebug() << "client request ready for processing, try now";
+
+	QTcpSocket* requestingSocket = clientSockets_.value(processedRequest->socketKey(), 0);
+	if(requestingSocket != 0)
+	{
+		QByteArray block;
+		AMDSDataStream output(&block, QIODevice::WriteOnly);
+		output.setVersion(QDataStream::Qt_4_0);
+		output << (quint32)0;
+
+		AMDSClientDataRequestV1 fakeDataRequest(AMDSClientDataRequestV1::Binary, processedRequest->socketKey(), "All");
+		output.write(fakeDataRequest);
+
+		qDebug() << "Going to write request with type " << processedRequest->requestType();
+		output.encodeClientRequestType(*processedRequest);
+		output.write(*processedRequest);
+
+		output.device()->seek(0);
+		output << (quint32)(block.size() - sizeof(quint32));
+		requestingSocket->write(block);
+
+		qDebug() << "Just wrote new client request with block size " << block.size();
+
+		qint64 outboundBytes = block.size();
+		tenMillisecondsStats_.setOutboundBytes(tenMillisecondsStats_.outboundBytes()+outboundBytes);
+		hundredMillisecondsStats_.setOutboundBytes(hundredMillisecondsStats_.outboundBytes()+outboundBytes);
+		oneSecondsStats_.setOutboundBytes(oneSecondsStats_.outboundBytes()+outboundBytes);
+		tenSecondsStats_.setOutboundBytes(tenSecondsStats_.outboundBytes()+outboundBytes);
+
+//		if(data->requestType() == AMDSClientDataRequestV1::StartTimePlusCount){
+//			qDebug() << "Sending out a start time plus count with data count " << data->data().count();
+//			QVector<double> values = QVector<double>(data->data().count());
+//			for(int x = 0, size = data->data().count(); x < size; x++){
+//				data->data().at(x)->data(values.data()+x);
+//				qDebug() << "Data point at " << x << values.at(x);
+//			}
+//		}
+
+		if(processedRequest->requestType() == AMDSClientRequestDefinitions::Continuous && processedRequest->responseType() != AMDSClientRequest::Error)
+		{
+//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
+//			data->histogramData()->clear();
+
+//			processedRequest->startContinuousRequestTimer(500);
+		}
+		else
+		{
+			processedRequest->deleteLater();
+			requestingSocket->disconnectFromHost();
+		}
+	}
+	else
+	{
+		processedRequest->deleteLater();
 		requestingSocket->disconnectFromHost();
 	}
 }
@@ -392,15 +416,6 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	qDebug() << "About to read the CDR from stream";
 	incoming.read(clientDataRequest);
 
-//	quint8 incomingRequestTypeAsInt;
-//	incoming >> incomingRequestTypeAsInt;
-//	AMDSClientRequest *clientRequest;
-//	AMDSClientRequest::RequestType incomingRequestType = (AMDSClientRequest::RequestType)incomingRequestTypeAsInt;
-//	switch(incomingRequestType){
-//	case AMDSClientRequest::Introspection:
-//		clientRequest = new AMDSClientIntrospectionRequest();
-//		break;
-//	}
 	qDebug() << "About to call polymorphic read";
 	AMDSClientRequest *clientRequest = incoming.decodeAndInstantiateClientRequestType();
 	incoming.read(*clientRequest);
@@ -411,9 +426,6 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 
 	quint8 responseTypeId;   // see enum ClientDataRequest::ResponseType for code
 	incoming >> responseTypeId;
-
-//	quint8 indexOfAmptek;    // which Amptek we wish to obtain data from
-//	incoming >> indexOfAmptek;
 
 	QString bufferName;
 	incoming >> bufferName;
@@ -429,6 +441,9 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 	QTime time2;
 	int count1;
 	int count2;
+
+	clientRequest->setSocketKey(clientKey);
+	emit clientRequestRead(clientRequest);
 
 	AMDSClientDataRequestV1::ResponseType responseRequestType;
 	responseRequestType = (AMDSClientDataRequestV1::ResponseType)responseTypeId;
@@ -461,42 +476,6 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 
 		onDataRequestReady(statisticsRequest);
 	}
-
-
-//	if(requestType == 0)
-//	{
-//		incoming >> time1;
-//		ClientDataRequest* dataRequest = new ClientDataRequest(time1, includeStatusData, responseRequestType, clientKey, indexOfAmptek);
-//		continuousDataRequests_.insert(dataRequest->socketKey(), dataRequest);
-//		connect(dataRequest, SIGNAL(sendNewContinuousDataRequest()), continuousDataRequestSignalMapper_, SLOT(map()));
-//		continuousDataRequestSignalMapper_->setMapping(dataRequest, dataRequest->socketKey());
-//		emit requestData(dataRequest);
-//	}
-//	else if(requestType == 1)
-//	{
-//		incoming >> time1;
-//		incoming >> count1;
-//		emit requestData(new ClientDataRequest(time1, count1, includeStatusData, responseRequestType, clientKey, indexOfAmptek));
-//	}
-//	else if(requestType == 2)
-//	{
-//		incoming >> count1;
-//		incoming >> count2;
-//		emit requestData(new ClientDataRequest(count1, count2, includeStatusData, responseRequestType, clientKey, indexOfAmptek));
-//	}
-//	else if(requestType == 3)
-//	{
-//		incoming >> time1;
-//		incoming >> time2;
-//		emit requestData(new ClientDataRequest(time1, time2, includeStatusData, responseRequestType, clientKey, indexOfAmptek));
-//	}
-//	else if(requestType == 4)
-//	{
-//		incoming >> time1;
-//		incoming >> count1;
-//		incoming >> count2;
-//		emit requestData(new ClientDataRequest(time1, count1, count2, includeStatusData, responseRequestType, clientKey, indexOfAmptek));
-//	}
 }
 
 void AMDSTcpDataServer::onContinuousDataRequestTimer(const QString &clientKey)
