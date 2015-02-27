@@ -35,11 +35,9 @@ void AMDSDataStream::read(AMDSAxisInfo &axisInfo){
 	qint16 start;
 	quint16 increment;
 
-//	qDebug() << "Reading an axisInfo";
 	*this >> name;
 	if(status() != QDataStream::Ok)
 		return;
-//	qDebug() << "Named: " << name;
 	*this >> description;
 	if(status() != QDataStream::Ok)
 		return;
@@ -75,11 +73,9 @@ void AMDSDataStream::read(AMDSBufferGroupInfo &bufferGroupInfo){
 	quint8 axesCount;
 	QList<AMDSAxisInfo> axes;
 
-//	qDebug() << "Reading a bufferGroupInfo";
 	*this >> name;
 	if(status() != QDataStream::Ok)
 		return;
-//	qDebug() << "Named: " << name;
 	*this >> description;
 	if(status() != QDataStream::Ok)
 		return;
@@ -139,180 +135,7 @@ void AMDSDataStream::read(AMDSPacketStats &packetStat){
 	packetStat.setMaxTotalBytes(maxTotalBytes);
 }
 
-#include "AMDSScalarDataHolder.h"
-
-//void AMDSDataStream::read(AMDSClientDataRequestV1 &clientDataRequest){
-//	QString socketKey;
-//	QString errorMessage;
-//	quint8 requestType;
-//	quint8 responseType;
-//	bool includeStatusData;
-//	QDateTime time1;
-//	QDateTime time2;
-//	quint64 count1;
-//	quint64 count2;
-//	QString bufferName;
-//	QList<AMDSBufferGroupInfo> bufferGroupInfos;
-//	QList<AMDSPacketStats> packetStats;
-//	QList<AMDSDataHolder*> data;
-//	quint16 dataCount;
-//	QVector<double> totalVector;
-
-//	*this >> socketKey;
-//	if(status() != QDataStream::Ok)
-//		return;
-//	*this >> errorMessage;
-//	if(status() != QDataStream::Ok)
-//		return;
-//	QDataStream::operator >>(requestType);
-//	if(status() != QDataStream::Ok)
-//		return;
-//	QDataStream::operator >>(responseType);
-//	if(status() != QDataStream::Ok)
-//		return;
-//	QDataStream::operator >>(includeStatusData);
-//	if(status() != QDataStream::Ok)
-//		return;
-//	*this >> time1;
-//	if(status() != QDataStream::Ok)
-//		return;
-//	*this >> time2;
-//	if(status() != QDataStream::Ok)
-//		return;
-//	QDataStream::operator >>(count1);
-//	if(status() != QDataStream::Ok)
-//		return;
-//	QDataStream::operator >>(count2);
-//	if(status() != QDataStream::Ok)
-//		return;
-//	*this >> bufferName;
-//	if(status() != QDataStream::Ok)
-//		return;
-
-//	switch(requestType){
-//	case AMDSClientDataRequestV1::Continuous:
-//		break;
-//	case AMDSClientDataRequestV1::StartTimePlusCount:{
-
-//		quint16 bufferGroupCount;
-
-//		QDataStream::operator >>(bufferGroupCount);
-//		if(status() != QDataStream::Ok)
-//			return;
-//		for(int x = 0, size = bufferGroupCount; x < size; x++){
-//			AMDSBufferGroupInfo oneBufferGroupInfo("Invalid");
-//			read(oneBufferGroupInfo);
-//			if(oneBufferGroupInfo.name() == "Invalid")
-//				return;
-//			bufferGroupInfos.append(oneBufferGroupInfo);
-//		}
-
-//		if(bufferGroupInfos.count() > 0){
-//			QDataStream::operator >>(dataCount);
-//			if(status() != QDataStream::Ok)
-//				return;
-
-//			quint64 totalSize = bufferGroupInfos.at(0).spanSize()*dataCount;
-//			totalVector = QVector<double>(totalSize);
-//			for(quint16 x = 0; x < totalSize; x++)
-//				QDataStream::operator >>(totalVector[x]);
-
-//		}
-
-//		break;}
-//	case AMDSClientDataRequestV1::RelativeCountPlusCount:
-//		break;
-//	case AMDSClientDataRequestV1::StartTimeToEndTime:
-//		break;
-//	case AMDSClientDataRequestV1::MiddleTimePlusCountBeforeAndAfter:
-//		break;
-//	case AMDSClientDataRequestV1::Introspection:{
-//		quint16 bufferGroupCount;
-
-//		QDataStream::operator >>(bufferGroupCount);
-//		if(status() != QDataStream::Ok)
-//			return;
-//		for(int x = 0, size = bufferGroupCount; x < size; x++){
-//			AMDSBufferGroupInfo oneBufferGroupInfo("Invalid");
-//			read(oneBufferGroupInfo);
-//			if(oneBufferGroupInfo.name() == "Invalid")
-//				return;
-//			bufferGroupInfos.append(oneBufferGroupInfo);
-//		}
-//		break;}
-//	case AMDSClientDataRequestV1::Statistics:{
-//		quint16 packetStatsCount;
-
-//		QDataStream::operator >>(packetStatsCount);
-//		if(status() != QDataStream::Ok)
-//			return;
-//		for(int x = 0, size = packetStatsCount; x < size; x++){
-//			AMDSPacketStats onePacketStat("Invalid");
-//			read(onePacketStat);
-//			if(onePacketStat.name() == "Invalid")
-//				return;
-//			packetStats.append(onePacketStat);
-//		}
-//		break;}
-//	default:
-//		break;
-//	}
-
-//	clientDataRequest.setSocketKey(socketKey);
-//	clientDataRequest.setErrorMessage(errorMessage);
-//	clientDataRequest.setRequestType((AMDSClientDataRequestV1::RequestType)requestType);
-//	clientDataRequest.setResponseType((AMDSClientDataRequestV1::ResponseType)responseType);
-//	clientDataRequest.setIncludeStatusData(includeStatusData);
-//	clientDataRequest.setTime1(time1);
-//	clientDataRequest.setTime2(time2);
-//	clientDataRequest.setCount1(count1);
-//	clientDataRequest.setCount2(count2);
-//	clientDataRequest.setBufferName(bufferName);
-
-//	switch(requestType){
-//	case AMDSClientDataRequestV1::Continuous:
-//		break;
-//	case AMDSClientDataRequestV1::StartTimePlusCount:{
-//		qDebug() << "Going to fill the actual data in star time plus count";
-
-//		for(int x = 0, size = bufferGroupInfos.count(); x < size; x++)
-//			clientDataRequest.appendBufferGroupInfo(bufferGroupInfos.at(x));
-
-//		int totalCounter = 0;
-//		clientDataRequest.clearData();
-//		for(quint16 x = 0; x < dataCount; x++){
-//			AMDSScalarDataHolder *oneScalerDataHolder = new AMDSScalarDataHolder();
-//			oneScalerDataHolder->setSingleValue(totalVector.at(totalCounter++));
-
-//			clientDataRequest.appendData(oneScalerDataHolder);
-//			double oneStoredValue;
-//			oneScalerDataHolder->data(&oneStoredValue);
-//			qDebug() << "One value was " << oneStoredValue;
-//		}
-
-//		break;}
-//	case AMDSClientDataRequestV1::RelativeCountPlusCount:
-//		break;
-//	case AMDSClientDataRequestV1::StartTimeToEndTime:
-//		break;
-//	case AMDSClientDataRequestV1::MiddleTimePlusCountBeforeAndAfter:
-//		break;
-//	case AMDSClientDataRequestV1::Introspection:{
-//		for(int x = 0, size = bufferGroupInfos.count(); x < size; x++)
-//			clientDataRequest.appendBufferGroupInfo(bufferGroupInfos.at(x));
-
-//		break;}
-//	case AMDSClientDataRequestV1::Statistics:{
-//		for(int x = 0, size = packetStats.count(); x < size; x++)
-//			clientDataRequest.appendPacketStats(packetStats.at(x));
-//		break;}
-//	default:
-//		break;
-//	}
-//}
-
 void AMDSDataStream::write(const AMDSAxisInfo &axisInfo){
-//	qDebug() << "Writing an axisInfo named " << axisInfo.name();
 	*this << axisInfo.name();
 	*this << axisInfo.description();
 	*this << axisInfo.units();
@@ -323,16 +146,12 @@ void AMDSDataStream::write(const AMDSAxisInfo &axisInfo){
 }
 
 void AMDSDataStream::write(const AMDSBufferGroupInfo &bufferGroupInfo){
-//	qDebug() << "Writing a bufferGroupInfo named " << bufferGroupInfo.name();
 	*this << bufferGroupInfo.name();
 	*this << bufferGroupInfo.description();
 	*this << bufferGroupInfo.units();
 	QDataStream::operator <<((quint8)(bufferGroupInfo.axes().count()));
-//	qDebug() << "This bufferGroupInfo has " << (quint8)(bufferGroupInfo.axes().count()) << " axes";
-	for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++){
-//		qDebug() << "Attempting axis " << x << " as " << bufferGroupInfo.axes().at(x).name();
+	for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++)
 		write(bufferGroupInfo.axes().at(x));
-	}
 }
 
 void AMDSDataStream::write(const AMDSPacketStats &packetStat){
@@ -343,62 +162,6 @@ void AMDSDataStream::write(const AMDSPacketStats &packetStat){
 	QDataStream::operator <<((quint64)(packetStat.maxOutboundBytes()));
 	QDataStream::operator <<((quint64)(packetStat.maxTotalBytes()));
 }
-
-//void AMDSDataStream::write(const AMDSClientDataRequestV1 &clientDataRequest){
-//	*this << clientDataRequest.socketKey();
-//	*this << clientDataRequest.lastError();
-//	QDataStream::operator <<((quint8)(clientDataRequest.requestType()));
-//	QDataStream::operator <<((quint8)(clientDataRequest.responseType()));
-//	QDataStream::operator <<(clientDataRequest.includeStatusData());
-//	*this << clientDataRequest.time1();
-//	*this << clientDataRequest.time2();
-//	QDataStream::operator <<(clientDataRequest.count1());
-//	QDataStream::operator <<(clientDataRequest.count2());
-//	*this << clientDataRequest.bufferName();
-
-//	switch(clientDataRequest.requestType()){
-//	case AMDSClientDataRequestV1::Continuous:
-//		break;
-//	case AMDSClientDataRequestV1::StartTimePlusCount:
-//		qDebug() << "Processing a start time plus count CDR with data count " << clientDataRequest.data().count() << " and BGI count " << clientDataRequest.bufferGroupInfos().count();
-
-//		QDataStream::operator <<((quint16)(clientDataRequest.bufferGroupInfos().count()));
-//		if( (clientDataRequest.data().count() > 0) && (clientDataRequest.data().at(0)->axesStyle() == AMDSDataHolder::UniformAxes) && (clientDataRequest.bufferGroupInfos().count() > 0) ){
-//			write(clientDataRequest.bufferGroupInfos().at(0));
-
-//			qDebug() << "We have uniform axes, so the total count should be the count " << clientDataRequest.data().count();
-//			qDebug() << " multiplied by the spanSize " << clientDataRequest.bufferGroupInfos().at(0).spanSize();
-
-//			QDataStream::operator <<((quint16)(clientDataRequest.data().count()));
-//			for(int x = 0, xSize = clientDataRequest.data().count(); x < xSize; x++){
-//				QVector<double> oneClientDataRequestVector = QVector<double>(clientDataRequest.bufferGroupInfos().at(0).spanSize());
-//				clientDataRequest.data().at(x)->data(oneClientDataRequestVector.data());
-//				for(int y = 0, ySize = clientDataRequest.bufferGroupInfos().at(0).spanSize(); y < ySize; y++)
-//					QDataStream::operator <<(oneClientDataRequestVector[y]);
-//			}
-//		}
-
-//		break;
-//	case AMDSClientDataRequestV1::RelativeCountPlusCount:
-//		break;
-//	case AMDSClientDataRequestV1::StartTimeToEndTime:
-//		break;
-//	case AMDSClientDataRequestV1::MiddleTimePlusCountBeforeAndAfter:
-//		break;
-//	case AMDSClientDataRequestV1::Introspection:
-//		QDataStream::operator <<((quint16)(clientDataRequest.bufferGroupInfos().count()));
-//		for(int x = 0, size = clientDataRequest.bufferGroupInfos().count(); x < size; x++)
-//			write(clientDataRequest.bufferGroupInfos().at(x));
-//		break;
-//	case AMDSClientDataRequestV1::Statistics:
-//		QDataStream::operator <<((quint16)(clientDataRequest.packetStats().count()));
-//		for(int x = 0, size = clientDataRequest.packetStats().count(); x < size; x++)
-//			write(clientDataRequest.packetStats().at(x));
-//		break;
-//	default:
-//		break;
-//	}
-//}
 
 void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequest){
 	qDebug() << "About to encode " << (quint8)clientRequest.requestType();

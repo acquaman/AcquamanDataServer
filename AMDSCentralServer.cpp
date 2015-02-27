@@ -34,7 +34,6 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
 
 	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV");
-//	AMDSBufferGroup *energyBufferGroup = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
 	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
 	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
@@ -42,43 +41,12 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	simpleCounter_ = 0;
 	fiftyMillisecondTimer_ = new QTimer(this);
 
-//	connect(dataServer_->server(), SIGNAL(requestData(AMDSClientDataRequestV1*)), this, SLOT(onDataServerDataRequested(AMDSClientDataRequestV1*)));
-//	connect(this, SIGNAL(dataRequestReady(AMDSClientDataRequestV1*)), dataServer_->server(), SLOT(onDataRequestReady(AMDSClientDataRequestV1*)));
-
 	connect(dataServer_->server(), SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SLOT(onDataServerClientRequestReady(AMDSClientRequest*)));
 	connect(this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
 	connect(fiftyMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onFiftyMillisecondTimerUpdate()));
 	fiftyMillisecondTimer_->start(50);
 }
-
-//void AMDSCentralServer::onDataServerDataRequested(AMDSClientDataRequestV1 *dataRequest){
-//	if(dataRequest->requestType() == AMDSClientDataRequestV1::Introspection){
-
-//		if(dataRequest->bufferName() == "All"){
-//			QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroups_.constBegin();
-//			while (i != bufferGroups_.constEnd()) {
-//				AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
-//				qDebug() << i.key() << " is " << oneInfo.name() << oneInfo.description() << oneInfo.units() << oneInfo.size().toString();
-//				dataRequest->appendBufferGroupInfo(oneInfo);
-//				++i;
-//			}
-//		}
-//		else if(bufferGroups_.contains(dataRequest->bufferName()))
-//			dataRequest->appendBufferGroupInfo(bufferGroups_.value(dataRequest->bufferName())->bufferGroupInfo());
-//		else
-//			dataRequest->setErrorMessage(QString("No buffer named %1, cannot introspect").arg(dataRequest->bufferName()));
-
-//		emit dataRequestReady(dataRequest);
-//	}
-//	else if(dataRequest->requestType() == AMDSClientDataRequestV1::StartTimePlusCount){
-//		qDebug() << "Got the start time plus count request on " << dataRequest->bufferName();
-//		if(dataRequest->bufferName() == "Energy"){
-//			connect(energyBufferGroup_, SIGNAL(dataRequestReady(AMDSClientDataRequestV1*)), dataServer_->server(), SLOT(onDataRequestReady(AMDSClientDataRequestV1*)));
-//			energyBufferGroup_->requestData(dataRequest);
-//		}
-//	}
-//}
 
 void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *clientRequest){
 	if(clientRequest->requestType() == AMDSClientRequestDefinitions::Introspection){
@@ -112,13 +80,6 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 			}
 		}
 	}
-//	else if(dataRequest->requestType() == AMDSClientDataRequestV1::StartTimePlusCount){
-//		qDebug() << "Got the start time plus count request on " << dataRequest->bufferName();
-//		if(dataRequest->bufferName() == "Energy"){
-//			connect(energyBufferGroup_, SIGNAL(dataRequestReady(AMDSClientDataRequestV1*)), dataServer_->server(), SLOT(onDataRequestReady(AMDSClientDataRequestV1*)));
-//			energyBufferGroup_->requestData(dataRequest);
-//		}
-//	}
 }
 
 #include "AMDSScalarDataHolder.h"

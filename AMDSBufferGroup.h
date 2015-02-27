@@ -6,7 +6,6 @@
 #include "AMDSBuffer.h"
 #include "AMDSBufferGroupInfo.h"
 #include "AMDSDataHolder.h"
-//#include "AMDSClientDataRequestV1.h"
 
 class AMDSClientRequest;
 class AMDSClientStartTimePlusCountDataRequest;
@@ -49,11 +48,10 @@ public slots:
 	/// Slot which handles a request for data. The buffer group will attempt to populate the request
 	/// based on the instructions it includes. When the data request is ready the dataRequestReady signal is emitted
 	void processClientRequest(AMDSClientRequest *clientRequest);
-//	void requestData(AMDSClientDataRequestV1* request);
+
 signals:
 	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
 	void clientRequestProcessed(AMDSClientRequest *clientRequest);
-//	void dataRequestReady(AMDSClientDataRequestV1* request);
 
 protected:
 	/// Helper functions which populate request data based on the parameters passed:
@@ -93,7 +91,6 @@ void AMDSBufferGroup::append(AMDSDataHolder *value)
 	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(value);
 	if(dataHolderRemoved)
 		delete dataHolderRemoved;
-	//		dataHolderRemoved->deleteLater();
 }
 
 void AMDSBufferGroup::clear()
@@ -101,7 +98,6 @@ void AMDSBufferGroup::clear()
 	QWriteLocker writeLock(&lock_);
 	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++)
 		delete dataHolders_[iElement];
-	//		dataHolders_[iElement]->deleteLater();
 
 	dataHolders_.clear();
 }

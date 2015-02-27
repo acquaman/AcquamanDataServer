@@ -82,32 +82,6 @@ void AMDSBufferGroup::populateData(AMDSClientContinuousDataRequest *clientContin
 //	}
 }
 
-//void AMDSBufferGroup::requestData(AMDSClientDataRequestV1 *request)
-//{
-//	QReadLocker readLock(&lock_);
-//	switch(request->requestType()){
-//	case AMDSClientDataRequestV1::Introspection:
-//		//something here
-//		break;
-//	case AMDSClientDataRequestV1::Continuous:
-//		populateData(request, request->time1());
-//		break;
-//	case AMDSClientDataRequestV1::StartTimePlusCount:
-//		populateData(request, request->time1(), request->count1());
-//		break;
-//	case AMDSClientDataRequestV1::RelativeCountPlusCount:
-//		populateData(request, request->count1(), request->count2());
-//		break;
-//	case AMDSClientDataRequestV1::StartTimeToEndTime:
-//		populateData(request, request->time1(), request->time2());
-//		break;
-//	case AMDSClientDataRequestV1::MiddleTimePlusCountBeforeAndAfter:
-//		populateData(request, request->time1(), request->count1(), request->count2());
-//		break;
-//	}
-//	emit dataRequestReady(request);
-//}
-
 //void AMDSBufferGroup::populateData(AMDSClientDataRequestV1 *request, const QDateTime &lastFetch)
 //{
 //	int startIndex = lowerBound(lastFetch);

@@ -5,7 +5,6 @@
 
 #include "AMDSAxisInfo.h"
 #include "AMDSBufferGroup.h"
-//#include "AMDSClientDataRequestV1.h"
 #include "AMDSPacketStats.h"
 #include "ClientRequest/AMDSClientRequest.h"
 
@@ -21,7 +20,6 @@ public:
 	void write(const AMDSAxisInfo &axisInfo);
 	void write(const AMDSBufferGroupInfo &bufferGroupInfo);
 	void write(const AMDSPacketStats &packetStat);
-//	void write(const AMDSClientDataRequestV1 &clientDataRequest);
 
 	void encodeClientRequestType(const AMDSClientRequest &clientRequest);
 	void write(const AMDSClientRequest &clientRequest);
@@ -30,7 +28,6 @@ public:
 	void read(AMDSAxisInfo &axisInfo);
 	void read(AMDSBufferGroupInfo &bufferGroupInfo);
 	void read(AMDSPacketStats &packetStat);
-//	void read(AMDSClientDataRequestV1 &clientDataRequest);
 
 	AMDSClientRequestDefinitions::RequestType decodeRequestType();
 	AMDSClientRequest* decodeAndInstantiateClientRequestType();

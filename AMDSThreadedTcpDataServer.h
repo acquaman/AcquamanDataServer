@@ -5,7 +5,6 @@
 #include <QThread>
 
 #include "AMDSTcpDataServer.h"
-//#include "AmptekSDD123Histogram.h"
 
 /**
   * Class which maintains the TCPServer in a separate thread, and passes signal messages to it.

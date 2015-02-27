@@ -30,7 +30,6 @@ HEADERS *= \
 	AMDSAxisInfo.h \
 	AMDSnDIndex.h \
 	AMDSLikely.h \
-	AMDSClientDataRequestV1.h \
 	AMDSDataStream.h \
 	AMDSEventData.h \
 	AMDSBufferGroupInfo.h \
@@ -54,7 +53,6 @@ SOURCES *= main.cpp \
 	AMDSThreadedBufferGroup.cpp \
 	AMDSAxisInfo.cpp \
 	AMDSnDIndex.cpp \
-	AMDSClientDataRequestV1.cpp \
 	AMDSDataStream.cpp \
 	AMDSEventData.cpp \
 	AMDSBufferGroupInfo.cpp \

@@ -46,9 +46,6 @@ AMDSClientRequest& AMDSClientRequest::operator =(const AMDSClientRequest &other)
 bool AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
 	qDebug() << "Calling AMDSClientRequest::writeToDataStream";
-//	*dataStream << (quint8)requestType_;
-//	if(dataStream->status() != QDataStream::Ok)
-//		return false;
 	*dataStream << socketKey_;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
@@ -65,14 +62,10 @@ bool AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const
 bool AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
 	qDebug() << "Calling AMDSClientRequest::readFromDataStream";
-//	quint8 readRequestType;
 	QString readSocketKey;
 	QString readErrorMessage;
 	quint8 readResponseType;
 
-//	dataStream >> readRequestType;
-//	if(dataStream->status() != QDataStream::Ok)
-//		return false;
 	*dataStream >> readSocketKey;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
