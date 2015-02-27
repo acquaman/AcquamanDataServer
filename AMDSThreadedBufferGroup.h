@@ -6,7 +6,7 @@
 
 #include "AMDSBufferGroup.h"
 
-class AMDSClientDataRequestV1;
+//class AMDSClientDataRequestV1;
 
 class AMDSThreadedBufferGroup : public QObject
 {
@@ -17,7 +17,7 @@ public:
 	AMDSBufferGroupInfo bufferGroupInfo() const;
 
 public slots:
-	void requestData(AMDSClientDataRequestV1 *dataRequest);
+//	void requestData(AMDSClientDataRequestV1 *dataRequest);
 
 signals:
 	void bufferGroupReady();

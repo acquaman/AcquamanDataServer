@@ -6,7 +6,11 @@
 #include "AMDSBuffer.h"
 #include "AMDSBufferGroupInfo.h"
 #include "AMDSDataHolder.h"
-#include "AMDSClientDataRequestV1.h"
+//#include "AMDSClientDataRequestV1.h"
+
+class AMDSClientRequest;
+class AMDSClientStartTimePlusCountDataRequest;
+class AMDSClientContinuousDataRequest;
 
 /**
   * Class representing a large buffer of data to store AMDSDataHolders in, of a given size. Once the buffer
@@ -44,23 +48,28 @@ public:
 public slots:
 	/// Slot which handles a request for data. The buffer group will attempt to populate the request
 	/// based on the instructions it includes. When the data request is ready the dataRequestReady signal is emitted
-	void requestData(AMDSClientDataRequestV1* request);
+	void processClientRequest(AMDSClientRequest *clientRequest);
+//	void requestData(AMDSClientDataRequestV1* request);
 signals:
 	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
-	void dataRequestReady(AMDSClientDataRequestV1* request);
+	void clientRequestProcessed(AMDSClientRequest *clientRequest);
+//	void dataRequestReady(AMDSClientDataRequestV1* request);
 
 protected:
 	/// Helper functions which populate request data based on the parameters passed:
-	/// Fills the request with all data acquired after lastFetch
-	void populateData(AMDSClientDataRequestV1* request, const QDateTime& lastFetch);
+
 	/// Fills the request with count number of spectra after (and including) startTime
-	void populateData(AMDSClientDataRequestV1* request, const QDateTime& startTime, int count);
-	/// Fills the request with count number of spectra either side of the entry relativeCount ago
-	void populateData(AMDSClientDataRequestV1* request, int relativeCount, int count);
-	/// Fills the request with all data between (and including) startTime and endTime
-	void populateData(AMDSClientDataRequestV1* request, const QDateTime& startTime, const QDateTime& endTime);
-	/// Fills the request with countBefore entries before middleTime to countAfter entries after.
-	void populateData(AMDSClientDataRequestV1* request, const QDateTime& middleTime, int countBefore, int countAfter);
+	void populateData(AMDSClientStartTimePlusCountDataRequest* clientStartTimePlusCountDataRequest);
+	/// Fills the request with all data acquired after lastFetch
+	void populateData(AMDSClientContinuousDataRequest* clientContinuousDataRequest, const QDateTime& lastFetch);
+
+//	/// Fills the request with count number of spectra either side of the entry relativeCount ago
+//	void populateData(AMDSClientRequest* request, int relativeCount, int count);
+//	/// Fills the request with all data between (and including) startTime and endTime
+//	void populateData(AMDSClientRequest* request, const QDateTime& startTime, const QDateTime& endTime);
+//	/// Fills the request with countBefore entries before middleTime to countAfter entries after.
+//	void populateData(AMDSClientRequest* request, const QDateTime& middleTime, int countBefore, int countAfter);
+
 	/// Helper function that returns the index in the buffer 1 before the given dwellTime, or at the point at
 	/// which the given dwellTime would occur within the buffer, if an exact match is not found.
 	int lowerBound(const QDateTime& dwellTime);

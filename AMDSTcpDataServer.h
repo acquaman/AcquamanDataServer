@@ -12,7 +12,8 @@
 #include <QNetworkConfigurationManager>
 #include <QSettings>
 
-#include "AMDSClientDataRequestV1.h"
+//#include "AMDSClientDataRequestV1.h"
+#include "AMDSPacketStats.h"
 
 class QTimer;
 class AMDSClientRequest;
@@ -32,7 +33,7 @@ public:
 
 signals:
 	void requestInfo();
-	void requestData(AMDSClientDataRequestV1*);
+//	void requestData(AMDSClientDataRequestV1*);
 	void clientRequestRead(AMDSClientRequest*);
 
 public slots:
@@ -49,7 +50,7 @@ public slots:
 	void stop();
 	/// Slot which handles a data request being passed back as ready. Uses the information contained
 	/// within data to respond to the request
-	void onDataRequestReady(AMDSClientDataRequestV1* data);
+//	void onDataRequestReady(AMDSClientDataRequestV1* data);
 
 	void onClientRequestProcessed(AMDSClientRequest *processedRequest);
 

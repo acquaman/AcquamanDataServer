@@ -1,6 +1,7 @@
 #include "AMDSClientDataRequest.h"
 
 #include "AMDSDataStream.h"
+#include "AMDSScalarDataHolder.h"
 
 AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	AMDSClientRequest(parent)
@@ -75,6 +76,13 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
 		// do some data writing here
+
+		for(int x = 0, xSize = data_.count(); x < xSize; x++){
+			QVector<double> oneClientDataRequestVector = QVector<double>(bufferGroupInfo_.spanSize());
+			data_.at(x)->data(oneClientDataRequestVector.data());
+			for(int y = 0, ySize = bufferGroupInfo_.spanSize(); y < ySize; y++)
+				*dataStream << oneClientDataRequestVector[y];
+		}
 	}
 
 	return true;
@@ -93,6 +101,7 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	AMDSBufferGroupInfo readBufferGroupInfo;
 	quint16 readDataCount;
 	QList<AMDSDataHolder*> readDataHolder;
+	QVector<double> totalVector;
 
 	*dataStream >> readBufferName;
 	if(dataStream->status() != QDataStream::Ok)
@@ -109,6 +118,11 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
 		// do some data reading here
+
+		quint64 totalSize = readDataCount*readBufferGroupInfo.spanSize();
+		totalVector = QVector<double>(totalSize);
+		for(quint64 x = 0; x < totalSize; x++)
+			*dataStream >> totalVector[x];
 	}
 
 	setBufferName(readBufferName);
@@ -116,6 +130,18 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	if(readIncludeData){
 		setBufferGroupInfo(readBufferGroupInfo);
 		// do some data setting here
+
+		int totalCounter = 0;
+		clearData();
+		for(quint16 x = 0; x < readDataCount; x++){
+			AMDSScalarDataHolder *oneScalarDataHolder = new AMDSScalarDataHolder();
+			oneScalarDataHolder->setSingleValue(totalVector.at(totalCounter++));
+
+			appendData(oneScalarDataHolder);
+			double oneStoredValue;
+			oneScalarDataHolder->data(&oneStoredValue);
+			qDebug() << "One value was " << oneStoredValue;
+		}
 	}
 
 	return true;

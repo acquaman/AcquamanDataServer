@@ -122,66 +122,6 @@ AMDSClientDataRequestV1::AMDSClientDataRequestV1(const AMDSClientDataRequestV1& 
 	(*this) = other;
 }
 
-//QString AMDSClientDataRequestV1::socketKey() const
-//{
-//	return socketKey_;
-//}
-
-//AMDSClientDataRequestV1::RequestType AMDSClientDataRequestV1::requestType() const
-//{
-//	return requestType_;
-//}
-
-//AMDSClientDataRequestV1::ResponseType AMDSClientDataRequestV1::responseType() const
-//{
-//	return responseType_;
-//}
-
-//bool AMDSClientDataRequestV1::includeStatusData() const
-//{
-//	return includeStatusData_;
-//}
-
-//QDateTime AMDSClientDataRequestV1::time1() const
-//{
-//	return time1_;
-//}
-
-//QDateTime AMDSClientDataRequestV1::time2() const
-//{
-//	return time2_;
-//}
-
-//quint64 AMDSClientDataRequestV1::count1() const
-//{
-//	return count1_;
-//}
-
-//quint64 AMDSClientDataRequestV1::count2() const
-//{
-//	return count2_;
-//}
-
-//int AMDSClientDataRequestV1::indexOfAmptek() const
-//{
-//	return indexOfAmptek_;
-//}
-
-//AmptekSDD123DwellHistogramGroup* AMDSClientDataRequestV1::histogramData()
-//{
-//    return &histogramData_;
-//}
-
-//QList<AMDSBufferGroupInfo> AMDSClientDataRequestV1::bufferGroupInfos() const{
-//	return bufferGroupInfos_;
-//}
-
-//void AMDSClientDataRequestV1::setError(const QString &errorMessage)
-//{
-//	responseType_ = Error;
-//	errorMessage_ = errorMessage;
-//}
-
 
 AMDSClientDataRequestV1 & AMDSClientDataRequestV1::operator =(const AMDSClientDataRequestV1 &other)
 {
@@ -201,37 +141,7 @@ AMDSClientDataRequestV1 & AMDSClientDataRequestV1::operator =(const AMDSClientDa
 	return (*this);
 }
 
-//QString AMDSClientDataRequestV1::lastError() const
-//{
-//	return errorMessage_;
-//}
-
 void AMDSClientDataRequestV1::startContinuousRequestTimer(int msecs)
 {
 	continuousDataRequestTimer_.singleShot(msecs, this, SIGNAL(sendNewContinuousDataRequest()));
 }
-
-//void AMDSClientDataRequestV1::setTime1(const QDateTime &time)
-//{
-//	time1_ = time;
-//}
-
-//void AMDSClientDataRequestV1::setRequestType(RequestType requestType){
-//	requestType_ = requestType;
-//}
-
-//void AMDSClientDataRequestV1::setResponseType(ResponseType responseType){
-//	responseType_ = responseType;
-//}
-
-//void AMDSClientDataRequestV1::setBufferGroupInfo(AMDSBufferGroupInfo bufferGroupInfo){
-//	bufferGroupInfo_ = bufferGroupInfo;
-//}
-
-//void AMDSClientDataRequestV1::appendBufferGroupInfo(AMDSBufferGroupInfo bufferGroupInfo){
-//	bufferGroupInfos_.append(bufferGroupInfo);
-//}
-
-//void AMDSClientDataRequestV1::clearBufferGroupInfos(){
-//	bufferGroupInfos_.clear();
-//}
