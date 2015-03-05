@@ -2,6 +2,7 @@
 #define AMDSCLIENTDATAREQUEST_H
 
 #include "ClientRequest/AMDSClientRequest.h"
+#include "AMDSDataTypeDefinitions.h"
 
 class AMDSDataHolder;
 
@@ -30,9 +31,13 @@ public:
 	/// Sets the flag to include status meta data
 	inline void setIncludeStatusData(bool includeStatusData) { includeStatusData_ = includeStatusData; }
 	inline void setBufferGroupInfo(const AMDSBufferGroupInfo &bufferGroupInfo) { bufferGroupInfo_ = bufferGroupInfo; }
+
+	inline AMDSDataTypeDefinitions::DataType uniformDataType() const { return uniformDataType_; }
 	/// Returns the list of data holders
 	inline QList<AMDSDataHolder*> data() const { return data_; }
 
+
+	inline void setUniformDataType(AMDSDataTypeDefinitions::DataType uniformDataType) { uniformDataType_ = uniformDataType; }
 	/// Adds some data to the list of data holders
 	inline void appendData(AMDSDataHolder *dataHolder) { data_.append(dataHolder); }
 	/// Clears the list of data holders
@@ -51,6 +56,7 @@ protected:
 
 	AMDSBufferGroupInfo bufferGroupInfo_;
 
+	AMDSDataTypeDefinitions::DataType uniformDataType_;
 	/// List of data holders
 	QList<AMDSDataHolder*> data_;
 };

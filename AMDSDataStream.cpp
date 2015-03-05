@@ -163,43 +163,133 @@ void AMDSDataStream::write(const AMDSPacketStats &packetStat){
 	QDataStream::operator <<((quint64)(packetStat.maxTotalBytes()));
 }
 
+void AMDSDataStream::encodeDataType(AMDSDataTypeDefinitions::DataType dataType){
+	QDataStream::operator <<((quint8)dataType);
+}
+
+void AMDSDataStream::write(const AMDSFlatArray &flatArray){
+	QDataStream::operator <<(flatArray.size());
+	switch(flatArray.dataType()){
+	case AMDSDataTypeDefinitions::Signed8:
+		*this << flatArray.constVectorQint8();
+		break;
+	case AMDSDataTypeDefinitions::Unsigned8:
+		*this << flatArray.constVectorQuint8();
+		break;
+	case AMDSDataTypeDefinitions::Signed16:
+		*this << flatArray.constVectorQint16();
+		break;
+	case AMDSDataTypeDefinitions::Unsigned16:
+		*this << flatArray.constVectorQuint16();
+		break;
+	case AMDSDataTypeDefinitions::Signed32:
+		*this << flatArray.constVectorQint32();
+		break;
+	case AMDSDataTypeDefinitions::Unsigned32:
+		*this << flatArray.constVectorQuint32();
+		break;
+	case AMDSDataTypeDefinitions::Signed64:
+		*this << flatArray.constVectorQint64();
+		break;
+	case AMDSDataTypeDefinitions::Unsigned64:
+		*this << flatArray.constVectorQuint64();
+		break;
+	case AMDSDataTypeDefinitions::Float:
+		*this << flatArray.constVectorFloat();
+		break;
+	case AMDSDataTypeDefinitions::Double:
+		*this << flatArray.constVectorDouble();
+		break;
+	case AMDSDataTypeDefinitions::InvalidType:
+		break;
+	default:
+		break;
+	}
+}
+
 void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequest){
-	qDebug() << "About to encode " << (quint8)clientRequest.requestType();
 	QDataStream::operator <<((quint8)clientRequest.requestType());
 }
 
 void AMDSDataStream::write(const AMDSClientRequest &clientRequest){
-	qDebug() << "In write for an AMDSClientRequest";
-	qDebug() << "Actual type is " << clientRequest.metaObject()->className();
-
-	qDebug() << "About to call writeToStream";
 	clientRequest.writeToDataStream(this);
+}
+
+AMDSDataTypeDefinitions::DataType AMDSDataStream::decodeDataType(){
+	quint8 dataTypeAsInt;
+	QDataStream::operator >>(dataTypeAsInt);
+	if(status() != QDataStream::Ok)
+		return AMDSDataTypeDefinitions::InvalidType;
+
+	AMDSDataTypeDefinitions::DataType dataType = (AMDSDataTypeDefinitions::DataType)dataTypeAsInt;
+	return dataType;
+}
+
+void AMDSDataStream::read(AMDSFlatArray &flatArray){
+	quint32 size;
+
+	QDataStream::operator >>(size);
+	if(status() != QDataStream::Ok)
+		return;
+
+	AMDSDataTypeDefinitions::DataType assumedDataType = flatArray.dataType();
+	flatArray.clearAndReset(assumedDataType, size);
+
+	switch(flatArray.dataType()){
+	case AMDSDataTypeDefinitions::Signed8:
+		*this >> flatArray.vectorQint8();
+		break;
+	case AMDSDataTypeDefinitions::Unsigned8:
+		*this >> flatArray.vectorQuint8();
+		break;
+	case AMDSDataTypeDefinitions::Signed16:
+		*this >> flatArray.vectorQint16();
+		break;
+	case AMDSDataTypeDefinitions::Unsigned16:
+		*this >> flatArray.vectorQuint16();
+		break;
+	case AMDSDataTypeDefinitions::Signed32:
+		*this >> flatArray.vectorQint32();
+		break;
+	case AMDSDataTypeDefinitions::Unsigned32:
+		*this >> flatArray.vectorQuint32();
+		break;
+	case AMDSDataTypeDefinitions::Signed64:
+		*this >> flatArray.vectorQint64();
+		break;
+	case AMDSDataTypeDefinitions::Unsigned64:
+		*this >> flatArray.vectorQuint64();
+		break;
+	case AMDSDataTypeDefinitions::Float:
+		*this >> flatArray.vectorFloat();
+		break;
+	case AMDSDataTypeDefinitions::Double:
+		*this >> flatArray.vectorDouble();
+		break;
+	case AMDSDataTypeDefinitions::InvalidType:
+		break;
+	default:
+		break;
+	}
 }
 
 AMDSClientRequestDefinitions::RequestType AMDSDataStream::decodeRequestType(){
 	quint8 clientRequestTypeAsInt;
-	qDebug() << "Try to decode";
 	QDataStream::operator >>(clientRequestTypeAsInt);
 	if(status() != QDataStream::Ok)
 		return AMDSClientRequestDefinitions::InvalidRequest;
 
 	AMDSClientRequestDefinitions::RequestType clientRequestType = (AMDSClientRequestDefinitions::RequestType)clientRequestTypeAsInt;
-	qDebug() << "Decoded as " << clientRequestType;
 	return clientRequestType;
 }
 
 AMDSClientRequest* AMDSDataStream::decodeAndInstantiateClientRequestType(){
 	AMDSClientRequestDefinitions::RequestType clientRequestType = decodeRequestType();
-	qDebug() << "Request type decoded as " << clientRequestType;
 	if(clientRequestType >= AMDSClientRequestDefinitions::InvalidRequest)
 		return 0;
 	return AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 }
 
 void AMDSDataStream::read(AMDSClientRequest &clientRequest){
-	qDebug() << "In read for AMDSClientRequest";
-	qDebug() << "Actual type is " << clientRequest.metaObject()->className();
-
-	qDebug() << "About to call readFromStream";
 	clientRequest.readFromDataStream(this);
 }

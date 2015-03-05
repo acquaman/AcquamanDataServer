@@ -6,6 +6,7 @@
 #include "AMDSAxisInfo.h"
 #include "AMDSBufferGroup.h"
 #include "AMDSPacketStats.h"
+#include "AMDSFlatArray.h"
 #include "ClientRequest/AMDSClientRequest.h"
 
 class AMDSDataStream : public QDataStream
@@ -21,6 +22,9 @@ public:
 	void write(const AMDSBufferGroupInfo &bufferGroupInfo);
 	void write(const AMDSPacketStats &packetStat);
 
+	void encodeDataType(AMDSDataTypeDefinitions::DataType dataType);
+	void write(const AMDSFlatArray &flatArray);
+
 	void encodeClientRequestType(const AMDSClientRequest &clientRequest);
 	void write(const AMDSClientRequest &clientRequest);
 
@@ -28,6 +32,9 @@ public:
 	void read(AMDSAxisInfo &axisInfo);
 	void read(AMDSBufferGroupInfo &bufferGroupInfo);
 	void read(AMDSPacketStats &packetStat);
+
+	AMDSDataTypeDefinitions::DataType decodeDataType();
+	void read(AMDSFlatArray &flatArray);
 
 	AMDSClientRequestDefinitions::RequestType decodeRequestType();
 	AMDSClientRequest* decodeAndInstantiateClientRequestType();

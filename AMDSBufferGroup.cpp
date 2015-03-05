@@ -57,6 +57,9 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clie
 		for (int iCurrent = startIndex, limit = dataHolders_.count(); iCurrent < count && iCurrent < limit; iCurrent++)
 		{
 			AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
+			AMDSFlatArray oneFlatArray;
+			dataHolder->data(&oneFlatArray);
+			qDebug() << "Iterating at " << iCurrent << " as " << oneFlatArray.vectorDouble().at(0);
 			clientStartTimePlusCountDataRequest->appendData(dataHolder);
 //			request->histogramData()->append(dataHolders_[iCurrent]);
 		}

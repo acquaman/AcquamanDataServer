@@ -43,7 +43,9 @@ HEADERS *= \
 	ClientRequest/AMDSClientIntrospectionRequest.h \
 	ClientRequest/AMDSClientStatisticsRequest.h \
 	ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
-	ClientRequest/AMDSClientContinuousDataRequest.h
+	ClientRequest/AMDSClientContinuousDataRequest.h \
+    AMDSDataTypeDefinitions.h \
+    AMDSFlatArray.h
 
 SOURCES *= main.cpp \
 	AMDSTcpDataServer.cpp \
@@ -65,4 +67,5 @@ SOURCES *= main.cpp \
 	ClientRequest/AMDSClientIntrospectionRequest.cpp \
 	ClientRequest/AMDSClientStatisticsRequest.cpp \
 	ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
-	ClientRequest/AMDSClientContinuousDataRequest.cpp
+	ClientRequest/AMDSClientContinuousDataRequest.cpp \
+    AMDSFlatArray.cpp

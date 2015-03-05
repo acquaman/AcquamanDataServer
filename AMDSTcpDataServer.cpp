@@ -180,11 +180,18 @@ void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 			AMDSClientStartTimePlusCountDataRequest *processedStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(processedRequest);
 			if(processedStartTimePlusCountDataRequest){
 				qDebug() << "Sending out a start time plus count with data count " << processedStartTimePlusCountDataRequest->data().count();
-				QVector<double> values = QVector<double>(processedStartTimePlusCountDataRequest->data().count());
+				QList<AMDSFlatArray> values;
 				for(int x = 0, size = processedStartTimePlusCountDataRequest->data().count(); x < size; x++){
-					processedStartTimePlusCountDataRequest->data().at(x)->data(values.data()+x);
-					qDebug() << "Data point at " << x << values.at(x);
+					AMDSFlatArray oneFlatArray;
+					processedStartTimePlusCountDataRequest->data().at(x)->data(&oneFlatArray);
+					values.append(oneFlatArray);
+					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
 				}
+//				QVector<double> values = QVector<double>(processedStartTimePlusCountDataRequest->data().count());
+//				for(int x = 0, size = processedStartTimePlusCountDataRequest->data().count(); x < size; x++){
+//					processedStartTimePlusCountDataRequest->data().at(x)->data(values.data()+x);
+//					qDebug() << "Data point at " << x << values.at(x);
+//				}
 			}
 		}
 

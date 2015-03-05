@@ -26,10 +26,10 @@ public:
 	AMDSEventData(QDateTime eventTime = QDateTime::currentDateTime());
 	virtual ~AMDSEventData();
 
-	inline QDateTime eventTime() const;
-	virtual inline AMDSEventData::EventType eventType() const;
-	virtual inline AMDSEventData::TimeScale timeScale() const;
-	virtual inline quint16 timeUncertainty() const;
+	inline QDateTime eventTime() const { return eventTime_; }
+	virtual inline AMDSEventData::EventType eventType() const { return AMDSEventData::UniformEvent; }
+	virtual inline AMDSEventData::TimeScale timeScale() const { return AMDSEventData::UniformScale; }
+	virtual inline quint16 timeUncertainty() const { return 0; }
 
 	inline bool setEventTime(QDateTime eventTime);
 	virtual inline bool setEventType(AMDSEventData::EventType eventType);
@@ -63,22 +63,6 @@ protected:
 ////////////////////////////////////////
 // AMDSEventData inline implementations
 ////////////////////////////////////////
-
-QDateTime AMDSEventData::eventTime() const{
-	return eventTime_;
-}
-
-AMDSEventData::EventType AMDSEventData::eventType() const{
-	return AMDSEventData::UniformEvent;
-}
-
-AMDSEventData::TimeScale AMDSEventData::timeScale() const{
-	return AMDSEventData::UniformScale;
-}
-
-quint16 AMDSEventData::timeUncertainty() const{
-	return -1;
-}
 
 bool AMDSEventData::setEventTime(QDateTime eventTime){
 	eventTime_ = eventTime;

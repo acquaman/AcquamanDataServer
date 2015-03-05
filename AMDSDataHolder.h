@@ -4,6 +4,8 @@
 #include "AMDSAxisInfo.h"
 #include "AMDSnDIndex.h"
 #include "AMDSEventData.h"
+#include "AMDSDataTypeDefinitions.h"
+#include "AMDSFlatArray.h"
 
 class AMDSDataHolder
 {
@@ -14,10 +16,17 @@ public:
 		InvalidAxes = 2
 	};
 
+	enum DataTypeStyle{
+		UniformDataType = 0,
+		DefinedDataType = 1,
+		InvalidDataType = 2
+	};
+
 	AMDSDataHolder();
 	virtual ~AMDSDataHolder();
 
 	inline virtual AMDSDataHolder::AxesStyle axesStyle() const { return AMDSDataHolder::UniformAxes; }
+	inline virtual AMDSDataHolder::DataTypeStyle dataTypeStyle() const { return AMDSDataHolder::UniformDataType; }
 	inline const AMDSEventData* eventData() const { return eventData_; }
 
 	virtual inline QList<AMDSAxisInfo> axes() const { return QList<AMDSAxisInfo>(); }
@@ -29,7 +38,8 @@ public:
 	/// Returns the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const { return 0; }
 
-	virtual inline bool data(double *outputValues) const = 0;
+//	virtual inline bool data(double *outputValues) const = 0;
+	virtual inline bool data(AMDSFlatArray *outputValues) const = 0;
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
 	virtual inline bool operator <(const QDateTime &rhs);
@@ -57,7 +67,8 @@ public:
 	/// Returns the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const;
 
-	virtual inline bool data(double *outputValues) const = 0;
+//	virtual inline bool data(double *outputValues) const = 0;
+	virtual inline bool data(AMDSFlatArray *outputValues) const = 0;
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
 protected:
