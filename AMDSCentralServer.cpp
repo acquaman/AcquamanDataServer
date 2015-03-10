@@ -6,7 +6,6 @@
 #include "AMDSThreadedBufferGroup.h"
 #include "AMDSBufferGroup.h"
 #include "AMDSBufferGroupInfo.h"
-//#include "AMDSClientDataRequestV1.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
@@ -72,7 +71,6 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 	else{
 		AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
 		if(clientDataRequest){
-			qDebug() << "Got the start time plus count request on " << clientDataRequest->bufferName();
 			if(clientDataRequest->bufferName() == "Energy"){
 				clientDataRequest->setBufferGroupInfo(energyBufferGroup_->bufferGroupInfo());
 				connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
@@ -84,7 +82,6 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 
 #include "AMDSScalarDataHolder.h"
 void AMDSCentralServer::onFiftyMillisecondTimerUpdate(){
-//	AMDSScalarDataHolder *oneScalerDataHolder = new AMDSScalarDataHolder();
 	AMDSLightWeightScalarDataHolder *oneScalerDataHolder = new AMDSLightWeightScalarDataHolder();
 	oneScalerDataHolder->setSingleValue(simpleCounter_++);
 

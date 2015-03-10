@@ -47,10 +47,8 @@ AMDSClientDataRequest& AMDSClientDataRequest::operator =(const AMDSClientDataReq
 
 bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	qDebug() << "Calling AMDSClientDataRequest::writeToDataStream";
 	if(!AMDSClientRequest::writeToDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientDataRequest::writeToDataStream";
 
 	*dataStream << bufferName_;
 	if(dataStream->status() != QDataStream::Ok)
@@ -86,13 +84,9 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 		data_.at(0)->data(&oneFlatArray);
 		dataStream->encodeDataType(oneFlatArray.dataType());
 		for(int x = 0, xSize = data_.count(); x < xSize; x++){
-//			QVector<double> oneClientDataRequestVector = QVector<double>(bufferGroupInfo_.spanSize());
-//			data_.at(x)->data(oneClientDataRequestVector.data());
 			AMDSFlatArray oneFlatArray(AMDSDataTypeDefinitions::Signed8, 0);
 			data_.at(x)->data(&oneFlatArray);
 			dataStream->write(oneFlatArray);
-//			for(int y = 0, ySize = bufferGroupInfo_.spanSize(); y < ySize; y++)
-//				*dataStream << oneClientDataRequestVector[y];
 		}
 
 		dataStream->encodeDataHolderType(*(data_.at(0)));
@@ -104,10 +98,8 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 
 bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	qDebug() << "Calling AMDSClientDataRequest::readFromDataStream";
 	if(!AMDSClientRequest::readFromDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientDataRequest::readFromDataStream";
 
 	QString readBufferName;
 	bool readIncludeStatusData;
@@ -118,7 +110,6 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	AMDSDataTypeDefinitions::DataType readDataType;
 	QList<AMDSFlatArray> readFlatArrays;
 	QList<AMDSDataHolder*> readDataHolder;
-	QVector<double> totalVector;
 	AMDSDataHolder *oneDataHolder;
 
 	*dataStream >> readBufferName;
@@ -140,23 +131,16 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 			return false;
 		// do some data reading here
 
-		quint64 totalSize = readDataCount*readBufferGroupInfo.spanSize();
-
 		readDataType = dataStream->decodeDataType();
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
 
 
-//		for(quint64 x = 0; x < totalSize; x++){
 		for(quint16 x = 0; x < readDataCount; x++){
 			AMDSFlatArray oneFlatArray(readDataType, 1);
 			dataStream->read(oneFlatArray);
 			readFlatArrays.append(oneFlatArray);
 		}
-
-//		totalVector = QVector<double>(totalSize);
-//		for(quint64 x = 0; x < totalSize; x++)
-//			*dataStream >> totalVector[x];
 
 		oneDataHolder = dataStream->decodeAndInstantiateDataHolder();
 		dataStream->read(*oneDataHolder);
@@ -171,25 +155,14 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		// do some data setting here
 
 		setUniformDataType((AMDSDataTypeDefinitions::DataType)readUniformDataType);
-		int totalCounter = 0;
 		clearData();
 		for(quint16 x = 0; x < readDataCount; x++){
-//			AMDSScalarDataHolder *oneScalarDataHolder = new AMDSScalarDataHolder();
 			AMDSLightWeightScalarDataHolder *oneScalarDataHolder = new AMDSLightWeightScalarDataHolder();
 			oneScalarDataHolder->setData(&(readFlatArrays[x]));
 
 			appendData(oneScalarDataHolder);
 			AMDSFlatArray oneStoredValue(AMDSDataTypeDefinitions::InvalidType, 0);
 			oneScalarDataHolder->data(&oneStoredValue);
-			qDebug() << "One value was of type " << oneStoredValue.dataType() << " with value " << oneStoredValue.vectorDouble().at(0);
-
-//			AMDSScalarDataHolder *oneScalarDataHolder = new AMDSScalarDataHolder();
-//			oneScalarDataHolder->setSingleValue(totalVector.at(totalCounter++));
-
-//			appendData(oneScalarDataHolder);
-//			double oneStoredValue;
-//			oneScalarDataHolder->data(&oneStoredValue);
-//			qDebug() << "One value was " << oneStoredValue;
 		}
 
 		data_[0] = oneDataHolder;

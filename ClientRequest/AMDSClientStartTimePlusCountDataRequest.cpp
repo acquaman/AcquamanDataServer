@@ -40,10 +40,8 @@ AMDSClientStartTimePlusCountDataRequest& AMDSClientStartTimePlusCountDataRequest
 
 bool AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	qDebug() << "Calling AMDSClientStartTimePlusCountDataRequest::writeToDataStream";
 	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientStartTimePlusCountDataRequest::writeToDataStream";
 
 	*dataStream << startTime_;
 	if(dataStream->status() != QDataStream::Ok)
@@ -57,10 +55,8 @@ bool AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *
 
 bool AMDSClientStartTimePlusCountDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	qDebug() << "Calling AMDSClientStartTimePlusCountDataRequest::readFromDataStream";
 	if(!AMDSClientDataRequest::readFromDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientStartTimePlusCountDataRequest::readFromDataStream";
 
 	QDateTime readStartTime;
 	quint64 readCount;

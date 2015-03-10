@@ -41,10 +41,8 @@ AMDSClientIntrospectionRequest& AMDSClientIntrospectionRequest::operator =(const
 
 bool AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	qDebug() << "Calling AMDSClientIntrospectionRequest::writeToDataStream";
 	if(!AMDSClientRequest::writeToDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientIntrospectionRequest::writeToDataStream";
 
 	*dataStream << bufferName_;
 	if(dataStream->status() != QDataStream::Ok)
@@ -63,10 +61,8 @@ bool AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStrea
 
 bool AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	qDebug() << "Calling AMDSClientIntrospectionRequest::readFromDataStream";
 	if(!AMDSClientRequest::readFromDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientIntrospectionRequest::readFromDataStream";
 
 	QString readBufferName;
 	quint16 readBufferGroupInfosCount;

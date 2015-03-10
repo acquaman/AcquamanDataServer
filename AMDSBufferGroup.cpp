@@ -42,7 +42,6 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clie
 {
 	QDateTime startTime = clientStartTimePlusCountDataRequest->startTime();
 	quint64 count = clientStartTimePlusCountDataRequest->count();
-	qDebug() << "Received request to populate data for start time plus count as " << startTime << count;
 
 	int startIndex = lowerBound(startTime);
 
@@ -51,16 +50,14 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clie
 	else
 	{
 		count = startIndex + count;
+		int countAsInt = count;
 		clientStartTimePlusCountDataRequest->clearData();
 		clientStartTimePlusCountDataRequest->setBufferGroupInfo(bufferGroupInfo_);
-		qDebug() << "Located data starting at index " << startIndex << " going to index " << count;
-		for (int iCurrent = startIndex, limit = dataHolders_.count(); iCurrent < count && iCurrent < limit; iCurrent++)
+		for (int iCurrent = startIndex, limit = dataHolders_.count(); iCurrent < countAsInt && iCurrent < limit; iCurrent++)
 		{
 			AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
 			AMDSFlatArray oneFlatArray;
 			dataHolder->data(&oneFlatArray);
-			qDebug() << "Iterating at " << iCurrent << " as " << oneFlatArray.vectorDouble().at(0);
-			qDebug() << "Data holder in AMDSBufferGroup thinks its type is " << dataHolder->metaObject()->className();
 			clientStartTimePlusCountDataRequest->appendData(dataHolder);
 //			request->histogramData()->append(dataHolders_[iCurrent]);
 		}

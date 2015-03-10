@@ -40,10 +40,8 @@ AMDSClientStatisticsRequest& AMDSClientStatisticsRequest::operator =(const AMDSC
 
 bool AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	qDebug() << "Calling AMDSClientStatisticsRequest::writeToDataStream";
 	if(!AMDSClientRequest::writeToDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientStatisticsRequest::writeToDataStream";
 
 	*dataStream << (quint32)packetStats_.count();
 	if(dataStream->status() != QDataStream::Ok)
@@ -57,10 +55,8 @@ bool AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) 
 
 bool AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	qDebug() << "Calling AMDSClientStatisticsRequest::readFromDataStream";
 	if(!AMDSClientRequest::readFromDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientStatisticsRequest::readFromDataStream";
 
 	quint32 readPacketStatsCount;
 	QList<AMDSPacketStats> readPacketStats;

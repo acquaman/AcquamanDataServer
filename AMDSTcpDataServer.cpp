@@ -101,7 +101,7 @@ void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
 	interfaceName_ = interfaceName;
 	port_ = port;
 
-	qDebug() << "InterfaceName and port " << interfaceName_ << port_;
+//	qDebug() << "InterfaceName and port " << interfaceName_ << port_;
 
 	clientDisconnectSignalMapper_ = new QSignalMapper(this);
 	clientRequestSignalMapper_ = new QSignalMapper(this);
@@ -114,7 +114,7 @@ void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
 		const QString id = settings.value("DefaultSessionConfig").toString();
 		settings.endGroup();
 
-		qDebug() << "What's the id right now" << id;
+//		qDebug() << "What's the id right now" << id;
 
 		QNetworkConfiguration config = manager.configurationFromIdentifier(id);
 		if((config.state() & QNetworkConfiguration::Discovered) != QNetworkConfiguration::Discovered)
@@ -124,12 +124,12 @@ void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
 
 		session_ = new QNetworkSession(config, this);
 		connect(session_, SIGNAL(opened()), this, SLOT(sessionOpened()));
-		qDebug() << "Trying to open session";
+//		qDebug() << "Trying to open session";
 		session_->open();
 	}
 	else
 	{
-		qDebug() << "Just call session opened";
+//		qDebug() << "Just call session opened";
 		sessionOpened();
 	}
 	connect(clientDisconnectSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onClientDisconnect(QString)));
@@ -139,7 +139,7 @@ void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
 
 void AMDSTcpDataServer::stop()
 {
-	qDebug() << "Stopping the server...";
+//	qDebug() << "Stopping the server...";
 	QStringList clientKeys = clientSockets_.keys();
 
 	for(int iClientKey = 0; iClientKey < clientKeys.count(); ++iClientKey)
@@ -158,13 +158,11 @@ void AMDSTcpDataServer::stop()
 	if(session_)
 		session_->close();
 
-	qDebug() << "Server stopped";
+//	qDebug() << "Server stopped";
 }
 
 void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
 {
-	qDebug() << "client request ready for processing, try now";
-
 	QTcpSocket* requestingSocket = clientSockets_.value(processedRequest->socketKey(), 0);
 	if(requestingSocket != 0)
 	{
@@ -173,7 +171,6 @@ void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		output.setVersion(QDataStream::Qt_4_0);
 		output << (quint32)0;
 
-		qDebug() << "Going to write request with type " << processedRequest->requestType();
 		output.encodeClientRequestType(*processedRequest);
 		output.write(*processedRequest);
 
@@ -181,7 +178,7 @@ void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		output << (quint32)(block.size() - sizeof(quint32));
 		requestingSocket->write(block);
 
-		qDebug() << "Just wrote new client request with block size " << block.size();
+//		qDebug() << "Just wrote new client request with block size " << block.size();
 
 		qint64 outboundBytes = block.size();
 		tenMillisecondsStats_.setOutboundBytes(tenMillisecondsStats_.outboundBytes()+outboundBytes);
@@ -192,7 +189,6 @@ void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		if(processedRequest->requestType() == AMDSClientRequestDefinitions::StartTimePlusCount){
 			AMDSClientStartTimePlusCountDataRequest *processedStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(processedRequest);
 			if(processedStartTimePlusCountDataRequest){
-				qDebug() << "Sending out a start time plus count with data count " << processedStartTimePlusCountDataRequest->data().count();
 				QList<AMDSFlatArray> values;
 				for(int x = 0, size = processedStartTimePlusCountDataRequest->data().count(); x < size; x++){
 					AMDSFlatArray oneFlatArray;
@@ -200,11 +196,6 @@ void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 					values.append(oneFlatArray);
 					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
 				}
-//				QVector<double> values = QVector<double>(processedStartTimePlusCountDataRequest->data().count());
-//				for(int x = 0, size = processedStartTimePlusCountDataRequest->data().count(); x < size; x++){
-//					processedStartTimePlusCountDataRequest->data().at(x)->data(values.data()+x);
-//					qDebug() << "Data point at " << x << values.at(x);
-//				}
 			}
 		}
 
@@ -230,7 +221,7 @@ void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 
 void AMDSTcpDataServer::sessionOpened()
 {
-	qDebug() << "Session has been opened";
+//	qDebug() << "Session has been opened";
 	QSettings settings;
 	if(session_)
 	{
@@ -251,7 +242,7 @@ void AMDSTcpDataServer::sessionOpened()
 	QString interfaceWithoutSuffix = interfaceName_;
 	int interfaceOffset = 0;
 
-	qDebug() << "Interface name here is " << interfaceName_;
+//	qDebug() << "Interface name here is " << interfaceName_;
 
 	if(interfaceName_.contains(":"))
 	{
@@ -264,7 +255,7 @@ void AMDSTcpDataServer::sessionOpened()
 		interfaceOffset++;
 	}
 
-	qDebug() << "We will check against " << interfaceWithoutSuffix;
+//	qDebug() << "We will check against " << interfaceWithoutSuffix;
 
 	QList<QNetworkAddressEntry> associatedAddresses = QNetworkInterface::interfaceFromName(interfaceWithoutSuffix).addressEntries();
 

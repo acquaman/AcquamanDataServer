@@ -37,10 +37,8 @@ AMDSClientContinuousDataRequest& AMDSClientContinuousDataRequest::operator =(con
 
 bool AMDSClientContinuousDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	qDebug() << "Calling AMDSClientContinuousDataRequest::writeToDataStream";
 	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientContinuousDataRequest::writeToDataStream";
 
 	*dataStream << startTime_;
 	if(dataStream->status() != QDataStream::Ok)
@@ -51,10 +49,8 @@ bool AMDSClientContinuousDataRequest::writeToDataStream(AMDSDataStream *dataStre
 
 bool AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	qDebug() << "Calling AMDSClientContinuousDataRequest::readFromDataStream";
 	if(!AMDSClientDataRequest::readFromDataStream(dataStream))
 		return false;
-	qDebug() << "Continuing on with AMDSClientContinuousDataRequest::readFromDataStream";
 
 	QDateTime readStartTime;
 	*dataStream >> readStartTime;
