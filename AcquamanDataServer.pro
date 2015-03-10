@@ -32,10 +32,14 @@ HEADERS *= \
 	AMDSLikely.h \
 	AMDSDataStream.h \
 	AMDSEventData.h \
+	AMDSEventDataSupport.h \
 	AMDSBufferGroupInfo.h \
 	AMDSDataHolder.h \
+	AMDSDataHolderSupport.h \
 	AMDSScalarDataHolder.h \
 	AMDSPacketStats.h \
+	AMDSDataTypeDefinitions.h \
+	AMDSFlatArray.h \
 	ClientRequest/AMDSClientRequest.h \
 	ClientRequest/AMDSClientRequestSupport.h \
 	ClientRequest/AMDSClientRequestDefinitions.h \
@@ -43,9 +47,7 @@ HEADERS *= \
 	ClientRequest/AMDSClientIntrospectionRequest.h \
 	ClientRequest/AMDSClientStatisticsRequest.h \
 	ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
-	ClientRequest/AMDSClientContinuousDataRequest.h \
-    AMDSDataTypeDefinitions.h \
-    AMDSFlatArray.h
+	ClientRequest/AMDSClientContinuousDataRequest.h
 
 SOURCES *= main.cpp \
 	AMDSTcpDataServer.cpp \
@@ -57,15 +59,17 @@ SOURCES *= main.cpp \
 	AMDSnDIndex.cpp \
 	AMDSDataStream.cpp \
 	AMDSEventData.cpp \
+	AMDSEventDataSupport.cpp \
 	AMDSBufferGroupInfo.cpp \
 	AMDSDataHolder.cpp \
+	AMDSDataHolderSupport.cpp \
 	AMDSScalarDataHolder.cpp \
 	AMDSPacketStats.cpp \
+	AMDSFlatArray.cpp \
 	ClientRequest/AMDSClientRequest.cpp \
 	ClientRequest/AMDSClientRequestSupport.cpp \
 	ClientRequest/AMDSClientDataRequest.cpp \
 	ClientRequest/AMDSClientIntrospectionRequest.cpp \
 	ClientRequest/AMDSClientStatisticsRequest.cpp \
 	ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
-	ClientRequest/AMDSClientContinuousDataRequest.cpp \
-    AMDSFlatArray.cpp
+	ClientRequest/AMDSClientContinuousDataRequest.cpp

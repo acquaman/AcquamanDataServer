@@ -11,6 +11,13 @@
 #include "ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "ClientRequest/AMDSClientContinuousDataRequest.h"
 
+#include "AMDSDataHolderSupport.h"
+#include "AMDSDataHolder.h"
+#include "AMDSScalarDataHolder.h"
+
+#include "AMDSEventDataSupport.h"
+#include "AMDSEventData.h"
+
 AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
 	QObject(parent)
 {
@@ -22,6 +29,12 @@ AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
 		AMDSClientRequestSupport::registerClass<AMDSClientStartTimePlusCountDataRequest>(AMDSClientRequestDefinitions::StartTimePlusCount);
 	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
 		AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
+
+	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightScalarDataHolder::staticMetaObject.className()))
+		AMDSDataHolderSupport::registerClass<AMDSLightWeightScalarDataHolder>();
+
+	if(!AMDSEventDataSupport::registeredClasses()->contains(AMDSLightWeightEventData::staticMetaObject.className()))
+		AMDSEventDataSupport::registerClass<AMDSLightWeightEventData>();
 
 	session_ = 0;
 	server_ = 0;

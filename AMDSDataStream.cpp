@@ -1,6 +1,8 @@
 #include "AMDSDataStream.h"
 
 #include "ClientRequest/AMDSClientRequestSupport.h"
+#include "AMDSEventDataSupport.h"
+#include "AMDSDataHolderSupport.h"
 
 AMDSDataStream::AMDSDataStream() :
 	QDataStream()
@@ -66,6 +68,16 @@ void AMDSDataStream::read(AMDSAxisInfo &axisInfo){
 	axisInfo.setIncrement(increment);
 }
 
+void AMDSDataStream::write(const AMDSAxisInfo &axisInfo){
+	*this << axisInfo.name();
+	*this << axisInfo.description();
+	*this << axisInfo.units();
+	QDataStream::operator <<(axisInfo.size());
+	QDataStream::operator <<(axisInfo.isUniform());
+	QDataStream::operator <<(axisInfo.start());
+	QDataStream::operator <<(axisInfo.increment());
+}
+
 void AMDSDataStream::read(AMDSBufferGroupInfo &bufferGroupInfo){
 	QString name;
 	QString description;
@@ -98,6 +110,15 @@ void AMDSDataStream::read(AMDSBufferGroupInfo &bufferGroupInfo){
 	bufferGroupInfo.setDescription(description);
 	bufferGroupInfo.setUnits(units);
 	bufferGroupInfo.setAxes(axes);
+}
+
+void AMDSDataStream::write(const AMDSBufferGroupInfo &bufferGroupInfo){
+	*this << bufferGroupInfo.name();
+	*this << bufferGroupInfo.description();
+	*this << bufferGroupInfo.units();
+	QDataStream::operator <<((quint8)(bufferGroupInfo.axes().count()));
+	for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++)
+		write(bufferGroupInfo.axes().at(x));
 }
 
 void AMDSDataStream::read(AMDSPacketStats &packetStat){
@@ -135,25 +156,6 @@ void AMDSDataStream::read(AMDSPacketStats &packetStat){
 	packetStat.setMaxTotalBytes(maxTotalBytes);
 }
 
-void AMDSDataStream::write(const AMDSAxisInfo &axisInfo){
-	*this << axisInfo.name();
-	*this << axisInfo.description();
-	*this << axisInfo.units();
-	QDataStream::operator <<(axisInfo.size());
-	QDataStream::operator <<(axisInfo.isUniform());
-	QDataStream::operator <<(axisInfo.start());
-	QDataStream::operator <<(axisInfo.increment());
-}
-
-void AMDSDataStream::write(const AMDSBufferGroupInfo &bufferGroupInfo){
-	*this << bufferGroupInfo.name();
-	*this << bufferGroupInfo.description();
-	*this << bufferGroupInfo.units();
-	QDataStream::operator <<((quint8)(bufferGroupInfo.axes().count()));
-	for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++)
-		write(bufferGroupInfo.axes().at(x));
-}
-
 void AMDSDataStream::write(const AMDSPacketStats &packetStat){
 	*this << packetStat.name();
 	QDataStream::operator <<((quint64)(packetStat.inboundBytes()));
@@ -161,6 +163,60 @@ void AMDSDataStream::write(const AMDSPacketStats &packetStat){
 	QDataStream::operator <<((quint64)(packetStat.maxInboundBytes()));
 	QDataStream::operator <<((quint64)(packetStat.maxOutboundBytes()));
 	QDataStream::operator <<((quint64)(packetStat.maxTotalBytes()));
+}
+
+void AMDSDataStream::encodeEventDataType(const AMDSEventData &eventData){
+	QString eventDataClassNameAsString(eventData.metaObject()->className());
+	*this << eventDataClassNameAsString;
+}
+
+void AMDSDataStream::write(const AMDSEventData &eventData){
+	eventData.writeToDataStream(this);
+}
+
+QString AMDSDataStream::decodeEventDataType(){
+	QString eventDataClassName;
+	*this >> eventDataClassName;
+	if(status() != QDataStream::Ok)
+		return QString();
+
+	return eventDataClassName;
+}
+
+AMDSEventData* AMDSDataStream::decodeAndInstantiateEventData(){
+	QString eventDataClassName = decodeEventDataType();
+	return AMDSEventDataSupport::instantiateEventDataFromClassName(eventDataClassName);
+}
+
+void AMDSDataStream::read(AMDSEventData &eventData){
+	eventData.readFromDataStream(this);
+}
+
+void AMDSDataStream::encodeDataHolderType(const AMDSDataHolder &dataHolder){
+	QString classNameAsString(dataHolder.metaObject()->className());
+	*this << classNameAsString;
+}
+
+void AMDSDataStream::write(const AMDSDataHolder &dataHolder){
+	dataHolder.writeToDataStream(this);
+}
+
+QString AMDSDataStream::decodeDataHolderType(){
+	QString dataHolderClassName;
+	*this >> dataHolderClassName;
+	if(status() != QDataStream::Ok)
+		return QString();
+
+	return dataHolderClassName;
+}
+
+AMDSDataHolder* AMDSDataStream::decodeAndInstantiateDataHolder(){
+	QString dataHolderClassName = decodeDataHolderType();
+	return AMDSDataHolderSupport::instantiateDataHolderFromClassName(dataHolderClassName);
+}
+
+void AMDSDataStream::read(AMDSDataHolder &dataHolder){
+	dataHolder.readFromDataStream(this);
 }
 
 void AMDSDataStream::encodeDataType(AMDSDataTypeDefinitions::DataType dataType){
@@ -205,14 +261,6 @@ void AMDSDataStream::write(const AMDSFlatArray &flatArray){
 	default:
 		break;
 	}
-}
-
-void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequest){
-	QDataStream::operator <<((quint8)clientRequest.requestType());
-}
-
-void AMDSDataStream::write(const AMDSClientRequest &clientRequest){
-	clientRequest.writeToDataStream(this);
 }
 
 AMDSDataTypeDefinitions::DataType AMDSDataStream::decodeDataType(){
@@ -271,6 +319,14 @@ void AMDSDataStream::read(AMDSFlatArray &flatArray){
 	default:
 		break;
 	}
+}
+
+void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequest){
+	QDataStream::operator <<((quint8)clientRequest.requestType());
+}
+
+void AMDSDataStream::write(const AMDSClientRequest &clientRequest){
+	clientRequest.writeToDataStream(this);
 }
 
 AMDSClientRequestDefinitions::RequestType AMDSDataStream::decodeRequestType(){

@@ -19,23 +19,34 @@ public:
 	virtual ~AMDSDataStream();
 
 	void write(const AMDSAxisInfo &axisInfo);
+	/// If the axis info was not readable, then the passed in reference is left unchanged.
+	void read(AMDSAxisInfo &axisInfo);
+
 	void write(const AMDSBufferGroupInfo &bufferGroupInfo);
+	void read(AMDSBufferGroupInfo &bufferGroupInfo);
+
 	void write(const AMDSPacketStats &packetStat);
+	void read(AMDSPacketStats &packetStat);
+
+	void encodeEventDataType(const AMDSEventData &eventData);
+	void write(const AMDSEventData &eventData);
+	QString decodeEventDataType();
+	AMDSEventData* decodeAndInstantiateEventData();
+	void read(AMDSEventData &eventData);
+
+	void encodeDataHolderType(const AMDSDataHolder &dataHolder);
+	void write(const AMDSDataHolder &dataHolder);
+	QString decodeDataHolderType();
+	AMDSDataHolder* decodeAndInstantiateDataHolder();
+	void read(AMDSDataHolder &dataHolder);
 
 	void encodeDataType(AMDSDataTypeDefinitions::DataType dataType);
 	void write(const AMDSFlatArray &flatArray);
-
-	void encodeClientRequestType(const AMDSClientRequest &clientRequest);
-	void write(const AMDSClientRequest &clientRequest);
-
-	/// If the axis info was not readable, then the passed in reference is left unchanged.
-	void read(AMDSAxisInfo &axisInfo);
-	void read(AMDSBufferGroupInfo &bufferGroupInfo);
-	void read(AMDSPacketStats &packetStat);
-
 	AMDSDataTypeDefinitions::DataType decodeDataType();
 	void read(AMDSFlatArray &flatArray);
 
+	void encodeClientRequestType(const AMDSClientRequest &clientRequest);
+	void write(const AMDSClientRequest &clientRequest);
 	AMDSClientRequestDefinitions::RequestType decodeRequestType();
 	AMDSClientRequest* decodeAndInstantiateClientRequestType();
 	void read(AMDSClientRequest &clientRequest);

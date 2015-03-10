@@ -94,6 +94,9 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 //			for(int y = 0, ySize = bufferGroupInfo_.spanSize(); y < ySize; y++)
 //				*dataStream << oneClientDataRequestVector[y];
 		}
+
+		dataStream->encodeDataHolderType(*(data_.at(0)));
+		dataStream->write(*(data_.at(0)));
 	}
 
 	return true;
@@ -116,6 +119,7 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	QList<AMDSFlatArray> readFlatArrays;
 	QList<AMDSDataHolder*> readDataHolder;
 	QVector<double> totalVector;
+	AMDSDataHolder *oneDataHolder;
 
 	*dataStream >> readBufferName;
 	if(dataStream->status() != QDataStream::Ok)
@@ -142,7 +146,9 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
 
-		for(quint64 x = 0; x < totalSize; x++){
+
+//		for(quint64 x = 0; x < totalSize; x++){
+		for(quint16 x = 0; x < readDataCount; x++){
 			AMDSFlatArray oneFlatArray(readDataType, 1);
 			dataStream->read(oneFlatArray);
 			readFlatArrays.append(oneFlatArray);
@@ -151,6 +157,11 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 //		totalVector = QVector<double>(totalSize);
 //		for(quint64 x = 0; x < totalSize; x++)
 //			*dataStream >> totalVector[x];
+
+		oneDataHolder = dataStream->decodeAndInstantiateDataHolder();
+		dataStream->read(*oneDataHolder);
+		if(dataStream->status() != QDataStream::Ok)
+			return false;
 	}
 
 	setBufferName(readBufferName);
@@ -163,7 +174,8 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		int totalCounter = 0;
 		clearData();
 		for(quint16 x = 0; x < readDataCount; x++){
-			AMDSScalarDataHolder *oneScalarDataHolder = new AMDSScalarDataHolder();
+//			AMDSScalarDataHolder *oneScalarDataHolder = new AMDSScalarDataHolder();
+			AMDSLightWeightScalarDataHolder *oneScalarDataHolder = new AMDSLightWeightScalarDataHolder();
 			oneScalarDataHolder->setData(&(readFlatArrays[x]));
 
 			appendData(oneScalarDataHolder);
@@ -179,6 +191,8 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 //			oneScalarDataHolder->data(&oneStoredValue);
 //			qDebug() << "One value was " << oneStoredValue;
 		}
+
+		data_[0] = oneDataHolder;
 	}
 
 	return true;

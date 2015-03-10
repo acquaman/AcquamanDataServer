@@ -60,6 +60,7 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clie
 			AMDSFlatArray oneFlatArray;
 			dataHolder->data(&oneFlatArray);
 			qDebug() << "Iterating at " << iCurrent << " as " << oneFlatArray.vectorDouble().at(0);
+			qDebug() << "Data holder in AMDSBufferGroup thinks its type is " << dataHolder->metaObject()->className();
 			clientStartTimePlusCountDataRequest->appendData(dataHolder);
 //			request->histogramData()->append(dataHolders_[iCurrent]);
 		}
