@@ -19,6 +19,8 @@ bool AMDSLightWeightScalarDataHolder::writeToDataStream(AMDSDataStream *dataStre
 
 	AMDSFlatArray flatDataArray = AMDSFlatArray();
 	data(&flatDataArray);
+
+	dataStream->encodeDataType(flatDataArray.dataType());
 	dataStream->write(flatDataArray);
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
@@ -32,6 +34,17 @@ bool AMDSLightWeightScalarDataHolder::readFromDataStream(AMDSDataStream *dataStr
 		return false;
 
 	// something about data here
+	AMDSDataTypeDefinitions::DataType readDataType;
+	readDataType = dataStream->decodeDataType();
+	if(readDataType == AMDSDataTypeDefinitions::InvalidType)
+		return false;
+
+	AMDSFlatArray flatDataArray = AMDSFlatArray(readDataType, 1);
+	dataStream->read(flatDataArray);
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
+	singleValue_ = flatDataArray.constVectorDouble().at(0);
 
 	return true;
 }

@@ -2,6 +2,7 @@
 
 #include "AMDSDataStream.h"
 #include "AMDSScalarDataHolder.h"
+#include "AMDSDataHolderSupport.h"
 
 AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	AMDSClientRequest(parent)
@@ -80,17 +81,21 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 			return false;
 		// do some data writing here
 
-		AMDSFlatArray oneFlatArray(AMDSDataTypeDefinitions::Signed8, 0);
-		data_.at(0)->data(&oneFlatArray);
-		dataStream->encodeDataType(oneFlatArray.dataType());
-		for(int x = 0, xSize = data_.count(); x < xSize; x++){
-			AMDSFlatArray oneFlatArray(AMDSDataTypeDefinitions::Signed8, 0);
-			data_.at(x)->data(&oneFlatArray);
-			dataStream->write(oneFlatArray);
-		}
+//		AMDSFlatArray oneFlatArray(AMDSDataTypeDefinitions::Signed8, 0);
+//		data_.at(0)->data(&oneFlatArray);
+//		dataStream->encodeDataType(oneFlatArray.dataType());
+//		for(int x = 0, xSize = data_.count(); x < xSize; x++){
+//			AMDSFlatArray oneFlatArray(AMDSDataTypeDefinitions::Signed8, 0);
+//			data_.at(x)->data(&oneFlatArray);
+//			dataStream->write(oneFlatArray);
+//		}
+
+//		dataStream->encodeDataHolderType(*(data_.at(0)));
+//		dataStream->write(*(data_.at(0)));
 
 		dataStream->encodeDataHolderType(*(data_.at(0)));
-		dataStream->write(*(data_.at(0)));
+		for(int x = 0, size = data_.count(); x < size; x++)
+			dataStream->write(*(data_.at(x)));
 	}
 
 	return true;
@@ -131,21 +136,38 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 			return false;
 		// do some data reading here
 
-		readDataType = dataStream->decodeDataType();
-		if(dataStream->status() != QDataStream::Ok)
+//		readDataType = dataStream->decodeDataType();
+//		if(dataStream->status() != QDataStream::Ok)
+//			return false;
+
+
+//		for(quint16 x = 0; x < readDataCount; x++){
+//			AMDSFlatArray oneFlatArray(readDataType, 1);
+//			dataStream->read(oneFlatArray);
+//			readFlatArrays.append(oneFlatArray);
+//		}
+
+//		oneDataHolder = dataStream->decodeAndInstantiateDataHolder();
+//		dataStream->read(*oneDataHolder);
+//		if(dataStream->status() != QDataStream::Ok)
+//			return false;
+
+		QString readDataHolderType;
+		readDataHolderType = dataStream->decodeDataHolderType();
+		if(readDataHolderType.isEmpty())
 			return false;
 
+		AMDSDataHolder *oneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(readDataHolderType);
+		if(!oneDataHolder)
+			return false;
 
-		for(quint16 x = 0; x < readDataCount; x++){
-			AMDSFlatArray oneFlatArray(readDataType, 1);
-			dataStream->read(oneFlatArray);
-			readFlatArrays.append(oneFlatArray);
+		for(int x = 0; x < readDataCount; x++){
+			oneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(readDataHolderType);
+			dataStream->read(*oneDataHolder);
+			if(dataStream->status() != QDataStream::Ok)
+				return false;
+			readDataHolder.append(oneDataHolder);
 		}
-
-		oneDataHolder = dataStream->decodeAndInstantiateDataHolder();
-		dataStream->read(*oneDataHolder);
-		if(dataStream->status() != QDataStream::Ok)
-			return false;
 	}
 
 	setBufferName(readBufferName);
@@ -157,15 +179,16 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		setUniformDataType((AMDSDataTypeDefinitions::DataType)readUniformDataType);
 		clearData();
 		for(quint16 x = 0; x < readDataCount; x++){
-			AMDSLightWeightScalarDataHolder *oneScalarDataHolder = new AMDSLightWeightScalarDataHolder();
-			oneScalarDataHolder->setData(&(readFlatArrays[x]));
+			appendData(readDataHolder.at(x));
+//			AMDSLightWeightScalarDataHolder *oneScalarDataHolder = new AMDSLightWeightScalarDataHolder();
+//			oneScalarDataHolder->setData(&(readFlatArrays[x]));
 
-			appendData(oneScalarDataHolder);
-			AMDSFlatArray oneStoredValue(AMDSDataTypeDefinitions::InvalidType, 0);
-			oneScalarDataHolder->data(&oneStoredValue);
+//			appendData(oneScalarDataHolder);
+//			AMDSFlatArray oneStoredValue(AMDSDataTypeDefinitions::InvalidType, 0);
+//			oneScalarDataHolder->data(&oneStoredValue);
 		}
 
-		data_[0] = oneDataHolder;
+//		data_[0] = oneDataHolder;
 	}
 
 	return true;
