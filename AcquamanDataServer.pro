@@ -48,7 +48,8 @@ HEADERS *= \
 	ClientRequest/AMDSClientStatisticsRequest.h \
 	ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
 	ClientRequest/AMDSClientContinuousDataRequest.h \
-    AMDSMetaObjectSupport.h
+    AMDSMetaObjectSupport.h \
+    AMDSSpectralDataHolder.h
 
 SOURCES *= main.cpp \
 	AMDSTcpDataServer.cpp \
@@ -74,4 +75,5 @@ SOURCES *= main.cpp \
 	ClientRequest/AMDSClientStatisticsRequest.cpp \
 	ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
 	ClientRequest/AMDSClientContinuousDataRequest.cpp \
-    AMDSMetaObjectSupport.cpp
+    AMDSMetaObjectSupport.cpp \
+    AMDSSpectralDataHolder.cpp

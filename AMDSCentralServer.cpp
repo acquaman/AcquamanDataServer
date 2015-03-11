@@ -83,7 +83,8 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 #include "AMDSScalarDataHolder.h"
 void AMDSCentralServer::onFiftyMillisecondTimerUpdate(){
 	AMDSLightWeightScalarDataHolder *oneScalerDataHolder = new AMDSLightWeightScalarDataHolder();
-	oneScalerDataHolder->setSingleValue(simpleCounter_++);
+	double valueAsDouble = (double)simpleCounter_++;
+	oneScalerDataHolder->setSingleValue(valueAsDouble);
 
 	energyBufferGroup_->append(oneScalerDataHolder);
 }

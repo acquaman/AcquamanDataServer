@@ -2,8 +2,8 @@
 
 #include "AMDSDataStream.h"
 
-AMDSLightWeightScalarDataHolder::AMDSLightWeightScalarDataHolder(QObject *parent) :
-	AMDSLightWeightDataHolder(parent)
+AMDSLightWeightScalarDataHolder::AMDSLightWeightScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType, QObject *parent) :
+	AMDSLightWeightDataHolder(parent), valueFlatArray_(dataType, 1)
 {
 	eventData_ = new AMDSLightWeightEventData();
 }
@@ -17,12 +17,18 @@ bool AMDSLightWeightScalarDataHolder::writeToDataStream(AMDSDataStream *dataStre
 	if(!AMDSLightWeightDataHolder::writeToDataStream(dataStream, encodeDataType))
 		return false;
 
-	AMDSFlatArray flatDataArray = AMDSFlatArray();
-	data(&flatDataArray);
+//	AMDSFlatArray flatDataArray = AMDSFlatArray();
+//	data(&flatDataArray);
+
+//	if(encodeDataType)
+//		dataStream->encodeDataType(flatDataArray.dataType());
+//	dataStream->write(flatDataArray);
+//	if(dataStream->status() != QDataStream::Ok)
+//		return false;
 
 	if(encodeDataType)
-		dataStream->encodeDataType(flatDataArray.dataType());
-	dataStream->write(flatDataArray);
+		dataStream->encodeDataType(valueFlatArray_.dataType());
+	dataStream->write(valueFlatArray_);
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
@@ -42,20 +48,25 @@ bool AMDSLightWeightScalarDataHolder::readFromDataStream(AMDSDataStream *dataStr
 	if(readDataType == AMDSDataTypeDefinitions::InvalidType)
 		return false;
 
-	AMDSFlatArray flatDataArray = AMDSFlatArray(readDataType, 1);
-	dataStream->read(flatDataArray);
+//	AMDSFlatArray flatDataArray = AMDSFlatArray(readDataType, 1);
+//	dataStream->read(flatDataArray);
+//	if(dataStream->status() != QDataStream::Ok)
+//		return false;
+
+//	singleValue_ = flatDataArray.constVectorDouble().at(0);
+
+	valueFlatArray_.clearAndReset(readDataType, 1);
+	dataStream->read(valueFlatArray_);
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
-
-	singleValue_ = flatDataArray.constVectorDouble().at(0);
 
 	return true;
 }
 
-AMDSFullScalarDataHolder::AMDSFullScalarDataHolder(AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo> &axes, QObject *parent) :
+AMDSFullScalarDataHolder::AMDSFullScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType, AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo> &axes, QObject *parent) :
 	AMDSFullDataHolder(axesStyle, dataTypeStyle, axes, parent)
 {
-	lightWeightDataHolder_ = new AMDSLightWeightScalarDataHolder(this);
+	lightWeightDataHolder_ = new AMDSLightWeightScalarDataHolder(dataType, this);
 }
 
 AMDSFullScalarDataHolder::~AMDSFullScalarDataHolder()
