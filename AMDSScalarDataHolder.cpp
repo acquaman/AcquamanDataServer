@@ -12,15 +12,16 @@ AMDSLightWeightScalarDataHolder::~AMDSLightWeightScalarDataHolder()
 {
 }
 
-bool AMDSLightWeightScalarDataHolder::writeToDataStream(AMDSDataStream *dataStream) const{
+bool AMDSLightWeightScalarDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
 	// This will take care of encoding and writing our eventData to the stream
-	if(!AMDSLightWeightDataHolder::writeToDataStream(dataStream))
+	if(!AMDSLightWeightDataHolder::writeToDataStream(dataStream, encodeDataType))
 		return false;
 
 	AMDSFlatArray flatDataArray = AMDSFlatArray();
 	data(&flatDataArray);
 
-	dataStream->encodeDataType(flatDataArray.dataType());
+	if(encodeDataType)
+		dataStream->encodeDataType(flatDataArray.dataType());
 	dataStream->write(flatDataArray);
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
@@ -28,14 +29,16 @@ bool AMDSLightWeightScalarDataHolder::writeToDataStream(AMDSDataStream *dataStre
 	return true;
 }
 
-bool AMDSLightWeightScalarDataHolder::readFromDataStream(AMDSDataStream *dataStream){
+bool AMDSLightWeightScalarDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
 	// This will take care of decoding and instantiating our eventData from the stream (and deleting any old eventData memory we allocated)
-	if(!AMDSLightWeightDataHolder::readFromDataStream(dataStream))
+	if(!AMDSLightWeightDataHolder::readFromDataStream(dataStream, decodeAsDataType))
 		return false;
 
-	// something about data here
 	AMDSDataTypeDefinitions::DataType readDataType;
-	readDataType = dataStream->decodeDataType();
+	if(decodeAsDataType == AMDSDataTypeDefinitions::InvalidType)
+		readDataType = dataStream->decodeDataType();
+	else
+		readDataType = decodeAsDataType;
 	if(readDataType == AMDSDataTypeDefinitions::InvalidType)
 		return false;
 
@@ -59,17 +62,17 @@ AMDSFullScalarDataHolder::~AMDSFullScalarDataHolder()
 {
 }
 
-bool AMDSFullScalarDataHolder::writeToDataStream(AMDSDataStream *dataStream) const{
+bool AMDSFullScalarDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
 	// This will take care of encoding and writing our lightWeightDataHolder to the stream
-	if(!AMDSFullDataHolder::writeToDataStream(dataStream))
+	if(!AMDSFullDataHolder::writeToDataStream(dataStream, encodeDataType))
 		return false;
 
 	return true;
 }
 
-bool AMDSFullScalarDataHolder::readFromDataStream(AMDSDataStream *dataStream){
+bool AMDSFullScalarDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
 	// This will take care of decoding and instantiating our lightWeightDataHolder from the stream (and deleting any old memory we allocated for one before)
-	if(!AMDSFullDataHolder::readFromDataStream(dataStream))
+	if(!AMDSFullDataHolder::readFromDataStream(dataStream, decodeAsDataType))
 		return false;
 
 	return true;

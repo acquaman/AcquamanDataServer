@@ -35,10 +35,10 @@ public:
 	void read(AMDSEventData &eventData);
 
 	void encodeDataHolderType(const AMDSDataHolder &dataHolder);
-	void write(const AMDSDataHolder &dataHolder);
+	void write(const AMDSDataHolder &dataHolder, bool encodeDataType = true);
 	QString decodeDataHolderType();
 	AMDSDataHolder* decodeAndInstantiateDataHolder();
-	void read(AMDSDataHolder &dataHolder);
+	void read(AMDSDataHolder &dataHolder, AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::InvalidType);
 
 	void encodeDataType(AMDSDataTypeDefinitions::DataType dataType);
 	void write(const AMDSFlatArray &flatArray);

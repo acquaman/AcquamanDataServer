@@ -197,8 +197,8 @@ void AMDSDataStream::encodeDataHolderType(const AMDSDataHolder &dataHolder){
 	*this << classNameAsString;
 }
 
-void AMDSDataStream::write(const AMDSDataHolder &dataHolder){
-	dataHolder.writeToDataStream(this);
+void AMDSDataStream::write(const AMDSDataHolder &dataHolder, bool encodeDataType){
+	dataHolder.writeToDataStream(this, encodeDataType);
 }
 
 QString AMDSDataStream::decodeDataHolderType(){
@@ -215,8 +215,8 @@ AMDSDataHolder* AMDSDataStream::decodeAndInstantiateDataHolder(){
 	return AMDSDataHolderSupport::instantiateDataHolderFromClassName(dataHolderClassName);
 }
 
-void AMDSDataStream::read(AMDSDataHolder &dataHolder){
-	dataHolder.readFromDataStream(this);
+void AMDSDataStream::read(AMDSDataHolder &dataHolder, AMDSDataTypeDefinitions::DataType dataType){
+	dataHolder.readFromDataStream(this, dataType);
 }
 
 void AMDSDataStream::encodeDataType(AMDSDataTypeDefinitions::DataType dataType){

@@ -21,9 +21,9 @@ public:
 	inline void setData(AMDSFlatArray *inputValues);
 
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
+	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
 protected:
 	double singleValue_;
@@ -39,9 +39,9 @@ public:
 	virtual inline bool data(AMDSFlatArray *outputValues) const;
 
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
+	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
 protected:
 };

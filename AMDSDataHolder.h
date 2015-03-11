@@ -34,6 +34,7 @@ public:
 	inline virtual AMDSDataHolder::AxesStyle axesStyle() const = 0;
 	inline virtual AMDSDataHolder::DataTypeStyle dataTypeStyle() const = 0;
 	inline virtual const AMDSEventData* eventData() const = 0;
+	inline virtual AMDSDataTypeDefinitions::DataType dataType() const = 0;
 
 	virtual inline QList<AMDSAxisInfo> axes() const = 0;
 	virtual inline quint8 rank() const = 0;
@@ -51,10 +52,10 @@ public:
 	virtual inline bool operator >(const QDateTime &rhs) = 0;
 	virtual inline bool operator ==(const QDateTime &rhs) = 0;
 
-	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const = 0;
-	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream) = 0;
+	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered. By default the data type is encoded into the stream; however, this can be disabled and moved to a higher level if need be.
+	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType = true) const = 0;
+	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered. By default the data type is decoded from the stream; however, passing a particular data type will assume that there is no data type encoded in the stream.
+	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType = AMDSDataTypeDefinitions::InvalidType) = 0;
 };
 
 class AMDSLightWeightDataHolder : public AMDSDataHolder
@@ -67,6 +68,7 @@ public:
 	inline virtual AMDSDataHolder::AxesStyle axesStyle() const { return AMDSDataHolder::UniformAxes; }
 	inline virtual AMDSDataHolder::DataTypeStyle dataTypeStyle() const { return AMDSDataHolder::UniformDataType; }
 	inline const AMDSEventData* eventData() const { return eventData_; }
+	inline virtual AMDSDataTypeDefinitions::DataType dataType() const;
 
 	virtual inline QList<AMDSAxisInfo> axes() const { return QList<AMDSAxisInfo>(); }
 	virtual inline quint8 rank() const { return 0; }
@@ -85,9 +87,9 @@ public:
 	virtual inline bool operator ==(const QDateTime &rhs);
 
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
+	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
 protected:
 	AMDSEventData *eventData_;
@@ -103,6 +105,7 @@ public:
 	inline virtual AMDSDataHolder::AxesStyle axesStyle() const { return axesStyle_; }
 	inline virtual AMDSDataHolder::DataTypeStyle dataTypeStyle() const { return dataTypeStyle_; }
 	inline const AMDSEventData* eventData() const { return lightWeightDataHolder_->eventData(); }
+	inline virtual AMDSDataTypeDefinitions::DataType dataType() const;
 
 	virtual inline QList<AMDSAxisInfo> axes() const { return axes_; }
 	virtual inline quint8 rank() const { return axes_.count(); }
@@ -121,9 +124,9 @@ public:
 	virtual inline bool operator ==(const QDateTime &rhs) { return lightWeightDataHolder_->operator ==(rhs); }
 
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
+	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
 protected:
 	AMDSLightWeightDataHolder *lightWeightDataHolder_;
@@ -140,9 +143,18 @@ quint32 AMDSLightWeightDataHolder::size(int axisId) const{
 	return 0;
 }
 
+AMDSDataTypeDefinitions::DataType AMDSLightWeightDataHolder::dataType() const{
+	if(dataTypeStyle() != AMDSDataHolder::UniformDataType)
+		return AMDSDataTypeDefinitions::InvalidType;
+
+	AMDSFlatArray oneFlatArray;
+	data(&oneFlatArray);
+	return oneFlatArray.dataType();
+}
+
 bool AMDSLightWeightDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
 	Q_UNUSED(axes)
-	return true;
+	return false;
 }
 
 bool AMDSLightWeightDataHolder::operator <(const QDateTime &rhs){
@@ -173,6 +185,15 @@ quint64 AMDSFullDataHolder::spanSize() const {
 	for(quint8 i=axes_.count()-1; i>=0; --i)
 		aSize *= axes_.at(i).size();
 	return aSize;
+}
+
+AMDSDataTypeDefinitions::DataType AMDSFullDataHolder::dataType() const{
+	if(dataTypeStyle() != AMDSDataHolder::UniformDataType)
+		return AMDSDataTypeDefinitions::InvalidType;
+
+	AMDSFlatArray oneFlatArray;
+	data(&oneFlatArray);
+	return oneFlatArray.dataType();
 }
 
 bool AMDSFullDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){

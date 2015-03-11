@@ -23,7 +23,8 @@ AMDSLightWeightDataHolder::~AMDSLightWeightDataHolder()
 {
 }
 
-bool AMDSLightWeightDataHolder::writeToDataStream(AMDSDataStream *dataStream) const{
+bool AMDSLightWeightDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
+	Q_UNUSED(encodeDataType)
 	dataStream->encodeEventDataType(*eventData_);
 	if(!eventData_->writeToDataStream(dataStream))
 		return false;
@@ -31,7 +32,8 @@ bool AMDSLightWeightDataHolder::writeToDataStream(AMDSDataStream *dataStream) co
 	return true;
 }
 
-bool AMDSLightWeightDataHolder::readFromDataStream(AMDSDataStream *dataStream){
+bool AMDSLightWeightDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
+	Q_UNUSED(decodeAsDataType)
 	if(eventData_)
 		eventData_->deleteLater();
 	eventData_ = dataStream->decodeAndInstantiateEventData();
@@ -54,9 +56,9 @@ AMDSFullDataHolder::~AMDSFullDataHolder()
 {
 }
 
-bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream) const{
+bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
 	dataStream->encodeDataHolderType(*lightWeightDataHolder_);
-	if(!lightWeightDataHolder_->writeToDataStream(dataStream))
+	if(!lightWeightDataHolder_->writeToDataStream(dataStream, encodeDataType))
 		return false;
 
 	*dataStream << (quint8)axesStyle_;
@@ -79,7 +81,7 @@ bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream) const{
 	return true;
 }
 
-bool AMDSFullDataHolder::readFromDataStream(AMDSDataStream *dataStream){
+bool AMDSFullDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
 	if(lightWeightDataHolder_)
 		lightWeightDataHolder_->deleteLater();
 
@@ -89,7 +91,7 @@ bool AMDSFullDataHolder::readFromDataStream(AMDSDataStream *dataStream){
 	else
 		return false;
 
-	if(!lightWeightDataHolder_->readFromDataStream(dataStream))
+	if(!lightWeightDataHolder_->readFromDataStream(dataStream, decodeAsDataType))
 		return false;
 
 	quint8 readAxesStyleAsInt;
