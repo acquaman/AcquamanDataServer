@@ -1,6 +1,7 @@
 #include "AMDSDataHolderSupport.h"
 
 #include "AMDSDataHolder.h"
+#include "AMDSMetaObjectSupport.h"
 
 AMDSDataHolderObjectInfo::AMDSDataHolderObjectInfo()
 {
@@ -15,7 +16,7 @@ AMDSDataHolderObjectInfo::AMDSDataHolderObjectInfo(AMDSDataHolder *prototypeData
 
 AMDSDataHolderObjectInfo::AMDSDataHolderObjectInfo(const QMetaObject *dataHolderMetaObject)
 {
-	if(inheritsDataHolder(dataHolderMetaObject))
+	if(AMDSDataHolderSupport::inheritsDataHolder(dataHolderMetaObject))
 		initWithMetaObject(dataHolderMetaObject);
 	else{
 		dataHolderMetaObject_ = 0;
@@ -27,41 +28,10 @@ AMDSDataHolderObjectInfo::~AMDSDataHolderObjectInfo()
 {
 }
 
-bool AMDSDataHolderObjectInfo::inheritsDataHolderClass(const QMetaObject *queryMetaObject, const QMetaObject *typeMetaObject)
-{
-	const QMetaObject *dataHolderSuperClass = queryMetaObject;
-	const QMetaObject *generalDataHolderMetaObject = &(AMDSDataHolder::staticMetaObject);
-	bool inheritsDataHolderClass = false;
-	do {
-		inheritsDataHolderClass = (dataHolderSuperClass->className() == generalDataHolderMetaObject->className());
-	} while( (dataHolderSuperClass = dataHolderSuperClass->superClass()) && !inheritsDataHolderClass);
-
-	if(!inheritsDataHolderClass)
-		return false;
-
-	const QMetaObject *specificSuperClass = queryMetaObject;
-	bool inheritsSpecificClass = false;
-	do {
-		inheritsSpecificClass = (specificSuperClass->className() == typeMetaObject->className());
-	} while( (specificSuperClass = specificSuperClass->superClass()) && !inheritsSpecificClass);
-
-	return inheritsSpecificClass;
-}
-
 void AMDSDataHolderObjectInfo::initWithMetaObject(const QMetaObject *dataHolderMetaObject)
 {
 	dataHolderMetaObject_ = dataHolderMetaObject;
 	dataHolderClassName_ = dataHolderMetaObject->className();
-}
-
-bool AMDSDataHolderObjectInfo::inheritsDataHolder(const QMetaObject *metaObject) const
-{
-	const QMetaObject *superClass = metaObject;
-	bool inheritsDataHolderClass;
-	do {
-		inheritsDataHolderClass = (superClass->className() == QString("AMDSDataHolder"));
-	} while( (superClass = superClass->superClass()) && !inheritsDataHolderClass);
-	return inheritsDataHolderClass;
 }
 
 namespace AMDSDataHolderSupport{
@@ -78,5 +48,10 @@ namespace AMDSDataHolderSupport{
 				return dataHolder;
 		}
 		return 0;
+	}
+
+	bool inheritsDataHolder(const QMetaObject *queryMetaObject){
+		const QMetaObject *dataHolderMetaObject = &(AMDSDataHolder::staticMetaObject);
+		return AMDSMetaObjectSupport::inheritsClass(queryMetaObject, dataHolderMetaObject);
 	}
 }

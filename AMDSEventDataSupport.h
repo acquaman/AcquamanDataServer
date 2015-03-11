@@ -34,9 +34,6 @@ protected:
 private:
 	/// used to implement both constructors
 	void initWithMetaObject(const QMetaObject *eventDataMetaObject);
-
-	/// checks to make sure a QMetaObject inherits AMDSEventData
-	bool inheritsEventData(const QMetaObject *metaObject) const;
 };
 
 namespace AMDSEventDataSupport {
@@ -47,19 +44,13 @@ namespace AMDSEventDataSupport {
 
 	AMDSEventData* instantiateEventDataFromClassName(const QString &className);
 
+	bool inheritsEventData(const QMetaObject *queryMetaObject);
+
 	template<class Ta>
 	bool registerClass(){
 		// create the meta object for the client request
 		const QMetaObject *eventDataMetaObject = &(Ta::staticMetaObject);
-
-		// is this a subclass of AMDSClientRequest? (Or an AMDSClientRequest itself?)
-		const QMetaObject *eventDataSuperClass = eventDataMetaObject;
-		bool inheritsEventDataClass;
-		do {
-			inheritsEventDataClass = (eventDataSuperClass->className() == QString("AMDSEventData"));
-		} while( (eventDataSuperClass = eventDataSuperClass->superClass()) && !inheritsEventDataClass);
-
-		if(!inheritsEventDataClass)
+		if(!inheritsEventData(eventDataMetaObject))
 			return false;
 
 		AMDSEventDataObjectInfo newInfo(eventDataMetaObject);

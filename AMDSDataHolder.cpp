@@ -2,6 +2,7 @@
 
 #include "AMDSDataStream.h"
 #include "AMDSDataHolderSupport.h"
+#include "AMDSMetaObjectSupport.h"
 
 AMDSDataHolder::AMDSDataHolder(QObject *parent) :
 	QObject(parent)
@@ -83,7 +84,7 @@ bool AMDSFullDataHolder::readFromDataStream(AMDSDataStream *dataStream){
 		lightWeightDataHolder_->deleteLater();
 
 	AMDSDataHolder *asDataHolder = dataStream->decodeAndInstantiateDataHolder();
-	if(AMDSDataHolderObjectInfo::inheritsDataHolderClass(asDataHolder->metaObject(), &(AMDSLightWeightDataHolder::staticMetaObject)))
+	if(AMDSMetaObjectSupport::inheritsClass(asDataHolder->metaObject(), &(AMDSLightWeightDataHolder::staticMetaObject), &(AMDSDataHolder::staticMetaObject)))
 		lightWeightDataHolder_ = qobject_cast<AMDSLightWeightDataHolder*>(asDataHolder);
 	else
 		return false;

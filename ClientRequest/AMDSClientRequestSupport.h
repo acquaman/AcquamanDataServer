@@ -37,9 +37,6 @@ protected:
 private:
 	/// used to implement both constructors
 	void initWithMetaObject(AMDSClientRequestDefinitions::RequestType requestType, const QMetaObject *clientRequestMetaObject);
-
-	/// checks to make sure a QMetaObject inherits AMDSClientRequest
-	bool inheritsClientRequest(const QMetaObject *metaObject) const;
 };
 
 namespace AMDSClientRequestSupport {
@@ -50,6 +47,8 @@ namespace AMDSClientRequestSupport {
 
 	AMDSClientRequest* instantiateClientRequestFromType(AMDSClientRequestDefinitions::RequestType clientRequestType);
 
+	bool inheritsClientRequest(const QMetaObject *queryMetaObject);
+
 	template<class Ta>
 	bool registerClass(AMDSClientRequestDefinitions::RequestType requestType){
 		// make sure this is a valid requestType
@@ -58,15 +57,7 @@ namespace AMDSClientRequestSupport {
 
 		// create the meta object for the client request
 		const QMetaObject *clientRequestMetaObject = &(Ta::staticMetaObject);
-
-		// is this a subclass of AMDSClientRequest? (Or an AMDSClientRequest itself?)
-		const QMetaObject* clientRequestSuperClass = clientRequestMetaObject;
-		bool inheritsClientRequestClass;
-		do {
-			inheritsClientRequestClass = (clientRequestSuperClass->className() == QString("AMDSClientRequest"));
-		} while( (clientRequestSuperClass = clientRequestSuperClass->superClass()) && !inheritsClientRequestClass);
-
-		if(!inheritsClientRequestClass)
+		if(!inheritsClientRequest(clientRequestMetaObject))
 			return false;
 
 		AMDSClientRequestObjectInfo newInfo(requestType, clientRequestMetaObject);

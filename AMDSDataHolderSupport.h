@@ -27,8 +27,6 @@ public:
 	inline QString dataHolderClassName() const { return dataHolderClassName_; }
 	inline const QMetaObject *dataHolderMetaObject() const { return dataHolderMetaObject_; }
 
-	static bool inheritsDataHolderClass(const QMetaObject *queryMetaObject, const QMetaObject *typeMetaObject);
-
 protected:
 	QString dataHolderClassName_; ///< the class name (C++ type name) of the data holder object
 	const QMetaObject *dataHolderMetaObject_; ///< QMetaObject pointer with the complete meta-object for the data holder
@@ -36,9 +34,6 @@ protected:
 private:
 	/// used to implement both constructors
 	void initWithMetaObject(const QMetaObject *dataHolderMetaObject);
-
-	/// checks to make sure a QMetaObject inherits AMDSDataHolder
-	bool inheritsDataHolder(const QMetaObject *metaObject) const;
 };
 
 namespace AMDSDataHolderSupport {
@@ -49,19 +44,13 @@ namespace AMDSDataHolderSupport {
 
 	AMDSDataHolder* instantiateDataHolderFromClassName(const QString &className);
 
+	bool inheritsDataHolder(const QMetaObject *queryMetaObject);
+
 	template<class Ta>
 	bool registerClass(){
 		// create the meta object for the client request
 		const QMetaObject *dataHolderMetaObject = &(Ta::staticMetaObject);
-
-		// is this a subclass of AMDSDataHolder? (Or an AMDSDataHolder itself?)
-		const QMetaObject *dataHolderSuperClass = dataHolderMetaObject;
-		bool inheritsDataHolderClass;
-		do {
-			inheritsDataHolderClass = (dataHolderSuperClass->className() == QString("AMDSDataHolder"));
-		} while( (dataHolderSuperClass = dataHolderSuperClass->superClass()) && !inheritsDataHolderClass);
-
-		if(!inheritsDataHolderClass)
+		if(!inheritsDataHolder(dataHolderMetaObject))
 			return false;
 
 		AMDSDataHolderObjectInfo newInfo(dataHolderMetaObject);

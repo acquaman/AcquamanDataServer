@@ -1,6 +1,7 @@
 #include "AMDSClientRequestSupport.h"
 
 #include "ClientRequest/AMDSClientRequest.h"
+#include "AMDSMetaObjectSupport.h"
 
 AMDSClientRequestObjectInfo::AMDSClientRequestObjectInfo()
 {
@@ -16,7 +17,7 @@ AMDSClientRequestObjectInfo::AMDSClientRequestObjectInfo(AMDSClientRequestDefini
 
 AMDSClientRequestObjectInfo::AMDSClientRequestObjectInfo(AMDSClientRequestDefinitions::RequestType requestType, const QMetaObject *clientRequestMetaObject)
 {
-	if(inheritsClientRequest(clientRequestMetaObject))
+	if(AMDSClientRequestSupport::inheritsClientRequest(clientRequestMetaObject))
 		initWithMetaObject(requestType, clientRequestMetaObject);
 	else{
 		requestType_ = AMDSClientRequestDefinitions::InvalidRequest;
@@ -36,16 +37,6 @@ void AMDSClientRequestObjectInfo::initWithMetaObject(AMDSClientRequestDefinition
 	clientRequestClassName_ = clientRequestMetaObject->className();
 }
 
-bool AMDSClientRequestObjectInfo::inheritsClientRequest(const QMetaObject *metaObject) const
-{
-	const QMetaObject *superClass = metaObject;
-	bool inheritsClientRequestClass;
-	do {
-		inheritsClientRequestClass = (superClass->className() == QString("AMDSClientRequest"));
-	} while( (superClass = superClass->superClass()) && !inheritsClientRequestClass);
-	return inheritsClientRequestClass;
-}
-
 namespace AMDSClientRequestSupport{
 	QHash<AMDSClientRequestDefinitions::RequestType, AMDSClientRequestObjectInfo> registeredClasses_;
 
@@ -63,5 +54,10 @@ namespace AMDSClientRequestSupport{
 				return clientRequest;
 		}
 		return 0;
+	}
+
+	bool inheritsClientRequest(const QMetaObject *queryMetaObject){
+		const QMetaObject *clientRequestMetaObject = &(AMDSClientRequest::staticMetaObject);
+		return AMDSMetaObjectSupport::inheritsClass(queryMetaObject, clientRequestMetaObject);
 	}
 }

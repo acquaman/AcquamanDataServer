@@ -1,6 +1,7 @@
 #include "AMDSEventDataSupport.h"
 
 #include "AMDSEventData.h"
+#include "AMDSMetaObjectSupport.h"
 
 AMDSEventDataObjectInfo::AMDSEventDataObjectInfo()
 {
@@ -15,7 +16,7 @@ AMDSEventDataObjectInfo::AMDSEventDataObjectInfo(AMDSEventData *prototypeEventDa
 
 AMDSEventDataObjectInfo::AMDSEventDataObjectInfo(const QMetaObject *eventDataMetaObject)
 {
-	if(inheritsEventData(eventDataMetaObject))
+	if(AMDSEventDataSupport::inheritsEventData(eventDataMetaObject))
 		initWithMetaObject(eventDataMetaObject);
 	else{
 		eventDataMetaObject_ = 0;
@@ -33,16 +34,6 @@ void AMDSEventDataObjectInfo::initWithMetaObject(const QMetaObject *eventDataMet
 	eventDataClassName_ = eventDataMetaObject->className();
 }
 
-bool AMDSEventDataObjectInfo::inheritsEventData(const QMetaObject *metaObject) const
-{
-	const QMetaObject *superClass = metaObject;
-	bool inheritsEventDataClass;
-	do {
-		inheritsEventDataClass = (superClass->className() == QString("AMDSEventData"));
-	} while( (superClass = superClass->superClass()) && !inheritsEventDataClass);
-	return inheritsEventDataClass;
-}
-
 namespace AMDSEventDataSupport{
 	QHash<QString, AMDSEventDataObjectInfo> registeredClasses_;
 
@@ -57,5 +48,10 @@ namespace AMDSEventDataSupport{
 				return eventData;
 		}
 		return 0;
+	}
+
+	bool inheritsEventData(const QMetaObject *queryMetaObject){
+		const QMetaObject *eventDataMetaObject = &(AMDSEventData::staticMetaObject);
+		return AMDSMetaObjectSupport::inheritsClass(queryMetaObject, eventDataMetaObject);
 	}
 }
