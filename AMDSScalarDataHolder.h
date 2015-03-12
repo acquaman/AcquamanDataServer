@@ -36,7 +36,6 @@ public:
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
 protected:
-//	double singleValue_;
 	AMDSFlatArray valueFlatArray_;
 };
 
@@ -154,10 +153,6 @@ bool AMDSLightWeightScalarDataHolder::setSingleValue(double singleValue){
 }
 
 bool AMDSLightWeightScalarDataHolder::data(AMDSFlatArray *outputValues) const{
-//	AMDSFlatArray asFlatArray = AMDSFlatArray(AMDSDataTypeDefinitions::Double, 1);
-//	asFlatArray.vectorDouble()[0] = singleValue_;
-//	return asFlatArray.copyData(outputValues);
-//	return asFlatArray.replaceData(outputValues);
 	return valueFlatArray_.replaceData(outputValues);
 }
 
@@ -167,9 +162,6 @@ bool AMDSLightWeightScalarDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
 }
 
 void AMDSLightWeightScalarDataHolder::setData(AMDSFlatArray *inputValues){
-//	if(inputValues->dataType() != AMDSDataTypeDefinitions::Double)
-//		return;
-//	setSingleValue(inputValues->vectorDouble().at(0));
 	inputValues->copyData(&valueFlatArray_);
 }
 
