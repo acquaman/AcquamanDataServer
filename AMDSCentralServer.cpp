@@ -28,8 +28,8 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
 	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
 	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", amptek1BufferGroupAxes);
-	AMDSBufferGroup *amptek1BufferGroup = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
-	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup);
+	amptek1BufferGroup_ = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup_);
 	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
 
 	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV");
@@ -40,11 +40,17 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	simpleCounter_ = 0;
 	fiftyMillisecondTimer_ = new QTimer(this);
 
+	spectralCounter_ = 0;
+	hundredMillisecondTimer_ = new QTimer(this);
+
 	connect(dataServer_->server(), SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SLOT(onDataServerClientRequestReady(AMDSClientRequest*)));
 	connect(this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
 	connect(fiftyMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onFiftyMillisecondTimerUpdate()));
 	fiftyMillisecondTimer_->start(50);
+
+	connect(hundredMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondTimerUpdate()));
+	hundredMillisecondTimer_->start(100);
 }
 
 void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *clientRequest){
@@ -76,6 +82,11 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 				connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 				energyBufferGroup_->processClientRequest(clientRequest);
 			}
+			if(clientDataRequest->bufferName() == "Amptek1"){
+				clientDataRequest->setBufferGroupInfo(amptek1BufferGroup_->bufferGroupInfo());
+				connect(amptek1BufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+				amptek1BufferGroup_->processClientRequest(clientRequest);
+			}
 		}
 	}
 }
@@ -87,4 +98,20 @@ void AMDSCentralServer::onFiftyMillisecondTimerUpdate(){
 	oneScalerDataHolder->setSingleValue(valueAsDouble);
 
 	energyBufferGroup_->append(oneScalerDataHolder);
+}
+
+#include "AMDSSpectralDataHolder.h"
+void AMDSCentralServer::onHundredMillisecondTimerUpdate(){
+	AMDSLightWeightSpectralDataHolder *oneSpectralDataHolder = new AMDSLightWeightSpectralDataHolder(AMDSDataTypeDefinitions::Signed64, amptek1BufferGroup_->bufferGroupInfo().size(0));
+
+	AMDSFlatArray oneSpectralFlatArray(AMDSDataTypeDefinitions::Signed64, amptek1BufferGroup_->bufferGroupInfo().size(0));
+	spectralCounter_++;
+	qint64 oneValue;
+	for(int x = 0; x < oneSpectralFlatArray.constVectorQint64().size(); x++){
+		oneValue = (spectralCounter_+x)*2;
+		oneSpectralFlatArray.vectorQint64()[x] = oneValue;
+	}
+	oneSpectralDataHolder->setData(&oneSpectralFlatArray);
+
+	amptek1BufferGroup_->append(oneSpectralDataHolder);
 }

@@ -44,6 +44,8 @@ public:
 	inline bool copyData(AMDSFlatArray *other) const;
 	inline bool replaceData(AMDSFlatArray *other) const;
 
+	inline QString printData() const;
+
 protected:
 	inline void resizeType(AMDSDataTypeDefinitions::DataType dataType, quint32 size);
 
@@ -250,6 +252,69 @@ void AMDSFlatArray::resizeType(AMDSDataTypeDefinitions::DataType dataType, quint
 	default:
 		break;
 	}
+}
+
+QString AMDSFlatArray::printData() const{
+	QString retVal;
+	switch(dataType_){
+	case AMDSDataTypeDefinitions::Signed8:
+		retVal.append("Signed 8: ");
+		for(int x = 0, size = vectorQint8_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorQint8_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Unsigned8:
+		retVal.append("Unsigned 8: ");
+		for(int x = 0, size = vectorQuint8_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorQuint8_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Signed16:
+		retVal.append("Signed 16: ");
+		for(int x = 0, size = vectorQint16_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorQint16_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Unsigned16:
+		retVal.append("Unsigned 16: ");
+		for(int x = 0, size = vectorQuint16_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorQuint16_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Signed32:
+		retVal.append("Signed 32: ");
+		for(int x = 0, size = vectorQint32_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorQint32_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Unsigned32:
+		retVal.append("Unsigned 32: ");
+		for(int x = 0, size = vectorQuint32_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorQuint32_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Signed64:
+		retVal.append("Signed 64: ");
+		for(int x = 0, size = vectorQint64_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorQint64_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Unsigned64:
+		retVal.append("Unsigned 64: ");
+		for(int x = 0, size = vectorQuint64_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorQuint64_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Float:
+		retVal.append("Float: ");
+		for(int x = 0, size = vectorFloat_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorFloat_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::Double:
+		retVal.append("Double: ");
+		for(int x = 0, size = vectorDouble_.size(); x < size; x++)
+			retVal.append(QString("%1 ").arg(vectorDouble_.at(x)));
+		break;
+	case AMDSDataTypeDefinitions::InvalidType:
+		retVal = "Invalid Type";
+		break;
+	default:
+		retVal = "Default Case, past enumeration";
+		break;
+	}
+	return retVal;
 }
 
 #endif // AMDSFLATARRAY_H

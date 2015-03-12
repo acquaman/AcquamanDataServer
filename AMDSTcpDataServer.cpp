@@ -14,6 +14,7 @@
 #include "AMDSDataHolderSupport.h"
 #include "AMDSDataHolder.h"
 #include "AMDSScalarDataHolder.h"
+#include "AMDSSpectralDataHolder.h"
 
 #include "AMDSEventDataSupport.h"
 #include "AMDSEventData.h"
@@ -32,6 +33,8 @@ AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
 
 	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightScalarDataHolder::staticMetaObject.className()))
 		AMDSDataHolderSupport::registerClass<AMDSLightWeightScalarDataHolder>();
+	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightSpectralDataHolder::staticMetaObject.className()))
+		AMDSDataHolderSupport::registerClass<AMDSLightWeightSpectralDataHolder>();
 
 	if(!AMDSEventDataSupport::registeredClasses()->contains(AMDSLightWeightEventData::staticMetaObject.className()))
 		AMDSEventDataSupport::registerClass<AMDSLightWeightEventData>();
@@ -194,7 +197,8 @@ void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 					AMDSFlatArray oneFlatArray;
 					processedStartTimePlusCountDataRequest->data().at(x)->data(&oneFlatArray);
 					values.append(oneFlatArray);
-					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
+//					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
+					qDebug() << "Data at " << x << oneFlatArray.printData();
 				}
 			}
 		}

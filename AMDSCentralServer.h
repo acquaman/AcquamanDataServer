@@ -24,6 +24,7 @@ protected slots:
 	void onDataServerClientRequestReady(AMDSClientRequest *clientRequest);
 
 	void onFiftyMillisecondTimerUpdate();
+	void onHundredMillisecondTimerUpdate();
 
 protected:
 	AMDSThreadedTcpDataServer *dataServer_;
@@ -32,6 +33,10 @@ protected:
 	AMDSBufferGroup *energyBufferGroup_;
 	quint64 simpleCounter_;
 	QTimer *fiftyMillisecondTimer_;
+
+	AMDSBufferGroup *amptek1BufferGroup_;
+	quint64 spectralCounter_;
+	QTimer *hundredMillisecondTimer_;
 };
 
 #endif // AMDSCENTRALSERVER_H
