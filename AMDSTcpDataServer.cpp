@@ -11,10 +11,10 @@
 #include "ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "ClientRequest/AMDSClientContinuousDataRequest.h"
 
-#include "AMDSDataHolderSupport.h"
-#include "AMDSDataHolder.h"
-#include "AMDSScalarDataHolder.h"
-#include "AMDSSpectralDataHolder.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
+#include "DataHolder/AMDSDataHolder.h"
+#include "DataHolder/AMDSScalarDataHolder.h"
+#include "DataHolder/AMDSSpectralDataHolder.h"
 
 #include "AMDSEventDataSupport.h"
 #include "AMDSEventData.h"

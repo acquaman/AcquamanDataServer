@@ -5,7 +5,7 @@
 
 #include "AMDSBuffer.h"
 #include "AMDSBufferGroupInfo.h"
-#include "AMDSDataHolder.h"
+#include "DataHolder/AMDSDataHolder.h"
 
 class AMDSClientRequest;
 class AMDSClientStartTimePlusCountDataRequest;

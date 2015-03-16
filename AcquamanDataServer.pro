@@ -34,9 +34,6 @@ HEADERS *= \
 	AMDSEventData.h \
 	AMDSEventDataSupport.h \
 	AMDSBufferGroupInfo.h \
-	AMDSDataHolder.h \
-	AMDSDataHolderSupport.h \
-	AMDSScalarDataHolder.h \
 	AMDSPacketStats.h \
 	AMDSDataTypeDefinitions.h \
 	AMDSFlatArray.h \
@@ -48,8 +45,12 @@ HEADERS *= \
 	ClientRequest/AMDSClientStatisticsRequest.h \
 	ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
 	ClientRequest/AMDSClientContinuousDataRequest.h \
-    AMDSMetaObjectSupport.h \
-    AMDSSpectralDataHolder.h
+	DataHolder/AMDSDataHolder.h \
+	DataHolder/AMDSDataHolderSupport.h \
+	DataHolder/AMDSGenericFlatArrayDataHolder.h \
+	DataHolder/AMDSScalarDataHolder.h \
+	DataHolder/AMDSSpectralDataHolder.h \
+	AMDSMetaObjectSupport.h
 
 SOURCES *= main.cpp \
 	AMDSTcpDataServer.cpp \
@@ -63,9 +64,6 @@ SOURCES *= main.cpp \
 	AMDSEventData.cpp \
 	AMDSEventDataSupport.cpp \
 	AMDSBufferGroupInfo.cpp \
-	AMDSDataHolder.cpp \
-	AMDSDataHolderSupport.cpp \
-	AMDSScalarDataHolder.cpp \
 	AMDSPacketStats.cpp \
 	AMDSFlatArray.cpp \
 	ClientRequest/AMDSClientRequest.cpp \
@@ -75,5 +73,9 @@ SOURCES *= main.cpp \
 	ClientRequest/AMDSClientStatisticsRequest.cpp \
 	ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
 	ClientRequest/AMDSClientContinuousDataRequest.cpp \
-    AMDSMetaObjectSupport.cpp \
-    AMDSSpectralDataHolder.cpp
+	DataHolder/AMDSDataHolder.cpp \
+	DataHolder/AMDSDataHolderSupport.cpp \
+	DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
+	DataHolder/AMDSScalarDataHolder.cpp \
+	DataHolder/AMDSSpectralDataHolder.cpp \
+	AMDSMetaObjectSupport.cpp

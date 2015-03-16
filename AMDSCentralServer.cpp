@@ -91,7 +91,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 	}
 }
 
-#include "AMDSScalarDataHolder.h"
+#include "DataHolder/AMDSScalarDataHolder.h"
 void AMDSCentralServer::onFiftyMillisecondTimerUpdate(){
 	AMDSLightWeightScalarDataHolder *oneScalerDataHolder = new AMDSLightWeightScalarDataHolder();
 	double valueAsDouble = (double)simpleCounter_++;
@@ -100,7 +100,7 @@ void AMDSCentralServer::onFiftyMillisecondTimerUpdate(){
 	energyBufferGroup_->append(oneScalerDataHolder);
 }
 
-#include "AMDSSpectralDataHolder.h"
+#include "DataHolder/AMDSSpectralDataHolder.h"
 void AMDSCentralServer::onHundredMillisecondTimerUpdate(){
 	AMDSLightWeightSpectralDataHolder *oneSpectralDataHolder = new AMDSLightWeightSpectralDataHolder(AMDSDataTypeDefinitions::Signed64, amptek1BufferGroup_->bufferGroupInfo().size(0));
 

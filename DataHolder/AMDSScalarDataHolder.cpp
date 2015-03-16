@@ -3,7 +3,8 @@
 #include "AMDSDataStream.h"
 
 AMDSLightWeightScalarDataHolder::AMDSLightWeightScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType, QObject *parent) :
-	AMDSLightWeightDataHolder(parent), valueFlatArray_(dataType, 1)
+//	AMDSLightWeightDataHolder(parent), valueFlatArray_(dataType, 1)
+	AMDSLightWeightGenericFlatArrayDataHolder(dataType, 1, parent)
 {
 	eventData_ = new AMDSLightWeightEventData();
 }
@@ -13,38 +14,40 @@ AMDSLightWeightScalarDataHolder::~AMDSLightWeightScalarDataHolder()
 }
 
 bool AMDSLightWeightScalarDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
-	// This will take care of encoding and writing our eventData to the stream
-	if(!AMDSLightWeightDataHolder::writeToDataStream(dataStream, encodeDataType))
-		return false;
+	return AMDSLightWeightGenericFlatArrayDataHolder::writeToDataStream(dataStream, encodeDataType);
+//	// This will take care of encoding and writing our eventData to the stream
+//	if(!AMDSLightWeightDataHolder::writeToDataStream(dataStream, encodeDataType))
+//		return false;
 
-	if(encodeDataType)
-		dataStream->encodeDataType(valueFlatArray_.dataType());
-	dataStream->write(valueFlatArray_);
-	if(dataStream->status() != QDataStream::Ok)
-		return false;
+//	if(encodeDataType)
+//		dataStream->encodeDataType(valueFlatArray_.dataType());
+//	dataStream->write(valueFlatArray_);
+//	if(dataStream->status() != QDataStream::Ok)
+//		return false;
 
-	return true;
+//	return true;
 }
 
 bool AMDSLightWeightScalarDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
-	// This will take care of decoding and instantiating our eventData from the stream (and deleting any old eventData memory we allocated)
-	if(!AMDSLightWeightDataHolder::readFromDataStream(dataStream, decodeAsDataType))
-		return false;
+	return AMDSLightWeightGenericFlatArrayDataHolder::readFromDataStream(dataStream, decodeAsDataType);
+//	// This will take care of decoding and instantiating our eventData from the stream (and deleting any old eventData memory we allocated)
+//	if(!AMDSLightWeightDataHolder::readFromDataStream(dataStream, decodeAsDataType))
+//		return false;
 
-	AMDSDataTypeDefinitions::DataType readDataType;
-	if(decodeAsDataType == AMDSDataTypeDefinitions::InvalidType)
-		readDataType = dataStream->decodeDataType();
-	else
-		readDataType = decodeAsDataType;
-	if(readDataType == AMDSDataTypeDefinitions::InvalidType)
-		return false;
+//	AMDSDataTypeDefinitions::DataType readDataType;
+//	if(decodeAsDataType == AMDSDataTypeDefinitions::InvalidType)
+//		readDataType = dataStream->decodeDataType();
+//	else
+//		readDataType = decodeAsDataType;
+//	if(readDataType == AMDSDataTypeDefinitions::InvalidType)
+//		return false;
 
-	valueFlatArray_.clearAndReset(readDataType, 1);
-	dataStream->read(valueFlatArray_);
-	if(dataStream->status() != QDataStream::Ok)
-		return false;
+//	valueFlatArray_.clearAndReset(readDataType, 1);
+//	dataStream->read(valueFlatArray_);
+//	if(dataStream->status() != QDataStream::Ok)
+//		return false;
 
-	return true;
+//	return true;
 }
 
 AMDSFullScalarDataHolder::AMDSFullScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType, AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo> &axes, QObject *parent) :

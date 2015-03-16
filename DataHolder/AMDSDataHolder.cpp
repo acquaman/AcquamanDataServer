@@ -1,7 +1,7 @@
 #include "AMDSDataHolder.h"
 
 #include "AMDSDataStream.h"
-#include "AMDSDataHolderSupport.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
 #include "AMDSMetaObjectSupport.h"
 
 AMDSDataHolder::AMDSDataHolder(QObject *parent) :

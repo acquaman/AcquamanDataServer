@@ -2,7 +2,7 @@
 
 #include "ClientRequest/AMDSClientRequestSupport.h"
 #include "AMDSEventDataSupport.h"
-#include "AMDSDataHolderSupport.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
 
 AMDSDataStream::AMDSDataStream() :
 	QDataStream()

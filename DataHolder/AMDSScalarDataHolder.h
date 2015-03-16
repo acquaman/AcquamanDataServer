@@ -1,17 +1,20 @@
 #ifndef AMDSSCALARDATAHOLDER_H
 #define AMDSSCALARDATAHOLDER_H
 
-#include "AMDSDataHolder.h"
+//#include "DataHolder/AMDSDataHolder.h"
+#include "DataHolder/AMDSGenericFlatArrayDataHolder.h"
 
-class AMDSLightWeightScalarDataHolder : public AMDSLightWeightDataHolder
+class AMDSLightWeightScalarDataHolder : public AMDSLightWeightGenericFlatArrayDataHolder
 {
 Q_OBJECT
 public:
 	Q_INVOKABLE AMDSLightWeightScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, QObject *parent = 0);
 	virtual ~AMDSLightWeightScalarDataHolder();
 
+	virtual inline QList<AMDSAxisInfo> axes() const { return QList<AMDSAxisInfo>(); }
 	virtual inline quint8 rank() const { return 0; }
 	virtual inline quint32 size(int axisId) const;
+	virtual inline AMDSnDIndex size() const { return AMDSnDIndex(); }
 	virtual inline quint64 spanSize() const { return 1; }
 
 	virtual inline bool data(AMDSFlatArray *outputValues) const;
@@ -28,15 +31,15 @@ public:
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
 
-	inline void setData(AMDSFlatArray *inputValues);
+	virtual inline void setData(AMDSFlatArray *inputValues);
 
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
-protected:
-	AMDSFlatArray valueFlatArray_;
+//protected:
+//	AMDSFlatArray valueFlatArray_;
 };
 
 class AMDSFullScalarDataHolder : public AMDSFullDataHolder
@@ -59,7 +62,7 @@ public:
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
 
-	inline void setData(AMDSFlatArray *inputValues);
+	virtual inline void setData(AMDSFlatArray *inputValues);
 
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
@@ -242,9 +245,10 @@ bool AMDSFullScalarDataHolder::setSingleValue(double singleValue){
 }
 
 void AMDSFullScalarDataHolder::setData(AMDSFlatArray *inputValues){
-	AMDSLightWeightScalarDataHolder *lightWeightScalarDataHolder = qobject_cast<AMDSLightWeightScalarDataHolder*>(lightWeightDataHolder_);
-	if(lightWeightScalarDataHolder)
-		lightWeightScalarDataHolder->setData(inputValues);
+	lightWeightDataHolder_->setData(inputValues);
+//	AMDSLightWeightScalarDataHolder *lightWeightScalarDataHolder = qobject_cast<AMDSLightWeightScalarDataHolder*>(lightWeightDataHolder_);
+//	if(lightWeightScalarDataHolder)
+//		lightWeightScalarDataHolder->setData(inputValues);
 }
 
 #endif // AMDSSCALARDATAHOLDER_H

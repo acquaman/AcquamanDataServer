@@ -1,8 +1,8 @@
 #include "AMDSClientDataRequest.h"
 
 #include "AMDSDataStream.h"
-#include "AMDSScalarDataHolder.h"
-#include "AMDSDataHolderSupport.h"
+#include "DataHolder/AMDSScalarDataHolder.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
 
 AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	AMDSClientRequest(parent)

@@ -1,6 +1,6 @@
 #include "AMDSDataHolderSupport.h"
 
-#include "AMDSDataHolder.h"
+#include "DataHolder/AMDSDataHolder.h"
 #include "AMDSMetaObjectSupport.h"
 
 AMDSDataHolderObjectInfo::AMDSDataHolderObjectInfo()

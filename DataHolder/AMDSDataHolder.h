@@ -48,6 +48,8 @@ public:
 	virtual inline bool data(AMDSFlatArray *outputValues) const = 0;
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes) = 0;
 
+	virtual inline void setData(AMDSFlatArray *inputValues) = 0;
+
 	virtual inline bool operator <(const QDateTime &rhs) = 0;
 	virtual inline bool operator >(const QDateTime &rhs) = 0;
 	virtual inline bool operator ==(const QDateTime &rhs) = 0;
@@ -70,17 +72,19 @@ public:
 	inline const AMDSEventData* eventData() const { return eventData_; }
 	inline virtual AMDSDataTypeDefinitions::DataType dataType() const;
 
-	virtual inline QList<AMDSAxisInfo> axes() const { return QList<AMDSAxisInfo>(); }
-	virtual inline quint8 rank() const { return 0; }
+	virtual inline QList<AMDSAxisInfo> axes() const = 0;// { return QList<AMDSAxisInfo>(); }
+	virtual inline quint8 rank() const = 0;// { return 0; }
 	/// Returns the length of all the axes
-	virtual inline AMDSnDIndex size() const { return AMDSnDIndex(); }
+	virtual inline AMDSnDIndex size() const = 0;// { return AMDSnDIndex(); }
 	/// Returns the length of the specified axis \c axisId.  (\c axisId is assumed to be >= 0 and < rank().)
-	virtual inline quint32 size(int axisId) const;
+	virtual inline quint32 size(int axisId) const = 0;
 	/// Returns the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
-	virtual inline quint64 spanSize() const { return 0; }
+	virtual inline quint64 spanSize() const = 0;// { return 0; }
 
 	virtual inline bool data(AMDSFlatArray *outputValues) const = 0;
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
+
+	virtual inline void setData(AMDSFlatArray *inputValues) = 0;
 
 	virtual inline bool operator <(const QDateTime &rhs);
 	virtual inline bool operator >(const QDateTime &rhs);
@@ -119,6 +123,8 @@ public:
 	virtual inline bool data(AMDSFlatArray *outputValues) const = 0;
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
+	virtual inline void setData(AMDSFlatArray *inputValues) = 0;
+
 	virtual inline bool operator <(const QDateTime &rhs) { return lightWeightDataHolder_->operator <(rhs); }
 	virtual inline bool operator >(const QDateTime &rhs) { return lightWeightDataHolder_->operator >(rhs); }
 	virtual inline bool operator ==(const QDateTime &rhs) { return lightWeightDataHolder_->operator ==(rhs); }
@@ -138,10 +144,10 @@ protected:
 ////////////////////////////////////////
 // AMDSDataHolder inline implementations
 ////////////////////////////////////////
-quint32 AMDSLightWeightDataHolder::size(int axisId) const{
-	Q_UNUSED(axisId)
-	return 0;
-}
+//quint32 AMDSLightWeightDataHolder::size(int axisId) const{
+//	Q_UNUSED(axisId)
+//	return 0;
+//}
 
 AMDSDataTypeDefinitions::DataType AMDSLightWeightDataHolder::dataType() const{
 	if(dataTypeStyle() != AMDSDataHolder::UniformDataType)
