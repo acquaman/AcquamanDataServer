@@ -45,3 +45,21 @@ bool AMDSLightWeightGenericFlatArrayDataHolder::readFromDataStream(AMDSDataStrea
 
 	return true;
 }
+
+AMDSFullGenericFlatArrayDataHolder::AMDSFullGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo> &axes, QObject *parent) :
+	AMDSFullDataHolder(axesStyle, dataTypeStyle, axes, parent)
+{
+
+}
+
+AMDSFullGenericFlatArrayDataHolder::~AMDSFullGenericFlatArrayDataHolder()
+{
+}
+
+bool AMDSFullGenericFlatArrayDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
+	return lightWeightDataHolder_->writeToDataStream(dataStream, encodeDataType);
+}
+
+bool AMDSFullGenericFlatArrayDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
+	return lightWeightDataHolder_->readFromDataStream(dataStream, decodeAsDataType);
+}

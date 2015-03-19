@@ -1,7 +1,6 @@
 #ifndef AMDSSCALARDATAHOLDER_H
 #define AMDSSCALARDATAHOLDER_H
 
-//#include "DataHolder/AMDSDataHolder.h"
 #include "DataHolder/AMDSGenericFlatArrayDataHolder.h"
 
 class AMDSLightWeightScalarDataHolder : public AMDSLightWeightGenericFlatArrayDataHolder
@@ -37,12 +36,9 @@ public:
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
-
-//protected:
-//	AMDSFlatArray valueFlatArray_;
 };
 
-class AMDSFullScalarDataHolder : public AMDSFullDataHolder
+class AMDSFullScalarDataHolder : public AMDSFullGenericFlatArrayDataHolder
 {
 Q_OBJECT
 public:
@@ -246,9 +242,6 @@ bool AMDSFullScalarDataHolder::setSingleValue(double singleValue){
 
 void AMDSFullScalarDataHolder::setData(AMDSFlatArray *inputValues){
 	lightWeightDataHolder_->setData(inputValues);
-//	AMDSLightWeightScalarDataHolder *lightWeightScalarDataHolder = qobject_cast<AMDSLightWeightScalarDataHolder*>(lightWeightDataHolder_);
-//	if(lightWeightScalarDataHolder)
-//		lightWeightScalarDataHolder->setData(inputValues);
 }
 
 #endif // AMDSSCALARDATAHOLDER_H
