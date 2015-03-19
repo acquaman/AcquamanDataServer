@@ -45,8 +45,6 @@ public:
 	Q_INVOKABLE AMDSFullScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, AMDSDataHolder::AxesStyle axesStyle = AMDSDataHolder::UniformAxes, AMDSDataHolder::DataTypeStyle dataTypeStyle = AMDSDataHolder::UniformDataType, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>(), QObject *parent = 0);
 	virtual ~AMDSFullScalarDataHolder();
 
-	virtual inline bool data(AMDSFlatArray *outputValues) const;
-
 	virtual inline bool setSingleValue(qint8 singleValue);
 	virtual inline bool setSingleValue(quint8 singleValue);
 	virtual inline bool setSingleValue(qint16 singleValue);
@@ -57,8 +55,6 @@ public:
 	virtual inline bool setSingleValue(quint64 singleValue);
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
-
-	virtual inline void setData(AMDSFlatArray *inputValues);
 
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
@@ -166,10 +162,6 @@ void AMDSLightWeightScalarDataHolder::setData(AMDSFlatArray *inputValues){
 	inputValues->copyData(&valueFlatArray_);
 }
 
-bool AMDSFullScalarDataHolder::data(AMDSFlatArray *outputValues) const{
-	return lightWeightDataHolder_->data(outputValues);
-}
-
 bool AMDSFullScalarDataHolder::setSingleValue(qint8 singleValue){
 	AMDSLightWeightScalarDataHolder *lightWeightScalarDataHolder = qobject_cast<AMDSLightWeightScalarDataHolder*>(lightWeightDataHolder_);
 	if(lightWeightScalarDataHolder)
@@ -238,10 +230,6 @@ bool AMDSFullScalarDataHolder::setSingleValue(double singleValue){
 	if(lightWeightScalarDataHolder)
 		return lightWeightScalarDataHolder->setSingleValue(singleValue);
 	return false;
-}
-
-void AMDSFullScalarDataHolder::setData(AMDSFlatArray *inputValues){
-	lightWeightDataHolder_->setData(inputValues);
 }
 
 #endif // AMDSSCALARDATAHOLDER_H

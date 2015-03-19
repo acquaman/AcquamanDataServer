@@ -33,10 +33,6 @@ public:
 	Q_INVOKABLE AMDSFullSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, AMDSDataHolder::AxesStyle axesStyle = AMDSDataHolder::UniformAxes, AMDSDataHolder::DataTypeStyle dataTypeStyle = AMDSDataHolder::UniformDataType, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>(), QObject *parent = 0);
 	virtual ~AMDSFullSpectralDataHolder();
 
-	virtual inline bool data(AMDSFlatArray *outputValues) const;
-
-	virtual inline void setData(AMDSFlatArray *inputValues);
-
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
@@ -70,14 +66,6 @@ bool AMDSLightWeightSpectralDataHolder::setAxes(const QList<AMDSAxisInfo> &axes)
 
 void AMDSLightWeightSpectralDataHolder::setData(AMDSFlatArray *inputValues){
 	inputValues->copyData(&valueFlatArray_);
-}
-
-bool AMDSFullSpectralDataHolder::data(AMDSFlatArray *outputValues) const{
-	return lightWeightDataHolder_->data(outputValues);
-}
-
-void AMDSFullSpectralDataHolder::setData(AMDSFlatArray *inputValues){
-	lightWeightDataHolder_->setData(inputValues);
 }
 
 #endif // AMDSSPECTRALDATAHOLDER_H
