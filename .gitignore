@@ -1,0 +1,9 @@
+# Build and Release Folder
+Makefile
+build/
+build_files/
+
+# Other files and folders
+AcquamanDataServer.pro.user
+
+
