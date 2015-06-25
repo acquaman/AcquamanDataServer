@@ -30,5 +30,5 @@ void AMDSThreadedTcpDataServer::onThreadStarted()
 	settings.endGroup();
 	qDebug() << "Going to request server to start";
 	//emit startServer(interfaceName, port);
-	emit startServer("en3", port);
+	emit startServer("en0", port);
 }
