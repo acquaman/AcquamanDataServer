@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
 	QCoreApplication a(argc, argv);
 
-	AMDSCentralServer *centralServer = new AMDSCentralServer();
+	new AMDSCentralServer();
 
 	return a.exec();
 }
