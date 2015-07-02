@@ -12,7 +12,14 @@ TARGET = AcquamanDataServer
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TEMPLATE = app
+DESTDIR = build
+
+OBJECTS_DIR=build_files
+MOC_DIR=build_files
+UI_DIR=build_files
+RCC_DIR=build_files
+
+#TEMPLATE = app
 
 #PATH_TO_ACQUAMAN = ../acquaman
 #INCLUDEPATH *= $$PATH_TO_ACQUAMAN/source/
@@ -21,63 +28,64 @@ TEMPLATE = app
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
-	AMDSBuffer.h \
-	AMDSTcpDataServer.h \
-	AMDSThreadedTcpDataServer.h \
-	AMDSCentralServer.h \
-	AMDSBufferGroup.h \
-	AMDSThreadedBufferGroup.h \
-	AMDSAxisInfo.h \
-	AMDSnDIndex.h \
-	AMDSLikely.h \
-	AMDSDataStream.h \
-	AMDSEventData.h \
-	AMDSEventDataSupport.h \
-	AMDSBufferGroupInfo.h \
-	AMDSPacketStats.h \
-	AMDSDataTypeDefinitions.h \
-	AMDSFlatArray.h \
-	ClientRequest/AMDSClientRequest.h \
-	ClientRequest/AMDSClientRequestSupport.h \
-	ClientRequest/AMDSClientRequestDefinitions.h \
-	ClientRequest/AMDSClientDataRequest.h \
-	ClientRequest/AMDSClientIntrospectionRequest.h \
-	ClientRequest/AMDSClientStatisticsRequest.h \
-	ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
-	ClientRequest/AMDSClientContinuousDataRequest.h \
-	DataHolder/AMDSDataHolder.h \
-	DataHolder/AMDSDataHolderSupport.h \
-	DataHolder/AMDSGenericFlatArrayDataHolder.h \
-	DataHolder/AMDSScalarDataHolder.h \
-	DataHolder/AMDSSpectralDataHolder.h \
-	AMDSMetaObjectSupport.h \
-    DataHolder/AMDSImageDataHolder.h
+	source/AMDSBuffer.h \
+	source/AMDSTcpDataServer.h \
+	source/AMDSThreadedTcpDataServer.h \
+	source/AMDSCentralServer.h \
+	source/AMDSBufferGroup.h \
+	source/AMDSThreadedBufferGroup.h \
+	source/AMDSAxisInfo.h \
+	source/AMDSnDIndex.h \
+	source/AMDSLikely.h \
+	source/AMDSDataStream.h \
+	source/AMDSEventData.h \
+	source/AMDSEventDataSupport.h \
+	source/AMDSBufferGroupInfo.h \
+	source/AMDSPacketStats.h \
+	source/AMDSDataTypeDefinitions.h \
+	source/AMDSFlatArray.h \
+	source/AMDSMetaObjectSupport.h \
+	source/ClientRequest/AMDSClientRequest.h \
+	source/ClientRequest/AMDSClientRequestSupport.h \
+	source/ClientRequest/AMDSClientRequestDefinitions.h \
+	source/ClientRequest/AMDSClientDataRequest.h \
+	source/ClientRequest/AMDSClientIntrospectionRequest.h \
+	source/ClientRequest/AMDSClientStatisticsRequest.h \
+	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
+	source/ClientRequest/AMDSClientContinuousDataRequest.h \
+	source/DataHolder/AMDSDataHolder.h \
+	source/DataHolder/AMDSDataHolderSupport.h \
+	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
+	source/DataHolder/AMDSScalarDataHolder.h \
+	source/DataHolder/AMDSSpectralDataHolder.h \
+	source/DataHolder/AMDSImageDataHolder.h
 
-SOURCES *= main.cpp \
-	AMDSTcpDataServer.cpp \
-	AMDSThreadedTcpDataServer.cpp \
-	AMDSCentralServer.cpp \
-	AMDSBufferGroup.cpp \
-	AMDSThreadedBufferGroup.cpp \
-	AMDSAxisInfo.cpp \
-	AMDSnDIndex.cpp \
-	AMDSDataStream.cpp \
-	AMDSEventData.cpp \
-	AMDSEventDataSupport.cpp \
-	AMDSBufferGroupInfo.cpp \
-	AMDSPacketStats.cpp \
-	AMDSFlatArray.cpp \
-	ClientRequest/AMDSClientRequest.cpp \
-	ClientRequest/AMDSClientRequestSupport.cpp \
-	ClientRequest/AMDSClientDataRequest.cpp \
-	ClientRequest/AMDSClientIntrospectionRequest.cpp \
-	ClientRequest/AMDSClientStatisticsRequest.cpp \
-	ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
-	ClientRequest/AMDSClientContinuousDataRequest.cpp \
-	DataHolder/AMDSDataHolder.cpp \
-	DataHolder/AMDSDataHolderSupport.cpp \
-	DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
-	DataHolder/AMDSScalarDataHolder.cpp \
-	DataHolder/AMDSSpectralDataHolder.cpp \
-	AMDSMetaObjectSupport.cpp \
-    DataHolder/AMDSImageDataHolder.cpp
+SOURCES *= \
+	source/main.cpp \
+	source/AMDSTcpDataServer.cpp \
+	source/AMDSThreadedTcpDataServer.cpp \
+	source/AMDSCentralServer.cpp \
+	source/AMDSBufferGroup.cpp \
+	source/AMDSThreadedBufferGroup.cpp \
+	source/AMDSAxisInfo.cpp \
+	source/AMDSnDIndex.cpp \
+	source/AMDSDataStream.cpp \
+	source/AMDSEventData.cpp \
+	source/AMDSEventDataSupport.cpp \
+	source/AMDSBufferGroupInfo.cpp \
+	source/AMDSPacketStats.cpp \
+	source/AMDSFlatArray.cpp \
+	source/AMDSMetaObjectSupport.cpp \
+	source/ClientRequest/AMDSClientRequest.cpp \
+	source/ClientRequest/AMDSClientRequestSupport.cpp \
+	source/ClientRequest/AMDSClientDataRequest.cpp \
+	source/ClientRequest/AMDSClientIntrospectionRequest.cpp \
+	source/ClientRequest/AMDSClientStatisticsRequest.cpp \
+	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
+	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
+	source/DataHolder/AMDSDataHolder.cpp \
+	source/DataHolder/AMDSDataHolderSupport.cpp \
+	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
+	source/DataHolder/AMDSScalarDataHolder.cpp \
+	source/DataHolder/AMDSSpectralDataHolder.cpp \
+	source/DataHolder/AMDSImageDataHolder.cpp
