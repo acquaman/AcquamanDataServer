@@ -188,7 +188,7 @@ AMDSnDIndex AMDSFullDataHolder::size() const {
 
 quint64 AMDSFullDataHolder::spanSize() const {
 	quint64 aSize = 1;
-	for(quint8 i=axes_.count()-1; i>=0; --i)
+	for(qint8 i=axes_.count()-1; i>=0; --i)
 		aSize *= axes_.at(i).size();
 	return aSize;
 }

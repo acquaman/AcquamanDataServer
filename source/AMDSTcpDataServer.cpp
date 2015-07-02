@@ -383,6 +383,8 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 
 void AMDSTcpDataServer::onContinuousDataRequestTimer(const QString &clientKey)
 {
+	Q_UNUSED(clientKey)
+
 //	ClientDataRequest* request = continuousDataRequests_.value(clientKey, 0);
 
 //	if(request == 0)

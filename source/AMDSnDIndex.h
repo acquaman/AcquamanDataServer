@@ -256,14 +256,14 @@ bool AMDSnDIndex::operator!=(const AMDSnDIndex& other) const {
 
 quint32 AMDSnDIndex::product() const {
 	quint32 rv = 1;
-	for(quint8 mu=rank_-1; mu>=0; --mu)
+	for(qint8 mu=rank_-1; mu>=0; --mu)
 		rv *= at(mu);
 	return rv;
 }
 
 quint32 AMDSnDIndex::totalPointsTo(const AMDSnDIndex& toIndex) const {
 	quint32 rv = 1;
-	for(quint8 mu = rank_-1; mu >= 0; --mu)
+	for(qint8 mu = rank_-1; mu >= 0; --mu)
 		rv *= (toIndex.at(mu) - at(mu) + 1);
 	return rv;
 }

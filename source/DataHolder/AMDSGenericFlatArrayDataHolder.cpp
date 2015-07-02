@@ -49,7 +49,8 @@ bool AMDSLightWeightGenericFlatArrayDataHolder::readFromDataStream(AMDSDataStrea
 AMDSFullGenericFlatArrayDataHolder::AMDSFullGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo> &axes, QObject *parent) :
 	AMDSFullDataHolder(axesStyle, dataTypeStyle, axes, parent)
 {
-
+	Q_UNUSED(dataType)
+	Q_UNUSED(size)
 }
 
 AMDSFullGenericFlatArrayDataHolder::~AMDSFullGenericFlatArrayDataHolder()

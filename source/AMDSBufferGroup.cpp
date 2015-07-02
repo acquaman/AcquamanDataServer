@@ -17,6 +17,10 @@ AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	QReadLocker readLock(&lock_);
 	switch(clientRequest->requestType()){
+	case AMDSClientRequestDefinitions::Introspection:
+		break;
+	case AMDSClientRequestDefinitions::Statistics:
+		break;
 	case AMDSClientRequestDefinitions::StartTimePlusCount:{
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
 		if(clientStartTimePlusCountDataRequest)
@@ -33,6 +37,9 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		break;
 	case AMDSClientRequestDefinitions::Continuous:
 //		populateData(request, request->time1());
+		break;
+	case AMDSClientRequestDefinitions::InvalidRequest:
+	default:
 		break;
 	}
 	emit clientRequestProcessed(clientRequest);
@@ -66,6 +73,8 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clie
 
 void AMDSBufferGroup::populateData(AMDSClientContinuousDataRequest *clientContinuousDataRequest, const QDateTime &lastFetch)
 {
+	Q_UNUSED(clientContinuousDataRequest)
+	Q_UNUSED(lastFetch)
 //	int startIndex = lowerBound(lastFetch);
 
 //	if(startIndex == -1)
