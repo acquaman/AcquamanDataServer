@@ -10,10 +10,10 @@
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientDataRequest.h"
 
-AMDSCentralServer::AMDSCentralServer(QObject *parent) :
+AMDSCentralServer::AMDSCentralServer(QString hwType, QObject *parent) :
 	QObject(parent)
 {
-	dataServer_ = new AMDSThreadedTcpDataServer(this);
+	dataServer_ = new AMDSThreadedTcpDataServer(hwType, this);
 
 	quint64 maxCountSize = 1000*60*60*10; // 10 hours of 1kHz signal
 
