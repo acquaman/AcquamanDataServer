@@ -14,7 +14,7 @@ class AMDSThreadedTcpDataServer : public QObject
 	Q_OBJECT
 public:
 	/// Constructs a TCP server object, and passes it to a new thread
-	explicit AMDSThreadedTcpDataServer(QObject *parent = 0);
+	explicit AMDSThreadedTcpDataServer(QString hwType, QObject *parent = 0);
 	/// Returns a reference to the server
 	AMDSTcpDataServer* server();
 
@@ -29,6 +29,8 @@ protected slots:
 	void onThreadStarted();
 
 private:
+	QString hwType_;
+
 	AMDSTcpDataServer server_;
 	QThread thread_;
 };

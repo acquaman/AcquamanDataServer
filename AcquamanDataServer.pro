@@ -61,7 +61,7 @@ HEADERS *= \
 	source/DataHolder/AMDSImageDataHolder.h
 
 SOURCES *= \
-	source/main.cpp \
+	source/AMDSMain.cpp \
 	source/AMDSTcpDataServer.cpp \
 	source/AMDSThreadedTcpDataServer.cpp \
 	source/AMDSCentralServer.cpp \

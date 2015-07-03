@@ -15,7 +15,7 @@ class AMDSCentralServer : public QObject
 {
 Q_OBJECT
 public:
-	AMDSCentralServer(QObject *parent = 0);
+	AMDSCentralServer(QString hwType, QObject *parent = 0);
 
 signals:
 	void clientRequestProcessed(AMDSClientRequest *processedRequest);
