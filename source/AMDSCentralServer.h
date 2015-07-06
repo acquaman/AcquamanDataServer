@@ -4,10 +4,12 @@
 #include <QObject>
 #include <QMap>
 
+#include "AMDSError.h"
+
 class QTimer;
 
 class AMDSThreadedBufferGroup;
-class AMDSThreadedTcpDataServer;
+class AMDSThreadedTCPDataServer;
 class AMDSBufferGroup;
 class AMDSClientRequest;
 
@@ -21,13 +23,15 @@ signals:
 	void clientRequestProcessed(AMDSClientRequest *processedRequest);
 
 protected slots:
+	/// Handle the errors information
+	void onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, QString errorMessage);
 	void onDataServerClientRequestReady(AMDSClientRequest *clientRequest);
 
 	void onFiftyMillisecondTimerUpdate();
 	void onHundredMillisecondTimerUpdate();
 
 protected:
-	AMDSThreadedTcpDataServer *dataServer_;
+	AMDSThreadedTCPDataServer *dataServer_;
 	QMap<QString, AMDSThreadedBufferGroup*> bufferGroups_;
 
 	AMDSBufferGroup *energyBufferGroup_;

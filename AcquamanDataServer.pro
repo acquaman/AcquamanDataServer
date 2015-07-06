@@ -28,9 +28,10 @@ RCC_DIR=build_files
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
+	source/AMDSError.h \
+	source/AMDSTCPDataServer.h \
+	source/AMDSThreadedTCPDataServer.h \
 	source/AMDSBuffer.h \
-	source/AMDSTcpDataServer.h \
-	source/AMDSThreadedTcpDataServer.h \
 	source/AMDSCentralServer.h \
 	source/AMDSBufferGroup.h \
 	source/AMDSThreadedBufferGroup.h \
@@ -62,8 +63,8 @@ HEADERS *= \
 
 SOURCES *= \
 	source/AMDSMain.cpp \
-	source/AMDSTcpDataServer.cpp \
-	source/AMDSThreadedTcpDataServer.cpp \
+	source/AMDSTCPDataServer.cpp \
+	source/AMDSThreadedTCPDataServer.cpp \
 	source/AMDSCentralServer.cpp \
 	source/AMDSBufferGroup.cpp \
 	source/AMDSThreadedBufferGroup.cpp \
@@ -89,3 +90,8 @@ SOURCES *= \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp
+
+
+
+
+

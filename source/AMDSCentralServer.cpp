@@ -1,8 +1,9 @@
 #include "source/AMDSCentralServer.h"
 
+#include <QtCore/QCoreApplication>
 #include <QTimer>
 
-#include "source/AMDSThreadedTcpDataServer.h"
+#include "source/AMDSThreadedTCPDataServer.h"
 #include "source/AMDSThreadedBufferGroup.h"
 #include "source/AMDSBufferGroup.h"
 #include "source/AMDSBufferGroupInfo.h"
@@ -13,7 +14,7 @@
 AMDSCentralServer::AMDSCentralServer(QString hwType, QObject *parent) :
 	QObject(parent)
 {
-	dataServer_ = new AMDSThreadedTcpDataServer(hwType, this);
+	dataServer_ = new AMDSThreadedTCPDataServer(hwType, this);
 
 	quint64 maxCountSize = 1000*60*60*10; // 10 hours of 1kHz signal
 
@@ -43,6 +44,7 @@ AMDSCentralServer::AMDSCentralServer(QString hwType, QObject *parent) :
 	spectralCounter_ = 0;
 	hundredMillisecondTimer_ = new QTimer(this);
 
+	connect(dataServer_, SIGNAL(error(quint8,quint16,QString)), this, SLOT(onDataServerErrorHandler(quint8,quint16,QString)));
 	connect(dataServer_->server(), SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SLOT(onDataServerClientRequestReady(AMDSClientRequest*)));
 	connect(this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
@@ -51,6 +53,19 @@ AMDSCentralServer::AMDSCentralServer(QString hwType, QObject *parent) :
 
 	connect(hundredMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondTimerUpdate()));
 	hundredMillisecondTimer_->start(100);
+}
+
+void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, QString errorMessage)
+{
+	AMDSError::printError(errorLevel, errorCode, errorMessage);
+
+	switch(errorLevel) {
+	case AMDSError::FATAL:
+		QCoreApplication::quit();
+		break;
+	default:
+		break;
+	}
 }
 
 void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *clientRequest){

@@ -1,10 +1,13 @@
-#include "source/AMDSTcpDataServer.h"
+#include "source/AMDSTCPDataServer.h"
 
 #include <QDateTime>
 #include <QTimer>
 
 #include "source/AMDSDataStream.h"
+#include "source/AMDSEventDataSupport.h"
+#include "source/AMDSEventData.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
+
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
@@ -16,10 +19,7 @@
 #include "source/DataHolder/AMDSScalarDataHolder.h"
 #include "source/DataHolder/AMDSSpectralDataHolder.h"
 
-#include "source/AMDSEventDataSupport.h"
-#include "source/AMDSEventData.h"
-
-AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
+AMDSTCPDataServer::AMDSTCPDataServer(QObject *parent) :
 	QObject(parent)
 {
 	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Introspection))
@@ -50,10 +50,10 @@ AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
 	oneSecondsStats_.setName("OneSecond");
 	tenSecondsStats_.setName("TenSeconds");
 
-	tenMillisecondStatsTimer_ = new QTimer();
-	hundredMillisecondStatsTimer_ = new QTimer();
-	oneSecondStatsTimer_ = new QTimer();
-	tenSecondStatsTimer_ = new QTimer();
+	tenMillisecondStatsTimer_ = new QTimer(this);
+	hundredMillisecondStatsTimer_ = new QTimer(this);
+	oneSecondStatsTimer_ = new QTimer(this);
+	tenSecondStatsTimer_ = new QTimer(this);
 
 	connect(tenMillisecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onTenMillisecondStatsTimerTimeout()));
 	connect(hundredMillisecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondStatsTimerTimeout()));
@@ -66,12 +66,12 @@ AMDSTcpDataServer::AMDSTcpDataServer(QObject *parent) :
 	tenSecondStatsTimer_->start(10000);
 }
 
-AMDSTcpDataServer::~AMDSTcpDataServer()
+AMDSTCPDataServer::~AMDSTCPDataServer()
 {
 	stop();
 }
 
-void AMDSTcpDataServer::displayClients()
+void AMDSTCPDataServer::displayClients()
 {
 	if(clientSockets_.isEmpty())
 		qDebug() << "No clients connected";
@@ -88,7 +88,7 @@ void AMDSTcpDataServer::displayClients()
 
 }
 
-void AMDSTcpDataServer::displayDetails()
+void AMDSTCPDataServer::displayDetails()
 {
 	if(!server_->isListening())
 		qDebug() << "Server is failing to listen: " << server_->errorString();
@@ -99,7 +99,7 @@ void AMDSTcpDataServer::displayDetails()
 
 }
 
-void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
+void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
 {
 	interfaceName_ = interfaceName;
 	port_ = port;
@@ -140,7 +140,7 @@ void AMDSTcpDataServer::start(const QString &interfaceName, quint16 port)
 	connect(continuousDataRequestSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onContinuousDataRequestTimer(QString)));
 }
 
-void AMDSTcpDataServer::stop()
+void AMDSTCPDataServer::stop()
 {
 //	qDebug() << "Stopping the server...";
 	QStringList clientKeys = clientSockets_.keys();
@@ -164,7 +164,7 @@ void AMDSTcpDataServer::stop()
 //	qDebug() << "Server stopped";
 }
 
-void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
+void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
 {
 	QTcpSocket* requestingSocket = clientSockets_.value(processedRequest->socketKey(), 0);
 	if(requestingSocket != 0)
@@ -223,7 +223,7 @@ void AMDSTcpDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 	}
 }
 
-void AMDSTcpDataServer::sessionOpened()
+void AMDSTCPDataServer::sessionOpened()
 {
 //	qDebug() << "Session has been opened";
 	QSettings settings;
@@ -278,15 +278,14 @@ void AMDSTcpDataServer::sessionOpened()
 	connect(server_, SIGNAL(newConnection()), this, SLOT(onNewClientConnected()));
 	if(!server_->listen(address, port_))
 	{
-		qDebug() << "Unable to start server: " << server_->errorString();
+		emit error(AMDSError::FATAL, AMDS_TCPDATASERVER_FAIL_TO_START_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
 		return;
 	}
 	qDebug() << "Listening on " << server_->serverAddress().toString() << ":" << server_->serverPort();
 }
 
 
-
-void AMDSTcpDataServer::onNewClientConnected()
+void AMDSTCPDataServer::onNewClientConnected()
 {
 	QTcpSocket* clientSocket = server_->nextPendingConnection();
 
@@ -302,7 +301,7 @@ void AMDSTcpDataServer::onNewClientConnected()
 	}
 }
 
-void AMDSTcpDataServer::onClientDisconnect(const QString &clientKey)
+void AMDSTCPDataServer::onClientDisconnect(const QString &clientKey)
 {
 	QTcpSocket* socketToDisconnect = clientSockets_.value(clientKey);
 
@@ -314,7 +313,7 @@ void AMDSTcpDataServer::onClientDisconnect(const QString &clientKey)
 	socketToDisconnect->deleteLater();
 }
 
-void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
+void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 {
 	QTcpSocket* requestingSocket = clientSockets_.value(clientKey, 0);
 
@@ -381,7 +380,7 @@ void AMDSTcpDataServer::onClientSentRequest(const QString &clientKey)
 		emit clientRequestRead(clientRequest);
 }
 
-void AMDSTcpDataServer::onContinuousDataRequestTimer(const QString &clientKey)
+void AMDSTCPDataServer::onContinuousDataRequestTimer(const QString &clientKey)
 {
 	Q_UNUSED(clientKey)
 
@@ -394,7 +393,7 @@ void AMDSTcpDataServer::onContinuousDataRequestTimer(const QString &clientKey)
 
 }
 
-void AMDSTcpDataServer::onTenMillisecondStatsTimerTimeout(){
+void AMDSTCPDataServer::onTenMillisecondStatsTimerTimeout(){
 	if(tenMillisecondsStats_.inboundBytes() > tenMillisecondsStats_.maxInboundBytes())
 		tenMillisecondsStats_.setMaxInboundBytes(tenMillisecondsStats_.inboundBytes());
 	if(tenMillisecondsStats_.outboundBytes() > tenMillisecondsStats_.maxOutboundBytes())
@@ -406,7 +405,7 @@ void AMDSTcpDataServer::onTenMillisecondStatsTimerTimeout(){
 	tenMillisecondsStats_.setOutboundBytes(0);
 }
 
-void AMDSTcpDataServer::onHundredMillisecondStatsTimerTimeout(){
+void AMDSTCPDataServer::onHundredMillisecondStatsTimerTimeout(){
 	if(hundredMillisecondsStats_.inboundBytes() > hundredMillisecondsStats_.maxInboundBytes())
 		hundredMillisecondsStats_.setMaxInboundBytes(hundredMillisecondsStats_.inboundBytes());
 	if(hundredMillisecondsStats_.outboundBytes() > hundredMillisecondsStats_.maxOutboundBytes())
@@ -418,7 +417,7 @@ void AMDSTcpDataServer::onHundredMillisecondStatsTimerTimeout(){
 	hundredMillisecondsStats_.setOutboundBytes(0);
 }
 
-void AMDSTcpDataServer::onOneSecondStatsTimerTimeout(){
+void AMDSTCPDataServer::onOneSecondStatsTimerTimeout(){
 	if(oneSecondsStats_.inboundBytes() > oneSecondsStats_.maxInboundBytes())
 		oneSecondsStats_.setMaxInboundBytes(oneSecondsStats_.inboundBytes());
 	if(oneSecondsStats_.outboundBytes() > oneSecondsStats_.maxOutboundBytes())
@@ -430,7 +429,7 @@ void AMDSTcpDataServer::onOneSecondStatsTimerTimeout(){
 	oneSecondsStats_.setOutboundBytes(0);
 }
 
-void AMDSTcpDataServer::onTenSecondStatsTimerTimeout(){
+void AMDSTCPDataServer::onTenSecondStatsTimerTimeout(){
 	if(tenSecondsStats_.inboundBytes() > tenSecondsStats_.maxInboundBytes())
 		tenSecondsStats_.setMaxInboundBytes(tenSecondsStats_.inboundBytes());
 	if(tenSecondsStats_.outboundBytes() > tenSecondsStats_.maxOutboundBytes())
