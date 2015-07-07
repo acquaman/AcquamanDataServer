@@ -77,7 +77,7 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 			return false;
 		quint16 dataCount = data_.count();
 		*dataStream << dataCount;
-		if(dataStream->status() != QDataStream::Ok)
+		if(dataStream->status() != QDataStream::Ok || dataCount == 0)
 			return false;
 
 		bool encodeDataTypeInDataHolder = true;
