@@ -278,7 +278,7 @@ void AMDSTCPDataServer::sessionOpened()
 	connect(server_, SIGNAL(newConnection()), this, SLOT(onNewClientConnected()));
 	if(!server_->listen(address, port_))
 	{
-		emit error(AMDSError::FATAL, AMDS_TCPDATASERVER_FAIL_TO_START_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
+		emit error(AMDSErrorReport::Serious, AMDS_TCPDATASERVER_FAIL_TO_START_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
 		return;
 	}
 	qDebug() << "Listening on " << server_->serverAddress().toString() << ":" << server_->serverPort();

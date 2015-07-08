@@ -4,8 +4,6 @@
 #include <QObject>
 #include <QMap>
 
-#include "AMDSError.h"
-
 class QTimer;
 
 class AMDSThreadedBufferGroup;
