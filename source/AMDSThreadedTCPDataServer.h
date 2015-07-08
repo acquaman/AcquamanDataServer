@@ -24,9 +24,6 @@ signals:
 	/// Starts the server listening on the given interfaceName and port
 	void startServer(const QString& interfaceName, quint16 port);
 
-	/// error signal
-	void error(quint8 errorLevel, quint16 errorCode, const QString &errorString);
-
 	void requestBufferGroupInfo();
 
 protected slots:

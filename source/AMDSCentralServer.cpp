@@ -47,7 +47,7 @@ AMDSCentralServer::AMDSCentralServer(QString hwType, QObject *parent) :
 	spectralCounter_ = 0;
 	hundredMillisecondTimer_ = new QTimer(this);
 
-	connect(dataServer_, SIGNAL(error(quint8,quint16,QString)), this, SLOT(onDataServerErrorHandler(quint8,quint16,QString)));
+	connect(dataServer_->server(), SIGNAL(error(quint8,quint16,QString)), this, SLOT(onDataServerErrorHandler(quint8,quint16,QString)));
 	connect(dataServer_->server(), SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SLOT(onDataServerClientRequestReady(AMDSClientRequest*)));
 	connect(this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 

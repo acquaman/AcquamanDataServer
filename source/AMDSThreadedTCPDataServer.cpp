@@ -12,7 +12,6 @@ AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QString hwType, QObject *pa
 
 	connect(thread_, SIGNAL(started()), this, SLOT(onThreadStarted()));
 	connect(this, SIGNAL(startServer(QString,quint16)), server_, SLOT(start(QString,quint16)));
-	connect(server_, SIGNAL(error(quint8,quint16,QString)), this, SIGNAL(error(quint8,quint16,QString)));
 
 	server_->moveToThread(thread_);
 	thread_->start(QThread::LowPriority);
