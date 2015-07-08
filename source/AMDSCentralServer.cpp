@@ -10,10 +10,13 @@
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientDataRequest.h"
+#include "source/util/AMDSErrorMonitor.h"
 
 AMDSCentralServer::AMDSCentralServer(QString hwType, QObject *parent) :
 	QObject(parent)
 {
+	AMDSErrorMon::information(this, 0, "Starting Acquaman Data Server application ...");
+
 	dataServer_ = new AMDSThreadedTCPDataServer(hwType, this);
 
 	quint64 maxCountSize = 1000*60*60*10; // 10 hours of 1kHz signal
@@ -57,13 +60,13 @@ AMDSCentralServer::AMDSCentralServer(QString hwType, QObject *parent) :
 
 void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, QString errorMessage)
 {
-	AMDSError::printError(errorLevel, errorCode, errorMessage);
-
 	switch(errorLevel) {
-	case AMDSError::FATAL:
+	case AMDSErrorReport::Serious:
+		AMDSErrorMon::error(this, errorCode, errorMessage);
 		QCoreApplication::quit();
 		break;
 	default:
+		AMDSErrorMon::alert(this, errorCode, errorMessage);
 		break;
 	}
 }

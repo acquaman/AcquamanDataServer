@@ -12,7 +12,7 @@
 #include <QNetworkConfigurationManager>
 #include <QSettings>
 
-#include "source/AMDSError.h"
+#include "source/util/AMDSErrorMonitor.h"
 #include "source/AMDSPacketStats.h"
 
 class QTimer;

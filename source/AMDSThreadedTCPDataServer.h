@@ -5,7 +5,6 @@
 #include <QThread>
 
 #include "source/AMDSTCPDataServer.h"
-#include "source/AMDSError.h"
 
 /**
   * Class which maintains the TCPServer in a separate thread, and passes signal messages to it.

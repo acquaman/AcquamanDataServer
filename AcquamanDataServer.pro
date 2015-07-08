@@ -6,7 +6,7 @@
 
 QT       += core network
 
-QT       -= gui
+QT       += gui
 
 TARGET = AcquamanDataServer
 CONFIG   += console
@@ -28,7 +28,6 @@ RCC_DIR=build_files
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
-	source/AMDSError.h \
 	source/AMDSTCPDataServer.h \
 	source/AMDSThreadedTCPDataServer.h \
 	source/AMDSBuffer.h \
@@ -59,7 +58,8 @@ HEADERS *= \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
-	source/DataHolder/AMDSImageDataHolder.h
+	source/DataHolder/AMDSImageDataHolder.h \
+    source/util/AMDSErrorMonitor.h
 
 SOURCES *= \
 	source/AMDSMain.cpp \
@@ -89,7 +89,8 @@ SOURCES *= \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
-	source/DataHolder/AMDSImageDataHolder.cpp
+	source/DataHolder/AMDSImageDataHolder.cpp \
+    source/util/AMDSErrorMonitor.cpp
 
 
 
