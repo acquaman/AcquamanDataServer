@@ -26,7 +26,7 @@ public:
 	/// Sets the start time for the data request
 	inline void setStartTime(const QDateTime &startTime) { startTime_ = startTime; }
 	/// Sets the number of data points after the start time to collect
-	inline void setCount(quint64 count) { count_ = count; }
+	inline void setCount(quint64 count) { count_ = count==0 ? 1:count ; }
 
 	/// Writes this AMDSClientStartTimePlusCountDataRequest to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;

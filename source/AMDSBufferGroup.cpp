@@ -24,8 +24,6 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	case AMDSClientRequestDefinitions::StartTimePlusCount:{
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
 		if(clientStartTimePlusCountDataRequest) {
-			if (clientStartTimePlusCountDataRequest->count() == 0)
-				clientStartTimePlusCountDataRequest->setCount(1);
 			populateData(clientStartTimePlusCountDataRequest);
 		}
 		break;}
