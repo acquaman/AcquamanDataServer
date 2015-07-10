@@ -51,6 +51,10 @@ public:
 	/// Reads this AMDSClientRequest from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream);
 
+private:
+	/// To set the values of all the properties
+	void setProperties(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
+
 protected:
 	QString socketKey_;
 	QString errorMessage_;

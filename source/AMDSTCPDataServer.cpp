@@ -19,6 +19,8 @@
 #include "source/DataHolder/AMDSScalarDataHolder.h"
 #include "source/DataHolder/AMDSSpectralDataHolder.h"
 
+#include "source/util/AMDSErrorMonitor.h"
+
 AMDSTCPDataServer::AMDSTCPDataServer(QObject *parent) :
 	QObject(parent)
 {
@@ -142,7 +144,6 @@ void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
 
 void AMDSTCPDataServer::stop()
 {
-//	qDebug() << "Stopping the server...";
 	QStringList clientKeys = clientSockets_.keys();
 
 	for(int iClientKey = 0; iClientKey < clientKeys.count(); ++iClientKey)
@@ -161,7 +162,7 @@ void AMDSTCPDataServer::stop()
 	if(session_)
 		session_->close();
 
-//	qDebug() << "Server stopped";
+	AMDSErrorMon::information(this, 0, "AMDS TCP Data Server stopped");
 }
 
 void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
@@ -226,7 +227,6 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 void AMDSTCPDataServer::sessionOpened()
 {
 //	qDebug() << "Session has been opened";
-	QSettings settings;
 	if(session_)
 	{
 		QNetworkConfiguration config = session_->configuration();
@@ -237,6 +237,7 @@ void AMDSTCPDataServer::sessionOpened()
 			id = config.identifier();
 
 
+		QSettings settings;
 		settings.beginGroup("Session");
 		settings.setValue("DefaultSessionConfig", id);
 		settings.endGroup();
@@ -266,8 +267,9 @@ void AMDSTCPDataServer::sessionOpened()
 	QList<QNetworkAddressEntry> associatedIPV4Addresses;
 	for(int x = 0, size = associatedAddresses.count(); x < size; x++){
 		qDebug() << "At " << x << associatedAddresses.at(x).ip() << associatedAddresses.at(x).ip().toIPv4Address();
-		if(associatedAddresses.at(x).ip().toIPv4Address())
+		if(associatedAddresses.at(x).ip().toIPv4Address()) {
 			associatedIPV4Addresses.append(associatedAddresses.at(x));
+		}
 	}
 
 	if(interfaceOffset < associatedAddresses.count())
@@ -281,6 +283,7 @@ void AMDSTCPDataServer::sessionOpened()
 		emit error(AMDSErrorReport::Serious, AMDS_TCPDATASERVER_FAIL_TO_START_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
 		return;
 	}
+
 	qDebug() << "Listening on " << server_->serverAddress().toString() << ":" << server_->serverPort();
 }
 
