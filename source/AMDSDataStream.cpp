@@ -3,6 +3,7 @@
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/AMDSEventDataSupport.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
+#include "source/util/AMDSErrorMonitor.h"
 
 AMDSDataStream::AMDSDataStream() :
 	QDataStream()
@@ -343,7 +344,13 @@ AMDSClientRequest* AMDSDataStream::decodeAndInstantiateClientRequestType(){
 	AMDSClientRequestDefinitions::RequestType clientRequestType = decodeRequestType();
 	if(clientRequestType >= AMDSClientRequestDefinitions::InvalidRequest)
 		return 0;
-	return AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
+
+	AMDSClientRequest* clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
+	if (!clientRequest) {
+		qDebug() << QString("Failed to parse clientRequest for type: %s").arg(clientRequestType);
+	}
+
+	return clientRequest;
 }
 
 void AMDSDataStream::read(AMDSClientRequest &clientRequest){
