@@ -60,7 +60,7 @@ HEADERS *= \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h \
-    source/util/AMDSErrorMonitor.h
+	source/util/AMDSErrorMonitor.h
 
 SOURCES *= \
 	source/AMDSMain.cpp \
@@ -92,4 +92,4 @@ SOURCES *= \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
-    source/util/AMDSErrorMonitor.cpp
+	source/util/AMDSErrorMonitor.cpp
