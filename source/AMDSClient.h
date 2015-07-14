@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QTcpSocket>
 #include <QVector>
+
 class QDialogButtonBox;
 class QLabel;
 class QLineEdit;
@@ -15,12 +16,13 @@ class QTextEdit;
 class QComboBox;
 class QSpinBox;
 class QCheckBox;
-class Client : public QDialog
+
+class AMDSClient : public QDialog
 {
 	Q_OBJECT
 
 public:
-	Client(QWidget *parent = 0);
+	AMDSClient(QWidget *parent = 0);
 
 private slots:
 	void requestNewFortune();

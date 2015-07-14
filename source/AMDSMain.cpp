@@ -6,6 +6,9 @@
 #include <QSettings>
 
 #include "source/AMDSCentralServer.h"
+#include "source/AMDSEventDataSupport.h"
+#include "source/ClientRequest/AMDSClientRequestSupport.h"
+#include "source/DataHolder/AMDSDataHolderSupport.h"
 
 /*
  * Print the usage of the application
@@ -32,6 +35,12 @@ void initializeAppSettings(QString interface, quint16 port)
 		settings.setValue("port", port);
 
 	settings.endGroup();
+}
+
+void initializeRegisteredClasses() {
+	AMDSClientRequestSupport::registerClientRequestClass();
+	AMDSDataHolderSupport::registerDataHolderClass();
+	AMDSEventDataSupport::registerEventDataObjectClass();
 }
 
 int main(int argc, char *argv[])
@@ -62,6 +71,7 @@ int main(int argc, char *argv[])
 		printUsage();
 	} else {
 		initializeAppSettings(interfaceType, port);
+		initializeRegisteredClasses();
 
 		new AMDSCentralServer();
 		return app.exec();

@@ -4,10 +4,6 @@
 #include <QTimer>
 
 #include "source/AMDSDataStream.h"
-#include "source/AMDSEventDataSupport.h"
-#include "source/AMDSEventData.h"
-#include "source/ClientRequest/AMDSClientRequestSupport.h"
-
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
@@ -15,35 +11,11 @@
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
-#include "source/DataHolder/AMDSDataHolderSupport.h"
-#include "source/DataHolder/AMDSDataHolder.h"
-#include "source/DataHolder/AMDSScalarDataHolder.h"
-#include "source/DataHolder/AMDSSpectralDataHolder.h"
-
 #include "source/util/AMDSErrorMonitor.h"
 
 AMDSTCPDataServer::AMDSTCPDataServer(QObject *parent) :
 	QObject(parent)
 {
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Introspection))
-		AMDSClientRequestSupport::registerClass<AMDSClientIntrospectionRequest>(AMDSClientRequestDefinitions::Introspection);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Statistics))
-		AMDSClientRequestSupport::registerClass<AMDSClientStatisticsRequest>(AMDSClientRequestDefinitions::Statistics);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::StartTimePlusCount))
-		AMDSClientRequestSupport::registerClass<AMDSClientStartTimePlusCountDataRequest>(AMDSClientRequestDefinitions::StartTimePlusCount);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::RelativeCountPlusCount))
-		AMDSClientRequestSupport::registerClass<AMDSClientRelativeCountPlusCountDataRequest>(AMDSClientRequestDefinitions::RelativeCountPlusCount);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
-		AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
-
-	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightScalarDataHolder::staticMetaObject.className()))
-		AMDSDataHolderSupport::registerClass<AMDSLightWeightScalarDataHolder>();
-	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightSpectralDataHolder::staticMetaObject.className()))
-		AMDSDataHolderSupport::registerClass<AMDSLightWeightSpectralDataHolder>();
-
-	if(!AMDSEventDataSupport::registeredClasses()->contains(AMDSLightWeightEventData::staticMetaObject.className()))
-		AMDSEventDataSupport::registerClass<AMDSLightWeightEventData>();
-
 	session_ = 0;
 	server_ = 0;
 	port_ = 0;

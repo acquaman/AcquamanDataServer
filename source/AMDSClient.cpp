@@ -1,13 +1,10 @@
-#include <QtGui>
-#include <QtNetwork>
-
-#include <QDateTimeEdit>
-
 #include "AMDSClient.h"
 
-#include "source/AMDSDataStream.h"
+#include <QtGui>
+#include <QtNetwork>
+#include <QDateTimeEdit>
 
-#include <QDebug>
+#include "source/AMDSDataStream.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
@@ -17,36 +14,12 @@
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
-#include "source/DataHolder/AMDSDataHolderSupport.h"
-#include "source/DataHolder/AMDSDataHolder.h"
-#include "source/DataHolder/AMDSScalarDataHolder.h"
-#include "source/DataHolder/AMDSSpectralDataHolder.h"
 
-#include "source/AMDSEventDataSupport.h"
-#include "source/AMDSEventData.h"
+#include <QDebug>
 
-Client::Client(QWidget *parent)
+AMDSClient::AMDSClient(QWidget *parent)
 :   QDialog(parent), networkSession(0)
 {
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Introspection))
-		AMDSClientRequestSupport::registerClass<AMDSClientIntrospectionRequest>(AMDSClientRequestDefinitions::Introspection);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Statistics))
-		AMDSClientRequestSupport::registerClass<AMDSClientStatisticsRequest>(AMDSClientRequestDefinitions::Statistics);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::StartTimePlusCount))
-		AMDSClientRequestSupport::registerClass<AMDSClientStartTimePlusCountDataRequest>(AMDSClientRequestDefinitions::StartTimePlusCount);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::RelativeCountPlusCount))
-		AMDSClientRequestSupport::registerClass<AMDSClientRelativeCountPlusCountDataRequest>(AMDSClientRequestDefinitions::RelativeCountPlusCount);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
-		AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
-
-	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightScalarDataHolder::staticMetaObject.className()))
-		AMDSDataHolderSupport::registerClass<AMDSLightWeightScalarDataHolder>();
-	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightSpectralDataHolder::staticMetaObject.className()))
-		AMDSDataHolderSupport::registerClass<AMDSLightWeightSpectralDataHolder>();
-
-	if(!AMDSEventDataSupport::registeredClasses()->contains(AMDSLightWeightEventData::staticMetaObject.className()))
-		AMDSEventDataSupport::registerClass<AMDSLightWeightEventData>();
-
 	hostLabel = new QLabel(tr("&Server name:"));
 	portLabel = new QLabel(tr("S&erver port:"));
 
@@ -161,7 +134,7 @@ Client::Client(QWidget *parent)
 	}
 }
 
-void Client::requestNewFortune()
+void AMDSClient::requestNewFortune()
 {
 	getFortuneButton->setEnabled(false);
 	blockSize = 0;
@@ -172,7 +145,7 @@ void Client::requestNewFortune()
 	QTimer::singleShot(1000, this, SLOT(requestData()));
 }
 
-void Client::readFortune()
+void AMDSClient::readFortune()
 {
 
 	AMDSDataStream in(tcpSocket);
@@ -262,7 +235,7 @@ void Client::readFortune()
 	blockSize = 0;
 }
 
-void Client::displayError(QAbstractSocket::SocketError socketError)
+void AMDSClient::displayError(QAbstractSocket::SocketError socketError)
 {
 	switch (socketError) {
 	case QAbstractSocket::RemoteHostClosedError:
@@ -288,7 +261,7 @@ void Client::displayError(QAbstractSocket::SocketError socketError)
 	getFortuneButton->setEnabled(true);
 }
 
-void Client::enableGetFortuneButton()
+void AMDSClient::enableGetFortuneButton()
 {
 	getFortuneButton->setEnabled((!networkSession || networkSession->isOpen()) &&
 								 !hostLineEdit->text().isEmpty() &&
@@ -296,7 +269,7 @@ void Client::enableGetFortuneButton()
 
 }
 
-void Client::sessionOpened()
+void AMDSClient::sessionOpened()
 {
 	qDebug() << "Network session has been opened";
 
@@ -319,7 +292,7 @@ void Client::sessionOpened()
 	enableGetFortuneButton();
 }
 
-void Client::requestData()
+void AMDSClient::requestData()
 {
 	QByteArray block;
 	AMDSDataStream out(&block, QIODevice::WriteOnly);
