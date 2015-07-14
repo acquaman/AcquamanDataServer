@@ -70,15 +70,15 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 	else{
 		AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
 		if(clientDataRequest){
-			if(clientDataRequest->bufferName() == "Energy"){
-				clientDataRequest->setBufferGroupInfo(energyBufferGroup_->bufferGroupInfo());
-				connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-				energyBufferGroup_->processClientRequest(clientRequest);
-			}
-			if(clientDataRequest->bufferName() == "Amptek1"){
-				clientDataRequest->setBufferGroupInfo(amptek1BufferGroup_->bufferGroupInfo());
-				connect(amptek1BufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-				amptek1BufferGroup_->processClientRequest(clientRequest);
+
+			AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(clientDataRequest->bufferName(), 0);
+			if (threadedBufferGroup) {
+				AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
+				clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
+				connect(bufferGroup, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+				bufferGroup->processClientRequest(clientRequest);
+			} else {
+				AMDSErrorMon::alert(this, 0, QString("Invalid client data request with buffer name: %1").arg(clientDataRequest->bufferName()));
 			}
 		}
 	}
