@@ -304,7 +304,7 @@ void AMDSClient::requestData()
 	AMDSClientRequestDefinitions::RequestType clientRequestType = (AMDSClientRequestDefinitions::RequestType)requestTypeId;
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 	if (!clientRequest) {
-		qDebug() << "Client::Failed to parse clientRequest for type: " << clientRequestType;
+		qDebug() << "AMDSClient::Failed to parse clientRequest for type: " << clientRequestType;
 		return;
 	}
 

@@ -22,18 +22,20 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		break;
 	case AMDSClientRequestDefinitions::Statistics:
 		break;
-	case AMDSClientRequestDefinitions::StartTimePlusCount:{
+	case AMDSClientRequestDefinitions::StartTimePlusCount: {
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
 		if(clientStartTimePlusCountDataRequest) {
 			populateData(clientStartTimePlusCountDataRequest);
 		}
-		break;}
+		break;
+	}
 	case AMDSClientRequestDefinitions::RelativeCountPlusCount: {
 		AMDSClientRelativeCountPlusCountDataRequest *clientRelativeCountPlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(clientRequest);
 		if(clientRelativeCountPlusCountDataRequest) {
 			populateData(clientRelativeCountPlusCountDataRequest);
 		}
-		break;}
+		break;
+	}
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 //		populateData(request, request->time1(), request->time2());
 		break;
@@ -71,7 +73,6 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clie
 			AMDSFlatArray oneFlatArray;
 			dataHolder->data(&oneFlatArray);
 			clientStartTimePlusCountDataRequest->appendData(dataHolder);
-//			request->histogramData()->append(dataHolders_[iCurrent]);
 		}
 	}
 }
