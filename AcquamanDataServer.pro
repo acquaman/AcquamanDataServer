@@ -52,6 +52,7 @@ HEADERS *= \
 	source/ClientRequest/AMDSClientIntrospectionRequest.h \
 	source/ClientRequest/AMDSClientStatisticsRequest.h \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
+	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
@@ -83,6 +84,7 @@ SOURCES *= \
 	source/ClientRequest/AMDSClientIntrospectionRequest.cpp \
 	source/ClientRequest/AMDSClientStatisticsRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
+	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
@@ -91,8 +93,3 @@ SOURCES *= \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
     source/util/AMDSErrorMonitor.cpp
-
-
-
-
-

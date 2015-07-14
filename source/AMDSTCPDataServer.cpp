@@ -12,6 +12,7 @@
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 #include "source/DataHolder/AMDSDataHolderSupport.h"
@@ -30,6 +31,8 @@ AMDSTCPDataServer::AMDSTCPDataServer(QObject *parent) :
 		AMDSClientRequestSupport::registerClass<AMDSClientStatisticsRequest>(AMDSClientRequestDefinitions::Statistics);
 	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::StartTimePlusCount))
 		AMDSClientRequestSupport::registerClass<AMDSClientStartTimePlusCountDataRequest>(AMDSClientRequestDefinitions::StartTimePlusCount);
+	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::RelativeCountPlusCount))
+		AMDSClientRequestSupport::registerClass<AMDSClientRelativeCountPlusCountDataRequest>(AMDSClientRequestDefinitions::RelativeCountPlusCount);
 	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
 		AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
 
@@ -197,6 +200,20 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 				for(int x = 0, size = processedStartTimePlusCountDataRequest->data().count(); x < size; x++){
 					AMDSFlatArray oneFlatArray;
 					processedStartTimePlusCountDataRequest->data().at(x)->data(&oneFlatArray);
+					values.append(oneFlatArray);
+//					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
+					qDebug() << "Data at " << x << oneFlatArray.printData();
+				}
+			}
+		}
+
+		if(processedRequest->requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount){
+			AMDSClientRelativeCountPlusCountDataRequest *processedRelativeCountPlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(processedRequest);
+			if(processedRelativeCountPlusCountDataRequest){
+				QList<AMDSFlatArray> values;
+				for(int x = 0, size = processedRelativeCountPlusCountDataRequest->data().count(); x < size; x++){
+					AMDSFlatArray oneFlatArray;
+					processedRelativeCountPlusCountDataRequest->data().at(x)->data(&oneFlatArray);
 					values.append(oneFlatArray);
 //					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
 					qDebug() << "Data at " << x << oneFlatArray.printData();

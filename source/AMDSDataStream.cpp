@@ -347,7 +347,7 @@ AMDSClientRequest* AMDSDataStream::decodeAndInstantiateClientRequestType(){
 
 	AMDSClientRequest* clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 	if (!clientRequest) {
-		qDebug() << QString("Failed to parse clientRequest for type: %s").arg(clientRequestType);
+		qDebug() << QString("AMDSDataStream::Failed to parse clientRequest for type: %s").arg(clientRequestType);
 	}
 
 	return clientRequest;
