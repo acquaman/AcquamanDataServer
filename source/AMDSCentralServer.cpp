@@ -75,10 +75,10 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 			if (threadedBufferGroup) {
 				AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
 				clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
-				connect(bufferGroup, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 				bufferGroup->processClientRequest(clientRequest);
 			} else {
 				AMDSErrorMon::alert(this, 0, QString("Invalid client data request with buffer name: %1").arg(clientDataRequest->bufferName()));
+				emit clientRequestProcessed(clientRequest);
 			}
 		}
 	}
@@ -130,6 +130,11 @@ void AMDSCentralServer::initializeBufferGroup(quint64 maxCountSize)
 	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
 	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
+
+	connect(mcpBufferGroup, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+	connect(amptek1BufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+	connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+
 }
 
 void AMDSCentralServer::startTimer()
