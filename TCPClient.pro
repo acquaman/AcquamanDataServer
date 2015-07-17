@@ -38,6 +38,7 @@ HEADERS  += \
 	source/ClientRequest/AMDSClientStatisticsRequest.h \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h \
+	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
@@ -64,6 +65,7 @@ SOURCES += \
 	source/ClientRequest/AMDSClientStatisticsRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.cpp \
+	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
@@ -71,6 +73,4 @@ SOURCES += \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/AMDSMetaObjectSupport.cpp
-
-
 

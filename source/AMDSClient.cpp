@@ -12,6 +12,7 @@
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 
@@ -169,7 +170,9 @@ void AMDSClient::readFortune()
 	AMDSClientRequest *clientRequest = in.decodeAndInstantiateClientRequestType();
 	in.read(*clientRequest);
 
-	if(clientRequest->requestType() == AMDSClientRequestDefinitions::Introspection){
+	switch (clientRequest->requestType()) {
+	case AMDSClientRequestDefinitions::Introspection: {
+		/// TODO: this need to be reorganized and implemented (printData) in the class of AMDSClientIntrospectionRequest
 		AMDSClientIntrospectionRequest *clientIntrospectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
 		if(clientIntrospectionRequest){
 			QList<AMDSBufferGroupInfo> bufferGroupInfos;
@@ -198,37 +201,20 @@ void AMDSClient::readFortune()
 				}
 			}
 		}
-	}
-	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::Statistics){
-		AMDSClientStatisticsRequest *clientStatisticsRequest = qobject_cast<AMDSClientStatisticsRequest*>(clientRequest);
-		if(clientStatisticsRequest){
-			for(int x = 0, size = clientStatisticsRequest->packetStats().count(); x < size; x++)
-				qDebug() << "Packet Stats " << clientStatisticsRequest->packetStats().at(x).name() << ": " << clientStatisticsRequest->packetStats().at(x).allStats();
-		}
-	}
-	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::StartTimePlusCount){
-		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
-		if(clientStartTimePlusCountDataRequest){
-			for(int x = 0, size = clientStartTimePlusCountDataRequest->data().count(); x < size; x++){
-				AMDSFlatArray oneFlatArray = AMDSFlatArray(clientStartTimePlusCountDataRequest->uniformDataType(), clientStartTimePlusCountDataRequest->bufferGroupInfo().spanSize());
-				clientStartTimePlusCountDataRequest->data().at(x)->data(&oneFlatArray);
 
-//				qDebug() << "Data at " << x << oneFlatArray.vectorDouble();
-				qDebug() << "\nData at " << x << oneFlatArray.printData();
-			}
-		}
+		break;
 	}
-	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount){
-		AMDSClientRelativeCountPlusCountDataRequest *clientRelativePlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(clientRequest);
-		if(clientRelativePlusCountDataRequest){
-			for(int x = 0, size = clientRelativePlusCountDataRequest->data().count(); x < size; x++){
-				AMDSFlatArray oneFlatArray = AMDSFlatArray(clientRelativePlusCountDataRequest->uniformDataType(), clientRelativePlusCountDataRequest->bufferGroupInfo().spanSize());
-				clientRelativePlusCountDataRequest->data().at(x)->data(&oneFlatArray);
 
-//				qDebug() << "Data at " << x << oneFlatArray.vectorDouble();
-				qDebug() << "\nData at " << x << oneFlatArray.printData();
-			}
-		}
+	case AMDSClientRequestDefinitions::Statistics:
+	case AMDSClientRequestDefinitions::StartTimePlusCount:
+	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
+	case AMDSClientRequestDefinitions::StartTimeToEndTime:
+			clientRequest->printData();
+			break;
+
+	default:
+		qDebug() << "The printData() function is NOT implemented (or called) for " << clientRequest->requestType();
+		break;
 	}
 
 	getFortuneButton->setEnabled(true);
@@ -334,6 +320,14 @@ void AMDSClient::requestData()
 			clientRelativeCountPlusCountDataRequest->setBufferName(bufferNameComboBox_->currentText());
 			clientRelativeCountPlusCountDataRequest->setRelativeCount(relativeCount);
 			clientRelativeCountPlusCountDataRequest->setCount(count);
+		}
+	}
+	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::StartTimeToEndTime){
+		AMDSClientStartTimeToEndTimeDataRequest *clientStartTimeToEndTimeDataRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
+		if(clientStartTimeToEndTimeDataRequest){
+			clientStartTimeToEndTimeDataRequest->setBufferName(bufferNameComboBox_->currentText());
+			clientStartTimeToEndTimeDataRequest->setStartTime(time1Edit->dateTime());
+			clientStartTimeToEndTimeDataRequest->setEndTime(time2Edit->dateTime());
 		}
 	}
 

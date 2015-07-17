@@ -187,3 +187,15 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	return true;
 }
+
+void AMDSClientDataRequest::printData()
+{
+	QList<AMDSFlatArray> values;
+	for(int x = 0, size = data().count(); x < size; x++){
+		AMDSFlatArray oneFlatArray = AMDSFlatArray(uniformDataType(), bufferGroupInfo().spanSize());
+//		AMDSFlatArray oneFlatArray;
+		data().at(x)->data(&oneFlatArray);
+		values.append(oneFlatArray);
+		qDebug() << "Data at " << x << oneFlatArray.printData();
+	}
+}

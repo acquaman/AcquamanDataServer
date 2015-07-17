@@ -9,6 +9,7 @@
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 #include "source/util/AMDSErrorMonitor.h"
@@ -142,6 +143,8 @@ void AMDSTCPDataServer::stop()
 
 void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
 {
+	bool missionAccomplished = true;
+
 	QTcpSocket* requestingSocket = clientSockets_.value(processedRequest->socketKey(), 0);
 	if(requestingSocket != 0)
 	{
@@ -165,47 +168,35 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		oneSecondsStats_.setOutboundBytes(oneSecondsStats_.outboundBytes()+outboundBytes);
 		tenSecondsStats_.setOutboundBytes(tenSecondsStats_.outboundBytes()+outboundBytes);
 
-		if(processedRequest->requestType() == AMDSClientRequestDefinitions::StartTimePlusCount){
-			AMDSClientStartTimePlusCountDataRequest *processedStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(processedRequest);
-			if(processedStartTimePlusCountDataRequest){
-				QList<AMDSFlatArray> values;
-				for(int x = 0, size = processedStartTimePlusCountDataRequest->data().count(); x < size; x++){
-					AMDSFlatArray oneFlatArray;
-					processedStartTimePlusCountDataRequest->data().at(x)->data(&oneFlatArray);
-					values.append(oneFlatArray);
-					qDebug() << "Data at " << x << oneFlatArray.printData();
+		switch (processedRequest->requestType()) {
+		case AMDSClientRequestDefinitions::StartTimePlusCount:
+		case AMDSClientRequestDefinitions::RelativeCountPlusCount:
+		case AMDSClientRequestDefinitions::StartTimeToEndTime:
+			{
+				AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
+				if(processedClientDataRequest){
+					processedClientDataRequest->printData();
 				}
+
+				break;
 			}
-		}
 
-		if(processedRequest->requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount){
-			AMDSClientRelativeCountPlusCountDataRequest *processedRelativeCountPlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(processedRequest);
-			if(processedRelativeCountPlusCountDataRequest){
-				QList<AMDSFlatArray> values;
-				for(int x = 0, size = processedRelativeCountPlusCountDataRequest->data().count(); x < size; x++){
-					AMDSFlatArray oneFlatArray;
-					processedRelativeCountPlusCountDataRequest->data().at(x)->data(&oneFlatArray);
-					values.append(oneFlatArray);
-					qDebug() << "Data at " << x << oneFlatArray.printData();
-				}
+		case AMDSClientRequestDefinitions::Continuous:
+			if(processedRequest->responseType() != AMDSClientRequest::Error) {
+	//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
+	//			data->histogramData()->clear();
+
+	//			processedRequest->startContinuousRequestTimer(500);
+				missionAccomplished = false;
 			}
-		}
+			break;
 
-		if(processedRequest->requestType() == AMDSClientRequestDefinitions::Continuous && processedRequest->responseType() != AMDSClientRequest::Error)
-		{
-//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
-//			data->histogramData()->clear();
-
-//			processedRequest->startContinuousRequestTimer(500);
-		}
-		else
-		{
-			processedRequest->deleteLater();
-			requestingSocket->disconnectFromHost();
+		default:
+			break;
 		}
 	}
-	else
-	{
+
+	if (missionAccomplished) {
 		processedRequest->deleteLater();
 		requestingSocket->disconnectFromHost();
 	}

@@ -43,10 +43,10 @@ bool AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *
 	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
 		return false;
 
-	*dataStream << startTime_;
+	*dataStream << startTime();
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
-	*dataStream << count_;
+	*dataStream << count();
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 

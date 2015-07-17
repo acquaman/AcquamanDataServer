@@ -2,6 +2,7 @@
 
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
@@ -17,6 +18,7 @@ AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
 
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	QReadLocker readLock(&lock_);
+
 	switch(clientRequest->requestType()){
 	case AMDSClientRequestDefinitions::Introspection:
 		break;
@@ -36,9 +38,13 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		}
 		break;
 	}
-	case AMDSClientRequestDefinitions::StartTimeToEndTime:
-//		populateData(request, request->time1(), request->time2());
+	case AMDSClientRequestDefinitions::StartTimeToEndTime:{
+		AMDSClientStartTimeToEndTimeDataRequest *clientStartTimeToEndTimeDataRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
+		if(clientStartTimeToEndTimeDataRequest) {
+			populateData(clientStartTimeToEndTimeDataRequest);
+		}
 		break;
+	}
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
 //		populateData(request, request->time1(), request->count1(), request->count2());
 		break;
@@ -52,33 +58,37 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	emit clientRequestProcessed(clientRequest);
 }
 
-void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clientStartTimePlusCountDataRequest)
+void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clientDataRequest)
 {
-	QDateTime startTime = clientStartTimePlusCountDataRequest->startTime();
-	quint64 count = clientStartTimePlusCountDataRequest->count();
+	QDateTime startTime = clientDataRequest->startTime();
+	quint64 count = clientDataRequest->count();
 
 	int startIndex = lowerBound(startTime);
 
 	if(startIndex == -1)
-		clientStartTimePlusCountDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(startTime.toString()));
+		clientDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(startTime.toString()));
 	else
 	{
+		clientDataRequest->clearData();
+		clientDataRequest->setBufferGroupInfo(bufferGroupInfo_);
+
 		count = startIndex + count;
 		int countAsInt = count;
-		clientStartTimePlusCountDataRequest->clearData();
-		clientStartTimePlusCountDataRequest->setBufferGroupInfo(bufferGroupInfo_);
 		for (int iCurrent = startIndex, limit = dataHolders_.count(); iCurrent < countAsInt && iCurrent < limit; iCurrent++)
 		{
 			AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
 			AMDSFlatArray oneFlatArray;
 			dataHolder->data(&oneFlatArray);
-			clientStartTimePlusCountDataRequest->appendData(dataHolder);
+			clientDataRequest->appendData(dataHolder);
 		}
 	}
 }
 
 void AMDSBufferGroup::populateData(AMDSClientRelativeCountPlusCountDataRequest* clientDataRequest)
 {
+	clientDataRequest->clearData();
+	clientDataRequest->setBufferGroupInfo(bufferGroupInfo_);
+
 	int relativeCount = clientDataRequest->relativeCount();
 	int count = clientDataRequest->count();
 
@@ -92,6 +102,33 @@ void AMDSBufferGroup::populateData(AMDSClientRelativeCountPlusCountDataRequest* 
 	{
 		AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
 		clientDataRequest->appendData(dataHolder);
+	}
+}
+
+void AMDSBufferGroup::populateData(AMDSClientStartTimeToEndTimeDataRequest* clientDataRequest)
+{
+	QDateTime startTime = clientDataRequest->startTime();
+	QDateTime endTime = clientDataRequest->endTime();
+
+	int startIndex = lowerBound(startTime);
+	int endIndex = lowerBound(endTime);
+
+	startIndex = (startIndex < 0 ? 0 : startIndex);
+	endIndex = (endIndex < dataHolders_.count() ? endIndex : dataHolders_.count() - 1);
+
+	if(startIndex == -1) {
+		clientDataRequest->setErrorMessage(QString("Could not locate data for start time %1 (ReqType: 4)").arg(startTime.toString()));
+	} else if (endIndex == -1) {
+		clientDataRequest->setErrorMessage(QString("Could not locate data for end time %1 (ReqType: 4)").arg(endTime.toString()));
+	} else {
+		clientDataRequest->clearData();
+		clientDataRequest->setBufferGroupInfo(bufferGroupInfo_);
+
+		for (int iCurrent = startIndex; iCurrent < endIndex + 1; iCurrent++)
+		{
+			AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
+			clientDataRequest->appendData(dataHolder);
+		}
 	}
 }
 
