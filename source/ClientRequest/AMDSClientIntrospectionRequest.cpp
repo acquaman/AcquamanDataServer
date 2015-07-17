@@ -1,5 +1,7 @@
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 
+//#include <QtGui>
+
 #include "source/AMDSDataStream.h"
 
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(QObject *parent) :
@@ -88,4 +90,34 @@ bool AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStre
 	bufferGroupInfos_.append(readBufferGroupInfos);
 
 	return true;
+}
+
+void AMDSClientIntrospectionRequest::printData()
+{
+	/// TODO: to be added ...
+//	QList<AMDSBufferGroupInfo> requestBufferGroupInfos = bufferGroupInfos();
+
+//	if(requestBufferGroupInfos.count() > 0){
+//		const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestType->model());
+//		for(int x = 1; x < 7; x++){
+//			QStandardItem* item = model->item(x);
+//			item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+//			// visually disable by greying out - works only if combobox has been painted already and palette returns the wanted color
+//			item->setData(QVariant(), Qt::TextColorRole);
+//		}
+//	}
+
+//	if(bufferName() == "All"){
+//		bufferNameComboBox_->clear();
+//		bufferNameComboBox_->addItem("All");
+//	}
+//	for(int y = 0, ySize = requestBufferGroupInfos.count(); y < ySize; y++){
+//		if(bufferName() == "All")
+//			bufferNameComboBox_->addItem(requestBufferGroupInfos.at(y).name());
+//		qDebug() << requestBufferGroupInfos.at(y).name() << requestBufferGroupInfos.at(y).description() << requestBufferGroupInfos.at(y).units() << requestBufferGroupInfos.at(y).rank() << requestBufferGroupInfos.at(y).size().toString();
+//		for(int x = 0, size = requestBufferGroupInfos.at(y).axes().count(); x < size; x++){
+//			qDebug() << "\tAxis info at " << x << requestBufferGroupInfos.at(y).axes().at(x).name() << requestBufferGroupInfos.at(y).axes().at(x).description() << requestBufferGroupInfos.at(y).axes().at(x).units() << requestBufferGroupInfos.at(y).axes().at(x).size() << requestBufferGroupInfos.at(y).axes().at(x).isUniform() << requestBufferGroupInfos.at(y).axes().at(x).start() << requestBufferGroupInfos.at(y).axes().at(x).increment();
+//		}
+//	}
+
 }
