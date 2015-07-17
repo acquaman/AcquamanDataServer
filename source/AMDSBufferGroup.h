@@ -8,6 +8,7 @@
 #include "source/DataHolder/AMDSDataHolder.h"
 
 class AMDSClientRequest;
+class AMDSClientDataRequest;
 class AMDSClientStartTimePlusCountDataRequest;
 class AMDSClientRelativeCountPlusCountDataRequest;
 class AMDSClientStartTimeToEndTimeDataRequest;
@@ -58,6 +59,8 @@ signals:
 protected:
 	/// Helper functions which populate request data based on the parameters passed:
 
+	/// Fills the data to the clientRequest
+	void populateData(AMDSClientDataRequest* clientDataRequest, int startIndex, int endIndex);
 	/// Fills the request with count number of spectra after (and including) startTime
 	void populateData(AMDSClientStartTimePlusCountDataRequest* clientDataRequest);
 	/// Fills the request with count number of spectra after (and including) relative count (backward)
