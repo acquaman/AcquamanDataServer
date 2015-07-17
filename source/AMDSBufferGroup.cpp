@@ -3,6 +3,7 @@
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
@@ -45,9 +46,13 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		}
 		break;
 	}
-	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
-//		populateData(request, request->time1(), request->count1(), request->count2());
+	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:{
+		AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest *clientMiddleTimePlusCountBeforeAndAfterDataRequest = qobject_cast<AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest*>(clientRequest);
+		if(clientMiddleTimePlusCountBeforeAndAfterDataRequest) {
+			populateData(clientMiddleTimePlusCountBeforeAndAfterDataRequest);
+		}
 		break;
+	}
 	case AMDSClientRequestDefinitions::Continuous:
 //		populateData(request, request->time1());
 		break;
@@ -111,6 +116,20 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimeToEndTimeDataRequest* clie
 		clientDataRequest->setErrorMessage(QString("Could not locate data for end time %1 (ReqType: 4)").arg(endTime.toString()));
 	} else {
 		populateData(clientDataRequest, startIndex, endIndex);
+	}
+}
+
+void AMDSBufferGroup::populateData(AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest* clientDataRequest)
+{
+	QDateTime middleTime = clientDataRequest->middleTime();
+	int countBefore = clientDataRequest->countBefore();
+	int countAfter = clientDataRequest->countAfter();
+
+	int middleIndex = lowerBound(middleTime);
+	if(middleIndex == -1) {
+		clientDataRequest->setErrorMessage(QString("Could not locate data for middle time %1 (ReqType: 5)").arg(middleTime.toString()));
+	} else {
+		populateData(clientDataRequest, middleIndex - countBefore, middleIndex + countAfter);
 	}
 }
 

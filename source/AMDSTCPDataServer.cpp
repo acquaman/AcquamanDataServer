@@ -10,6 +10,7 @@
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 #include "source/util/AMDSErrorMonitor.h"
@@ -172,6 +173,7 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		case AMDSClientRequestDefinitions::StartTimePlusCount:
 		case AMDSClientRequestDefinitions::RelativeCountPlusCount:
 		case AMDSClientRequestDefinitions::StartTimeToEndTime:
+		case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
 			{
 				AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
 				if(processedClientDataRequest){

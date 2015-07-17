@@ -13,6 +13,7 @@
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 
@@ -209,6 +210,7 @@ void AMDSClient::readFortune()
 	case AMDSClientRequestDefinitions::StartTimePlusCount:
 	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
+	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
 			clientRequest->printData();
 			break;
 
@@ -328,6 +330,18 @@ void AMDSClient::requestData()
 			clientStartTimeToEndTimeDataRequest->setBufferName(bufferNameComboBox_->currentText());
 			clientStartTimeToEndTimeDataRequest->setStartTime(time1Edit->dateTime());
 			clientStartTimeToEndTimeDataRequest->setEndTime(time2Edit->dateTime());
+		}
+	}
+	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter){
+		AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest *clientMiddleTimePlusCountBeforeAndAfterDataRequest = qobject_cast<AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest*>(clientRequest);
+		if(clientMiddleTimePlusCountBeforeAndAfterDataRequest){
+			quint64 countBefore = count1Edit->text().toUInt();
+			quint64 countAfter = count2Edit->text().toUInt();
+
+			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setBufferName(bufferNameComboBox_->currentText());
+			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setMiddleTime(time1Edit->dateTime());
+			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountBefore(countBefore);
+			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountAfter(countAfter);
 		}
 	}
 
