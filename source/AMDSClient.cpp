@@ -211,7 +211,7 @@ void AMDSClient::readFortune()
 	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
-			clientRequest->printData();
+			clientRequest->validateResponse();
 			break;
 
 	default:

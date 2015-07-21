@@ -92,9 +92,11 @@ bool AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStre
 	return true;
 }
 
-void AMDSClientIntrospectionRequest::printData()
+bool AMDSClientIntrospectionRequest::validateResponse()
 {
 	/// TODO: to be added ...
+	return true;
+
 //	QList<AMDSBufferGroupInfo> requestBufferGroupInfos = bufferGroupInfos();
 
 //	if(requestBufferGroupInfos.count() > 0){

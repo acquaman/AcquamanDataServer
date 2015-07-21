@@ -21,6 +21,7 @@ RCC_DIR=build_files
 
 HEADERS  += \
 	source/AMDSClient.h \
+	source/AMDSMetaObjectSupport.h \
 	source/AMDSAxisInfo.h \
 	source/AMDSnDIndex.h \
 	source/AMDSBufferGroupInfo.h \
@@ -46,10 +47,11 @@ HEADERS  += \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
-	source/AMDSMetaObjectSupport.h
+	source/util/AMDSErrorMonitor.h
 
 SOURCES += \
 	source/AMDSClientMain.cpp \
+	source/AMDSMetaObjectSupport.cpp \
 	source/AMDSClient.cpp \
 	source/AMDSAxisInfo.cpp \
 	source/AMDSnDIndex.cpp \
@@ -74,5 +76,4 @@ SOURCES += \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
-	source/AMDSMetaObjectSupport.cpp
-
+	source/util/AMDSErrorMonitor.cpp

@@ -75,7 +75,6 @@ void AMDSTCPDataServer::displayDetails()
 	{
 		qDebug() << "Server is listening on " << interfaceName_ << " (" << server_->serverAddress().toString() << server_->serverPort() << ")";
 	}
-
 }
 
 void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
@@ -144,7 +143,7 @@ void AMDSTCPDataServer::stop()
 
 void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
 {
-	bool missionAccomplished = true;
+	bool missionAccomplished = false;
 
 	QTcpSocket* requestingSocket = clientSockets_.value(processedRequest->socketKey(), 0);
 	if(requestingSocket != 0)
@@ -169,36 +168,42 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		oneSecondsStats_.setOutboundBytes(oneSecondsStats_.outboundBytes()+outboundBytes);
 		tenSecondsStats_.setOutboundBytes(tenSecondsStats_.outboundBytes()+outboundBytes);
 
-		switch (processedRequest->requestType()) {
-		case AMDSClientRequestDefinitions::StartTimePlusCount:
-		case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-		case AMDSClientRequestDefinitions::StartTimeToEndTime:
-		case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
-			{
-				AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
-				if(processedClientDataRequest){
-					processedClientDataRequest->printData();
-				}
-
-				break;
+		AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
+		if(processedClientDataRequest) {
+			if (processedClientDataRequest->validateResponse()) {
 			}
-
-		case AMDSClientRequestDefinitions::Continuous:
-			if(processedRequest->responseType() != AMDSClientRequest::Error) {
-	//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
-	//			data->histogramData()->clear();
-
-	//			processedRequest->startContinuousRequestTimer(500);
-				missionAccomplished = false;
-			}
-			break;
-
-		default:
-			break;
 		}
+
+//		switch (processedRequest->requestType()) {
+//		case AMDSClientRequestDefinitions::StartTimePlusCount:
+//		case AMDSClientRequestDefinitions::RelativeCountPlusCount:
+//		case AMDSClientRequestDefinitions::StartTimeToEndTime:
+//		case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
+//			{
+//				AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
+//				if(processedClientDataRequest){
+//					processedClientDataRequest->printData();
+//				}
+
+//				break;
+//			}
+
+//		case AMDSClientRequestDefinitions::Continuous:
+//			if(processedRequest->responseType() != AMDSClientRequest::Error) {
+//	//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
+//	//			data->histogramData()->clear();
+
+//	//			processedRequest->startContinuousRequestTimer(500);
+//				missionAccomplished = false;
+//			}
+//			break;
+
+//		default:
+//			break;
+//		}
 	}
 
-	if (missionAccomplished) {
+	if (!missionAccomplished) {
 		processedRequest->deleteLater();
 		requestingSocket->disconnectFromHost();
 	}
