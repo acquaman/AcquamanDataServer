@@ -36,7 +36,7 @@ public:
 protected:
 	/// Start time for data
 	QDateTime startTime_;
-	/// Number of data points after the start time to collect, default value 1
+	/// Number of data points after the start time to collect, must be > 0.
 	quint64 count_;
 };
 
