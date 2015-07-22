@@ -73,10 +73,6 @@ bool AMDSClientContinuousDataRequest::writeToDataStream(AMDSDataStream *dataStre
 	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
 		return false;
 
-//	*dataStream << startTime();
-//	if(dataStream->status() != QDataStream::Ok)
-//		return false;
-
 	*dataStream << updateInterval();
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
@@ -102,20 +98,18 @@ bool AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStr
 	setUpdateInterval(readUpdateInterval);
 //	setHandShakeSocketKey(readHandShakeSocketKey);
 
-//	setLastFetchTime(startTime());
-
 	return true;
 }
 
 bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 {
-	AMDSErrorMon::alert(this, 0, QString("Message update interval: %1!").arg(updateInterval()));
-
 	bool messageExpired = isExpired();
-	if (messageExpired)
+	if (messageExpired) {
 		AMDSErrorMon::alert(this, 0, QString("Message (%1:%2) expired!").arg(socketKey()).arg(bufferName()));
-	else
+	} else {
+		AMDSErrorMon::information(this, 0, QString("Message (%1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
 		continuousDataRequestTimer_.singleShot(updateInterval(), this, SLOT(onDataRequestTimerTimeout()));
+	}
 
 	return !messageExpired;
 }

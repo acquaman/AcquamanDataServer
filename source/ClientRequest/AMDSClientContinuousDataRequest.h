@@ -33,8 +33,6 @@ public:
 
 	AMDSClientContinuousDataRequest& operator =(const AMDSClientContinuousDataRequest &other);
 
-	/// Return whether this is the original request message
-	inline bool isOriginalRequest() { return lastFetchTime_ == QDateTime(); }
 	/// Sets the start time for the data request
 	inline void setStartTime(const QDateTime &startTime) { startTime_ = startTime; }
 	/// Sets the updateInterval for the data request

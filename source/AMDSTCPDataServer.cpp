@@ -86,7 +86,7 @@ void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
 
 	clientDisconnectSignalMapper_ = new QSignalMapper(this);
 	clientRequestSignalMapper_ = new QSignalMapper(this);
-	continuousDataRequestSignalMapper_ = new QSignalMapper(this);
+//	continuousDataRequestSignalMapper_ = new QSignalMapper(this);
 	QNetworkConfigurationManager manager;
 	if(manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired)
 	{
@@ -115,7 +115,7 @@ void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
 	}
 	connect(clientDisconnectSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onClientDisconnect(QString)));
 	connect(clientRequestSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onClientSentRequest(QString)));
-	connect(continuousDataRequestSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onContinuousDataRequestTimer(QString)));
+//	connect(continuousDataRequestSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onContinuousDataRequestTimer(QString)));
 }
 
 void AMDSTCPDataServer::stop()
@@ -373,18 +373,18 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 	}
 }
 
-void AMDSTCPDataServer::onContinuousDataRequestTimer(const QString &clientKey)
-{
-	Q_UNUSED(clientKey)
+//void AMDSTCPDataServer::onContinuousDataRequestTimer(const QString &clientKey)
+//{
+//	Q_UNUSED(clientKey)
 
-//	ClientDataRequest* request = continuousDataRequests_.value(clientKey, 0);
+////	ClientDataRequest* request = continuousDataRequests_.value(clientKey, 0);
 
-//	if(request == 0)
-//		return;
+////	if(request == 0)
+////		return;
 
-//	emit requestData(request);
+////	emit requestData(request);
 
-}
+//}
 
 void AMDSTCPDataServer::onTenMillisecondStatsTimerTimeout(){
 	if(tenMillisecondsStats_.inboundBytes() > tenMillisecondsStats_.maxInboundBytes())
