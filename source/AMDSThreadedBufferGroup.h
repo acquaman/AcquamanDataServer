@@ -13,6 +13,7 @@ public:
 	AMDSThreadedBufferGroup(AMDSBufferGroup *bufferGroup, QObject *parent = 0);
 
 	AMDSBufferGroupInfo bufferGroupInfo() const;
+	AMDSBufferGroup * bufferGroup() const;
 
 signals:
 	void bufferGroupReady();

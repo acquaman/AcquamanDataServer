@@ -3,6 +3,7 @@
 #include "source/AMDSDataStream.h"
 #include "source/DataHolder/AMDSScalarDataHolder.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
+#include "source/util/AMDSErrorMonitor.h"
 
 AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	AMDSClientRequest(parent)
@@ -58,26 +59,24 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
-	bool includeData;
-	if(bufferGroupInfo_.name() == "Invalid"){
-		includeData = false;
-		*dataStream << includeData;
-		if(dataStream->status() != QDataStream::Ok)
-			return false;
-	}
-	else{
-		includeData = true;
-		*dataStream << includeData;
-		if(dataStream->status() != QDataStream::Ok)
-			return false;
+	bool includeData = bufferGroupInfo_.includeData();
+	*dataStream << includeData;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
+	// write data to the data stream
+	if(includeData){
+
 		dataStream->write(bufferGroupInfo_);
+
 		quint8 uniformDataType = (quint8)uniformDataType_;
 		*dataStream << uniformDataType;
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
+
 		quint16 dataCount = data_.count();
 		*dataStream << dataCount;
-		if(dataStream->status() != QDataStream::Ok)
+		if(dataStream->status() != QDataStream::Ok || dataCount == 0)
 			return false;
 
 		bool encodeDataTypeInDataHolder = true;
@@ -126,17 +125,21 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	*dataStream >> readBufferName;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
+
 	*dataStream >> readIncludeStatusData;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
+
 	*dataStream >> readIncludeData;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
+
 	if(readIncludeData){
 		dataStream->read(readBufferGroupInfo);
 		*dataStream >> readUniformDataType;
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
+
 		*dataStream >> readDataCount;
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
@@ -175,14 +178,36 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	setIncludeStatusData(readIncludeStatusData);
 	if(readIncludeData){
 		setBufferGroupInfo(readBufferGroupInfo);
+
 		// do some data setting here
-
 		setUniformDataType((AMDSDataTypeDefinitions::DataType)readUniformDataType);
-		clearData();
-		for(quint16 x = 0; x < readDataCount; x++)
-			appendData(readDataHolder.at(x));
 
+		clearData();
+		data_.append(readDataHolder);
 	}
 
 	return true;
+}
+
+bool AMDSClientDataRequest::validateResponse()
+{
+	bool noError = true;
+	if(responseType() == AMDSClientRequest::Error) {
+		AMDSErrorMon::alert(this, 0, QString("Failed to retrieve data. Error: %1").arg(errorMessage()));
+		noError = false;
+	} else {
+		if (data().count() == 0)
+			AMDSErrorMon::information(this, 0, "No data for this message yet!");
+		else {
+	//		QList<AMDSFlatArray> values;
+			for(int x = 0, size = data().count(); x < size; x++){
+				AMDSFlatArray oneFlatArray = AMDSFlatArray(uniformDataType(), bufferGroupInfo().spanSize());
+				data().at(x)->data(&oneFlatArray);
+	//			values.append(oneFlatArray);
+				AMDSErrorMon::information(this, 0, QString("Data at %1 - %2").arg(x).arg(oneFlatArray.printData()));
+			}
+		}
+	}
+
+	return noError;
 }
