@@ -211,6 +211,7 @@ void AMDSClient::readFortune()
 	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
+	case AMDSClientRequestDefinitions::Continuous:
 			clientRequest->validateResponse();
 			break;
 
@@ -342,6 +343,20 @@ void AMDSClient::requestData()
 			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setMiddleTime(time1Edit->dateTime());
 			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountBefore(countBefore);
 			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountAfter(countAfter);
+		}
+	}
+	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
+		AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
+		if(clientContinuousDataRequest){
+			quint64 updateInterval = 500;
+			if (count1Edit->text().length() > 0)
+				updateInterval = count1Edit->text().toUInt();
+
+			clientContinuousDataRequest->setBufferName(bufferNameComboBox_->currentText());
+			clientContinuousDataRequest->setUpdateInterval(updateInterval);
+			if (count2Edit->text().length() > 0) {
+				clientContinuousDataRequest->setHandShakeSocketKey(count2Edit->text());
+			}
 		}
 	}
 

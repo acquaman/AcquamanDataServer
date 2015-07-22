@@ -171,36 +171,12 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
 		if(processedClientDataRequest) {
 			if (processedClientDataRequest->validateResponse()) {
+				if (processedClientDataRequest->requestType() == AMDSClientRequestDefinitions::Continuous) {
+					AMDSClientContinuousDataRequest *processedClientDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(processedClientDataRequest);
+					missionAccomplished = processedClientDataRequest->startContinuousRequestTimer();
+				}
 			}
 		}
-
-//		switch (processedRequest->requestType()) {
-//		case AMDSClientRequestDefinitions::StartTimePlusCount:
-//		case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-//		case AMDSClientRequestDefinitions::StartTimeToEndTime:
-//		case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
-//			{
-//				AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
-//				if(processedClientDataRequest){
-//					processedClientDataRequest->printData();
-//				}
-
-//				break;
-//			}
-
-//		case AMDSClientRequestDefinitions::Continuous:
-//			if(processedRequest->responseType() != AMDSClientRequest::Error) {
-//	//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
-//	//			data->histogramData()->clear();
-
-//	//			processedRequest->startContinuousRequestTimer(500);
-//				missionAccomplished = false;
-//			}
-//			break;
-
-//		default:
-//			break;
-//		}
 	}
 
 	if (!missionAccomplished) {
@@ -370,8 +346,31 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 			onClientRequestProcessed(clientRequest);
 		}
 	}
-	else
+	else {
+		if(clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
+			AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
+			if(clientContinuousDataRequest){
+				if (clientContinuousDataRequest->isHandShakingMessage()) {
+					QString socketKey = clientContinuousDataRequest->handShakingSocketKey();
+					AMDSClientContinuousDataRequest *handShakingclientDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(continuousDataRequests_.value(socketKey));
+					if (handShakingclientDataRequest) {
+						handShakingclientDataRequest->setHandShakeTime(QDateTime::currentDateTime());
+					} else {
+						AMDSErrorMon::alert(this, 0, QString("Didn't find hand shaking message with socketKey (%1)").arg(socketKey));
+					}
+
+					clientContinuousDataRequest->deleteLater();
+					requestingSocket->disconnectFromHost();
+					return;
+				} else {
+					continuousDataRequests_.insert(clientContinuousDataRequest->socketKey(), clientContinuousDataRequest);
+					connect(clientContinuousDataRequest, SIGNAL(sendNewContinuousDataRequest(AMDSClientRequest*)), this, SIGNAL(clientRequestRead(AMDSClientRequest*)));
+				}
+			}
+		}
+
 		emit clientRequestRead(clientRequest);
+	}
 }
 
 void AMDSTCPDataServer::onContinuousDataRequestTimer(const QString &clientKey)
