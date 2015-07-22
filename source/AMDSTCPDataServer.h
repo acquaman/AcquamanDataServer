@@ -92,7 +92,7 @@ protected:
 	/// the ip_address:port in the format xx.xx.xx.xx:xxxxx to the size of the request
 	QHash<QString, int> clientSocketDataInProgress_;
 	/// A map storing continuous data requests from clients
-//	QHash<QString, ClientDataRequest*> continuousDataRequests_;
+	QHash<QString, AMDSClientRequest*> continuousDataRequests_;
 	/// A signal mapper which allows for us to listen to the disonnect signal from all the client sockets
 	/// currently connected. Mapped on the same string as the clientSockets_ hash:
 	/// xx.xx.xx.xx:xxxxx

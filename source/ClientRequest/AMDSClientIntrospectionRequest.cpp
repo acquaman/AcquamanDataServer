@@ -1,19 +1,21 @@
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 
+//#include <QtGui>
+
 #include "source/AMDSDataStream.h"
 
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(QObject *parent) :
 	AMDSClientRequest(parent)
 {
-	requestType_ = AMDSClientRequestDefinitions::Introspection;
+	setRequestType(AMDSClientRequestDefinitions::Introspection);
 
-	bufferName_ = "Invalid";
+	setBufferName("Invalid");
 }
 
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, QObject *parent) :
 	AMDSClientRequest(socketKey, QString(), AMDSClientRequestDefinitions::Introspection, responseType, parent)
 {
-	bufferName_ = bufferName;
+	setBufferName(bufferName);
 }
 
 AMDSClientIntrospectionRequest::~AMDSClientIntrospectionRequest()
@@ -30,7 +32,8 @@ AMDSClientIntrospectionRequest& AMDSClientIntrospectionRequest::operator =(const
 {
 	if(this != &other){
 		AMDSClientRequest::operator =(other);
-		bufferName_ = other.bufferName();
+
+		setBufferName(other.bufferName());
 
 		clearBufferGroupInfos();
 		for(int x = 0, size = other.bufferGroupInfos().count(); x < size; x++)
@@ -84,8 +87,39 @@ bool AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStre
 	}
 
 	setBufferName(readBufferName);
-	for(int x = 0, size = readBufferGroupInfos.count(); x < size; x++)
-		appendBufferGroupInfo(readBufferGroupInfos.at(x));
+	bufferGroupInfos_.append(readBufferGroupInfos);
 
 	return true;
+}
+
+bool AMDSClientIntrospectionRequest::validateResponse()
+{
+	/// TODO: to be added ...
+	return true;
+
+//	QList<AMDSBufferGroupInfo> requestBufferGroupInfos = bufferGroupInfos();
+
+//	if(requestBufferGroupInfos.count() > 0){
+//		const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestType->model());
+//		for(int x = 1; x < 7; x++){
+//			QStandardItem* item = model->item(x);
+//			item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+//			// visually disable by greying out - works only if combobox has been painted already and palette returns the wanted color
+//			item->setData(QVariant(), Qt::TextColorRole);
+//		}
+//	}
+
+//	if(bufferName() == "All"){
+//		bufferNameComboBox_->clear();
+//		bufferNameComboBox_->addItem("All");
+//	}
+//	for(int y = 0, ySize = requestBufferGroupInfos.count(); y < ySize; y++){
+//		if(bufferName() == "All")
+//			bufferNameComboBox_->addItem(requestBufferGroupInfos.at(y).name());
+//		qDebug() << requestBufferGroupInfos.at(y).name() << requestBufferGroupInfos.at(y).description() << requestBufferGroupInfos.at(y).units() << requestBufferGroupInfos.at(y).rank() << requestBufferGroupInfos.at(y).size().toString();
+//		for(int x = 0, size = requestBufferGroupInfos.at(y).axes().count(); x < size; x++){
+//			qDebug() << "\tAxis info at " << x << requestBufferGroupInfos.at(y).axes().at(x).name() << requestBufferGroupInfos.at(y).axes().at(x).description() << requestBufferGroupInfos.at(y).axes().at(x).units() << requestBufferGroupInfos.at(y).axes().at(x).size() << requestBufferGroupInfos.at(y).axes().at(x).isUniform() << requestBufferGroupInfos.at(y).axes().at(x).start() << requestBufferGroupInfos.at(y).axes().at(x).increment();
+//		}
+//	}
+
 }
