@@ -58,26 +58,24 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
-	bool includeData;
-	if(bufferGroupInfo_.name() == "Invalid"){
-		includeData = false;
-		*dataStream << includeData;
-		if(dataStream->status() != QDataStream::Ok)
-			return false;
-	}
-	else{
-		includeData = true;
-		*dataStream << includeData;
-		if(dataStream->status() != QDataStream::Ok)
-			return false;
+	bool includeData = bufferGroupInfo_.includeData();
+	*dataStream << includeData;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
+	// write data to the data stream
+	if(includeData){
+
 		dataStream->write(bufferGroupInfo_);
+
 		quint8 uniformDataType = (quint8)uniformDataType_;
 		*dataStream << uniformDataType;
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
+
 		quint16 dataCount = data_.count();
 		*dataStream << dataCount;
-		if(dataStream->status() != QDataStream::Ok)
+		if(dataStream->status() != QDataStream::Ok || dataCount == 0)
 			return false;
 
 		bool encodeDataTypeInDataHolder = true;
@@ -126,17 +124,21 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	*dataStream >> readBufferName;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
+
 	*dataStream >> readIncludeStatusData;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
+
 	*dataStream >> readIncludeData;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
+
 	if(readIncludeData){
 		dataStream->read(readBufferGroupInfo);
 		*dataStream >> readUniformDataType;
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
+
 		*dataStream >> readDataCount;
 		if(dataStream->status() != QDataStream::Ok)
 			return false;
@@ -175,13 +177,12 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	setIncludeStatusData(readIncludeStatusData);
 	if(readIncludeData){
 		setBufferGroupInfo(readBufferGroupInfo);
+
 		// do some data setting here
-
 		setUniformDataType((AMDSDataTypeDefinitions::DataType)readUniformDataType);
-		clearData();
-		for(quint16 x = 0; x < readDataCount; x++)
-			appendData(readDataHolder.at(x));
 
+		clearData();
+		data_.append(readDataHolder);
 	}
 
 	return true;

@@ -2,24 +2,16 @@
 
 #include "source/AMDSDataStream.h"
 
-#include <QDebug>
-
 AMDSClientRequest::AMDSClientRequest(QObject *parent) :
 	QObject(parent)
 {
-	socketKey_ = QString();
-	errorMessage_ = QString();
-	requestType_ = AMDSClientRequestDefinitions::InvalidRequest;
-	responseType_ = AMDSClientRequest::InvalidResponse;
+	setProperties(QString(), QString(), AMDSClientRequestDefinitions::InvalidRequest, AMDSClientRequest::InvalidResponse);
 }
 
 AMDSClientRequest::AMDSClientRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, QObject *parent) :
 	QObject(parent)
 {
-	socketKey_ = socketKey;
-	errorMessage_ = errorMessage;
-	requestType_ = requestType;
-	responseType_ = responseType;
+	setProperties(socketKey, errorMessage, requestType, responseType);
 }
 
 AMDSClientRequest::~AMDSClientRequest()
@@ -35,10 +27,7 @@ AMDSClientRequest::AMDSClientRequest(const AMDSClientRequest &other) :
 AMDSClientRequest& AMDSClientRequest::operator =(const AMDSClientRequest &other)
 {
 	if(this != &other){
-		socketKey_ = other.socketKey();
-		errorMessage_ = other.errorMessage();
-		requestType_ = other.requestType();
-		responseType_ = other.responseType();
+		setProperties(other.socketKey(), other.errorMessage(), other.requestType(), other.responseType());
 	}
 	return (*this);
 }
@@ -74,9 +63,16 @@ bool AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
-	setSocketKey(readSocketKey);
-	setErrorMessage(readErrorMessage);
-	setResponseType((AMDSClientRequest::ResponseType)readResponseType);
+	//NOTE: we won't change the requestType :)
+	setProperties(readSocketKey, readErrorMessage, requestType(), (AMDSClientRequest::ResponseType)readResponseType);
 
 	return true;
+}
+
+void AMDSClientRequest::setProperties(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType)
+{
+	setSocketKey(socketKey);
+	setErrorMessage(errorMessage);
+	setRequestType(requestType);
+	setResponseType(responseType);
 }

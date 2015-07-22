@@ -15,18 +15,29 @@ class AMDSCentralServer : public QObject
 {
 Q_OBJECT
 public:
-	AMDSCentralServer(QString hwType, QObject *parent = 0);
+	/// Constructor: to initialize the TCP Data server thread and the timers for buffer groups
+	AMDSCentralServer(QObject *parent = 0);
 
 signals:
+	/// The signal when the AMDSCenterServer finished processing a client request, then the TCP data suppose to wrap the msg and send back to client
 	void clientRequestProcessed(AMDSClientRequest *processedRequest);
 
 protected slots:
-	/// Handle the errors information
+	/// slot to handle the errors information from the TCP Data server
 	void onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, QString errorMessage);
+	/// slot to handle the client request from the TCP Data server
 	void onDataServerClientRequestReady(AMDSClientRequest *clientRequest);
 
+	/// slot to handle the 50 ms timer, to fetch and update the scaler data buffer
 	void onFiftyMillisecondTimerUpdate();
+	/// slot to handle the 100 ms timer, to fetch and update the amptek data buffer
 	void onHundredMillisecondTimerUpdate();
+
+protected:
+	/// function to initialize the buffer groups, with the given buffer size
+	virtual void initializeBufferGroup(quint64 maxCountSize);
+	/// function to start the timer of data buffer update
+	virtual void startTimer();
 
 protected:
 	AMDSThreadedTCPDataServer *dataServer_;

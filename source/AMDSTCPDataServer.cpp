@@ -4,41 +4,18 @@
 #include <QTimer>
 
 #include "source/AMDSDataStream.h"
-#include "source/AMDSEventDataSupport.h"
-#include "source/AMDSEventData.h"
-#include "source/ClientRequest/AMDSClientRequestSupport.h"
-
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
-#include "source/DataHolder/AMDSDataHolderSupport.h"
-#include "source/DataHolder/AMDSDataHolder.h"
-#include "source/DataHolder/AMDSScalarDataHolder.h"
-#include "source/DataHolder/AMDSSpectralDataHolder.h"
+#include "source/util/AMDSErrorMonitor.h"
 
 AMDSTCPDataServer::AMDSTCPDataServer(QObject *parent) :
 	QObject(parent)
 {
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Introspection))
-		AMDSClientRequestSupport::registerClass<AMDSClientIntrospectionRequest>(AMDSClientRequestDefinitions::Introspection);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Statistics))
-		AMDSClientRequestSupport::registerClass<AMDSClientStatisticsRequest>(AMDSClientRequestDefinitions::Statistics);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::StartTimePlusCount))
-		AMDSClientRequestSupport::registerClass<AMDSClientStartTimePlusCountDataRequest>(AMDSClientRequestDefinitions::StartTimePlusCount);
-	if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
-		AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
-
-	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightScalarDataHolder::staticMetaObject.className()))
-		AMDSDataHolderSupport::registerClass<AMDSLightWeightScalarDataHolder>();
-	if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightSpectralDataHolder::staticMetaObject.className()))
-		AMDSDataHolderSupport::registerClass<AMDSLightWeightSpectralDataHolder>();
-
-	if(!AMDSEventDataSupport::registeredClasses()->contains(AMDSLightWeightEventData::staticMetaObject.className()))
-		AMDSEventDataSupport::registerClass<AMDSLightWeightEventData>();
-
 	session_ = 0;
 	server_ = 0;
 	port_ = 0;
@@ -142,7 +119,6 @@ void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
 
 void AMDSTCPDataServer::stop()
 {
-//	qDebug() << "Stopping the server...";
 	QStringList clientKeys = clientSockets_.keys();
 
 	for(int iClientKey = 0; iClientKey < clientKeys.count(); ++iClientKey)
@@ -161,7 +137,7 @@ void AMDSTCPDataServer::stop()
 	if(session_)
 		session_->close();
 
-//	qDebug() << "Server stopped";
+	AMDSErrorMon::information(this, 0, "AMDS TCP Data Server stopped");
 }
 
 void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
@@ -197,7 +173,19 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 					AMDSFlatArray oneFlatArray;
 					processedStartTimePlusCountDataRequest->data().at(x)->data(&oneFlatArray);
 					values.append(oneFlatArray);
-//					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
+					qDebug() << "Data at " << x << oneFlatArray.printData();
+				}
+			}
+		}
+
+		if(processedRequest->requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount){
+			AMDSClientRelativeCountPlusCountDataRequest *processedRelativeCountPlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(processedRequest);
+			if(processedRelativeCountPlusCountDataRequest){
+				QList<AMDSFlatArray> values;
+				for(int x = 0, size = processedRelativeCountPlusCountDataRequest->data().count(); x < size; x++){
+					AMDSFlatArray oneFlatArray;
+					processedRelativeCountPlusCountDataRequest->data().at(x)->data(&oneFlatArray);
+					values.append(oneFlatArray);
 					qDebug() << "Data at " << x << oneFlatArray.printData();
 				}
 			}
@@ -226,7 +214,6 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 void AMDSTCPDataServer::sessionOpened()
 {
 //	qDebug() << "Session has been opened";
-	QSettings settings;
 	if(session_)
 	{
 		QNetworkConfiguration config = session_->configuration();
@@ -237,6 +224,7 @@ void AMDSTCPDataServer::sessionOpened()
 			id = config.identifier();
 
 
+		QSettings settings;
 		settings.beginGroup("Session");
 		settings.setValue("DefaultSessionConfig", id);
 		settings.endGroup();
@@ -266,8 +254,9 @@ void AMDSTCPDataServer::sessionOpened()
 	QList<QNetworkAddressEntry> associatedIPV4Addresses;
 	for(int x = 0, size = associatedAddresses.count(); x < size; x++){
 		qDebug() << "At " << x << associatedAddresses.at(x).ip() << associatedAddresses.at(x).ip().toIPv4Address();
-		if(associatedAddresses.at(x).ip().toIPv4Address())
+		if(associatedAddresses.at(x).ip().toIPv4Address()) {
 			associatedIPV4Addresses.append(associatedAddresses.at(x));
+		}
 	}
 
 	if(interfaceOffset < associatedAddresses.count())
@@ -281,6 +270,7 @@ void AMDSTCPDataServer::sessionOpened()
 		emit error(AMDSErrorReport::Serious, AMDS_TCPDATASERVER_FAIL_TO_START_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
 		return;
 	}
+
 	qDebug() << "Listening on " << server_->serverAddress().toString() << ":" << server_->serverPort();
 }
 
@@ -294,22 +284,28 @@ void AMDSTCPDataServer::onNewClientConnected()
 		QString socketDescription = QString("%1:%2").arg(clientSocket->peerAddress().toString()).arg(clientSocket->peerPort());
 		qDebug() << "Connection with " << socketDescription << " established";
 		clientSockets_.insert(socketDescription, clientSocket);
-		connect(clientSocket, SIGNAL(disconnected()), clientDisconnectSignalMapper_, SLOT(map()));
+
 		clientDisconnectSignalMapper_->setMapping(clientSocket, socketDescription);
-		connect(clientSocket, SIGNAL(readyRead()), clientRequestSignalMapper_, SLOT(map()));
 		clientRequestSignalMapper_->setMapping(clientSocket, socketDescription);
+		connect(clientSocket, SIGNAL(disconnected()), clientDisconnectSignalMapper_, SLOT(map()));
+		connect(clientSocket, SIGNAL(readyRead()), clientRequestSignalMapper_, SLOT(map()));
 	}
 }
 
 void AMDSTCPDataServer::onClientDisconnect(const QString &clientKey)
 {
 	QTcpSocket* socketToDisconnect = clientSockets_.value(clientKey);
-
 	if(!socketToDisconnect)
 		return;
 
 	clientSockets_.remove(clientKey);
 	qDebug() << "Disconnection from " << clientKey;
+
+	clientDisconnectSignalMapper_->removeMappings(socketToDisconnect);
+	clientRequestSignalMapper_->removeMappings(socketToDisconnect);
+	disconnect(socketToDisconnect, SIGNAL(disconnected()), clientDisconnectSignalMapper_, SLOT(map()));
+	disconnect(socketToDisconnect, SIGNAL(readyRead()), clientRequestSignalMapper_, SLOT(map()));
+
 	socketToDisconnect->deleteLater();
 }
 

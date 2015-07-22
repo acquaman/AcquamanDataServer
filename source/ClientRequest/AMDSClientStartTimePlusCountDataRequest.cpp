@@ -5,17 +5,17 @@
 AMDSClientStartTimePlusCountDataRequest::AMDSClientStartTimePlusCountDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)
 {
-	requestType_ = AMDSClientRequestDefinitions::StartTimePlusCount;
+	setRequestType(AMDSClientRequestDefinitions::StartTimePlusCount);
 
-	startTime_ = QDateTime();
-	count_ = 0;
+	setStartTime(QDateTime());
+	setCount(1);
 }
 
 AMDSClientStartTimePlusCountDataRequest::AMDSClientStartTimePlusCountDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, const QDateTime &startTime, quint64 count, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
 	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::StartTimePlusCount, responseType, bufferName, includeStatusData, bufferGroupInfo, parent)
 {
-	startTime_ = startTime;
-	count_ = count;
+	setStartTime(startTime);
+	setCount(count);
 }
 
 AMDSClientStartTimePlusCountDataRequest::~AMDSClientStartTimePlusCountDataRequest()
@@ -32,8 +32,8 @@ AMDSClientStartTimePlusCountDataRequest& AMDSClientStartTimePlusCountDataRequest
 {
 	if(this != &other){
 		AMDSClientDataRequest::operator =(other);
-		startTime_ = other.startTime();
-		count_ = other.count();
+		setStartTime(other.startTime());
+		setCount(other.count());
 	}
 	return (*this);
 }

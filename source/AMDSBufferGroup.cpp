@@ -1,6 +1,7 @@
 #include "source/AMDSBufferGroup.h"
 
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
@@ -21,14 +22,20 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		break;
 	case AMDSClientRequestDefinitions::Statistics:
 		break;
-	case AMDSClientRequestDefinitions::StartTimePlusCount:{
+	case AMDSClientRequestDefinitions::StartTimePlusCount: {
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
-		if(clientStartTimePlusCountDataRequest)
+		if(clientStartTimePlusCountDataRequest) {
 			populateData(clientStartTimePlusCountDataRequest);
-		break;}
-	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-//		populateData(request, request->count1(), request->count2());
+		}
 		break;
+	}
+	case AMDSClientRequestDefinitions::RelativeCountPlusCount: {
+		AMDSClientRelativeCountPlusCountDataRequest *clientRelativeCountPlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(clientRequest);
+		if(clientRelativeCountPlusCountDataRequest) {
+			populateData(clientRelativeCountPlusCountDataRequest);
+		}
+		break;
+	}
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 //		populateData(request, request->time1(), request->time2());
 		break;
@@ -66,8 +73,25 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clie
 			AMDSFlatArray oneFlatArray;
 			dataHolder->data(&oneFlatArray);
 			clientStartTimePlusCountDataRequest->appendData(dataHolder);
-//			request->histogramData()->append(dataHolders_[iCurrent]);
 		}
+	}
+}
+
+void AMDSBufferGroup::populateData(AMDSClientRelativeCountPlusCountDataRequest* clientDataRequest)
+{
+	int relativeCount = clientDataRequest->relativeCount();
+	int count = clientDataRequest->count();
+
+	int startIndex = dataHolders_.count() - 1 - relativeCount;
+	int endIndex = dataHolders_.count() - 1 - relativeCount + count;
+
+	startIndex = (startIndex < 0 ? 0 : startIndex);
+	endIndex = (endIndex < dataHolders_.count() ? endIndex : dataHolders_.count() - 1);
+
+	for (int iCurrent = startIndex; iCurrent < endIndex; iCurrent++)
+	{
+		AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
+		clientDataRequest->appendData(dataHolder);
 	}
 }
 
