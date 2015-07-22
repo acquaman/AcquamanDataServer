@@ -42,9 +42,13 @@ private:
 namespace AMDSClientRequestSupport {
 	extern QHash<AMDSClientRequestDefinitions::RequestType, AMDSClientRequestObjectInfo> registeredClasses_;
 
+	/// helper function to register all the client request classes
+	void registerClientRequestClass();
+
 	/// returns a const pointer to the hash of registered AMClientRequestObjectInfo classes
 	const QHash<AMDSClientRequestDefinitions::RequestType, AMDSClientRequestObjectInfo>* registeredClasses();
 
+	/// helper function to instantiate client request from the give type
 	AMDSClientRequest* instantiateClientRequestFromType(AMDSClientRequestDefinitions::RequestType clientRequestType);
 
 	bool inheritsClientRequest(const QMetaObject *queryMetaObject);

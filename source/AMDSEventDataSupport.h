@@ -39,6 +39,9 @@ private:
 namespace AMDSEventDataSupport {
 	extern QHash<QString, AMDSEventDataObjectInfo> registeredClasses_;
 
+	/// register all the event data object
+	void registerEventDataObjectClass();
+
 	/// returns a const pointer to the hash of registered AMClientRequestObjectInfo classes
 	const QHash<QString, AMDSEventDataObjectInfo>* registeredClasses();
 

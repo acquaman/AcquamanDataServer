@@ -34,6 +34,8 @@ public:
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSClientIntrospectionRequest from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// prints data
+	virtual void printData();
 
 protected:
 	/// The string identifier for the buffer or buffers being introspected
