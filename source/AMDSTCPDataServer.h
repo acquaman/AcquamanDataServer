@@ -12,6 +12,7 @@
 #include <QNetworkConfigurationManager>
 #include <QSettings>
 
+#include "source/util/AMDSErrorMonitor.h"
 #include "source/AMDSPacketStats.h"
 
 class QTimer;
@@ -20,17 +21,21 @@ class AMDSClientRequest;
 /**
  *  A class which handles incoming client connections, and handles requests from them for data
  */
-class AMDSTcpDataServer : public QObject
+#define AMDS_TCPDATASERVER_FAIL_TO_START_SERVER 10100
+
+class AMDSTCPDataServer : public QObject
 {
 	Q_OBJECT
 public:
 	/// Creates a new instance of a data server. Server will not start listening until a call to
 	/// start() is made
-	explicit AMDSTcpDataServer(QObject *parent = 0);
+	explicit AMDSTCPDataServer(QObject *parent = 0);
 	/// Default destructor for AMDSTcpDataServer. Calls stop
-	~AMDSTcpDataServer();
+	~AMDSTCPDataServer();
 
 signals:
+	/// error signal
+	void error(quint8 errorLevel, quint16 errorCode, const QString &errorString);
 	void requestInfo();
 	void clientRequestRead(AMDSClientRequest*);
 

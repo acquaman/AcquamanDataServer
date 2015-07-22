@@ -4,23 +4,28 @@
 #include <QObject>
 #include <QThread>
 
-#include "source/AMDSTcpDataServer.h"
+#include "source/AMDSTCPDataServer.h"
 
 /**
   * Class which maintains the TCPServer in a separate thread, and passes signal messages to it.
   */
-class AMDSThreadedTcpDataServer : public QObject
+class AMDSThreadedTCPDataServer : public QObject
 {
 	Q_OBJECT
 public:
 	/// Constructs a TCP server object, and passes it to a new thread
-	explicit AMDSThreadedTcpDataServer(QString hwType, QObject *parent = 0);
+	explicit AMDSThreadedTCPDataServer(QString hwType, QObject *parent = 0);
+	/// Destructor
+	~AMDSThreadedTCPDataServer();
 	/// Returns a reference to the server
-	AMDSTcpDataServer* server();
+	AMDSTCPDataServer* server();
 
 signals:
 	/// Starts the server listening on the given interfaceName and port
 	void startServer(const QString& interfaceName, quint16 port);
+
+	/// error signal
+	void error(quint8 errorLevel, quint16 errorCode, const QString &errorString);
 
 	void requestBufferGroupInfo();
 
@@ -31,8 +36,8 @@ protected slots:
 private:
 	QString hwType_;
 
-	AMDSTcpDataServer server_;
-	QThread thread_;
+	AMDSTCPDataServer *server_;
+	QThread *thread_;
 };
 
 #endif // AMDSTHREADEDTCPDATASERVER_H
