@@ -17,6 +17,9 @@ class QComboBox;
 class QSpinBox;
 class QCheckBox;
 
+class AMDSClientTCPSocket;
+class AMDSClientRequest;
+
 class AMDSClient : public QDialog
 {
 	Q_OBJECT
@@ -26,11 +29,15 @@ public:
 
 private slots:
 	void requestNewFortune();
-	void readFortune();
-	void displayError(QAbstractSocket::SocketError socketError);
+	void onSocketDataReady(AMDSClientTCPSocket* socket, AMDSClientRequest *clientRequest);
+
+
+
+//	void readFortune();
+	void onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketError);
 	void enableGetFortuneButton();
 	void sessionOpened();
-	void requestData();
+//	void requestData();
 
 private:
 	QLabel *hostLabel;
@@ -50,7 +57,9 @@ private:
 	QSpinBox* amptekIndex;
 	QComboBox *bufferNameComboBox_;
 	QCheckBox* includeStatusDataCheckbox;
+
 	QTcpSocket *tcpSocket;
+
 	QString currentFortune;
 	quint32 blockSize;
 
