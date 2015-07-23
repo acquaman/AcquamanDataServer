@@ -16,6 +16,8 @@ public:
 
 	/// Returns the socket key of this connection
 	inline QString socketKey() { return socketKey_; }
+	/// Returns the errorStrong of the encapsulated tcpSocket_
+	inline QString errorString() { return tcpSocket_->errorString(); }
 
 signals:
 	/// emit signal when there are errors

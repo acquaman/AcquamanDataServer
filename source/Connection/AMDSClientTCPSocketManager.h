@@ -10,34 +10,28 @@ class AMDSClientTCPSocketManager : public QObject
 {
     Q_OBJECT
 public:
-	static AMDSClientTCPSocketManager *clientTCPSocketManager;
+	static AMDSClientTCPSocketManager *clientTCPSocketManager_;
 	static AMDSClientTCPSocketManager *socketManager() {
-		if (clientTCPSocketManager == 0) {
-			clientTCPSocketManager = new AMDSClientTCPSocketManager();
+		if (clientTCPSocketManager_ == 0) {
+			clientTCPSocketManager_ = new AMDSClientTCPSocketManager();
 		}
 
-		return clientTCPSocketManager;
+		return clientTCPSocketManager_;
 	}
 
 public:
 	explicit AMDSClientTCPSocketManager(QObject *parent = 0);
 
-	AMDSClientTCPSocket *tcpSocket(QString socketKey) { return clientTCPSocketsBySocketKey_.value(socketKey); }
-	void appendSocket(AMDSClientTCPSocket *clientTCPSocket) {
-		clientTCPSocketsBySocketKey_.insert(clientTCPSocket->socketKey(), clientTCPSocket);
-		qDebug() << "active connections: " << clientTCPSocketsBySocketKey_.size();
-	}
-	void removeSocket(QString socketKey) { clientTCPSocketsBySocketKey_.remove(socketKey); }
-
-signals:
-
-public slots:
-	void onTCPSocketConnect(quint8 requestTypeId, QString bufferName);
+	/// returns the AMDSClientTCPSocket with the given socket key
+	inline AMDSClientTCPSocket *tcpSocket(QString socketKey) { return clientTCPSocketsBySocketKey_.value(socketKey); }
+	/// appends a client socket to the list
+	void appendSocket(AMDSClientTCPSocket *clientTCPSocket) ;
+	/// remove a client socket from the list
+	void removeSocket(QString socketKey);
 
 protected:
+	/// the list of the client socket, hashed by the socketKey
 	QHash<QString, AMDSClientTCPSocket *> clientTCPSocketsBySocketKey_;
-	QHash<AMDSClientRequestDefinitions::RequestType, AMDSClientTCPSocket *> clientTCPSocketsByType_;
-
 };
 
 #endif // ADMSCLIENTTCPSOCKETMANAGER_H
