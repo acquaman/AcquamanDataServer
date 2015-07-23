@@ -23,11 +23,11 @@ public:
 	/// Returns the last fetch time for the data request
 	inline QDateTime lastFetchTime() const { return lastFetchTime_; }
 	/// return the handShaking socket key
-	inline QString handShakingSocketKey() { return handShakeSocketKey_; }
-	/// check if it is hand shaking message
-	inline bool isHandShakingMessage() { return handShakeSocketKey_.length() > 0; }
+	inline QString handShakeSocketKey() const { return handShakeSocketKey_; }
 	/// Returns the last handshake time for the data request
 	inline QDateTime lastHandShakingTime() const { return lastHandShakeTime_; }
+	/// check if it is hand shaking message
+	inline bool isHandShakingMessage() { return handShakeSocketKey_.length() > 0; }
 	/// Returns whether message expired (didn't receive handshake in a given time interval
 	bool isExpired();
 

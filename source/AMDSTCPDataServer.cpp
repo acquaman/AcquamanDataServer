@@ -351,10 +351,11 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 			AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 			if(clientContinuousDataRequest){
 				if (clientContinuousDataRequest->isHandShakingMessage()) {
-					QString socketKey = clientContinuousDataRequest->handShakingSocketKey();
+					QString socketKey = clientContinuousDataRequest->handShakeSocketKey();
 					AMDSClientContinuousDataRequest *handShakingclientDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(continuousDataRequests_.value(socketKey));
 					if (handShakingclientDataRequest) {
 						handShakingclientDataRequest->setHandShakeTime(QDateTime::currentDateTime());
+						AMDSErrorMon::information(this, 0, QString("Hand shaking with socketKey (%1)").arg(socketKey));
 					} else {
 						AMDSErrorMon::alert(this, 0, QString("Didn't find hand shaking message with socketKey (%1)").arg(socketKey));
 					}
