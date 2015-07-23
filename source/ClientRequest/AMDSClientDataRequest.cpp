@@ -193,18 +193,16 @@ bool AMDSClientDataRequest::validateResponse()
 {
 	bool noError = true;
 	if(responseType() == AMDSClientRequest::Error) {
-		AMDSErrorMon::alert(this, 0, QString("Failed to retrieve data. Error: %1").arg(errorMessage()));
+		AMDSErrorMon::alert(this, 0, QString("(msg %1) Failed to retrieve data. Error: %2").arg(socketKey()).arg(errorMessage()));
 		noError = false;
 	} else {
 		if (data().count() == 0)
-			AMDSErrorMon::information(this, 0, "No data for this message yet!");
+			AMDSErrorMon::information(this, 0, QString("(msg %1) No data for this message yet!").arg(socketKey()));
 		else {
-	//		QList<AMDSFlatArray> values;
 			for(int x = 0, size = data().count(); x < size; x++){
 				AMDSFlatArray oneFlatArray = AMDSFlatArray(uniformDataType(), bufferGroupInfo().spanSize());
 				data().at(x)->data(&oneFlatArray);
-	//			values.append(oneFlatArray);
-				AMDSErrorMon::information(this, 0, QString("Data at %1 - %2").arg(x).arg(oneFlatArray.printData()));
+				AMDSErrorMon::information(this, 0, QString("(msg %1) Data at %2 - %3").arg(socketKey()).arg(x).arg(oneFlatArray.printData()));
 			}
 		}
 	}

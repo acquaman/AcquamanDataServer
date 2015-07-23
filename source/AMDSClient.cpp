@@ -54,8 +54,11 @@ AMDSClient::AMDSClient(QWidget *parent)
 	time2Edit->setDisplayFormat("HH:mm:ss.zzz");
 	count1Edit = new QLineEdit();
 	count2Edit = new QLineEdit();
+	activeContinuousConnection = new QComboBox;
+	activeContinuousConnection->setFixedWidth(200);
+	activeContinuousConnection->addItem("");
+
 	results = new QTextEdit();
-	tcpSocket = new QTcpSocket(this);
 	requestType = new QComboBox;
 	requestType->addItem("Introspect");
 	requestType->addItem("Statistics");
@@ -88,9 +91,6 @@ AMDSClient::AMDSClient(QWidget *parent)
 	connect(getFortuneButton, SIGNAL(clicked()),
 			this, SLOT(requestNewFortune()));
 	connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
-	connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(readFortune()));
-	connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-			this, SLOT(displayError(QAbstractSocket::SocketError)));
 
 	QGridLayout *mainLayout = new QGridLayout;
 	mainLayout->addWidget(hostLabel, 0, 0);
@@ -107,6 +107,7 @@ AMDSClient::AMDSClient(QWidget *parent)
 	formLayout->addRow("Time2", time2Edit);
 	formLayout->addRow("Count1", count1Edit);
 	formLayout->addRow("Count2", count2Edit);
+	formLayout->addRow("Active continuous connection", activeContinuousConnection);
 	formLayout->addRow("Include Status", includeStatusDataCheckbox);
 	mainLayout->addLayout(formLayout, 4, 0, 1, 2);
 	mainLayout->addWidget(results, 5, 0, 1, 2);
@@ -147,6 +148,7 @@ void AMDSClient::requestNewFortune()
 	QDateTime time2 = time2Edit->dateTime();
 	QString value1 = count1Edit->text();
 	QString value2 = count2Edit->text();
+	QString continuousSocket = activeContinuousConnection->currentText();
 
 	AMDSClientTCPSocket * clientTCPSocket = new AMDSClientTCPSocket(hostLineEdit->text(), portLineEdit->text().toInt());
 	connect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
@@ -173,36 +175,26 @@ void AMDSClient::requestNewFortune()
 		clientTCPSocket->requestData(bufferName, time1, value1.toInt(), value2.toInt());
 		break;
 	case AMDSClientRequestDefinitions::Continuous:
-//		if (value2.length() > 0) {
-//			AMDSErrorMon::alert(this, 0, QString("Hand shake message: %1").arg(value2));
+		clientTCPSocket->requestData(bufferName, value1.toInt(), continuousSocket);
+		if (continuousSocket.length() > 0) {
+			AMDSErrorMon::alert(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
 
-//			disconnect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
-//			disconnect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
-//			clientTCPSocket->deleteLater();
-//		}
-
-//		clientTCPSocket->requestData(bufferName, value1.toInt(), value2);
-//		break;
+			removeTCPSocket(clientTCPSocket);
+		}
+		break;
 	default:
 		AMDSErrorMon::alert(this, 0, QString("Invalide client request type: %1").arg(clientRequestType));
-		disconnect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
-		disconnect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
-		clientTCPSocket->deleteLater();
+		removeTCPSocket(clientTCPSocket);
 	}
-
-
-//	blockSize = 0;
-//	tcpSocket->abort();
-//	tcpSocket->connectToHost(hostLineEdit->text(),
-//							 portLineEdit->text().toInt());
-
-//	QTimer::singleShot(1000, this, SLOT(requestData()));
 }
 
 void AMDSClient::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSClientRequest *clientRequest)
 {
 	if (clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous) {
 		AMDSClientTCPSocketManager::socketManager()->appendSocket(clientTCPSocket);
+		if (activeContinuousConnection->findText(clientTCPSocket->socketKey()) == -1) {
+			activeContinuousConnection->addItem(clientTCPSocket->socketKey());
+		}
 	} else {
 		if (clientRequest->requestType() == AMDSClientRequestDefinitions::Introspection) {
 			AMDSClientIntrospectionRequest *introspectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
@@ -226,93 +218,16 @@ void AMDSClient::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSCli
 			}
 		}
 
-		disconnect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
-		disconnect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
-		clientTCPSocket->deleteLater();
+		removeTCPSocket(clientTCPSocket);
 	}
 }
-
-//void AMDSClient::readFortune()
-//{
-
-//	AMDSDataStream in(tcpSocket);
-//	in.setVersion(QDataStream::Qt_4_0);
-
-//	if (blockSize == 0) {
-//		if (tcpSocket->bytesAvailable() < (int)sizeof(quint32))
-//			return;
-
-//		in >> blockSize;
-//	}
-
-////	qDebug() << "Received from: " << tcpSocket->peerAddress();
-////	qDebug() << "\n\n\n";
-////	qDebug() << "Block size = " << blockSize;
-////	qDebug() << "Bytes available = " << tcpSocket->bytesAvailable();
-
-//	if (tcpSocket->bytesAvailable() < blockSize)
-//		return;
-
-//	AMDSClientRequest *clientRequest = in.decodeAndInstantiateClientRequestType();
-//	in.read(*clientRequest);
-
-//	switch (clientRequest->requestType()) {
-//	case AMDSClientRequestDefinitions::Introspection: {
-//		/// TODO: this need to be reorganized and implemented (printData) in the class of AMDSClientIntrospectionRequest
-//		AMDSClientIntrospectionRequest *clientIntrospectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
-//		if(clientIntrospectionRequest){
-//			QList<AMDSBufferGroupInfo> bufferGroupInfos;
-//			bufferGroupInfos = clientIntrospectionRequest->bufferGroupInfos();
-
-//			if(bufferGroupInfos.count() > 0){
-//				const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestType->model());
-//				for(int x = 1; x < 7; x++){
-//					QStandardItem* item = model->item(x);
-//					item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-//					// visually disable by greying out - works only if combobox has been painted already and palette returns the wanted color
-//					item->setData(QVariant(), Qt::TextColorRole);
-//				}
-//			}
-
-//			if(clientIntrospectionRequest->bufferName() == "All"){
-//				bufferNameComboBox_->clear();
-//				bufferNameComboBox_->addItem("All");
-//			}
-//			for(int y = 0, ySize = bufferGroupInfos.count(); y < ySize; y++){
-//				if(clientIntrospectionRequest->bufferName() == "All")
-//					bufferNameComboBox_->addItem(bufferGroupInfos.at(y).name());
-//				qDebug() << bufferGroupInfos.at(y).name() << bufferGroupInfos.at(y).description() << bufferGroupInfos.at(y).units() << bufferGroupInfos.at(y).rank() << bufferGroupInfos.at(y).size().toString();
-//				for(int x = 0, size = bufferGroupInfos.at(y).axes().count(); x < size; x++){
-//					qDebug() << "\tAxis info at " << x << bufferGroupInfos.at(y).axes().at(x).name() << bufferGroupInfos.at(y).axes().at(x).description() << bufferGroupInfos.at(y).axes().at(x).units() << bufferGroupInfos.at(y).axes().at(x).size() << bufferGroupInfos.at(y).axes().at(x).isUniform() << bufferGroupInfos.at(y).axes().at(x).start() << bufferGroupInfos.at(y).axes().at(x).increment();
-//				}
-//			}
-//		}
-
-//		break;
-//	}
-
-//	case AMDSClientRequestDefinitions::Statistics:
-//	case AMDSClientRequestDefinitions::StartTimePlusCount:
-//	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-//	case AMDSClientRequestDefinitions::StartTimeToEndTime:
-//	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
-//	case AMDSClientRequestDefinitions::Continuous:
-//			clientRequest->validateResponse();
-//			break;
-
-//	default:
-//		qDebug() << "The printData() function is NOT implemented (or called) for " << clientRequest->requestType();
-//		break;
-//	}
-
-//	getFortuneButton->setEnabled(true);
-//	blockSize = 0;
-//}
 
 void AMDSClient::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketError)
 {
 	switch (socketError) {
 	case QAbstractSocket::RemoteHostClosedError:
+		activeContinuousConnection->removeItem(activeContinuousConnection->findText(clientTCPSocket->socketKey()));
+		AMDSClientTCPSocketManager::socketManager()->removeSocket(clientTCPSocket->socketKey());
 		break;
 	case QAbstractSocket::HostNotFoundError:
 		QMessageBox::information(this, tr("Fortune Client"),
@@ -329,12 +244,10 @@ void AMDSClient::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSo
 	default:
 		QMessageBox::information(this, tr("Fortune Client"),
 								 tr("The following error occurred: %1.")
-								 .arg(tcpSocket->errorString()));
+								 .arg(clientTCPSocket->errorString()));
 	}
 
-	disconnect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
-	disconnect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
-	clientTCPSocket->deleteLater();
+	removeTCPSocket(clientTCPSocket);
 }
 
 void AMDSClient::enableGetFortuneButton()
@@ -368,90 +281,9 @@ void AMDSClient::sessionOpened()
 	enableGetFortuneButton();
 }
 
-//void AMDSClient::requestData()
-//{
-//	QByteArray block;
-//	AMDSDataStream out(&block, QIODevice::WriteOnly);
-//	out.setVersion(QDataStream::Qt_4_0);
-//	out << (quint16)0;
-
-//	quint8 requestTypeId = (quint8)requestType->currentIndex();
-
-//	AMDSClientRequestDefinitions::RequestType clientRequestType = (AMDSClientRequestDefinitions::RequestType)requestTypeId;
-//	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
-//	if (!clientRequest) {
-//		qDebug() << "AMDSClient::Failed to parse clientRequest for type: " << clientRequestType;
-//		return;
-//	}
-
-//	if(clientRequest->requestType() == AMDSClientRequestDefinitions::Introspection){
-//		AMDSClientIntrospectionRequest *clientIntrospectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
-//		if(clientIntrospectionRequest)
-//			clientIntrospectionRequest->setBufferName(bufferNameComboBox_->currentText());
-//	}
-//	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::Statistics){
-
-//	}
-//	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::StartTimePlusCount){
-//		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
-//		if(clientStartTimePlusCountDataRequest){
-//			clientStartTimePlusCountDataRequest->setBufferName(bufferNameComboBox_->currentText());
-//			clientStartTimePlusCountDataRequest->setStartTime(time1Edit->dateTime());
-//			quint64 count = count1Edit->text().toUInt();
-//			clientStartTimePlusCountDataRequest->setCount(count);
-//		}
-//	}
-//	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount){
-//		AMDSClientRelativeCountPlusCountDataRequest *clientRelativeCountPlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(clientRequest);
-//		if(clientRelativeCountPlusCountDataRequest){
-//			quint64 relativeCount = count1Edit->text().toUInt();
-//			quint64 count = count2Edit->text().toUInt();
-
-//			clientRelativeCountPlusCountDataRequest->setBufferName(bufferNameComboBox_->currentText());
-//			clientRelativeCountPlusCountDataRequest->setRelativeCount(relativeCount);
-//			clientRelativeCountPlusCountDataRequest->setCount(count);
-//		}
-//	}
-//	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::StartTimeToEndTime){
-//		AMDSClientStartTimeToEndTimeDataRequest *clientStartTimeToEndTimeDataRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
-//		if(clientStartTimeToEndTimeDataRequest){
-//			clientStartTimeToEndTimeDataRequest->setBufferName(bufferNameComboBox_->currentText());
-//			clientStartTimeToEndTimeDataRequest->setStartTime(time1Edit->dateTime());
-//			clientStartTimeToEndTimeDataRequest->setEndTime(time2Edit->dateTime());
-//		}
-//	}
-//	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter){
-//		AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest *clientMiddleTimePlusCountBeforeAndAfterDataRequest = qobject_cast<AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest*>(clientRequest);
-//		if(clientMiddleTimePlusCountBeforeAndAfterDataRequest){
-//			quint64 countBefore = count1Edit->text().toUInt();
-//			quint64 countAfter = count2Edit->text().toUInt();
-
-//			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setBufferName(bufferNameComboBox_->currentText());
-//			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setMiddleTime(time1Edit->dateTime());
-//			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountBefore(countBefore);
-//			clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountAfter(countAfter);
-//		}
-//	}
-//	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
-//		AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
-//		if(clientContinuousDataRequest){
-//			quint64 updateInterval = 500;
-//			if (count1Edit->text().length() > 0)
-//				updateInterval = count1Edit->text().toUInt();
-
-//			clientContinuousDataRequest->setBufferName(bufferNameComboBox_->currentText());
-//			clientContinuousDataRequest->setUpdateInterval(updateInterval);
-//			if (count2Edit->text().length() > 0) {
-//				clientContinuousDataRequest->setHandShakeSocketKey(count2Edit->text());
-//			}
-//		}
-//	}
-
-//	out.encodeClientRequestType(*clientRequest);
-//	out.write(*clientRequest);
-
-//	out.device()->seek(0);
-//	out << (quint16)(block.size() - sizeof(quint16));
-//	tcpSocket->write(block);
-//	qDebug() << (block.size() - sizeof(quint16));
-//}
+void AMDSClient::removeTCPSocket(AMDSClientTCPSocket *clientTCPSocket)
+{
+	disconnect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
+	disconnect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
+	clientTCPSocket->deleteLater();
+}

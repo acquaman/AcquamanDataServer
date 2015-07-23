@@ -9,7 +9,6 @@ class QDialogButtonBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
-class QTcpSocket;
 class QNetworkSession;
 class QDateTimeEdit;
 class QTextEdit;
@@ -31,13 +30,12 @@ private slots:
 	void requestNewFortune();
 	void onSocketDataReady(AMDSClientTCPSocket* socket, AMDSClientRequest *clientRequest);
 
-
-
-//	void readFortune();
 	void onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketError);
 	void enableGetFortuneButton();
 	void sessionOpened();
-//	void requestData();
+
+private:
+	void removeTCPSocket(AMDSClientTCPSocket *clientTCPSocket);
 
 private:
 	QLabel *hostLabel;
@@ -52,13 +50,12 @@ private:
 	QLineEdit* count2Edit;
 	QDateTimeEdit* time1Edit;
 	QDateTimeEdit* time2Edit;
+	QComboBox* activeContinuousConnection;
 	QTextEdit* results;
 	QComboBox* requestType;
 	QSpinBox* amptekIndex;
 	QComboBox *bufferNameComboBox_;
 	QCheckBox* includeStatusDataCheckbox;
-
-	QTcpSocket *tcpSocket;
 
 	QString currentFortune;
 	quint32 blockSize;

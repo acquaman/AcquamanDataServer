@@ -25,6 +25,7 @@ public:
 	AMDSClientTCPSocket *tcpSocket(QString socketKey) { return clientTCPSocketsBySocketKey_.value(socketKey); }
 	void appendSocket(AMDSClientTCPSocket *clientTCPSocket) {
 		clientTCPSocketsBySocketKey_.insert(clientTCPSocket->socketKey(), clientTCPSocket);
+		qDebug() << "active connections: " << clientTCPSocketsBySocketKey_.size();
 	}
 	void removeSocket(QString socketKey) { clientTCPSocketsBySocketKey_.remove(socketKey); }
 

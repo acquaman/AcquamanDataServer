@@ -28,6 +28,7 @@ AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port,
 AMDSClientTCPSocket::~AMDSClientTCPSocket()
 {
 	tcpSocket_->abort();
+	tcpSocket_->close();
 }
 
 void AMDSClientTCPSocket::onSocketError(QAbstractSocket::SocketError error)
