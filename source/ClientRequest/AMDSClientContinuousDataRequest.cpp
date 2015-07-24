@@ -98,8 +98,6 @@ bool AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStr
 	setUpdateInterval(readUpdateInterval);
 	setHandShakeSocketKey(readHandShakeSocketKey);
 
-	qDebug() << "=========== " << handShakeSocketKey();
-
 	return true;
 }
 

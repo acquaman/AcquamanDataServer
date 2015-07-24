@@ -177,9 +177,7 @@ void AMDSClient::requestNewFortune()
 	case AMDSClientRequestDefinitions::Continuous:
 		clientTCPSocket->requestData(bufferName, value1.toInt(), continuousSocket);
 		if (continuousSocket.length() > 0) {
-			AMDSErrorMon::alert(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
-
-			removeTCPSocket(clientTCPSocket);
+			AMDSErrorMon::information(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
 		}
 		break;
 	default:

@@ -2,7 +2,8 @@
 
 #include "source/util/AMDSErrorMonitor.h"
 
-AMDSClientTCPSocketManager *AMDSClientTCPSocketManager::clientTCPSocketManager = 0;
+AMDSClientTCPSocketManager *AMDSClientTCPSocketManager::clientTCPSocketManager_ = 0;
+
 AMDSClientTCPSocketManager::AMDSClientTCPSocketManager(QObject *parent) :
     QObject(parent)
 {
