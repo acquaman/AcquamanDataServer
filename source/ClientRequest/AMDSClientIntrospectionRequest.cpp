@@ -21,7 +21,7 @@ AMDSClientIntrospectionRequest::~AMDSClientIntrospectionRequest()
 }
 
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(const AMDSClientIntrospectionRequest &other) :
-	AMDSClientRequest(0)
+	AMDSClientRequest(other)
 {
 	(*this) = other;
 }

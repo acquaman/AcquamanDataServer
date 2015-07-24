@@ -23,7 +23,7 @@ AMDSClientStartTimePlusCountDataRequest::~AMDSClientStartTimePlusCountDataReques
 }
 
 AMDSClientStartTimePlusCountDataRequest::AMDSClientStartTimePlusCountDataRequest(const AMDSClientStartTimePlusCountDataRequest &other) :
-	AMDSClientDataRequest(0)
+	AMDSClientDataRequest(other)
 {
 	(*this) = other;
 }
