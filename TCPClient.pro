@@ -1,16 +1,16 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2015-01-21T14:07:03
+# Project created by QtCreator 2014-08-07T15:39:20
 #
 #-------------------------------------------------
 
-QT       += core network
+QT	   += core gui
+QT	 += network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-QT       += gui
 
-TARGET = AcquamanDataServer
-CONFIG   += console
-CONFIG   -= app_bundle
+TARGET = TCPClient
+TEMPLATE = app
 
 DESTDIR = build
 
@@ -19,32 +19,18 @@ MOC_DIR=build_files
 UI_DIR=build_files
 RCC_DIR=build_files
 
-#TEMPLATE = app
-
-#PATH_TO_ACQUAMAN = ../acquaman
-#INCLUDEPATH *= $$PATH_TO_ACQUAMAN/source/
-
-# Set standard level of compiler warnings for everyone. (Otherwise the warnings shown will be system-dependent.)
-QMAKE_CXXFLAGS *= -Wextra -g
-
-HEADERS *= \
-	source/AMDSTCPDataServer.h \
-	source/AMDSThreadedTCPDataServer.h \
-	source/AMDSBuffer.h \
-	source/AMDSCentralServer.h \
-	source/AMDSBufferGroup.h \
-	source/AMDSThreadedBufferGroup.h \
+HEADERS  += \
+	source/AMDSClient.h \
+	source/AMDSMetaObjectSupport.h \
 	source/AMDSAxisInfo.h \
 	source/AMDSnDIndex.h \
-	source/AMDSLikely.h \
+	source/AMDSBufferGroupInfo.h \
 	source/AMDSDataStream.h \
 	source/AMDSEventData.h \
 	source/AMDSEventDataSupport.h \
-	source/AMDSBufferGroupInfo.h \
 	source/AMDSPacketStats.h \
 	source/AMDSDataTypeDefinitions.h \
 	source/AMDSFlatArray.h \
-	source/AMDSMetaObjectSupport.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
@@ -56,30 +42,27 @@ HEADERS *= \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
+	source/Connection/AMDSClientTCPSocketManager.h \
+	source/Connection/AMDSClientTCPSocket.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
-	source/DataHolder/AMDSImageDataHolder.h \
 	source/util/AMDSErrorMonitor.h
 
-SOURCES *= \
-	source/AMDSMain.cpp \
-	source/AMDSTCPDataServer.cpp \
-	source/AMDSThreadedTCPDataServer.cpp \
-	source/AMDSCentralServer.cpp \
-	source/AMDSBufferGroup.cpp \
-	source/AMDSThreadedBufferGroup.cpp \
+SOURCES += \
+	source/AMDSClientMain.cpp \
+	source/AMDSMetaObjectSupport.cpp \
+	source/AMDSClient.cpp \
 	source/AMDSAxisInfo.cpp \
 	source/AMDSnDIndex.cpp \
+	source/AMDSBufferGroupInfo.cpp \
 	source/AMDSDataStream.cpp \
 	source/AMDSEventData.cpp \
 	source/AMDSEventDataSupport.cpp \
-	source/AMDSBufferGroupInfo.cpp \
 	source/AMDSPacketStats.cpp \
 	source/AMDSFlatArray.cpp \
-	source/AMDSMetaObjectSupport.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
 	source/ClientRequest/AMDSClientDataRequest.cpp \
@@ -90,10 +73,15 @@ SOURCES *= \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
+	source/Connection/AMDSClientTCPSocket.cpp \
+	source/Connection/AMDSClientTCPSocketManager.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
-	source/DataHolder/AMDSImageDataHolder.cpp \
 	source/util/AMDSErrorMonitor.cpp
+
+
+
+
