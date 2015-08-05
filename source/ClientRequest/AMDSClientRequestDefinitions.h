@@ -10,7 +10,8 @@ namespace AMDSClientRequestDefinitions {
 		StartTimeToEndTime = 4,
 		MiddleTimePlusCountBeforeAndAfter = 5,
 		Continuous = 6,
-		InvalidRequest = 7
+		ContinuousWithBatchStreams = 7,
+		InvalidRequest = 8
 	};
 }
 
