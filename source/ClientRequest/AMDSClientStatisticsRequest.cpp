@@ -21,7 +21,7 @@ AMDSClientStatisticsRequest::~AMDSClientStatisticsRequest()
 }
 
 AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(const AMDSClientStatisticsRequest &other) :
-	AMDSClientRequest(0)
+	AMDSClientRequest(other)
 {
 	(*this) = other;
 }

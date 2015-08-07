@@ -25,7 +25,7 @@ AMDSClientDataRequest::~AMDSClientDataRequest()
 }
 
 AMDSClientDataRequest::AMDSClientDataRequest(const AMDSClientDataRequest &other) :
-	AMDSClientRequest(0)
+	AMDSClientRequest(other)
 {
 	(*this) = other;
 }

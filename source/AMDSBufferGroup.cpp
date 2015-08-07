@@ -63,8 +63,8 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* clientDataRequest, int
 	clientDataRequest->clearData();
 	clientDataRequest->setBufferGroupInfo(bufferGroupInfo_);
 
-	int dataStartIndex = (startIndex < 0 ? 0 : startIndex);
-	int dataEndIndex = (endIndex < dataHolders_.count() ? endIndex : dataHolders_.count() - 1);
+	int dataStartIndex = qMax(0, startIndex);
+	int dataEndIndex = qMin(endIndex, dataHolders_.count() - 1);
 
 	for (int iCurrent = dataStartIndex; iCurrent < dataEndIndex; iCurrent++)
 	{

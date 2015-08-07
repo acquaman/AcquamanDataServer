@@ -24,7 +24,7 @@ AMDSClientRelativeCountPlusCountDataRequest::~AMDSClientRelativeCountPlusCountDa
 }
 
 AMDSClientRelativeCountPlusCountDataRequest::AMDSClientRelativeCountPlusCountDataRequest(const AMDSClientRelativeCountPlusCountDataRequest &other):
-	AMDSClientDataRequest(0)
+	AMDSClientDataRequest(other)
 {
 	(*this) = other;
 }
