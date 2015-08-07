@@ -59,8 +59,6 @@ void AMDSClientTCPSocket::readFortune()
 
 			readedBufferSize_ = tcpSocket_->bytesAvailable();
 			incomeDataBuffer_->append(tcpSocket_->readAll());
-
-			return; // finish reading this message, waiting for the future data
 		}
 	} else {
 		// more data package is coming
@@ -73,6 +71,10 @@ void AMDSClientTCPSocket::readFortune()
 			inDataStream = new AMDSDataStream(incomeDataBuffer_);
 		}
 	}
+
+	// finish reading this message, waiting for the future data
+	if (waitingMorePackages_)
+		return;
 
 	AMDSClientRequest *clientRequest = inDataStream->decodeAndInstantiateClientRequestType();
 	inDataStream->read(*clientRequest);
