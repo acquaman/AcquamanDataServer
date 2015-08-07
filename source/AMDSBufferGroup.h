@@ -8,7 +8,10 @@
 #include "source/DataHolder/AMDSDataHolder.h"
 
 class AMDSClientRequest;
+class AMDSClientDataRequest;
 class AMDSClientStartTimePlusCountDataRequest;
+class AMDSClientRelativeCountPlusCountDataRequest;
+class AMDSClientStartTimeToEndTimeDataRequest;
 class AMDSClientContinuousDataRequest;
 
 /**
@@ -56,15 +59,19 @@ signals:
 protected:
 	/// Helper functions which populate request data based on the parameters passed:
 
+	/// Fills the data to the clientRequest
+	void populateData(AMDSClientDataRequest* clientDataRequest, int startIndex, int endIndex);
 	/// Fills the request with count number of spectra after (and including) startTime
-	void populateData(AMDSClientStartTimePlusCountDataRequest* clientStartTimePlusCountDataRequest);
+	void populateData(AMDSClientStartTimePlusCountDataRequest* clientDataRequest);
+	/// Fills the request with count number of spectra after (and including) relative count (backward)
+	void populateData(AMDSClientRelativeCountPlusCountDataRequest* clientDataRequest);
+	/// Fills the request with all data between (and including) startTime and endTime
+	void populateData(AMDSClientStartTimeToEndTimeDataRequest* clientDataRequest);
 	/// Fills the request with all data acquired after lastFetch
 	void populateData(AMDSClientContinuousDataRequest* clientContinuousDataRequest, const QDateTime& lastFetch);
 
 //	/// Fills the request with count number of spectra either side of the entry relativeCount ago
 //	void populateData(AMDSClientRequest* request, int relativeCount, int count);
-//	/// Fills the request with all data between (and including) startTime and endTime
-//	void populateData(AMDSClientRequest* request, const QDateTime& startTime, const QDateTime& endTime);
 //	/// Fills the request with countBefore entries before middleTime to countAfter entries after.
 //	void populateData(AMDSClientRequest* request, const QDateTime& middleTime, int countBefore, int countAfter);
 

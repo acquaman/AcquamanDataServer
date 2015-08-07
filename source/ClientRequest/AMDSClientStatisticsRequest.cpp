@@ -78,3 +78,9 @@ bool AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	return true;
 }
+
+void AMDSClientStatisticsRequest::printData()
+{
+	for(int x = 0, size = packetStats().count(); x < size; x++)
+		qDebug() << "Packet Stats " << packetStats().at(x).name() << ": " << packetStats().at(x).allStats();
+}

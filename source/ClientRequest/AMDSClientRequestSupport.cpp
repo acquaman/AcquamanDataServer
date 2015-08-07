@@ -1,6 +1,13 @@
-#include "source/ClientRequest/AMDSClientRequestSupport.h"
+#include "AMDSClientRequestSupport.h"
 
 #include "source/ClientRequest/AMDSClientRequest.h"
+#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "source/ClientRequest/AMDSClientStatisticsRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+
 #include "source/AMDSMetaObjectSupport.h"
 
 AMDSClientRequestObjectInfo::AMDSClientRequestObjectInfo()
@@ -39,6 +46,21 @@ void AMDSClientRequestObjectInfo::initWithMetaObject(AMDSClientRequestDefinition
 
 namespace AMDSClientRequestSupport{
 	QHash<AMDSClientRequestDefinitions::RequestType, AMDSClientRequestObjectInfo> registeredClasses_;
+
+	void registerClientRequestClass() {
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Introspection))
+			AMDSClientRequestSupport::registerClass<AMDSClientIntrospectionRequest>(AMDSClientRequestDefinitions::Introspection);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Statistics))
+			AMDSClientRequestSupport::registerClass<AMDSClientStatisticsRequest>(AMDSClientRequestDefinitions::Statistics);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::StartTimePlusCount))
+			AMDSClientRequestSupport::registerClass<AMDSClientStartTimePlusCountDataRequest>(AMDSClientRequestDefinitions::StartTimePlusCount);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::RelativeCountPlusCount))
+			AMDSClientRequestSupport::registerClass<AMDSClientRelativeCountPlusCountDataRequest>(AMDSClientRequestDefinitions::RelativeCountPlusCount);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::StartTimeToEndTime))
+			AMDSClientRequestSupport::registerClass<AMDSClientStartTimeToEndTimeDataRequest>(AMDSClientRequestDefinitions::StartTimeToEndTime);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
+			AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
+	}
 
 	const QHash<AMDSClientRequestDefinitions::RequestType, AMDSClientRequestObjectInfo>* registeredClasses() {
 		return &registeredClasses_;

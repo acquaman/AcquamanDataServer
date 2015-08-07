@@ -1,6 +1,8 @@
 #include "source/AMDSBufferGroup.h"
 
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
@@ -16,22 +18,33 @@ AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
 
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	QReadLocker readLock(&lock_);
+
 	switch(clientRequest->requestType()){
 	case AMDSClientRequestDefinitions::Introspection:
 		break;
 	case AMDSClientRequestDefinitions::Statistics:
 		break;
-	case AMDSClientRequestDefinitions::StartTimePlusCount:{
+	case AMDSClientRequestDefinitions::StartTimePlusCount: {
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
-		if(clientStartTimePlusCountDataRequest)
+		if(clientStartTimePlusCountDataRequest) {
 			populateData(clientStartTimePlusCountDataRequest);
-		break;}
-	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-//		populateData(request, request->count1(), request->count2());
+		}
 		break;
-	case AMDSClientRequestDefinitions::StartTimeToEndTime:
-//		populateData(request, request->time1(), request->time2());
+	}
+	case AMDSClientRequestDefinitions::RelativeCountPlusCount: {
+		AMDSClientRelativeCountPlusCountDataRequest *clientRelativeCountPlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(clientRequest);
+		if(clientRelativeCountPlusCountDataRequest) {
+			populateData(clientRelativeCountPlusCountDataRequest);
+		}
 		break;
+	}
+	case AMDSClientRequestDefinitions::StartTimeToEndTime:{
+		AMDSClientStartTimeToEndTimeDataRequest *clientStartTimeToEndTimeDataRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
+		if(clientStartTimeToEndTimeDataRequest) {
+			populateData(clientStartTimeToEndTimeDataRequest);
+		}
+		break;
+	}
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
 //		populateData(request, request->time1(), request->count1(), request->count2());
 		break;
@@ -45,29 +58,59 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	emit clientRequestProcessed(clientRequest);
 }
 
-void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clientStartTimePlusCountDataRequest)
+void AMDSBufferGroup::populateData(AMDSClientDataRequest* clientDataRequest, int startIndex, int endIndex)
 {
-	QDateTime startTime = clientStartTimePlusCountDataRequest->startTime();
-	quint64 count = clientStartTimePlusCountDataRequest->count();
+	clientDataRequest->clearData();
+	clientDataRequest->setBufferGroupInfo(bufferGroupInfo_);
+
+	int dataStartIndex = (startIndex < 0 ? 0 : startIndex);
+	int dataEndIndex = (endIndex < dataHolders_.count() ? endIndex : dataHolders_.count() - 1);
+
+	for (int iCurrent = dataStartIndex; iCurrent < dataEndIndex; iCurrent++)
+	{
+		AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
+		AMDSFlatArray oneFlatArray;
+		dataHolder->data(&oneFlatArray);
+		clientDataRequest->appendData(dataHolder);
+	}
+}
+
+void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clientDataRequest)
+{
+	QDateTime startTime = clientDataRequest->startTime();
+	quint64 count = clientDataRequest->count();
 
 	int startIndex = lowerBound(startTime);
 
 	if(startIndex == -1)
-		clientStartTimePlusCountDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(startTime.toString()));
+		clientDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(startTime.toString()));
 	else
-	{
-		count = startIndex + count;
-		int countAsInt = count;
-		clientStartTimePlusCountDataRequest->clearData();
-		clientStartTimePlusCountDataRequest->setBufferGroupInfo(bufferGroupInfo_);
-		for (int iCurrent = startIndex, limit = dataHolders_.count(); iCurrent < countAsInt && iCurrent < limit; iCurrent++)
-		{
-			AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
-			AMDSFlatArray oneFlatArray;
-			dataHolder->data(&oneFlatArray);
-			clientStartTimePlusCountDataRequest->appendData(dataHolder);
-//			request->histogramData()->append(dataHolders_[iCurrent]);
-		}
+		populateData(clientDataRequest, startIndex, startIndex + count);
+}
+
+void AMDSBufferGroup::populateData(AMDSClientRelativeCountPlusCountDataRequest* clientDataRequest)
+{
+	int relativeCount = clientDataRequest->relativeCount();
+	int count = clientDataRequest->count();
+
+	int startIndex = dataHolders_.count() - 1 - relativeCount;
+	populateData(clientDataRequest, startIndex, startIndex+count);
+}
+
+void AMDSBufferGroup::populateData(AMDSClientStartTimeToEndTimeDataRequest* clientDataRequest)
+{
+	QDateTime startTime = clientDataRequest->startTime();
+	QDateTime endTime = clientDataRequest->endTime();
+
+	int startIndex = lowerBound(startTime);
+	int endIndex = lowerBound(endTime);
+
+	if(startIndex == -1) {
+		clientDataRequest->setErrorMessage(QString("Could not locate data for start time %1 (ReqType: 4)").arg(startTime.toString()));
+	} else if (endIndex == -1) {
+		clientDataRequest->setErrorMessage(QString("Could not locate data for end time %1 (ReqType: 4)").arg(endTime.toString()));
+	} else {
+		populateData(clientDataRequest, startIndex, endIndex);
 	}
 }
 

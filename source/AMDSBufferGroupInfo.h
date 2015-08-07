@@ -36,6 +36,8 @@ public:
 
 	void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
 
+	bool includeData() const { return name_ != "Invalid"; }
+
 protected:
 	QString name_;
 	QString description_;

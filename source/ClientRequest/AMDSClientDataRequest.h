@@ -47,6 +47,8 @@ public:
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSClientDataRequest from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// prints data
+	virtual void printData();
 
 protected:
 	/// The string identifier for the buffer data is being request from or received from
