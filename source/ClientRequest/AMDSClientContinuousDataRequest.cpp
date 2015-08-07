@@ -36,7 +36,7 @@ AMDSClientContinuousDataRequest::~AMDSClientContinuousDataRequest()
 }
 
 AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(const AMDSClientContinuousDataRequest &other) :
-	AMDSClientDataRequest(0)
+	AMDSClientDataRequest(other)
 {
 	(*this) = other;
 }
