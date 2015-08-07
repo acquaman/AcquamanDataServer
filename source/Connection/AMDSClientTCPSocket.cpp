@@ -19,6 +19,11 @@ AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port,
 	socketKey_ = "";
 	tcpSocket_ = new QTcpSocket(this);
 
+	waitingMorePackages_ = false;
+	readedBufferSize_ = 0;
+	expectedBufferSize_ = 0;
+	incomeDataBuffer_ = new QByteArray();
+
 	connect(tcpSocket_, SIGNAL(readyRead()), this, SLOT(readFortune()));
 	connect(tcpSocket_, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
 
@@ -41,17 +46,38 @@ void AMDSClientTCPSocket::readFortune()
 	if (tcpSocket_->bytesAvailable() < (int)sizeof(quint32))
 		return;
 
-	quint32 blockSize;
+	AMDSDataStream *inDataStream = new AMDSDataStream(tcpSocket_);
+	inDataStream->setVersion(QDataStream::Qt_4_0);
 
-	AMDSDataStream inDataStream(tcpSocket_);
-	inDataStream.setVersion(QDataStream::Qt_4_0);
+	if (!waitingMorePackages_) {
+		*inDataStream >> expectedBufferSize_;
 
-	inDataStream >> blockSize;
-	if (tcpSocket_->bytesAvailable() < blockSize)
+		if (tcpSocket_->bytesAvailable() < expectedBufferSize_) {
+			// more data package is expecting, we need to buffer the current ones
+			waitingMorePackages_ = true;
+			incomeDataBuffer_->clear();
+
+			readedBufferSize_ = tcpSocket_->bytesAvailable();
+			incomeDataBuffer_->append(tcpSocket_->readAll());
+		}
+	} else {
+		// more data package is coming
+		readedBufferSize_ += tcpSocket_->bytesAvailable();
+		incomeDataBuffer_->append(tcpSocket_->readAll());
+
+		if (readedBufferSize_ == expectedBufferSize_) {
+			waitingMorePackages_ = false;
+
+			inDataStream = new AMDSDataStream(incomeDataBuffer_);
+		}
+	}
+
+	// finish reading this message, waiting for the future data
+	if (waitingMorePackages_)
 		return;
 
-	AMDSClientRequest *clientRequest = inDataStream.decodeAndInstantiateClientRequestType();
-	inDataStream.read(*clientRequest);
+	AMDSClientRequest *clientRequest = inDataStream->decodeAndInstantiateClientRequestType();
+	inDataStream->read(*clientRequest);
 
 	switch (clientRequest->requestType()) {
 	case AMDSClientRequestDefinitions::Introspection:

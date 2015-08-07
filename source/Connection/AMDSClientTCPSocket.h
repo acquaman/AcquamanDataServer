@@ -53,6 +53,11 @@ private:
 protected:
 	QTcpSocket *tcpSocket_;
 	QString socketKey_;
+
+	bool waitingMorePackages_;
+	quint32 readedBufferSize_;
+	quint32 expectedBufferSize_;
+	QByteArray *incomeDataBuffer_;
 };
 
 #endif // AMDSCLIENTTCPSOCKET_H
