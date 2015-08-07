@@ -39,9 +39,13 @@ private:
 namespace AMDSDataHolderSupport {
 	extern QHash<QString, AMDSDataHolderObjectInfo> registeredClasses_;
 
+	/// support function to register all the data holder classes
+	void registerDataHolderClass();
+
 	/// returns a const pointer to the hash of registered AMDSDataHolderObjectInfo classes
 	const QHash<QString, AMDSDataHolderObjectInfo>* registeredClasses();
 
+	/// helper function to instantiate client request from the give type
 	AMDSDataHolder* instantiateDataHolderFromClassName(const QString &className);
 
 	bool inheritsDataHolder(const QMetaObject *queryMetaObject);

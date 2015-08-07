@@ -5,15 +5,15 @@
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(QObject *parent) :
 	AMDSClientRequest(parent)
 {
-	requestType_ = AMDSClientRequestDefinitions::Introspection;
+	setRequestType(AMDSClientRequestDefinitions::Introspection);
 
-	bufferName_ = "Invalid";
+	setBufferName("Invalid");
 }
 
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, QObject *parent) :
 	AMDSClientRequest(socketKey, QString(), AMDSClientRequestDefinitions::Introspection, responseType, parent)
 {
-	bufferName_ = bufferName;
+	setBufferName(bufferName);
 }
 
 AMDSClientIntrospectionRequest::~AMDSClientIntrospectionRequest()
@@ -21,7 +21,7 @@ AMDSClientIntrospectionRequest::~AMDSClientIntrospectionRequest()
 }
 
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(const AMDSClientIntrospectionRequest &other) :
-	AMDSClientRequest(0)
+	AMDSClientRequest(other)
 {
 	(*this) = other;
 }
@@ -30,7 +30,8 @@ AMDSClientIntrospectionRequest& AMDSClientIntrospectionRequest::operator =(const
 {
 	if(this != &other){
 		AMDSClientRequest::operator =(other);
-		bufferName_ = other.bufferName();
+
+		setBufferName(other.bufferName());
 
 		clearBufferGroupInfos();
 		for(int x = 0, size = other.bufferGroupInfos().count(); x < size; x++)
@@ -84,8 +85,7 @@ bool AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStre
 	}
 
 	setBufferName(readBufferName);
-	for(int x = 0, size = readBufferGroupInfos.count(); x < size; x++)
-		appendBufferGroupInfo(readBufferGroupInfos.at(x));
+	bufferGroupInfos_.append(readBufferGroupInfos);
 
 	return true;
 }

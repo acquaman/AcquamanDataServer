@@ -9,6 +9,7 @@
 
 class AMDSClientRequest;
 class AMDSClientStartTimePlusCountDataRequest;
+class AMDSClientRelativeCountPlusCountDataRequest;
 class AMDSClientContinuousDataRequest;
 
 /**
@@ -58,6 +59,8 @@ protected:
 
 	/// Fills the request with count number of spectra after (and including) startTime
 	void populateData(AMDSClientStartTimePlusCountDataRequest* clientStartTimePlusCountDataRequest);
+	/// Fills the request with count number of spectra after (and including) relative count (backward)
+	void populateData(AMDSClientRelativeCountPlusCountDataRequest* clientStartTimePlusCountDataRequest);
 	/// Fills the request with all data acquired after lastFetch
 	void populateData(AMDSClientContinuousDataRequest* clientContinuousDataRequest, const QDateTime& lastFetch);
 
