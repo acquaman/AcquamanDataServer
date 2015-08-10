@@ -144,7 +144,8 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
 		if(processedClientDataRequest) {
 			if (processedClientDataRequest->validateResponse()) {
-				if (processedClientDataRequest->requestType() == AMDSClientRequestDefinitions::Continuous) {
+				if (   processedClientDataRequest->requestType() == AMDSClientRequestDefinitions::Continuous
+					|| processedClientDataRequest->requestType() == AMDSClientRequestDefinitions::ContinuousWithBatchStreams) {
 					AMDSClientContinuousDataRequest *processedClientDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(processedClientDataRequest);
 					missionAccomplished = processedClientDataRequest->startContinuousRequestTimer();
 				}
@@ -333,7 +334,8 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 		}
 	}
 	else {
-		if(clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
+		if (   clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous
+			|| clientRequest->requestType() == AMDSClientRequestDefinitions::ContinuousWithBatchStreams){
 			AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 			if(clientContinuousDataRequest){
 				if (clientContinuousDataRequest->isHandShakingMessage()) {

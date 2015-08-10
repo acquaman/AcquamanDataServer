@@ -14,6 +14,7 @@ class AMDSClientRelativeCountPlusCountDataRequest;
 class AMDSClientStartTimeToEndTimeDataRequest;
 class AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest;
 class AMDSClientContinuousDataRequest;
+class AMDSClientContinuousWithBatchStreamsDataRequest;
 
 /**
   * Class representing a large buffer of data to store AMDSDataHolders in, of a given size. Once the buffer
@@ -72,6 +73,8 @@ protected:
 	void populateData(AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest* clientDataRequest);
 	/// Fills the request with all data acquired after lastFetch
 	void populateData(AMDSClientContinuousDataRequest* clientDataRequest);
+	/// Fills the request with all data acquired after lastFetch (with the particular bufferName)
+	void populateData(AMDSClientContinuousWithBatchStreamsDataRequest* clientDataRequest);
 
 //	/// Fills the request with count number of spectra either side of the entry relativeCount ago
 //	void populateData(AMDSClientRequest* request, int relativeCount, int count);

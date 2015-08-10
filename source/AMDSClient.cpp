@@ -196,6 +196,12 @@ void AMDSClient::requestNewFortune()
 			AMDSErrorMon::information(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
 		}
 		break;
+	case AMDSClientRequestDefinitions::ContinuousWithBatchStreams:
+		clientTCPSocket->requestData(selectedBufferNames, value1.toInt(), continuousSocket);
+		if (continuousSocket.length() > 0) {
+			AMDSErrorMon::information(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
+		}
+		break;
 	default:
 		AMDSErrorMon::alert(this, 0, QString("Invalide client request type: %1").arg(clientRequestType));
 		removeTCPSocket(clientTCPSocket);
@@ -204,7 +210,8 @@ void AMDSClient::requestNewFortune()
 
 void AMDSClient::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSClientRequest *clientRequest)
 {
-	if (clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous) {
+	if (   clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous
+		|| clientRequest->requestType() == AMDSClientRequestDefinitions::ContinuousWithBatchStreams ) {
 		AMDSClientTCPSocketManager::socketManager()->appendSocket(clientTCPSocket);
 		if (activeContinuousConnection->findText(clientTCPSocket->socketKey()) == -1) {
 			activeContinuousConnection->addItem(clientTCPSocket->socketKey());

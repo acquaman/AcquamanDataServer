@@ -8,6 +8,7 @@
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "source/ClientRequest/AMDSClientContinuousWithBatchStreamsDataRequest.h"
 
 #include "source/AMDSMetaObjectSupport.h"
 
@@ -63,6 +64,8 @@ namespace AMDSClientRequestSupport{
 			AMDSClientRequestSupport::registerClass<AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest>(AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter);
 		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
 			AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::ContinuousWithBatchStreams))
+			AMDSClientRequestSupport::registerClass<AMDSClientContinuousWithBatchStreamsDataRequest>(AMDSClientRequestDefinitions::ContinuousWithBatchStreams);
 	}
 
 	const QHash<AMDSClientRequestDefinitions::RequestType, AMDSClientRequestObjectInfo>* registeredClasses() {

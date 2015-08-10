@@ -1,7 +1,7 @@
 #ifndef AMDSCLIENTCONTINUOUSDATAREQUEST_H
 #define AMDSCLIENTCONTINUOUSDATAREQUEST_H
 
-#include "source/ClientRequest/AMDSClientDataRequest.h"
+#include "AMDSClientDataRequest.h"
 
 #include <QTimer>
 #include <QDateTime>

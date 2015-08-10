@@ -5,6 +5,7 @@
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "source/ClientRequest/AMDSClientContinuousWithBatchStreamsDataRequest.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
 	QObject(parent), dataHolders_(maxSize)
@@ -57,6 +58,13 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 		if(clientContinuousDataRequest) {
 			populateData(clientContinuousDataRequest);
+		}
+		break;
+	}
+	case AMDSClientRequestDefinitions::ContinuousWithBatchStreams:{
+		AMDSClientContinuousWithBatchStreamsDataRequest *clientContinuousWithBatchStreamsDataRequest = qobject_cast<AMDSClientContinuousWithBatchStreamsDataRequest*>(clientRequest);
+		if(clientContinuousWithBatchStreamsDataRequest) {
+			populateData(clientContinuousWithBatchStreamsDataRequest);
 		}
 		break;
 	}
@@ -138,6 +146,21 @@ void AMDSBufferGroup::populateData(AMDSClientMiddleTimePlusCountBeforeAndAfterDa
 }
 
 void AMDSBufferGroup::populateData(AMDSClientContinuousDataRequest *clientDataRequest)
+{
+	int startIndex = lowerBound(clientDataRequest->lastFetchTime());
+	if(startIndex == -1)
+		clientDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(clientDataRequest->lastFetchTime().toString()));
+	else {
+
+		QDateTime lastDataTime = dataHolders_[dataHolders_.count()-1]->eventTime();
+		clientDataRequest->setLastFetchTime(lastDataTime);
+		// Since the last fetch actually included the data at the given time, we need to increment the index
+		// by one, to start from the one following:
+		populateData(clientDataRequest, startIndex++, dataHolders_.count());
+	}
+}
+
+void AMDSBufferGroup::populateData(AMDSClientContinuousWithBatchStreamsDataRequest *clientDataRequest)
 {
 	int startIndex = lowerBound(clientDataRequest->lastFetchTime());
 	if(startIndex == -1)

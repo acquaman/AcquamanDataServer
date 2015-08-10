@@ -10,6 +10,7 @@
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientDataRequest.h"
+#include "source/ClientRequest/AMDSClientContinuousWithBatchStreamsDataRequest.h"
 #include "source/util/AMDSErrorMonitor.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
@@ -70,15 +71,25 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 	else{
 		AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
 		if(clientDataRequest){
-
-			AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(clientDataRequest->bufferName(), 0);
-			if (threadedBufferGroup) {
-				AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
-				clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
-				bufferGroup->processClientRequest(clientRequest);
+			QStringList requestedBufferNames;
+			if (clientDataRequest->requestType() == AMDSClientRequestDefinitions::ContinuousWithBatchStreams) {
+				AMDSClientContinuousWithBatchStreamsDataRequest *batchStreamDataRequest = qobject_cast<AMDSClientContinuousWithBatchStreamsDataRequest *>(clientRequest);
+				requestedBufferNames = batchStreamDataRequest->bufferNames();
 			} else {
-				AMDSErrorMon::alert(this, 0, QString("Invalid client data request with buffer name: %1").arg(clientDataRequest->bufferName()));
-				emit clientRequestProcessed(clientRequest);
+				requestedBufferNames.append(clientDataRequest->bufferName());
+			}
+
+			foreach (QString bufferName, requestedBufferNames) {
+				AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(bufferName, 0);
+				if (threadedBufferGroup) {
+					clientDataRequest->setBufferName(bufferName);
+					AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
+					clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
+					bufferGroup->processClientRequest(clientRequest);
+				} else {
+					AMDSErrorMon::alert(this, 0, QString("Invalid client data request with buffer name: %1").arg(clientDataRequest->bufferName()));
+					emit clientRequestProcessed(clientRequest);
+				}
 			}
 		}
 	}

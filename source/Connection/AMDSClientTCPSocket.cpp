@@ -11,6 +11,7 @@
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "source/ClientRequest/AMDSClientContinuousWithBatchStreamsDataRequest.h"
 #include "source/util/AMDSErrorMonitor.h"
 
 AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port, QObject *parent)
@@ -87,6 +88,7 @@ void AMDSClientTCPSocket::readFortune()
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
 	case AMDSClientRequestDefinitions::Continuous:
+	case AMDSClientRequestDefinitions::ContinuousWithBatchStreams:
 			if (clientRequest->validateResponse())
 				socketKey_ = clientRequest->socketKey();
 			break;
@@ -227,6 +229,27 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 updateInterva
 		}
 
 		sendData(clientContinuousDataRequest);
+	}
+}
+
+void AMDSClientTCPSocket::requestData(QStringList &bufferNames, quint64 updateInterval, QString handShakeSocketKey)
+{
+	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::ContinuousWithBatchStreams;
+	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
+	if (!clientRequest) {
+		AMDSErrorMon::alert(this, 0, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
+		return;
+	}
+
+	AMDSClientContinuousWithBatchStreamsDataRequest *clientContinuousWithBatchStreamDataRequest = qobject_cast<AMDSClientContinuousWithBatchStreamsDataRequest*>(clientRequest);
+	if(clientContinuousWithBatchStreamDataRequest){
+		clientContinuousWithBatchStreamDataRequest->setBufferNames(bufferNames);
+		clientContinuousWithBatchStreamDataRequest->setUpdateInterval(updateInterval);
+		if (handShakeSocketKey.length() > 0) {
+			clientContinuousWithBatchStreamDataRequest->setHandShakeSocketKey(handShakeSocketKey);
+		}
+
+		sendData(clientContinuousWithBatchStreamDataRequest);
 	}
 }
 

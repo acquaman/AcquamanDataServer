@@ -42,6 +42,7 @@ HEADERS  += \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
+	source/ClientRequest/AMDSClientContinuousWithBatchStreamsDataRequest.h \
 	source/Connection/AMDSClientTCPSocketManager.h \
 	source/Connection/AMDSClientTCPSocket.h \
 	source/DataHolder/AMDSDataHolder.h \
@@ -72,6 +73,7 @@ SOURCES += \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.cpp \
+	source/ClientRequest/AMDSClientContinuousWithBatchStreamsDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
 	source/Connection/AMDSClientTCPSocket.cpp \
 	source/Connection/AMDSClientTCPSocketManager.cpp \
@@ -81,7 +83,4 @@ SOURCES += \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/util/AMDSErrorMonitor.cpp
-
-
-
 

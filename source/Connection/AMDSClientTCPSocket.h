@@ -40,6 +40,8 @@ public slots:
 	void requestData(QString &bufferName, QDateTime &middleTime, quint64 countBefore, quint64 countAfter);
 	/// slot to request data from server for Continuous
 	void requestData(QString &bufferName, quint64 updateInterval, QString handShakeSocketKey="");
+	/// slot to request data from server for ContinuousWithBatchStreams
+	void requestData(QStringList &bufferNames, quint64 updateInterval, QString handShakeSocketKey="");
 
 protected slots:
 	void onSocketError(QAbstractSocket::SocketError error);
