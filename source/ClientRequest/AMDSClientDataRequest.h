@@ -17,10 +17,17 @@ public:
 	/// Copy constructor
 	AMDSClientDataRequest(const AMDSClientDataRequest& other);
 
+	/// returns whether this is a data client data request
+	virtual inline bool isDataClientRequest() { return true; }
+
+	/// returns whehter this si a continuous message
+	virtual bool inline isContinuousMessage() { return false;}
+
 	/// The string identifier for the buffer data is being request from or received from
 	inline QString bufferName() const { return bufferName_; }
 	/// Whether or not the client has requested that the statusData is included in the response
 	inline bool includeStatusData() const { return includeStatusData_; }
+	/// Returns the buffer group info
 	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
 
 	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
@@ -30,13 +37,15 @@ public:
 	inline void setBufferName(const QString &bufferName) { bufferName_ = bufferName; }
 	/// Sets the flag to include status meta data
 	inline void setIncludeStatusData(bool includeStatusData) { includeStatusData_ = includeStatusData; }
+	/// Sets the bufferGroupInfo
 	inline void setBufferGroupInfo(const AMDSBufferGroupInfo &bufferGroupInfo) { bufferGroupInfo_ = bufferGroupInfo; }
 
+	/// return the type of the uniform data
 	inline AMDSDataTypeDefinitions::DataType uniformDataType() const { return uniformDataType_; }
 	/// Returns the list of data holders
 	inline QList<AMDSDataHolder*> data() const { return data_; }
 
-
+	/// Sets the uniform data type
 	inline void setUniformDataType(AMDSDataTypeDefinitions::DataType uniformDataType) { uniformDataType_ = uniformDataType; }
 	/// Adds some data to the list of data holders
 	inline void appendData(AMDSDataHolder *dataHolder) { data_.append(dataHolder); }
@@ -56,8 +65,10 @@ protected:
 	/// Flag to determine if status meta data will be sent with the actual data
 	bool includeStatusData_;
 
+	/// the buffer group information of this message group
 	AMDSBufferGroupInfo bufferGroupInfo_;
 
+	/// the uniform data type
 	AMDSDataTypeDefinitions::DataType uniformDataType_;
 	/// List of data holders
 	QList<AMDSDataHolder*> data_;
