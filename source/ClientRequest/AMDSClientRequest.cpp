@@ -29,6 +29,7 @@ AMDSClientRequest& AMDSClientRequest::operator =(const AMDSClientRequest &other)
 	if(this != &other){
 		setAttributesValues(other.socketKey(), other.errorMessage(), other.requestType(), other.responseType());
 	}
+
 	return (*this);
 }
 

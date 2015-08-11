@@ -28,7 +28,7 @@ public:
 	AMDSClientRequest& operator=(const AMDSClientRequest& other);
 
 	/// returns whether this is a data client data request
-	virtual inline bool isDataClientRequest() { return false; }
+	virtual bool isDataClientRequest() { return false; }
 
 	/// A key used to identify the client socket on which the request was made
 	inline QString socketKey() const { return socketKey_; }
@@ -41,7 +41,7 @@ public:
 	inline AMDSClientRequest::ResponseType responseType() const { return responseType_; }
 
 	/// Sets the socket key identifier
-	inline void setSocketKey(const QString &socketKey) { socketKey_ = socketKey; }
+	virtual void setSocketKey(const QString &socketKey) { socketKey_ = socketKey; }
 	/// Sets an error string describing the type of error encountered. Also sets the responseType to Error
 	inline void setErrorMessage(const QString& errorMessage) { errorMessage_ = errorMessage; }
 	/// Sets the request type

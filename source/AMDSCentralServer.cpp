@@ -10,7 +10,7 @@
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientDataRequest.h"
-#include "source/ClientRequest/AMDSClientContinuousWithBatchStreamsDataRequest.h"
+#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "source/util/AMDSErrorMonitor.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
@@ -71,18 +71,32 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 	else{
 		AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
 		if(clientDataRequest){
-			QStringList requestedBufferNames;
-			if (clientDataRequest->isContinuousMessage()) {
-				AMDSClientContinuousDataRequest *continuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest *>(clientRequest);
-				requestedBufferNames = continuousDataRequest->bufferNames();
-			} else {
-				requestedBufferNames.append(clientDataRequest->bufferName());
-			}
+			if ( clientDataRequest->isContinuousMessage()) {
+				AMDSClientContinuousDataRequest *continuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientDataRequest);
+				if (!continuousDataRequest->startContinuousRequestTimer()) {
+					continuousDataRequest->deleteLater();
+					dataServer_->server()->disconnectFromHost(continuousDataRequest->socketKey());
 
-			foreach (QString bufferName, requestedBufferNames) {
-				AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(bufferName, 0);
+					return;
+				}
+
+				QStringList requestedBufferNames = continuousDataRequest->bufferNames();
+				foreach (QString bufferName, requestedBufferNames) {
+					AMDSClientDataRequest *dataRequest = continuousDataRequest->bufferDataRequest(bufferName);
+					AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(bufferName, 0);
+					if (threadedBufferGroup) {
+						AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
+						dataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
+						bufferGroup->processClientRequest(dataRequest);
+					} else {
+						AMDSErrorMon::alert(this, 0, QString("Invalid client data request with buffer name: %1").arg(dataRequest->bufferName()));
+						emit clientRequestProcessed(dataRequest);
+					}
+				}
+
+			} else {
+				AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(clientDataRequest->bufferName(), 0);
 				if (threadedBufferGroup) {
-					clientDataRequest->setBufferName(bufferName);
 					AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
 					clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
 					bufferGroup->processClientRequest(clientRequest);
@@ -91,15 +105,6 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 					emit clientRequestProcessed(clientRequest);
 				}
 			}
-
-			if ( clientDataRequest->isContinuousMessage()) {
-				AMDSClientContinuousDataRequest *continuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientDataRequest);
-				if (!continuousDataRequest->startContinuousRequestTimer()) {
-					continuousDataRequest->deleteLater();
-					dataServer_->server()->disconnectFromHost(continuousDataRequest->socketKey());
-				}
-			}
-
 		}
 	}
 }

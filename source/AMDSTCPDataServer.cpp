@@ -334,8 +334,7 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 		}
 	}
 	else {
-		if (   clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous
-			|| clientRequest->requestType() == AMDSClientRequestDefinitions::ContinuousWithBatchStreams){
+		if (   clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
 			AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 			if(clientContinuousDataRequest){
 				if (clientContinuousDataRequest->isHandShakingMessage()) {

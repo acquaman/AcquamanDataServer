@@ -67,7 +67,6 @@ AMDSClient::AMDSClient(QWidget *parent)
 	requestType->addItem("Start Time to End Time");
 	requestType->addItem("Middle Time + Count Before to Count After");
 	requestType->addItem("Continuous");
-	requestType->addItem("ContinuousWithBatchStreams");
 
 	const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestType->model());
 	for(int x = 1; x < AMDSClientRequestDefinitions::InvalidRequest; x++){
@@ -191,12 +190,6 @@ void AMDSClient::requestNewFortune()
 		clientTCPSocket->requestData(bufferName, time1, value1.toInt(), value2.toInt());
 		break;
 	case AMDSClientRequestDefinitions::Continuous:
-		clientTCPSocket->requestData(bufferName, value1.toInt(), continuousSocket);
-		if (continuousSocket.length() > 0) {
-			AMDSErrorMon::information(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
-		}
-		break;
-	case AMDSClientRequestDefinitions::ContinuousWithBatchStreams:
 		clientTCPSocket->requestData(selectedBufferNames, value1.toInt(), continuousSocket);
 		if (continuousSocket.length() > 0) {
 			AMDSErrorMon::information(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
@@ -210,8 +203,7 @@ void AMDSClient::requestNewFortune()
 
 void AMDSClient::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSClientRequest *clientRequest)
 {
-	if (   clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous
-		|| clientRequest->requestType() == AMDSClientRequestDefinitions::ContinuousWithBatchStreams ) {
+	if (   clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous ) {
 		AMDSClientTCPSocketManager::socketManager()->appendSocket(clientTCPSocket);
 		if (activeContinuousConnection->findText(clientTCPSocket->socketKey()) == -1) {
 			activeContinuousConnection->addItem(clientTCPSocket->socketKey());
@@ -277,7 +269,7 @@ void AMDSClient::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSo
 
 void AMDSClient::onRequestTypeChanged(QString requestType)
 {
-	if (requestType == "ContinuousWithBatchStreams") {
+	if (requestType == "Continuous") {
 		bufferNameListView_->setSelectionMode(QAbstractItemView::MultiSelection);
 	} else {
 		bufferNameListView_->setSelectionMode(QAbstractItemView::SingleSelection);

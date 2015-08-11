@@ -35,13 +35,13 @@ AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType re
 
 AMDSClientContinuousDataRequest::~AMDSClientContinuousDataRequest()
 {
-//	foreach (QString bufferName, bufferDataRequestList_.keys()) {
-//		AMDSClientContinuousDataRequest *bufferDataRequest = bufferDataRequestList_.value(bufferName);
-//		if (bufferDataRequest)
-//			bufferDataRequest->deleteLater();
-//	}
+	foreach (QString bufferName, bufferDataRequestList_.keys()) {
+		AMDSClientContinuousDataRequest *bufferDataRequest = bufferDataRequestList_.value(bufferName);
+		if (bufferDataRequest)
+			bufferDataRequest->deleteLater();
+	}
 
-//	bufferDataRequestList_.clear();
+	bufferDataRequestList_.clear();
 }
 
 AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(const AMDSClientContinuousDataRequest &other) :
@@ -67,6 +67,17 @@ AMDSClientContinuousDataRequest& AMDSClientContinuousDataRequest::operator =(con
 	}
 
 	return (*this);
+}
+
+void AMDSClientContinuousDataRequest::setSocketKey(const QString &socketKey)
+{
+	AMDSClientDataRequest::setSocketKey(socketKey);
+
+	foreach (QString bufferName, bufferNames()) {
+		AMDSClientContinuousDataRequest * dataRequest = bufferDataRequestList_.value(bufferName);
+		if (dataRequest)
+			dataRequest->setSocketKey(socketKey);
+	}
 }
 
 void AMDSClientContinuousDataRequest::setBufferNames(const QStringList &names) {
@@ -124,12 +135,12 @@ bool AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStr
 	setHandShakeSocketKey(readHandShakeSocketKey);
 	setBufferNames(readBufferNames);
 
-//	foreach (QString bufferName, readBufferNames) {
-//		AMDSClientContinuousDataRequest *bufferDataRequest = new AMDSClientContinuousDataRequest(*this);
-//		bufferDataRequest->setBufferName(bufferName);
+	foreach (QString bufferName, readBufferNames) {
+		AMDSClientContinuousDataRequest *bufferDataRequest = new AMDSClientContinuousDataRequest(*this);
+		bufferDataRequest->setBufferName(bufferName);
 
-//		bufferDataRequestList_.insert(bufferName, bufferDataRequest);
-//	}
+		bufferDataRequestList_.insert(bufferName, bufferDataRequest);
+	}
 
 	return true;
 }
@@ -138,10 +149,10 @@ bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 {
 	bool messageExpired = isExpired();
 	if (messageExpired) {
-		setErrorMessage(QString("Message (%1 --- %2) continuous update expired!").arg(socketKey()).arg(bufferName()));
+		setErrorMessage(QString("(msg %1) continuous update expired!").arg(socketKey()));
 		AMDSErrorMon::alert(this, 0, errorMessage());
 	} else {
-		AMDSErrorMon::information(this, 0, QString("Message (%1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
+		AMDSErrorMon::information(this, 0, QString("(msg %1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
 		continuousDataRequestTimer_.singleShot(updateInterval(), this, SLOT(onDataRequestTimerTimeout()));
 	}
 

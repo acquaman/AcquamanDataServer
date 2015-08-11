@@ -18,10 +18,10 @@ public:
 	AMDSClientDataRequest(const AMDSClientDataRequest& other);
 
 	/// returns whether this is a data client data request
-	virtual inline bool isDataClientRequest() { return true; }
+	virtual bool isDataClientRequest() { return true; }
 
 	/// returns whether this is a continuous message
-	virtual bool inline isContinuousMessage() { return false;}
+	virtual bool isContinuousMessage() { return false;}
 
 	/// The string identifier for the buffer data is being request from or received from
 	inline QString bufferName() const { return bufferName_; }
