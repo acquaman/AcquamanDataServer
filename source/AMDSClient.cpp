@@ -182,7 +182,7 @@ void AMDSClient::requestNewFortune()
 		clientTCPSocket->requestData(bufferName, time1, value1.toInt());
 		break;
 	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-		clientTCPSocket->requestData(bufferName, value1.toInt(), value1.toInt());
+		clientTCPSocket->requestData(bufferName, value1.toInt(), value2.toInt());
 		break;
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 		clientTCPSocket->requestData(bufferName, time1, time2);
