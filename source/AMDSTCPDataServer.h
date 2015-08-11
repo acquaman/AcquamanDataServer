@@ -33,6 +33,9 @@ public:
 	/// Default destructor for AMDSTcpDataServer. Calls stop
 	~AMDSTCPDataServer();
 
+	/// to disconnect the given connection from the host
+	void disconnectFromHost(QString socketKey);
+
 signals:
 	/// error signal
 	void error(quint8 errorLevel, quint16 errorCode, const QString &errorString);

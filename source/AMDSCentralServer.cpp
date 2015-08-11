@@ -91,6 +91,15 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 					emit clientRequestProcessed(clientRequest);
 				}
 			}
+
+			if ( clientDataRequest->isContinuousMessage()) {
+				AMDSClientContinuousDataRequest *continuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientDataRequest);
+				if (!continuousDataRequest->startContinuousRequestTimer()) {
+					continuousDataRequest->deleteLater();
+					dataServer_->server()->disconnectFromHost(continuousDataRequest->socketKey());
+				}
+			}
+
 		}
 	}
 }

@@ -16,6 +16,9 @@ public:
 	/// Copy constructor
 	AMDSClientContinuousDataRequest(const AMDSClientContinuousDataRequest &other);
 
+	/// returns whether this is a continuous message
+	virtual bool inline isContinuousMessage() { return true;}
+
 	/// Returns the start time for the data request
 	inline QDateTime startTime() const { return startTime_; }
 	/// Returns the update interval

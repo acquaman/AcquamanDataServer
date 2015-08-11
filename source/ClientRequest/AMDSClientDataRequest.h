@@ -20,7 +20,7 @@ public:
 	/// returns whether this is a data client data request
 	virtual inline bool isDataClientRequest() { return true; }
 
-	/// returns whehter this si a continuous message
+	/// returns whether this is a continuous message
 	virtual bool inline isContinuousMessage() { return false;}
 
 	/// The string identifier for the buffer data is being request from or received from
