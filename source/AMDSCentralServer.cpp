@@ -72,9 +72,9 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 		AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
 		if(clientDataRequest){
 			QStringList requestedBufferNames;
-			if (clientDataRequest->requestType() == AMDSClientRequestDefinitions::ContinuousWithBatchStreams) {
-				AMDSClientContinuousWithBatchStreamsDataRequest *batchStreamDataRequest = qobject_cast<AMDSClientContinuousWithBatchStreamsDataRequest *>(clientRequest);
-				requestedBufferNames = batchStreamDataRequest->bufferNames();
+			if (clientDataRequest->isContinuousMessage()) {
+				AMDSClientContinuousDataRequest *continuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest *>(clientRequest);
+				requestedBufferNames = continuousDataRequest->bufferNames();
 			} else {
 				requestedBufferNames.append(clientDataRequest->bufferName());
 			}

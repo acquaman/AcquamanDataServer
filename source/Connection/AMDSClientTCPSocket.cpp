@@ -222,7 +222,9 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 updateInterva
 
 	AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 	if(clientContinuousDataRequest){
-		clientContinuousDataRequest->setBufferName(bufferName);
+		QStringList bufferNames;
+		bufferNames.append(bufferName);
+		clientContinuousDataRequest->setBufferNames(bufferNames);
 		clientContinuousDataRequest->setUpdateInterval(updateInterval);
 		if (handShakeSocketKey.length() > 0) {
 			clientContinuousDataRequest->setHandShakeSocketKey(handShakeSocketKey);

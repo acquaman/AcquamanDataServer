@@ -11,7 +11,7 @@ AMDSClientContinuousWithBatchStreamsDataRequest::AMDSClientContinuousWithBatchSt
 }
 
 AMDSClientContinuousWithBatchStreamsDataRequest::AMDSClientContinuousWithBatchStreamsDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNamesList, bool includeStatusData, const quint64 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
-	AMDSClientContinuousDataRequest(responseType, socketKey, QString(), includeStatusData, msgUpdateInterval, msgHandShakeSocketKey, bufferGroupInfo, parent)
+	AMDSClientContinuousDataRequest(responseType, socketKey, bufferNamesList, includeStatusData, msgUpdateInterval, msgHandShakeSocketKey, bufferGroupInfo, parent)
 {
 	setRequestType(AMDSClientRequestDefinitions::ContinuousWithBatchStreams);
 
