@@ -348,7 +348,7 @@ void AMDSClient::requestData()
 	else if(clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
 		AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 		if(clientContinuousDataRequest){
-			quint64 updateInterval = 500;
+			quint32 updateInterval = 500;
 			if (count1Edit->text().length() > 0)
 				updateInterval = count1Edit->text().toUInt();
 

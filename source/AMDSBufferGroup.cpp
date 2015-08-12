@@ -139,24 +139,19 @@ void AMDSBufferGroup::populateData(AMDSClientMiddleTimePlusCountBeforeAndAfterDa
 
 void AMDSBufferGroup::populateData(AMDSClientContinuousDataRequest *clientDataRequest)
 {
-	// if it is the first message, we will initialize the last fetch time as the start time and wait for the data
-	if (clientDataRequest->isOriginalRequest()) {
-		clientDataRequest->setLastFetchTime(clientDataRequest->startTime());
-	} else {
-		QDateTime lastFetchTime = clientDataRequest->lastFetchTime();
+	QDateTime lastFetchTime = clientDataRequest->lastFetchTime();
 
-		int startIndex = lowerBound(lastFetchTime);
-		if(startIndex == -1)
-			clientDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(lastFetchTime.toString()));
-		else
-		{
+	int startIndex = lowerBound(lastFetchTime);
+	if(startIndex == -1)
+		clientDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(lastFetchTime.toString()));
+	else
+	{
 //			lastFetchTime = *(dataHolders_[dataHolders_.count()-1]);
-			lastFetchTime = QDateTime::currentDateTime();
-			clientDataRequest->setLastFetchTime(lastFetchTime);
-			// Since the last fetch actually included the data at the given time, we need to increment the index
-			// by one, to start from the one following:
-			populateData(clientDataRequest, startIndex++, dataHolders_.count());
-		}
+		lastFetchTime = QDateTime::currentDateTime();
+		clientDataRequest->setLastFetchTime(lastFetchTime);
+		// Since the last fetch actually included the data at the given time, we need to increment the index
+		// by one, to start from the one following:
+		populateData(clientDataRequest, startIndex++, dataHolders_.count());
 	}
 }
 

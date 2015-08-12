@@ -18,7 +18,7 @@ AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(QObject *parent
 	connect(&continuousDataRequestTimer_, SIGNAL(timeout()), this, SLOT(onDataRequestTimerTimeout()));
 }
 
-AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, const quint64 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
 	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, bufferName, includeStatusData, bufferGroupInfo, parent)
 {
 	setUpdateInterval(msgUpdateInterval);
@@ -93,7 +93,7 @@ bool AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStr
 	if(!AMDSClientDataRequest::readFromDataStream(dataStream))
 		return false;
 
-	quint64 readUpdateInterval;
+	quint32 readUpdateInterval;
 	*dataStream >> readUpdateInterval;
 
 //	QString readHandShakeSocketKey;
