@@ -20,7 +20,7 @@ AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QObject *parent) :
 AMDSThreadedTCPDataServer::~AMDSThreadedTCPDataServer()
 {
 	if (thread_->isRunning())
-		thread_->terminate();
+		thread_->quit();
 
 	server_->deleteLater();
 	thread_->deleteLater();
