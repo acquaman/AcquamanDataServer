@@ -68,8 +68,8 @@ protected slots:
 	/// Slot which handles a client sending a request to the server. Builds a ClientRequest* from the provided data,
 	/// if the request is well formed, and emits requestData()
 	void onClientSentRequest(const QString& clientKey);
-	/// Slot which handles the timeout which signals a continuous data request needs a new aggregate of data.
-	void onContinuousDataRequestTimer(const QString& clientKey);
+//	/// Slot which handles the timeout which signals a continuous data request needs a new aggregate of data.
+//	void onContinuousDataRequestTimer(const QString& clientKey);
 
 	void onTenMillisecondStatsTimerTimeout();
 	void onHundredMillisecondStatsTimerTimeout();
@@ -93,6 +93,7 @@ protected:
 	QHash<QString, int> clientSocketDataInProgress_;
 	/// A map storing continuous data requests from clients
 	QHash<QString, AMDSClientRequest*> continuousDataRequests_;
+
 	/// A signal mapper which allows for us to listen to the disonnect signal from all the client sockets
 	/// currently connected. Mapped on the same string as the clientSockets_ hash:
 	/// xx.xx.xx.xx:xxxxx
@@ -102,7 +103,7 @@ protected:
 	/// xx.xx.xx.xx:xxxxx
 	QSignalMapper* clientRequestSignalMapper_;
 
-	QSignalMapper* continuousDataRequestSignalMapper_;
+//	QSignalMapper* continuousDataRequestSignalMapper_;
 
 	QTimer *tenMillisecondStatsTimer_;
 	QTimer *hundredMillisecondStatsTimer_;
