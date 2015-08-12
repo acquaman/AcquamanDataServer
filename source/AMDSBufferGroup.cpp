@@ -83,7 +83,7 @@ void AMDSBufferGroup::populateData(AMDSClientRelativeCountPlusCountDataRequest* 
 	int count = clientDataRequest->count();
 
 	int startIndex = dataHolders_.count() - 1 - relativeCount;
-	int endIndex = dataHolders_.count() - 1 - relativeCount + count;
+	int endIndex = startIndex + count;
 
 	startIndex = qMax(0, startIndex);
 	endIndex = qMin(endIndex, dataHolders_.count() - 1);
