@@ -1,6 +1,8 @@
 #ifndef AMDSCLIENTINTROSPECTIONREQUEST_H
 #define AMDSCLIENTINTROSPECTIONREQUEST_H
 
+#include <QStringList>
+
 #include "source/ClientRequest/AMDSClientRequest.h"
 
 class AMDSClientIntrospectionRequest : public AMDSClientRequest
@@ -18,6 +20,12 @@ public:
 	inline QString bufferName() const { return bufferName_; }
 	/// Returns the list of buffer group infos
 	inline QList<AMDSBufferGroupInfo> bufferGroupInfos() const { return bufferGroupInfos_; }
+	/// Returns whether it is ready to read data
+	inline bool readReady() { return bufferGroupInfos_.count() > 0; }
+	/// Returns whether we are looking for all buffers now
+	inline bool checkAllBuffer() { return bufferName_ == "All"; }
+	/// Returns the list of names of all the buffers
+	QStringList getAllBufferNames();
 
 	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
 	AMDSClientIntrospectionRequest& operator=(const AMDSClientIntrospectionRequest& other);
