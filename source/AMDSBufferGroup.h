@@ -12,6 +12,7 @@ class AMDSClientDataRequest;
 class AMDSClientStartTimePlusCountDataRequest;
 class AMDSClientRelativeCountPlusCountDataRequest;
 class AMDSClientStartTimeToEndTimeDataRequest;
+class AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest;
 class AMDSClientContinuousDataRequest;
 
 /**
@@ -67,8 +68,10 @@ protected:
 	void populateData(AMDSClientRelativeCountPlusCountDataRequest* clientDataRequest);
 	/// Fills the request with all data between (and including) startTime and endTime
 	void populateData(AMDSClientStartTimeToEndTimeDataRequest* clientDataRequest);
+	/// Fills the request with all data acquired from middle time - countBefore to middle time + count after
+	void populateData(AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest* clientDataRequest);
 	/// Fills the request with all data acquired after lastFetch
-	void populateData(AMDSClientContinuousDataRequest* clientContinuousDataRequest, const QDateTime& lastFetch);
+	void populateData(AMDSClientContinuousDataRequest* clientDataRequest);
 
 //	/// Fills the request with count number of spectra either side of the entry relativeCount ago
 //	void populateData(AMDSClientRequest* request, int relativeCount, int count);

@@ -7,7 +7,7 @@
 AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(QObject *parent) :
 	AMDSClientRequest(parent)
 {
-	requestType_ = AMDSClientRequestDefinitions::Statistics;
+	setRequestType(AMDSClientRequestDefinitions::Statistics);
 }
 
 AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(AMDSClientRequest::ResponseType responseType, const QString socketKey, QObject *parent) :
@@ -32,8 +32,7 @@ AMDSClientStatisticsRequest& AMDSClientStatisticsRequest::operator =(const AMDSC
 		AMDSClientRequest::operator =(other);
 
 		clearPacketStats();
-		for(int x = 0, size = other.packetStats().count(); x < size; x++)
-			appendPacketStats(other.packetStats().at(x));
+		packetStats_.append(other.packetStats());
 	}
 	return (*this);
 }
@@ -73,14 +72,14 @@ bool AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
 		readPacketStats.append(onePacketStat);
 	}
 
-	for(int x = 0, size = readPacketStats.count(); x < size; x++)
-		appendPacketStats(readPacketStats.at(x));
-
+	packetStats_.append(readPacketStats);
 	return true;
 }
 
-void AMDSClientStatisticsRequest::printData()
+bool AMDSClientStatisticsRequest::validateResponse()
 {
 	for(int x = 0, size = packetStats().count(); x < size; x++)
 		qDebug() << "Packet Stats " << packetStats().at(x).name() << ": " << packetStats().at(x).allStats();
+
+	return true;
 }

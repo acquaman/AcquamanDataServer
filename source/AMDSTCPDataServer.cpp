@@ -10,6 +10,7 @@
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 #include "source/util/AMDSErrorMonitor.h"
@@ -52,7 +53,7 @@ AMDSTCPDataServer::~AMDSTCPDataServer()
 void AMDSTCPDataServer::displayClients()
 {
 	if(clientSockets_.isEmpty())
-		qDebug() << "No clients connected";
+		AMDSErrorMon::information(this, 0, "No clients connected");
 	else
 	{
 		QStringList keys =  clientSockets_.keys();
@@ -60,7 +61,7 @@ void AMDSTCPDataServer::displayClients()
 		{
 			QTcpSocket* currentSocket = clientSockets_.value(keys.at(iClientKey));
 			if(currentSocket)
-				qDebug() << currentSocket->peerAddress() << ":" << currentSocket->peerPort();
+				AMDSErrorMon::alert(this, 0, QString("%1:%2").arg(currentSocket->peerAddress().toString()).arg(currentSocket->peerPort()));
 		}
 	}
 
@@ -69,12 +70,11 @@ void AMDSTCPDataServer::displayClients()
 void AMDSTCPDataServer::displayDetails()
 {
 	if(!server_->isListening())
-		qDebug() << "Server is failing to listen: " << server_->errorString();
+		AMDSErrorMon::alert(this, 0, QString("Server is failing to listen: %1").arg(server_->errorString()));
 	else
 	{
-		qDebug() << "Server is listening on " << interfaceName_ << " (" << server_->serverAddress().toString() << server_->serverPort() << ")";
+		AMDSErrorMon::alert(this, 0, QString("Server is listening on %1 (%2:%3)").arg(interfaceName_).arg(server_->serverAddress().toString()).arg(server_->serverPort()));
 	}
-
 }
 
 void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
@@ -82,11 +82,8 @@ void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
 	interfaceName_ = interfaceName;
 	port_ = port;
 
-//	qDebug() << "InterfaceName and port " << interfaceName_ << port_;
-
 	clientDisconnectSignalMapper_ = new QSignalMapper(this);
 	clientRequestSignalMapper_ = new QSignalMapper(this);
-	continuousDataRequestSignalMapper_ = new QSignalMapper(this);
 	QNetworkConfigurationManager manager;
 	if(manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired)
 	{
@@ -95,7 +92,6 @@ void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
 		const QString id = settings.value("DefaultSessionConfig").toString();
 		settings.endGroup();
 
-//		qDebug() << "What's the id right now" << id;
 
 		QNetworkConfiguration config = manager.configurationFromIdentifier(id);
 		if((config.state() & QNetworkConfiguration::Discovered) != QNetworkConfiguration::Discovered)
@@ -105,17 +101,14 @@ void AMDSTCPDataServer::start(const QString &interfaceName, quint16 port)
 
 		session_ = new QNetworkSession(config, this);
 		connect(session_, SIGNAL(opened()), this, SLOT(sessionOpened()));
-//		qDebug() << "Trying to open session";
 		session_->open();
 	}
 	else
 	{
-//		qDebug() << "Just call session opened";
 		sessionOpened();
 	}
 	connect(clientDisconnectSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onClientDisconnect(QString)));
 	connect(clientRequestSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onClientSentRequest(QString)));
-	connect(continuousDataRequestSignalMapper_, SIGNAL(mapped(QString)), this, SLOT(onContinuousDataRequestTimer(QString)));
 }
 
 void AMDSTCPDataServer::stop()
@@ -143,11 +136,21 @@ void AMDSTCPDataServer::stop()
 
 void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
 {
-	bool missionAccomplished = true;
+	bool missionAccomplished = false;
 
 	QTcpSocket* requestingSocket = clientSockets_.value(processedRequest->socketKey(), 0);
 	if(requestingSocket != 0)
 	{
+		AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
+		if(processedClientDataRequest) {
+			if (processedClientDataRequest->validateResponse()) {
+				if (processedClientDataRequest->requestType() == AMDSClientRequestDefinitions::Continuous) {
+					AMDSClientContinuousDataRequest *processedClientDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(processedClientDataRequest);
+					missionAccomplished = processedClientDataRequest->startContinuousRequestTimer();
+				}
+			}
+		}
+
 		QByteArray block;
 		AMDSDataStream output(&block, QIODevice::WriteOnly);
 		output.setVersion(QDataStream::Qt_4_0);
@@ -160,43 +163,14 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		output << (quint32)(block.size() - sizeof(quint32));
 		requestingSocket->write(block);
 
-//		qDebug() << "Just wrote new client request with block size " << block.size();
-
 		qint64 outboundBytes = block.size();
 		tenMillisecondsStats_.setOutboundBytes(tenMillisecondsStats_.outboundBytes()+outboundBytes);
 		hundredMillisecondsStats_.setOutboundBytes(hundredMillisecondsStats_.outboundBytes()+outboundBytes);
 		oneSecondsStats_.setOutboundBytes(oneSecondsStats_.outboundBytes()+outboundBytes);
 		tenSecondsStats_.setOutboundBytes(tenSecondsStats_.outboundBytes()+outboundBytes);
-
-		switch (processedRequest->requestType()) {
-		case AMDSClientRequestDefinitions::StartTimePlusCount:
-		case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-		case AMDSClientRequestDefinitions::StartTimeToEndTime:
-			{
-				AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
-				if(processedClientDataRequest){
-					processedClientDataRequest->printData();
-				}
-
-				break;
-			}
-
-		case AMDSClientRequestDefinitions::Continuous:
-			if(processedRequest->responseType() != AMDSClientRequest::Error) {
-	//			data->setTime1(data->histogramData()->at(data->histogramData()->count() -1)->dwellStartTime());
-	//			data->histogramData()->clear();
-
-	//			processedRequest->startContinuousRequestTimer(500);
-				missionAccomplished = false;
-			}
-			break;
-
-		default:
-			break;
-		}
 	}
 
-	if (missionAccomplished) {
+	if (!missionAccomplished) {
 		processedRequest->deleteLater();
 		requestingSocket->disconnectFromHost();
 	}
@@ -204,7 +178,6 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 
 void AMDSTCPDataServer::sessionOpened()
 {
-//	qDebug() << "Session has been opened";
 	if(session_)
 	{
 		QNetworkConfiguration config = session_->configuration();
@@ -225,8 +198,6 @@ void AMDSTCPDataServer::sessionOpened()
 	QString interfaceWithoutSuffix = interfaceName_;
 	int interfaceOffset = 0;
 
-//	qDebug() << "Interface name here is " << interfaceName_;
-
 	if(interfaceName_.contains(":"))
 	{
 		QStringList nameParts = interfaceName_.split(':');
@@ -238,13 +209,11 @@ void AMDSTCPDataServer::sessionOpened()
 		interfaceOffset++;
 	}
 
-//	qDebug() << "We will check against " << interfaceWithoutSuffix;
-
 	QList<QNetworkAddressEntry> associatedAddresses = QNetworkInterface::interfaceFromName(interfaceWithoutSuffix).addressEntries();
 
 	QList<QNetworkAddressEntry> associatedIPV4Addresses;
 	for(int x = 0, size = associatedAddresses.count(); x < size; x++){
-		qDebug() << "At " << x << associatedAddresses.at(x).ip() << associatedAddresses.at(x).ip().toIPv4Address();
+		AMDSErrorMon::debug(this, 0, QString("At %1 %2 %3").arg(x).arg(associatedAddresses.at(x).ip().toString()).arg(associatedAddresses.at(x).ip().toIPv4Address()));
 		if(associatedAddresses.at(x).ip().toIPv4Address()) {
 			associatedIPV4Addresses.append(associatedAddresses.at(x));
 		}
@@ -252,7 +221,6 @@ void AMDSTCPDataServer::sessionOpened()
 
 	if(interfaceOffset < associatedAddresses.count())
 		address = associatedIPV4Addresses.at(interfaceOffset).ip();
-		//address = associatedAddresses.at(interfaceOffset).ip();
 
 	server_ = new QTcpServer(this);
 	connect(server_, SIGNAL(newConnection()), this, SLOT(onNewClientConnected()));
@@ -262,7 +230,7 @@ void AMDSTCPDataServer::sessionOpened()
 		return;
 	}
 
-	qDebug() << "Listening on " << server_->serverAddress().toString() << ":" << server_->serverPort();
+	AMDSErrorMon::information(this, 0, QString("Listening on %1:%2").arg(server_->serverAddress().toString()).arg(server_->serverPort()));
 }
 
 
@@ -273,7 +241,7 @@ void AMDSTCPDataServer::onNewClientConnected()
 	if(clientSocket)
 	{
 		QString socketDescription = QString("%1:%2").arg(clientSocket->peerAddress().toString()).arg(clientSocket->peerPort());
-		qDebug() << "Connection with " << socketDescription << " established";
+		AMDSErrorMon::information(this, 0, QString("Connection with %1 established").arg(socketDescription));
 		clientSockets_.insert(socketDescription, clientSocket);
 
 		clientDisconnectSignalMapper_->setMapping(clientSocket, socketDescription);
@@ -290,7 +258,7 @@ void AMDSTCPDataServer::onClientDisconnect(const QString &clientKey)
 		return;
 
 	clientSockets_.remove(clientKey);
-	qDebug() << "Disconnection from " << clientKey;
+	AMDSErrorMon::information(this, 0, QString("Disconnection from %1").arg(clientKey));
 
 	clientDisconnectSignalMapper_->removeMappings(socketToDisconnect);
 	clientRequestSignalMapper_->removeMappings(socketToDisconnect);
@@ -302,6 +270,7 @@ void AMDSTCPDataServer::onClientDisconnect(const QString &clientKey)
 
 void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 {
+
 	QTcpSocket* requestingSocket = clientSockets_.value(clientKey, 0);
 
 	if(requestingSocket == 0)
@@ -363,21 +332,32 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 			onClientRequestProcessed(clientRequest);
 		}
 	}
-	else
+	else {
+		if(clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
+			AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
+			if(clientContinuousDataRequest){
+				if (clientContinuousDataRequest->isHandShakingMessage()) {
+					QString socketKey = clientContinuousDataRequest->handShakeSocketKey();
+					AMDSClientContinuousDataRequest *handShakingclientDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(continuousDataRequests_.value(socketKey));
+					if (handShakingclientDataRequest) {
+						handShakingclientDataRequest->setHandShakeTime(QDateTime::currentDateTime());
+						AMDSErrorMon::information(this, 0, QString("Hand shaking with socketKey (%1)").arg(socketKey));
+					} else {
+						AMDSErrorMon::alert(this, 0, QString("Didn't find hand shaking message with socketKey (%1)").arg(socketKey));
+					}
+
+					clientContinuousDataRequest->deleteLater();
+					requestingSocket->disconnectFromHost();
+					return;
+				} else {
+					continuousDataRequests_.insert(clientContinuousDataRequest->socketKey(), clientContinuousDataRequest);
+					connect(clientContinuousDataRequest, SIGNAL(sendNewContinuousDataRequest(AMDSClientRequest*)), this, SIGNAL(clientRequestRead(AMDSClientRequest*)));
+				}
+			}
+		}
+
 		emit clientRequestRead(clientRequest);
-}
-
-void AMDSTCPDataServer::onContinuousDataRequestTimer(const QString &clientKey)
-{
-	Q_UNUSED(clientKey)
-
-//	ClientDataRequest* request = continuousDataRequests_.value(clientKey, 0);
-
-//	if(request == 0)
-//		return;
-
-//	emit requestData(request);
-
+	}
 }
 
 void AMDSTCPDataServer::onTenMillisecondStatsTimerTimeout(){

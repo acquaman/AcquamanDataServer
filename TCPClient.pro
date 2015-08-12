@@ -21,6 +21,7 @@ RCC_DIR=build_files
 
 HEADERS  += \
 	source/AMDSClient.h \
+	source/AMDSMetaObjectSupport.h \
 	source/AMDSAxisInfo.h \
 	source/AMDSnDIndex.h \
 	source/AMDSBufferGroupInfo.h \
@@ -39,16 +40,20 @@ HEADERS  += \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
+	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
+	source/Connection/AMDSClientTCPSocketManager.h \
+	source/Connection/AMDSClientTCPSocket.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
-	source/AMDSMetaObjectSupport.h
+	source/util/AMDSErrorMonitor.h
 
 SOURCES += \
 	source/AMDSClientMain.cpp \
+	source/AMDSMetaObjectSupport.cpp \
 	source/AMDSClient.cpp \
 	source/AMDSAxisInfo.cpp \
 	source/AMDSnDIndex.cpp \
@@ -66,11 +71,17 @@ SOURCES += \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
+	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
+	source/Connection/AMDSClientTCPSocket.cpp \
+	source/Connection/AMDSClientTCPSocketManager.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
-	source/AMDSMetaObjectSupport.cpp
+	source/util/AMDSErrorMonitor.cpp
+
+
+
 
