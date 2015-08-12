@@ -32,6 +32,8 @@ AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port,
 
 AMDSClientTCPSocket::~AMDSClientTCPSocket()
 {
+	incomeDataBuffer_->clear();
+
 	tcpSocket_->abort();
 	tcpSocket_->close();
 }
@@ -46,14 +48,14 @@ void AMDSClientTCPSocket::readFortune()
 	if (tcpSocket_->bytesAvailable() < (int)sizeof(quint32))
 		return;
 
-	AMDSDataStream *inDataStream = new AMDSDataStream(tcpSocket_);
-	inDataStream->setVersion(QDataStream::Qt_4_0);
-
+	AMDSDataStream *inDataStream ;
 	if (!waitingMorePackages_) {
+		inDataStream= new AMDSDataStream(tcpSocket_);
+		inDataStream->setVersion(QDataStream::Qt_4_0);
 		*inDataStream >> expectedBufferSize_;
 
 		if (tcpSocket_->bytesAvailable() < expectedBufferSize_) {
-			// more data package is expecting, we need to buffer the current ones
+			//more data package is expecting, we need to buffer the current ones
 			waitingMorePackages_ = true;
 			incomeDataBuffer_->clear();
 
