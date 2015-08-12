@@ -1,6 +1,7 @@
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "AMDSClientIntrospectionRequest.h"
 
 #include "source/AMDSDataStream.h"
+#include "source/util/AMDSErrorMonitor.h"
 
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(QObject *parent) :
 	AMDSClientRequest(parent)
@@ -38,6 +39,18 @@ AMDSClientIntrospectionRequest& AMDSClientIntrospectionRequest::operator =(const
 			appendBufferGroupInfo(other.bufferGroupInfos().at(x));
 	}
 	return (*this);
+}
+
+QStringList AMDSClientIntrospectionRequest::getAllBufferNames()
+{
+	QStringList bufferNames;
+	for(int x = 0, xSize = bufferGroupInfos_.count(); x < xSize; x++) {
+		AMDSBufferGroupInfo bufferGroupInfo = bufferGroupInfos_.at(x);
+
+		bufferNames.append(bufferGroupInfo.name());
+	}
+
+	return bufferNames;
 }
 
 bool AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream) const
@@ -86,6 +99,20 @@ bool AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStre
 
 	setBufferName(readBufferName);
 	bufferGroupInfos_.append(readBufferGroupInfos);
+
+	return true;
+}
+
+bool AMDSClientIntrospectionRequest::validateResponse()
+{
+	for(int y = 0, ySize = bufferGroupInfos_.count(); y < ySize; y++){
+		AMDSBufferGroupInfo bufferGroupInfo = bufferGroupInfos_.at(y);
+		AMDSErrorMon::information(this, 0, QString("%1 %2 %3 %4 %5").arg(bufferGroupInfo.name()).arg(bufferGroupInfo.description()).arg(bufferGroupInfo.units()).arg(bufferGroupInfo.rank()).arg(bufferGroupInfo.size().toString()));
+		for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++){
+			AMDSAxisInfo axisInfo = bufferGroupInfo.axes().at(x);
+			AMDSErrorMon::information(this, 0, QString("\tAxis info at %1 %2 %3 %4 %5 %6 %7 %8").arg(x).arg(axisInfo.name()).arg(axisInfo.description()).arg(axisInfo.units()).arg(axisInfo.size()).arg(axisInfo.isUniform()).arg(axisInfo.start()).arg(axisInfo.increment()));
+		}
+	}
 
 	return true;
 }

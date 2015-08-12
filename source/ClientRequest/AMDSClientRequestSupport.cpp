@@ -5,6 +5,8 @@
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
 #include "source/AMDSMetaObjectSupport.h"
@@ -55,6 +57,10 @@ namespace AMDSClientRequestSupport{
 			AMDSClientRequestSupport::registerClass<AMDSClientStartTimePlusCountDataRequest>(AMDSClientRequestDefinitions::StartTimePlusCount);
 		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::RelativeCountPlusCount))
 			AMDSClientRequestSupport::registerClass<AMDSClientRelativeCountPlusCountDataRequest>(AMDSClientRequestDefinitions::RelativeCountPlusCount);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::StartTimeToEndTime))
+			AMDSClientRequestSupport::registerClass<AMDSClientStartTimeToEndTimeDataRequest>(AMDSClientRequestDefinitions::StartTimeToEndTime);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter))
+			AMDSClientRequestSupport::registerClass<AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest>(AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter);
 		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
 			AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
 	}

@@ -24,6 +24,9 @@ public:
 	/// Copy constructor
 	AMDSClientRequest(const AMDSClientRequest& other);
 
+	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
+	AMDSClientRequest& operator=(const AMDSClientRequest& other);
+
 	/// A key used to identify the client socket on which the request was made
 	inline QString socketKey() const { return socketKey_; }
 	/// The last error message encountered attempting to fullfil the data request
@@ -33,9 +36,6 @@ public:
 	/// The response type the client has specified. If an error is encountered, this will be changed
 	/// to Error
 	inline AMDSClientRequest::ResponseType responseType() const { return responseType_; }
-
-	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
-	AMDSClientRequest& operator=(const AMDSClientRequest& other);
 
 	/// Sets the socket key identifier
 	inline void setSocketKey(const QString &socketKey) { socketKey_ = socketKey; }
@@ -51,9 +51,12 @@ public:
 	/// Reads this AMDSClientRequest from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream);
 
+	/// validate the message response
+	virtual bool validateResponse() {return true;}
+
 private:
-	/// To set the values of all the properties
-	void setProperties(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
+	/// To set the values of all the attributes
+	void setAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
 
 protected:
 	QString socketKey_;
