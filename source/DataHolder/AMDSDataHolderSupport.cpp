@@ -1,7 +1,10 @@
 #include "source/DataHolder/AMDSDataHolderSupport.h"
 
-#include "source/DataHolder/AMDSDataHolder.h"
 #include "source/AMDSMetaObjectSupport.h"
+
+#include "source/DataHolder/AMDSDataHolder.h"
+#include "source/DataHolder/AMDSScalarDataHolder.h"
+#include "source/DataHolder/AMDSSpectralDataHolder.h"
 
 AMDSDataHolderObjectInfo::AMDSDataHolderObjectInfo()
 {
@@ -36,6 +39,14 @@ void AMDSDataHolderObjectInfo::initWithMetaObject(const QMetaObject *dataHolderM
 
 namespace AMDSDataHolderSupport{
 	QHash<QString, AMDSDataHolderObjectInfo> registeredClasses_;
+
+	void registerDataHolderClass()
+	{
+		if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightScalarDataHolder::staticMetaObject.className()))
+			AMDSDataHolderSupport::registerClass<AMDSLightWeightScalarDataHolder>();
+		if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightSpectralDataHolder::staticMetaObject.className()))
+			AMDSDataHolderSupport::registerClass<AMDSLightWeightSpectralDataHolder>();
+	}
 
 	const QHash<QString, AMDSDataHolderObjectInfo>* registeredClasses() {
 		return &registeredClasses_;

@@ -12,50 +12,25 @@
 #include "source/ClientRequest/AMDSClientDataRequest.h"
 #include "source/util/AMDSErrorMonitor.h"
 
-AMDSCentralServer::AMDSCentralServer(QString hwType, QObject *parent) :
+AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
 	AMDSErrorMon::information(this, 0, "Starting Acquaman Data Server application ...");
 
-	dataServer_ = new AMDSThreadedTCPDataServer(hwType, this);
-
-	quint64 maxCountSize = 1000*60*60*10; // 10 hours of 1kHz signal
-
-	QList<AMDSAxisInfo> mcpBufferGroupAxes;
-	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
-	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
-	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", mcpBufferGroupAxes);
-	AMDSBufferGroup *mcpBufferGroup = new AMDSBufferGroup(mcpBufferGroupInfo, maxCountSize);
-	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroup);
-	bufferGroups_.insert(mcpThreadedBufferGroup->bufferGroupInfo().name(), mcpThreadedBufferGroup);
-
-	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
-	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
-	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", amptek1BufferGroupAxes);
-	amptek1BufferGroup_ = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
-	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup_);
-	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
-
-	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV");
-	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
-	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
-	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
-
-	simpleCounter_ = 0;
+	dataServer_ = new AMDSThreadedTCPDataServer(this);
 	fiftyMillisecondTimer_ = new QTimer(this);
-
-	spectralCounter_ = 0;
 	hundredMillisecondTimer_ = new QTimer(this);
 
-	connect(dataServer_, SIGNAL(error(quint8,quint16,QString)), this, SLOT(onDataServerErrorHandler(quint8,quint16,QString)));
+	initializeBufferGroup(1000*60*60*10); // 10 hours of 1kHz signal
+
+	connect(dataServer_->server(), SIGNAL(error(quint8,quint16,QString)), this, SLOT(onDataServerErrorHandler(quint8,quint16,QString)));
 	connect(dataServer_->server(), SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SLOT(onDataServerClientRequestReady(AMDSClientRequest*)));
 	connect(this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
 	connect(fiftyMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onFiftyMillisecondTimerUpdate()));
-	fiftyMillisecondTimer_->start(50);
-
 	connect(hundredMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondTimerUpdate()));
-	hundredMillisecondTimer_->start(100);
+
+	startTimer();
 }
 
 void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, QString errorMessage)
@@ -95,15 +70,15 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 	else{
 		AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
 		if(clientDataRequest){
-			if(clientDataRequest->bufferName() == "Energy"){
-				clientDataRequest->setBufferGroupInfo(energyBufferGroup_->bufferGroupInfo());
-				connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-				energyBufferGroup_->processClientRequest(clientRequest);
-			}
-			if(clientDataRequest->bufferName() == "Amptek1"){
-				clientDataRequest->setBufferGroupInfo(amptek1BufferGroup_->bufferGroupInfo());
-				connect(amptek1BufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-				amptek1BufferGroup_->processClientRequest(clientRequest);
+
+			AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(clientDataRequest->bufferName(), 0);
+			if (threadedBufferGroup) {
+				AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
+				clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
+				bufferGroup->processClientRequest(clientRequest);
+			} else {
+				AMDSErrorMon::alert(this, 0, QString("Invalid client data request with buffer name: %1").arg(clientDataRequest->bufferName()));
+				emit clientRequestProcessed(clientRequest);
 			}
 		}
 	}
@@ -132,4 +107,42 @@ void AMDSCentralServer::onHundredMillisecondTimerUpdate(){
 	oneSpectralDataHolder->setData(&oneSpectralFlatArray);
 
 	amptek1BufferGroup_->append(oneSpectralDataHolder);
+}
+
+void AMDSCentralServer::initializeBufferGroup(quint64 maxCountSize)
+{
+	QList<AMDSAxisInfo> mcpBufferGroupAxes;
+	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
+	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
+	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", mcpBufferGroupAxes);
+	AMDSBufferGroup *mcpBufferGroup = new AMDSBufferGroup(mcpBufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroup);
+	bufferGroups_.insert(mcpThreadedBufferGroup->bufferGroupInfo().name(), mcpThreadedBufferGroup);
+
+	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
+	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
+	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", amptek1BufferGroupAxes);
+	amptek1BufferGroup_ = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup_);
+	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
+
+	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV");
+	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
+	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
+
+	connect(mcpBufferGroup, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+	connect(amptek1BufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+	connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+
+}
+
+void AMDSCentralServer::startTimer()
+{
+	AMDSErrorMon::information(this, 0, "Starting the timer to update data buffer ...");
+	simpleCounter_ = 0;
+	spectralCounter_ = 0;
+
+	fiftyMillisecondTimer_->start(50);
+	hundredMillisecondTimer_->start(100);
 }

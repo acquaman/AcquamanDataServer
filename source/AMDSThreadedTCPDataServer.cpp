@@ -2,17 +2,16 @@
 
 #include <QCoreApplication>
 
-AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QString hwType, QObject *parent) :
+#include "source/util/AMDSErrorMonitor.h"
+
+AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QObject *parent) :
 	QObject(parent)
 {
-	hwType_ = hwType;
-
 	thread_ = new QThread;
 	server_ = new AMDSTCPDataServer;
 
 	connect(thread_, SIGNAL(started()), this, SLOT(onThreadStarted()));
 	connect(this, SIGNAL(startServer(QString,quint16)), server_, SLOT(start(QString,quint16)));
-	connect(server_, SIGNAL(error(quint8,quint16,QString)), this, SIGNAL(error(quint8,quint16,QString)));
 
 	server_->moveToThread(thread_);
 	thread_->start(QThread::LowPriority);
@@ -21,10 +20,10 @@ AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QString hwType, QObject *pa
 AMDSThreadedTCPDataServer::~AMDSThreadedTCPDataServer()
 {
 	if (thread_->isRunning())
-		thread_->terminate();
+		thread_->quit();
 
-	thread_->deleteLater();
 	server_->deleteLater();
+	thread_->deleteLater();
 }
 
 AMDSTCPDataServer* AMDSThreadedTCPDataServer::server()
@@ -34,17 +33,13 @@ AMDSTCPDataServer* AMDSThreadedTCPDataServer::server()
 
 void AMDSThreadedTCPDataServer::onThreadStarted()
 {
-	QSettings settings;
+	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "AcquamanDataServer", "AcquamanDataServer");
 	settings.beginGroup("Networking");
-	if(!settings.contains("interface"))
-		settings.setValue("interface", hwType_);
-
-	if(!settings.contains("port"))
-		settings.setValue("port", "28044");
-
-	quint16 port = settings.value("port").toInt();
+	QString interface = settings.value("interface").toString();
+	quint16 port = settings.value("port").toUInt();
 	settings.endGroup();
-	qDebug() << "Going to request server to start";
 
-	emit startServer(hwType_, port);
+	AMDSErrorMon::information(this, 0, QString("Starting TCP data server at (%1, %2)").arg(interface).arg(port));
+
+	emit startServer(interface, port);
 }

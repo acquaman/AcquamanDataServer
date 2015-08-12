@@ -3,43 +3,77 @@
 #include <QStringList>
 #include <QRegExp>
 #include <QDebug>
+#include <QSettings>
 
 #include "source/AMDSCentralServer.h"
+#include "source/AMDSEventDataSupport.h"
+#include "source/ClientRequest/AMDSClientRequestSupport.h"
+#include "source/DataHolder/AMDSDataHolderSupport.h"
 
+/*
+ * Print the usage of the application
+ */
 void printUsage()
 {
 	qDebug() << "\nUsages:" << "\n"
-			 << "	AcquamanDataServer --hw=[HW type]\n"
+			 << "	AcquamanDataServer --intf=[interface name] [--port=[portnumber]]\n"
 			 << "	AcquamanDataServer --help\n"
 			 << "\n";
 }
 
+/*
+ * Initialize the application settings
+ */
+void initializeAppSettings(QString interface, quint16 port)
+{
+	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "AcquamanDataServer", "AcquamanDataServer");
+	settings.beginGroup("Networking");
+	if(!settings.contains("interface") || interface != settings.value("interface"))
+		settings.setValue("interface", interface);
+
+	if(!settings.contains("port") || port != settings.value("port").toUInt())
+		settings.setValue("port", port);
+
+	settings.endGroup();
+}
+
+void initializeRegisteredClasses() {
+	AMDSClientRequestSupport::registerClientRequestClass();
+	AMDSDataHolderSupport::registerDataHolderClass();
+	AMDSEventDataSupport::registerEventDataObjectClass();
+}
+
 int main(int argc, char *argv[])
 {
-	QRegExp argHWType("--hw=([a-z0-9]{1,})");
+	QRegExp argInterfaceType("--intf=([a-z0-9]{1,})");
+	QRegExp argPortType("--port=([0-9]{1,})");
 	QRegExp argHelp("--help");
 
 	QCoreApplication app(argc, argv);
 	QStringList args = app.arguments();
 
-	bool missionAccomplished = false;
-	QString hwType = 0;
+	QString interfaceType = 0;
+	quint16 port = 28044;
 	for (int i = 1; i < args.size(); ++i) {
-		if (argHWType.indexIn(args.at(i)) != -1) {
-			hwType = argHWType.cap(1);
+		if (argInterfaceType.indexIn(args.at(i)) != -1) {
+			interfaceType = argInterfaceType.cap(1);
+		} else if (argPortType.indexIn(args.at(i)) != -1) {
+			QString value = argPortType.cap(1);
+			port = value.toUInt();
 		} else if (argHelp.indexIn(args.at(i)) != -1) {
 			printUsage();
-			missionAccomplished = true;
+			return 0;
 		}
 	}
 
-	if (missionAccomplished) {
-		return 0;
-	} else if (hwType == 0) {
-		qDebug() << "\nERROR: Missing or invalid HW type argument. \n";
+	if (interfaceType == 0) {
+		qDebug() << "\nERROR: Missing or invalid interface argument. \n";
 		printUsage();
 	} else {
-		new AMDSCentralServer(hwType);
+		initializeAppSettings(interfaceType, port);
+		initializeRegisteredClasses();
+
+		new AMDSCentralServer();
 		return app.exec();
 	}
 
