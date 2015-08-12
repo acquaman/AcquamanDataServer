@@ -13,7 +13,7 @@ class AMDSClientContinuousDataRequest : public AMDSClientDataRequest
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientContinuousDataRequest(QObject *parent = 0);
-	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, const quint64 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientContinuousDataRequest();
 	/// Copy constructor
 	AMDSClientContinuousDataRequest(const AMDSClientContinuousDataRequest &other);
@@ -30,7 +30,7 @@ public:
 	/// Returns the start time for the data request
 	inline QDateTime startTime() const { return startTime_; }
 	/// Returns the update interval
-	inline quint64 updateInterval() const { return updateInterval_; }
+	inline quint32 updateInterval() const { return updateInterval_; }
 	/// Returns the last fetch time for the data request
 	inline QDateTime lastFetchTime() const { return lastFetchTime_; }
 	/// return the handShaking socket key
@@ -51,7 +51,7 @@ public:
 	/// Sets the start time for the data request
 	inline void setStartTime(const QDateTime &startTime) { startTime_ = startTime; }
 	/// Sets the updateInterval for the data request
-	inline void setUpdateInterval(const quint64 updateInterval) { updateInterval_ = (updateInterval == 0 ? 500 : updateInterval); }
+	inline void setUpdateInterval(const quint32 updateInterval) { updateInterval_ = (updateInterval == 0 ? 500 : updateInterval); }
 	/// Sets the last fetch time for the data request
 	inline void setLastFetchTime(const QDateTime &lastFetchTime) { lastFetchTime_ = lastFetchTime; }
 	/// Sets the last handshake time for the data request
@@ -85,7 +85,7 @@ protected:
 	/// Start time for data
 	QDateTime startTime_;
 	/// Update interval // default 500ms
-	quint64 updateInterval_;
+	quint32 updateInterval_;
 	/// The datetime of last fetch
 	QDateTime lastFetchTime_;
 

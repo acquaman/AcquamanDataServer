@@ -42,6 +42,7 @@ public slots:
 	void requestData(QStringList &bufferNames, quint64 updateInterval, QString handShakeSocketKey="");
 
 protected slots:
+	/// slot to handle the socket error signals
 	void onSocketError(QAbstractSocket::SocketError error);
 	/// slot to handle the data from server
 	void readFortune();
@@ -51,12 +52,18 @@ private:
 	void sendData(AMDSClientRequest *clientRequest);
 
 protected:
+	/// the handler of the socket connection
 	QTcpSocket *tcpSocket_;
+	/// the socket key
 	QString socketKey_;
 
+	/// flag to identify whether we are waiting for the second data package or not
 	bool waitingMorePackages_;
+	/// variable to remember how many bytes we already read
 	quint32 readedBufferSize_;
+	/// variable to remember how many bytes we suppose to read
 	quint32 expectedBufferSize_;
+	/// byte array to save the readed bytes temporarily
 	QByteArray *incomeDataBuffer_;
 };
 
