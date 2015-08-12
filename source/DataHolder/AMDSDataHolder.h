@@ -50,6 +50,7 @@ public:
 
 	virtual inline void setData(AMDSFlatArray *inputValues) = 0;
 
+	virtual inline QDateTime eventTime() { return eventData()->eventTime(); }
 	virtual inline bool operator <(const QDateTime &rhs) = 0;
 	virtual inline bool operator >(const QDateTime &rhs) = 0;
 	virtual inline bool operator ==(const QDateTime &rhs) = 0;
