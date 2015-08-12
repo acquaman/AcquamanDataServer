@@ -173,7 +173,6 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 					AMDSFlatArray oneFlatArray;
 					processedStartTimePlusCountDataRequest->data().at(x)->data(&oneFlatArray);
 					values.append(oneFlatArray);
-//					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
 					qDebug() << "Data at " << x << oneFlatArray.printData();
 				}
 			}
@@ -187,7 +186,6 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 					AMDSFlatArray oneFlatArray;
 					processedRelativeCountPlusCountDataRequest->data().at(x)->data(&oneFlatArray);
 					values.append(oneFlatArray);
-//					qDebug() << "Data point at " << x << oneFlatArray.vectorDouble().at(0);
 					qDebug() << "Data at " << x << oneFlatArray.printData();
 				}
 			}
@@ -286,22 +284,28 @@ void AMDSTCPDataServer::onNewClientConnected()
 		QString socketDescription = QString("%1:%2").arg(clientSocket->peerAddress().toString()).arg(clientSocket->peerPort());
 		qDebug() << "Connection with " << socketDescription << " established";
 		clientSockets_.insert(socketDescription, clientSocket);
-		connect(clientSocket, SIGNAL(disconnected()), clientDisconnectSignalMapper_, SLOT(map()));
+
 		clientDisconnectSignalMapper_->setMapping(clientSocket, socketDescription);
-		connect(clientSocket, SIGNAL(readyRead()), clientRequestSignalMapper_, SLOT(map()));
 		clientRequestSignalMapper_->setMapping(clientSocket, socketDescription);
+		connect(clientSocket, SIGNAL(disconnected()), clientDisconnectSignalMapper_, SLOT(map()));
+		connect(clientSocket, SIGNAL(readyRead()), clientRequestSignalMapper_, SLOT(map()));
 	}
 }
 
 void AMDSTCPDataServer::onClientDisconnect(const QString &clientKey)
 {
 	QTcpSocket* socketToDisconnect = clientSockets_.value(clientKey);
-
 	if(!socketToDisconnect)
 		return;
 
 	clientSockets_.remove(clientKey);
 	qDebug() << "Disconnection from " << clientKey;
+
+	clientDisconnectSignalMapper_->removeMappings(socketToDisconnect);
+	clientRequestSignalMapper_->removeMappings(socketToDisconnect);
+	disconnect(socketToDisconnect, SIGNAL(disconnected()), clientDisconnectSignalMapper_, SLOT(map()));
+	disconnect(socketToDisconnect, SIGNAL(readyRead()), clientRequestSignalMapper_, SLOT(map()));
+
 	socketToDisconnect->deleteLater();
 }
 
