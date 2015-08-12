@@ -106,8 +106,6 @@ protected:
 	/// xx.xx.xx.xx:xxxxx
 	QSignalMapper* clientRequestSignalMapper_;
 
-//	QSignalMapper* continuousDataRequestSignalMapper_;
-
 	QTimer *tenMillisecondStatsTimer_;
 	QTimer *hundredMillisecondStatsTimer_;
 	QTimer *oneSecondStatsTimer_;
