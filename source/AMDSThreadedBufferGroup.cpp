@@ -17,6 +17,11 @@ AMDSBufferGroupInfo AMDSThreadedBufferGroup::bufferGroupInfo() const{
 	return bufferGroup_->bufferGroupInfo();
 }
 
+AMDSBufferGroup * AMDSThreadedBufferGroup::bufferGroup() const
+{
+	return bufferGroup_;
+}
+
 void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){
 	emit bufferGroupReady();
 }

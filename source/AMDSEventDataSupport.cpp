@@ -37,6 +37,12 @@ void AMDSEventDataObjectInfo::initWithMetaObject(const QMetaObject *eventDataMet
 namespace AMDSEventDataSupport{
 	QHash<QString, AMDSEventDataObjectInfo> registeredClasses_;
 
+	void registerEventDataObjectClass()
+	{
+		if(!AMDSEventDataSupport::registeredClasses()->contains(AMDSLightWeightEventData::staticMetaObject.className()))
+			AMDSEventDataSupport::registerClass<AMDSLightWeightEventData>();
+	}
+
 	const QHash<QString, AMDSEventDataObjectInfo>* registeredClasses() {
 		return &registeredClasses_;
 	}
