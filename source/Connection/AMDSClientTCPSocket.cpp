@@ -27,7 +27,7 @@ AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port,
 
 AMDSClientTCPSocket::~AMDSClientTCPSocket()
 {
-	tcpSocket_->abort();
+	tcpSocket_->disconnectFromHost();
 	tcpSocket_->close();
 }
 
