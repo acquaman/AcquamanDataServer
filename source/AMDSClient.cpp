@@ -152,11 +152,6 @@ void AMDSClient::requestNewFortune()
 		selectedBufferNames.append(index.data(Qt::DisplayRole).toString());
 	}
 
-	if (selectedBufferNames.count() == 0) {
-		QMessageBox::information( this, "Fortune Client", "Didn't select any buffer(s)!");
-		return;
-	}
-
 	quint8 requestTypeId = (quint8)requestType->currentIndex();
 	QString bufferName = selectedBufferNames.value(0);
 	QDateTime time1 = time1Edit->dateTime();
@@ -170,6 +165,13 @@ void AMDSClient::requestNewFortune()
 	connect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
 
 	AMDSClientRequestDefinitions::RequestType clientRequestType = (AMDSClientRequestDefinitions::RequestType)requestTypeId;
+	if (	(selectedBufferNames.count() == 0)
+		 && (clientRequestType != AMDSClientRequestDefinitions::Continuous )
+		 && (clientRequestType != AMDSClientRequestDefinitions::Statistics)) {
+		QMessageBox::information( this, "Fortune Client", "Didn't select any buffer(s)!");
+		return;
+	}
+
 	switch(clientRequestType) {
 	case AMDSClientRequestDefinitions::Introspection:
 		clientTCPSocket->requestData(bufferName);

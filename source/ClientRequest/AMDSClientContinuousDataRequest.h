@@ -67,6 +67,11 @@ public:
 	/// start the coninuousRequestTimer for next message
 	bool startContinuousRequestTimer();
 
+	/// perform hand shaking with the client
+	///    - if the handShaking message contains no interested buffername or interested buffers has no intersection with existing ones,
+	///      the current message will be deregistered
+	void handShaking(AMDSClientContinuousDataRequest *handShakingMessage);
+
 signals:
 	/// SIGNAL of new message requst
 	void sendNewContinuousDataRequest(AMDSClientRequest* message);

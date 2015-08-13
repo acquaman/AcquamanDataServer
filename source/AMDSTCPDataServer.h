@@ -80,6 +80,7 @@ protected slots:
 	/// Slot to handle client request task accomplished, the related resouces can be released
 	void onClientRequestTaskAccomplished(AMDSClientRequest *clientRequest);
 
+	/// Slot to handle the timeout signals of statistics timers
 	void onTenMillisecondStatsTimerTimeout();
 	void onHundredMillisecondStatsTimerTimeout();
 	void onOneSecondStatsTimerTimeout();
