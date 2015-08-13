@@ -27,8 +27,12 @@ public:
 	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
 	AMDSClientRequest& operator=(const AMDSClientRequest& other);
 
+	/// returns whether this is a statistics message
+	inline bool isStatisticsMessage() { return requestType() == AMDSClientRequestDefinitions::Statistics; }
 	/// returns whether this is a data client data request
-	virtual bool isDataClientRequest() { return false; }
+	bool isDataClientRequest();
+	/// returns whether this is a continuous message
+	inline bool isContinuousMessage() { return requestType() == AMDSClientRequestDefinitions::Continuous;}
 
 	/// A key used to identify the client socket on which the request was made
 	inline QString socketKey() const { return socketKey_; }

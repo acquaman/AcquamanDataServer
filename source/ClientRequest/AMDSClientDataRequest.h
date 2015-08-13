@@ -17,12 +17,6 @@ public:
 	/// Copy constructor
 	AMDSClientDataRequest(const AMDSClientDataRequest& other);
 
-	/// returns whether this is a data client data request
-	virtual bool isDataClientRequest() { return true; }
-
-	/// returns whether this is a continuous message
-	virtual bool isContinuousMessage() { return false;}
-
 	/// The string identifier for the buffer data is being request from or received from
 	inline QString bufferName() const { return bufferName_; }
 	/// Whether or not the client has requested that the statusData is included in the response
