@@ -73,6 +73,10 @@ protected slots:
 	/// Slot which handles a client sending a request to the server. Builds a ClientRequest* from the provided data,
 	/// if the request is well formed, and emits requestData()
 	void onClientSentRequest(const QString& clientKey);
+	/// Slot to handle the newly received statics client request message
+	void onClientStaticsRequestReceived(AMDSClientRequest *clientRequest);
+	/// Slot to handle the newly received continuous client request message, return true if the message is done handle
+	bool onClientContinuousRequestReceived(AMDSClientRequest *clientRequest);
 	/// Slot to handle client request task accomplished, the related resouces can be released
 	void onClientRequestTaskAccomplished(AMDSClientRequest *clientRequest);
 
