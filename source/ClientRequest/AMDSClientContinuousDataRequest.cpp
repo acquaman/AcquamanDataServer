@@ -151,6 +151,8 @@ bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 	if (messageExpired) {
 		setErrorMessage(QString("(msg %1) continuous update expired!").arg(socketKey()));
 		AMDSErrorMon::alert(this, 0, errorMessage());
+
+		emit clientRequestTaskAccomplished(this);
 	} else {
 		AMDSErrorMon::information(this, 0, QString("(msg %1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
 		continuousDataRequestTimer_.singleShot(updateInterval(), this, SLOT(onDataRequestTimerTimeout()));

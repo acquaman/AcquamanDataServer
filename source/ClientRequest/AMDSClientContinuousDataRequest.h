@@ -70,6 +70,8 @@ public:
 signals:
 	/// SIGNAL of new message requst
 	void sendNewContinuousDataRequest(AMDSClientRequest* message);
+	/// SIGNAL of task accomplished, the related resources can be removed
+	void clientRequestTaskAccomplished(AMDSClientRequest* message);
 
 protected slots:
 	/// to handle the timeout message of the timer: to send the new message

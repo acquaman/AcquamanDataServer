@@ -33,13 +33,12 @@ public:
 	/// Default destructor for AMDSTcpDataServer. Calls stop
 	~AMDSTCPDataServer();
 
-	/// to disconnect the given connection from the host
-	void disconnectFromHost(QString socketKey);
-
 signals:
 	/// error signal
 	void error(quint8 errorLevel, quint16 errorCode, const QString &errorString);
 	void requestInfo();
+
+	/// the signal of new client request read from socket
 	void clientRequestRead(AMDSClientRequest*);
 
 public slots:
@@ -59,6 +58,9 @@ public slots:
 	void onClientRequestProcessed(AMDSClientRequest *processedRequest);
 
 protected slots:
+	/// to disconnect the given connection from the host
+	void disconnectFromHost(QString socketKey);
+
 	/// Slot which sets the server to be listening. Automatically called from within the start() function, or
 	/// if a session is required, when the session is opened
 	void sessionOpened();
@@ -71,8 +73,8 @@ protected slots:
 	/// Slot which handles a client sending a request to the server. Builds a ClientRequest* from the provided data,
 	/// if the request is well formed, and emits requestData()
 	void onClientSentRequest(const QString& clientKey);
-//	/// Slot which handles the timeout which signals a continuous data request needs a new aggregate of data.
-//	void onContinuousDataRequestTimer(const QString& clientKey);
+	/// Slot to handle client request task accomplished, the related resouces can be released
+	void onClientRequestTaskAccomplished(AMDSClientRequest *clientRequest);
 
 	void onTenMillisecondStatsTimerTimeout();
 	void onHundredMillisecondStatsTimerTimeout();
@@ -95,7 +97,7 @@ protected:
 	/// the ip_address:port in the format xx.xx.xx.xx:xxxxx to the size of the request
 	QHash<QString, int> clientSocketDataInProgress_;
 	/// A map storing continuous data requests from clients
-	QHash<QString, AMDSClientRequest*> continuousDataRequests_;
+	QHash<QString, AMDSClientRequest*> activeContinuousDataRequestList_;
 
 	/// A signal mapper which allows for us to listen to the disonnect signal from all the client sockets
 	/// currently connected. Mapped on the same string as the clientSockets_ hash:
