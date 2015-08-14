@@ -44,10 +44,10 @@ public:
 	/// Sets the last handshake time for the data request
 	inline void setHandShakeTime(const QDateTime &handShakeTime) { lastHandShakeTime_ = handShakeTime; }
 
-	/// Writes this AMDSClientContinuousRequest to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientContinuousRequest from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// Writes this AMDSClientContinuousRequest to an AMDSDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
+	/// Reads this AMDSClientContinuousRequest from the AMDSDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(AMDSDataStream *dataStream);
 
 	/// start the coninuousRequestTimer for next message
 	bool startContinuousRequestTimer();

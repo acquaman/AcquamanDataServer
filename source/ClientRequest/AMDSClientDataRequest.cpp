@@ -47,22 +47,23 @@ AMDSClientDataRequest& AMDSClientDataRequest::operator =(const AMDSClientDataReq
 	return (*this);
 }
 
-bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	if(!AMDSClientRequest::writeToDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
+	if(errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	*dataStream << bufferName_;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAME;
 	*dataStream << includeStatusData_;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INCLUDE_STATUS;
 
 	bool includeData = bufferGroupInfo_.includeData();
 	*dataStream << includeData;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INCLUDE_DATA;
 
 	// write data to the data stream
 	if(includeData){
@@ -72,12 +73,12 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 		quint8 uniformDataType = (quint8)uniformDataType_;
 		*dataStream << uniformDataType;
 		if(dataStream->status() != QDataStream::Ok)
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_UNIFORM_DATA_TYPE;
 
 		quint16 dataCount = data_.count();
 		*dataStream << dataCount;
 		if(dataStream->status() != QDataStream::Ok || dataCount == 0)
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_COUNT;
 
 		bool encodeDataTypeInDataHolder = true;
 		AMDSDataTypeDefinitions::DataType underlyingDataType = data_.at(0)->dataType();
@@ -85,32 +86,33 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 			encodeDataTypeInDataHolder = false;
 		*dataStream << encodeDataTypeInDataHolder;
 		if(dataStream->status() != QDataStream::Ok)
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DECODE_DATA_TYPE_IN_DATA_HOLDER;
 
 		if(!encodeDataTypeInDataHolder){
 			dataStream->encodeDataType(underlyingDataType);
 			if(dataStream->status() != QDataStream::Ok)
-				return false;
+				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_HOLDER_TYPE;
 		}
 
 		dataStream->encodeDataHolderType(*(data_.at(0)));
 		if(dataStream->status() != QDataStream::Ok)
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DECODE_DATA_TYPE;
 
 		for(int x = 0, size = data_.count(); x < size; x++){
 			dataStream->write(*(data_.at(x)), encodeDataTypeInDataHolder);
 			if(dataStream->status() != QDataStream::Ok)
-				return false;
+				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_HOLDER_DATA;
 		}
 	}
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	if(!AMDSClientRequest::readFromDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientRequest::readFromDataStream(dataStream);
+	if(errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	QString readBufferName;
 	bool readIncludeStatusData;
@@ -124,34 +126,34 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	*dataStream >> readBufferName;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAME;
 
 	*dataStream >> readIncludeStatusData;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INCLUDE_STATUS;
 
 	*dataStream >> readIncludeData;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INCLUDE_DATA;
 
 	if(readIncludeData){
 		dataStream->read(readBufferGroupInfo);
 		*dataStream >> readUniformDataType;
 		if(dataStream->status() != QDataStream::Ok)
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_UNIFORM_DATA_TYPE;
 
 		*dataStream >> readDataCount;
 		if(dataStream->status() != QDataStream::Ok)
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_COUNT;
 
 		*dataStream >> decodeDataTypeInDataHolder;
 		if(dataStream->status() != QDataStream::Ok)
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DECODE_DATA_TYPE_IN_DATA_HOLDER;
 
 		if(!decodeDataTypeInDataHolder){
 			readDataType = dataStream->decodeDataType();
 			if(dataStream->status() != QDataStream::Ok)
-				return false;
+				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DECODE_DATA_TYPE;
 		}
 		else
 			readDataType = AMDSDataTypeDefinitions::InvalidType;
@@ -159,17 +161,17 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		QString readDataHolderType;
 		readDataHolderType = dataStream->decodeDataHolderType();
 		if(readDataHolderType.isEmpty())
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_HOLDER_TYPE;
 
 		AMDSDataHolder *oneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(readDataHolderType);
 		if(!oneDataHolder)
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INSTANTIATE_DATA_HOLDER;
 
 		for(int x = 0; x < readDataCount; x++){
 			oneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(readDataHolderType);
 			dataStream->read(*oneDataHolder, readDataType);
 			if(dataStream->status() != QDataStream::Ok)
-				return false;
+				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_HOLDER_DATA;
 			readDataHolder.append(oneDataHolder);
 		}
 	}
@@ -186,7 +188,7 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		data_.append(readDataHolder);
 	}
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
 bool AMDSClientDataRequest::validateResponse()

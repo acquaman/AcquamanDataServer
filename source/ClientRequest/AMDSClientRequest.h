@@ -46,10 +46,10 @@ public:
 	/// Sets the repsonse type
 	inline void setResponseType(ResponseType responseType) { responseType_ = responseType; }
 
-	/// Writes this AMDSClientRequest to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientRequest from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// Writes this AMDSClientRequest to an AMDSDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
+	/// Reads this AMDSClientRequest from the AMDSDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(AMDSDataStream *dataStream);
 
 	/// validate the message response
 	virtual bool validateResponse() {return true;}

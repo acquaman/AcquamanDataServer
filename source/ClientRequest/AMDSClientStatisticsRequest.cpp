@@ -37,43 +37,45 @@ AMDSClientStatisticsRequest& AMDSClientStatisticsRequest::operator =(const AMDSC
 	return (*this);
 }
 
-bool AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	if(!AMDSClientRequest::writeToDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	*dataStream << (quint32)packetStats_.count();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_PACKET_STATS_COUNT;
 
 	for(int x = 0, size = packetStats().count(); x < size; x++)
 		dataStream->write(packetStats().at(x));
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	if(!AMDSClientRequest::readFromDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientRequest::readFromDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	quint32 readPacketStatsCount;
 	QList<AMDSPacketStats> readPacketStats;
 
 	*dataStream >> readPacketStatsCount;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_PACKET_STATS_COUNT;
 
 	for(int x = 0, size = readPacketStatsCount; x < size; x++){
 		AMDSPacketStats onePacketStat("Invalid");
 		dataStream->read(onePacketStat);
 		if(onePacketStat.name() == "Invalid")
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_PACKET_STATS;
 		readPacketStats.append(onePacketStat);
 	}
 
 	packetStats_.append(readPacketStats);
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
 bool AMDSClientStatisticsRequest::validateResponse()
