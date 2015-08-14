@@ -75,7 +75,7 @@ protected:
 
 	/// Helper function that returns the index in the buffer 1 before the given dwellTime, or at the point at
 	/// which the given dwellTime would occur within the buffer, if an exact match is not found.
-	int lowerBound(const QDateTime& dwellTime);
+	int getDataIndexByDateTime(const QDateTime& dwellTime);
 
 protected:
 	AMDSBufferGroupInfo bufferGroupInfo_;
