@@ -22,15 +22,9 @@ RCC_DIR=build_files
 HEADERS  += \
 	source/AMDSClient.h \
 	source/AMDSMetaObjectSupport.h \
-	source/AMDSAxisInfo.h \
-	source/AMDSnDIndex.h \
 	source/AMDSBufferGroupInfo.h \
 	source/AMDSDataStream.h \
-	source/AMDSEventData.h \
-	source/AMDSEventDataSupport.h \
 	source/AMDSPacketStats.h \
-	source/AMDSDataTypeDefinitions.h \
-	source/AMDSFlatArray.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
@@ -44,6 +38,12 @@ HEADERS  += \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
 	source/Connection/AMDSClientTCPSocketManager.h \
 	source/Connection/AMDSClientTCPSocket.h \
+	source/DataElement/AMDSDataTypeDefinitions.h \
+	source/DataElement/AMDSAxisInfo.h \
+	source/DataElement/AMDSnDIndex.h \
+	source/DataElement/AMDSEventData.h \
+	source/DataElement/AMDSEventDataSupport.h \
+	source/DataElement/AMDSFlatArray.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
@@ -55,14 +55,9 @@ SOURCES += \
 	source/AMDSClientMain.cpp \
 	source/AMDSMetaObjectSupport.cpp \
 	source/AMDSClient.cpp \
-	source/AMDSAxisInfo.cpp \
-	source/AMDSnDIndex.cpp \
 	source/AMDSBufferGroupInfo.cpp \
 	source/AMDSDataStream.cpp \
-	source/AMDSEventData.cpp \
-	source/AMDSEventDataSupport.cpp \
 	source/AMDSPacketStats.cpp \
-	source/AMDSFlatArray.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
 	source/ClientRequest/AMDSClientDataRequest.cpp \
@@ -75,6 +70,11 @@ SOURCES += \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
 	source/Connection/AMDSClientTCPSocket.cpp \
 	source/Connection/AMDSClientTCPSocketManager.cpp \
+	source/DataElement/AMDSAxisInfo.cpp \
+	source/DataElement/AMDSnDIndex.cpp \
+	source/DataElement/AMDSEventData.cpp \
+	source/DataElement/AMDSEventDataSupport.cpp \
+	source/DataElement/AMDSFlatArray.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \

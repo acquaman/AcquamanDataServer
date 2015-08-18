@@ -1,8 +1,8 @@
 #ifndef AMDSBUFFERGROUPINFO_H
 #define AMDSBUFFERGROUPINFO_H
 
-#include "source/AMDSAxisInfo.h"
-#include "source/AMDSnDIndex.h"
+#include "source/DataElement/AMDSAxisInfo.h"
+#include "source/DataElement/AMDSnDIndex.h"
 
 class AMDSBufferGroupInfo
 {

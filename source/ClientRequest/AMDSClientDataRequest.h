@@ -2,7 +2,7 @@
 #define AMDSCLIENTDATAREQUEST_H
 
 #include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/AMDSDataTypeDefinitions.h"
+#include "source/DataElement/AMDSDataTypeDefinitions.h"
 
 class AMDSDataHolder;
 

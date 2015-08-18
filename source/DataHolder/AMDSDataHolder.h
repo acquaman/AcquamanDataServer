@@ -3,11 +3,11 @@
 
 #include <QObject>
 
-#include "source/AMDSAxisInfo.h"
-#include "source/AMDSnDIndex.h"
-#include "source/AMDSEventData.h"
-#include "source/AMDSDataTypeDefinitions.h"
-#include "source/AMDSFlatArray.h"
+#include "source/DataElement/AMDSDataTypeDefinitions.h"
+#include "source/DataElement/AMDSAxisInfo.h"
+#include "source/DataElement/AMDSnDIndex.h"
+#include "source/DataElement/AMDSEventData.h"
+#include "source/DataElement/AMDSFlatArray.h"
 
 
 class AMDSDataStream;
