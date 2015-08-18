@@ -1,4 +1,4 @@
-#include "source/AMDSFlatArray.h"
+#include "source/DataElement/AMDSFlatArray.h"
 
 AMDSFlatArray::AMDSFlatArray(AMDSDataTypeDefinitions::DataType dataType, quint32 size)
 {
