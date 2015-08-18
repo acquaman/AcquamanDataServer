@@ -83,6 +83,7 @@ AMDSClient::AMDSClient(QWidget *parent)
 
 	amptekIndex = new QSpinBox();
 	includeStatusDataCheckbox = new QCheckBox();
+	enableFlattenDataCheckbox = new QCheckBox();
 
 	connect(hostLineEdit, SIGNAL(textChanged(QString)),
 			this, SLOT(enableGetFortuneButton()));
@@ -109,6 +110,7 @@ AMDSClient::AMDSClient(QWidget *parent)
 	formLayout->addRow("Count2", count2Edit);
 	formLayout->addRow("Active continuous connection", activeContinuousConnection);
 	formLayout->addRow("Include Status", includeStatusDataCheckbox);
+	formLayout->addRow("Enable Flattening", enableFlattenDataCheckbox);
 	mainLayout->addLayout(formLayout, 4, 0, 1, 2);
 	mainLayout->addWidget(results, 5, 0, 1, 2);
 	setLayout(mainLayout);
@@ -150,6 +152,9 @@ void AMDSClient::requestNewFortune()
 	QString value2 = count2Edit->text();
 	QString continuousSocket = activeContinuousConnection->currentText();
 
+	bool includeStatus = includeStatusDataCheckbox->isChecked();
+	bool enableFlattening = enableFlattenDataCheckbox->isChecked();
+
 	AMDSClientTCPSocket * clientTCPSocket = new AMDSClientTCPSocket(hostLineEdit->text(), portLineEdit->text().toInt());
 	connect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
 	connect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
@@ -163,19 +168,19 @@ void AMDSClient::requestNewFortune()
 		clientTCPSocket->requestData();
 		break;
 	case AMDSClientRequestDefinitions::StartTimePlusCount:
-		clientTCPSocket->requestData(bufferName, time1, value1.toInt());
+		clientTCPSocket->requestData(bufferName, time1, value1.toInt(), includeStatus, enableFlattening);
 		break;
 	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-		clientTCPSocket->requestData(bufferName, value1.toInt(), value1.toInt());
+		clientTCPSocket->requestData(bufferName, value1.toInt(), value2.toInt(), includeStatus, enableFlattening);
 		break;
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
-		clientTCPSocket->requestData(bufferName, time1, time2);
+		clientTCPSocket->requestData(bufferName, time1, time2, includeStatus, enableFlattening);
 		break;
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
-		clientTCPSocket->requestData(bufferName, time1, value1.toInt(), value2.toInt());
+		clientTCPSocket->requestData(bufferName, time1, value1.toInt(), value2.toInt(), includeStatus, enableFlattening);
 		break;
 	case AMDSClientRequestDefinitions::Continuous:
-		clientTCPSocket->requestData(bufferName, value1.toInt(), continuousSocket);
+		clientTCPSocket->requestData(bufferName, value1.toInt(), includeStatus, enableFlattening, continuousSocket);
 		if (continuousSocket.length() > 0) {
 			AMDSErrorMon::information(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
 		}

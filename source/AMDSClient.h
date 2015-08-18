@@ -56,6 +56,7 @@ private:
 	QSpinBox* amptekIndex;
 	QComboBox *bufferNameComboBox_;
 	QCheckBox* includeStatusDataCheckbox;
+	QCheckBox* enableFlattenDataCheckbox;
 
 	QString currentFortune;
 	quint32 blockSize;
