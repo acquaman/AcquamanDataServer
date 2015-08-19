@@ -10,12 +10,6 @@ public:
 	AMDSLightWeightGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, QObject *parent = 0);
 	virtual ~AMDSLightWeightGenericFlatArrayDataHolder();
 
-	virtual inline QList<AMDSAxisInfo> axes() const = 0;
-	virtual inline quint8 rank() const  = 0;
-	/// Returns the length of all the axes
-	virtual inline AMDSnDIndex size() const  = 0;
-	/// Returns the length of the specified axis \c axisId.  (\c axisId is assumed to be >= 0 and < rank().)
-	virtual inline quint32 size(int axisId) const  = 0;
 	/// Returns the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const;
 

@@ -17,7 +17,6 @@ public:
 	virtual inline quint64 spanSize() const { return 1; }
 
 	virtual inline bool data(AMDSFlatArray *outputValues) const;
-	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
 	virtual inline bool setSingleValue(qint8 singleValue);
 	virtual inline bool setSingleValue(quint8 singleValue);
@@ -151,11 +150,6 @@ bool AMDSLightWeightScalarDataHolder::setSingleValue(double singleValue){
 
 bool AMDSLightWeightScalarDataHolder::data(AMDSFlatArray *outputValues) const{
 	return valueFlatArray_.replaceData(outputValues);
-}
-
-bool AMDSLightWeightScalarDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
-	Q_UNUSED(axes)
-	return false;
 }
 
 void AMDSLightWeightScalarDataHolder::setData(AMDSFlatArray *inputValues){

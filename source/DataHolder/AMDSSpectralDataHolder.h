@@ -16,8 +16,6 @@ public:
 	virtual inline AMDSnDIndex size() const;
 
 	virtual inline bool data(AMDSFlatArray *outputValues) const;
-	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
-
 	virtual inline void setData(AMDSFlatArray *inputValues);
 
 	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
@@ -57,11 +55,6 @@ AMDSnDIndex AMDSLightWeightSpectralDataHolder::size() const{
 
 bool AMDSLightWeightSpectralDataHolder::data(AMDSFlatArray *outputValues) const{
 	return valueFlatArray_.replaceData(outputValues);
-}
-
-bool AMDSLightWeightSpectralDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
-	Q_UNUSED(axes)
-	return false;
 }
 
 void AMDSLightWeightSpectralDataHolder::setData(AMDSFlatArray *inputValues){
