@@ -5,6 +5,7 @@
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "source/util/AMDSErrorMonitor.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
 	QObject(parent), dataHolders_(maxSize)
@@ -67,6 +68,22 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	emit clientRequestProcessed(clientRequest);
 }
 
+void AMDSBufferGroup::flattenData(QList<AMDSDataHolder *> dataArray)
+{
+	if (bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::NoFlatten) {
+		AMDSErrorMon::alert(this, 0, "Data flatten method is NoFlatten, but the flatten is enabled.");
+		return;
+	}
+
+//	AMDSDataHolder flattenDataHolder;
+//	foreach (AMDSDataHolder * dataHolder, dataArray) {
+
+//	}
+
+	dataArray.clear();
+//	dataArray.append(flattenDataHolder);
+}
+
 void AMDSBufferGroup::populateData(AMDSClientDataRequest* clientDataRequest, int startIndex, int endIndex)
 {
 	clientDataRequest->clearData();
@@ -75,11 +92,21 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* clientDataRequest, int
 	int dataStartIndex = qMax(0, startIndex);
 	int dataEndIndex = qMin(endIndex, dataHolders_.count() - 1);
 
+	QList<AMDSDataHolder *> targetDataArray;
 	for (int iCurrent = dataStartIndex; iCurrent < dataEndIndex; iCurrent++)
 	{
 		AMDSDataHolder* dataHolder = dataHolders_[iCurrent];
 		AMDSFlatArray oneFlatArray;
 		dataHolder->data(&oneFlatArray);
+
+		targetDataArray.append(dataHolder);
+	}
+
+	if (bufferGroupInfo_.flattenEnabled()) {
+		flattenData(targetDataArray);
+	}
+
+	foreach (AMDSDataHolder * dataHolder, targetDataArray) {
 		clientDataRequest->appendData(dataHolder);
 	}
 }
