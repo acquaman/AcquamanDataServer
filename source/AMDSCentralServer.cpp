@@ -54,7 +54,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 				QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroups_.constBegin();
 				while (i != bufferGroups_.constEnd()) {
 					AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
-					qDebug() << i.key() << " is " << oneInfo.name() << oneInfo.description() << oneInfo.units() << oneInfo.size().toString() << oneInfo.flattenEnabled() << oneInfo.flattenMethod();
+					AMDSErrorMon::debug(this, 0, QString("%1 definition is %2 %3 %4 %5 %6 %7").arg(i.key()).arg(oneInfo.name()).arg(oneInfo.description()).arg(oneInfo.units()).arg(oneInfo.size().toString()).arg(oneInfo.flattenEnabled()?"true":"false").arg(oneInfo.flattenMethod()));
 					clientIntrospectionRequest->appendBufferGroupInfo(oneInfo);
 					++i;
 				}
