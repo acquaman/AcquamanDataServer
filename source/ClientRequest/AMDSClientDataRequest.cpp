@@ -12,17 +12,17 @@ AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	includeStatusData_ = false;
 	bufferGroupInfo_.setName("Invalid");
 
-	setEnableFlattening(false);
+	setFlattenResultData(false);
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QString &bufferName, bool includeStatusData, bool enableFlattening, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+AMDSClientDataRequest::AMDSClientDataRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QString &bufferName, bool includeStatusData, bool flattenResultData, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
 	AMDSClientRequest(socketKey, errorMessage, requestType, responseType, parent)
 {
 	bufferName_ = bufferName;
 	includeStatusData_ = includeStatusData;
 	bufferGroupInfo_ = bufferGroupInfo;
 
-	setEnableFlattening(enableFlattening);
+	setFlattenResultData(flattenResultData);
 }
 
 AMDSClientDataRequest::~AMDSClientDataRequest()
@@ -43,7 +43,7 @@ AMDSClientDataRequest& AMDSClientDataRequest::operator =(const AMDSClientDataReq
 		includeStatusData_ = other.includeStatusData();
 		bufferGroupInfo_ = other.bufferGroupInfo_;
 
-		setEnableFlattening(other.enableFlattening());
+		setFlattenResultData(other.flattenResultData());
 		uniformDataType_ = other.uniformDataType();
 		clearData();
 		for(int x = 0, size = other.data().count(); x < size; x++)
@@ -63,7 +63,7 @@ bool AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 	*dataStream << includeStatusData_;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
-	*dataStream << enableFlattening_;
+	*dataStream << flattenResultData_;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
@@ -122,7 +122,7 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	QString readBufferName;
 	bool readIncludeStatusData;
-	bool readEnableFlattening;
+	bool readFlattenResultData;
 	bool readIncludeData;
 	AMDSBufferGroupInfo readBufferGroupInfo;
 	quint8 readUniformDataType;
@@ -139,7 +139,7 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
-	*dataStream >> readEnableFlattening;
+	*dataStream >> readFlattenResultData;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
@@ -189,7 +189,7 @@ bool AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	setBufferName(readBufferName);
 	setIncludeStatusData(readIncludeStatusData);
-	setEnableFlattening(readEnableFlattening);
+	setFlattenResultData(readFlattenResultData);
 	if(readIncludeData){
 		setBufferGroupInfo(readBufferGroupInfo);
 

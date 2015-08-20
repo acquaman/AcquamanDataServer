@@ -97,6 +97,7 @@ public:
 
 protected:
 	AMDSLightWeightEventData *lightWeightEventData_;
+
 	AMDSEventData::EventType eventType_;
 	AMDSEventData::TimeScale timeScale_;
 	quint16 timeUncertainty_;

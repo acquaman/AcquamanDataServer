@@ -10,22 +10,25 @@ public:
 	Q_INVOKABLE AMDSLightWeightImageDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint16 fastAxisSize = 1, quint16 slowAxisSize = 1, QObject *parent = 0);
 	virtual ~AMDSLightWeightImageDataHolder();
 
+	/// implement the function to return axes information
 	virtual inline QList<AMDSAxisInfo> axes() const;
+	/// implement the function to return the rank information (size of Axes)
 	virtual inline quint8 rank() const { return 2; }
+	/// implement the function to return the lenght of a the specified axis
 	virtual inline quint32 size(int axisId) const;
+	/// implement the function to return the lenght of axes
 	virtual inline AMDSnDIndex size() const;
 
-	virtual inline bool data(AMDSFlatArray *outputValues) const;
+	/// reimplement the function to set the axes information, return True is the set is successful
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
-	virtual inline void setData(AMDSFlatArray *inputValues);
-
-	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
+	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
+	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
 protected:
+	/// the size of fast axis
 	quint16 fastAxisSize_;
 };
 
@@ -37,6 +40,9 @@ public:
 	virtual ~AMDSFullImageDataHolder();
 };
 
+////////////////////////////////////////
+// AMDSLightWeightImageDataHolder inline implementations
+////////////////////////////////////////
 QList<AMDSAxisInfo> AMDSLightWeightImageDataHolder::axes() const{
 	quint32 fastAxisAs32 = (quint32)fastAxisSize_;
 	quint32 slowAxisAs32 = valueFlatArray_.size()/fastAxisAs32;
@@ -65,17 +71,11 @@ AMDSnDIndex AMDSLightWeightImageDataHolder::size() const{
 	return AMDSnDIndex(fastAxisAs32, slowAxisAs32);
 }
 
-bool AMDSLightWeightImageDataHolder::data(AMDSFlatArray *outputValues) const{
-	return valueFlatArray_.replaceData(outputValues);
-}
 
 bool AMDSLightWeightImageDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
 	Q_UNUSED(axes)
 	return false;
 }
 
-void AMDSLightWeightImageDataHolder::setData(AMDSFlatArray *inputValues){
-	inputValues->copyData(&valueFlatArray_);
-}
 
 #endif // AMDSIMAGEDATAHOLDER_H

@@ -18,8 +18,8 @@ AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(QObject *parent
 	connect(&continuousDataRequestTimer_, SIGNAL(timeout()), this, SLOT(onDataRequestTimerTimeout()));
 }
 
-AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool enableFlattening, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
-	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, bufferName, includeStatusData, enableFlattening, bufferGroupInfo, parent)
+AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, bufferName, includeStatusData, flattenResultData, bufferGroupInfo, parent)
 {
 	setUpdateInterval(msgUpdateInterval);
 	setHandShakeSocketKey(msgHandShakeSocketKey);

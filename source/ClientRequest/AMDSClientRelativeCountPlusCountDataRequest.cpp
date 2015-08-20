@@ -11,8 +11,8 @@ AMDSClientRelativeCountPlusCountDataRequest::AMDSClientRelativeCountPlusCountDat
 	setCount(1);
 }
 
-AMDSClientRelativeCountPlusCountDataRequest::AMDSClientRelativeCountPlusCountDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool enableFlattening, const quint64 relativeCount, quint64 count, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent):
-	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::RelativeCountPlusCount, responseType, bufferName, includeStatusData, enableFlattening, bufferGroupInfo, parent)
+AMDSClientRelativeCountPlusCountDataRequest::AMDSClientRelativeCountPlusCountDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const quint64 relativeCount, quint64 count, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent):
+	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::RelativeCountPlusCount, responseType, bufferName, includeStatusData, flattenResultData, bufferGroupInfo, parent)
 {
 	setRelativeCount(relativeCount);
 	setCount(count);

@@ -11,7 +11,7 @@ class AMDSClientDataRequest : public AMDSClientRequest
 Q_OBJECT
 public:
 	explicit AMDSClientDataRequest(QObject *parent = 0);
-	explicit AMDSClientDataRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QString &bufferName, bool includeStatusData, bool enableFlattening, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientDataRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QString &bufferName, bool includeStatusData, bool flattenResultData, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientDataRequest();
 
 	/// Copy constructor
@@ -22,7 +22,7 @@ public:
 	/// Whether or not the client has requested that the statusData is included in the response
 	inline bool includeStatusData() const { return includeStatusData_; }
 	/// Whether or not the client requested to flatten the data in the response
-	inline bool enableFlattening() const { return enableFlattening_; }
+	inline bool flattenResultData() const { return flattenResultData_; }
 	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
 
 	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
@@ -33,7 +33,7 @@ public:
 	/// Sets the flag to include status meta data
 	inline void setIncludeStatusData(bool includeStatusData) { includeStatusData_ = includeStatusData; }
 	/// Sets the flag to enable data flattening
-	inline void setEnableFlattening(bool enable) { enableFlattening_ = enable; }
+	inline void setFlattenResultData(bool enable) { flattenResultData_ = enable; }
 	inline void setBufferGroupInfo(const AMDSBufferGroupInfo &bufferGroupInfo) { bufferGroupInfo_ = bufferGroupInfo; }
 
 	inline AMDSDataTypeDefinitions::DataType uniformDataType() const { return uniformDataType_; }
@@ -60,7 +60,7 @@ protected:
 	/// Flag to determine if status meta data will be sent with the actual data
 	bool includeStatusData_;
 	/// Flag to determine whether to enable data flattening feature
-	bool enableFlattening_;
+	bool flattenResultData_;
 
 	AMDSBufferGroupInfo bufferGroupInfo_;
 

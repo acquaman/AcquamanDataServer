@@ -1,6 +1,8 @@
 #include "source/DataHolder/AMDSGenericFlatArrayDataHolder.h"
 
 #include "source/AMDSDataStream.h"
+#include "source/DataHolder/AMDSDataHolderSupport.h"
+#include "source/util/AMDSErrorMonitor.h"
 
 AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, QObject *parent) :
 	AMDSLightWeightDataHolder(parent), valueFlatArray_(dataType, size)
@@ -9,6 +11,30 @@ AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHo
 
 AMDSLightWeightGenericFlatArrayDataHolder::~AMDSLightWeightGenericFlatArrayDataHolder()
 {
+}
+
+AMDSDataHolder* AMDSLightWeightGenericFlatArrayDataHolder::operator +(AMDSDataHolder &dataHolder)
+{
+	AMDSLightWeightGenericFlatArrayDataHolder *addInputDataHolder = qobject_cast<AMDSLightWeightGenericFlatArrayDataHolder *>(&dataHolder);
+	if (!addInputDataHolder) {
+		AMDSErrorMon::alert(this, 0, QString("Invalid class type (%1) to do the PLUS operation").arg(dataHolder.metaObject()->className()));
+		return 0;
+	}
+
+	AMDSFlatArray data = dataArray() + addInputDataHolder->dataArray();
+
+	AMDSDataHolder* targetDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(metaObject()->className());
+	targetDataHolder->setData(&data);
+	return targetDataHolder;
+}
+
+AMDSDataHolder* AMDSLightWeightGenericFlatArrayDataHolder::operator /(const quint32 divisor)
+{
+	AMDSFlatArray data = dataArray() / divisor;
+
+	AMDSDataHolder* targetDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(metaObject()->className());
+	targetDataHolder->setData(&data);
+	return targetDataHolder;
 }
 
 bool AMDSLightWeightGenericFlatArrayDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{

@@ -126,7 +126,7 @@ void AMDSCentralServer::initializeBufferGroup(quint64 maxCountSize)
 	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup_);
 	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
 
-	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", false, AMDSBufferGroupInfo::NoFlatten);
+	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", true, AMDSBufferGroupInfo::Average);
 	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
 	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
