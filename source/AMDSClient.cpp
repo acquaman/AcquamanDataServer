@@ -142,6 +142,8 @@ AMDSClient::AMDSClient(QWidget *parent)
 
 void AMDSClient::requestNewFortune()
 {
+	QString hostName = hostLineEdit->text();
+	quint16 portNumber= portLineEdit->text().toInt();
 	quint8 requestTypeId = (quint8)requestType->currentIndex();
 	QString bufferName = bufferNameComboBox_->currentText();
 	QDateTime time1 = time1Edit->dateTime();
@@ -150,7 +152,7 @@ void AMDSClient::requestNewFortune()
 	QString value2 = count2Edit->text();
 	QString continuousSocket = activeContinuousConnection->currentText();
 
-	AMDSClientTCPSocket * clientTCPSocket = new AMDSClientTCPSocket(hostLineEdit->text(), portLineEdit->text().toInt());
+	AMDSClientTCPSocket * clientTCPSocket = new AMDSClientTCPSocket(hostName, portNumber);
 	connect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
 	connect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
 
