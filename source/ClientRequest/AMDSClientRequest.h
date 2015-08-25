@@ -27,6 +27,13 @@ public:
 	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
 	AMDSClientRequest& operator=(const AMDSClientRequest& other);
 
+	/// returns whether this is a statistics message
+	inline bool isStatisticsMessage() { return requestType() == AMDSClientRequestDefinitions::Statistics; }
+	/// returns whether this is a data client data request
+	bool isDataClientRequest();
+	/// returns whether this is a continuous message
+	inline bool isContinuousMessage() { return requestType() == AMDSClientRequestDefinitions::Continuous;}
+
 	/// A key used to identify the client socket on which the request was made
 	inline QString socketKey() const { return socketKey_; }
 	/// The last error message encountered attempting to fullfil the data request
@@ -38,7 +45,7 @@ public:
 	inline AMDSClientRequest::ResponseType responseType() const { return responseType_; }
 
 	/// Sets the socket key identifier
-	inline void setSocketKey(const QString &socketKey) { socketKey_ = socketKey; }
+	virtual void setSocketKey(const QString &socketKey) { socketKey_ = socketKey; }
 	/// Sets an error string describing the type of error encountered. Also sets the responseType to Error
 	inline void setErrorMessage(const QString& errorMessage) { errorMessage_ = errorMessage; }
 	/// Sets the request type
@@ -59,9 +66,13 @@ private:
 	void setAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
 
 protected:
+	/// the socket key to identify a connection
 	QString socketKey_;
+	/// the error message if an error is detected
 	QString errorMessage_;
+	/// the request type of the message
 	AMDSClientRequestDefinitions::RequestType requestType_;
+	/// the response type of the message
 	AMDSClientRequest::ResponseType responseType_;
 };
 

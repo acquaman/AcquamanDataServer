@@ -35,8 +35,10 @@ AMDSClientDataRequest& AMDSClientDataRequest::operator =(const AMDSClientDataReq
 {
 	if(this != &other){
 		AMDSClientRequest::operator =(other);
-		bufferName_ = other.bufferName();
-		includeStatusData_ = other.includeStatusData();
+
+		setBufferName(other.bufferName());
+		setIncludeStatusData(other.includeStatusData());
+
 		bufferGroupInfo_ = other.bufferGroupInfo_;
 
 		uniformDataType_ = other.uniformDataType();
@@ -193,16 +195,16 @@ bool AMDSClientDataRequest::validateResponse()
 {
 	bool noError = true;
 	if(responseType() == AMDSClientRequest::Error) {
-		AMDSErrorMon::alert(this, 0, QString("(msg %1) Failed to retrieve data. Error: %2").arg(socketKey()).arg(errorMessage()));
+		AMDSErrorMon::alert(this, 0, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
 		noError = false;
 	} else {
 		if (data().count() == 0)
-			AMDSErrorMon::information(this, 0, QString("(msg %1) No data for this message yet!").arg(socketKey()));
+			AMDSErrorMon::information(this, 0, QString("(msg %1 --- %2) No data for this message yet!").arg(socketKey()).arg(bufferName()));
 		else {
 			for(int x = 0, size = data().count(); x < size; x++){
 				AMDSFlatArray oneFlatArray = AMDSFlatArray(uniformDataType(), bufferGroupInfo().spanSize());
 				data().at(x)->data(&oneFlatArray);
-				AMDSErrorMon::information(this, 0, QString("(msg %1) Data at %2 - %3").arg(socketKey()).arg(x).arg(oneFlatArray.printData()));
+				AMDSErrorMon::information(this, 0, QString("(msg %1 --- %2) Data at %3 - %4").arg(socketKey()).arg(bufferName()).arg(x).arg(oneFlatArray.printData()));
 			}
 		}
 	}
