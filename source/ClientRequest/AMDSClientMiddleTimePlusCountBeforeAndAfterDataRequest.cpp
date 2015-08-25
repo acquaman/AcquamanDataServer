@@ -41,28 +41,30 @@ AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest& AMDSClientMiddleTimePlus
 	return (*this);
 }
 
-bool AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	*dataStream << middleTime();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_MIDDLE_TIME;
 	*dataStream << countBefore();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT_BEFORE;
 	*dataStream << countAfter();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT_AFTER;
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	if(!AMDSClientDataRequest::readFromDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	QDateTime readMiddleTime;
 	quint64 countBefore;
@@ -70,17 +72,17 @@ bool AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::readFromDataStream(
 
 	*dataStream >> readMiddleTime;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_MIDDLE_TIME;
 	*dataStream >> countBefore;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT_BEFORE;
 	*dataStream >> countAfter;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT_AFTER;
 
 	setMiddleTime(readMiddleTime);
 	setCountBefore(countBefore);
 	setCountAfter(countAfter);
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }

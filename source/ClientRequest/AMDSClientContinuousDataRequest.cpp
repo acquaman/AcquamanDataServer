@@ -97,36 +97,42 @@ bool AMDSClientContinuousDataRequest::isExpired()
 	return timeSpanInSecond > 60;
 }
 
-bool AMDSClientContinuousDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientContinuousDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	*dataStream << updateInterval();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_UPDATE_INTERVAL;
 
 	*dataStream << handShakeSocketKey();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_HANDSHAKE_SOCKET_KEY;
 
 	*dataStream << bufferNames();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAMES;
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	if(!AMDSClientDataRequest::readFromDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	quint32 readUpdateInterval;
 	*dataStream >> readUpdateInterval;
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_UPDATE_INTERVAL;
 
 	QString readHandShakeSocketKey;
 	*dataStream >> readHandShakeSocketKey;
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_HANDSHAKE_SOCKET_KEY;
 
 	QStringList readBufferNames;
 	*dataStream >> readBufferNames;
@@ -142,7 +148,7 @@ bool AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStr
 		bufferDataRequestList_.insert(bufferName, bufferDataRequest);
 	}
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
 bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
