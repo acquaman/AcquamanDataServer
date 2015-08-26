@@ -22,7 +22,6 @@ AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port,
 	waitingMorePackages_ = false;
 	readedBufferSize_ = 0;
 	expectedBufferSize_ = 0;
-	incomeDataBuffer_ = new QByteArray();
 
 	connect(tcpSocket_, SIGNAL(readyRead()), this, SLOT(readFortune()));
 	connect(tcpSocket_, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
@@ -32,7 +31,7 @@ AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port,
 
 AMDSClientTCPSocket::~AMDSClientTCPSocket()
 {
-	incomeDataBuffer_->clear();
+	incomeDataBuffer_.clear();
 	tcpSocket_->disconnectFromHost();
 	tcpSocket_->close();
 }
@@ -56,26 +55,25 @@ void AMDSClientTCPSocket::readFortune()
 		if (tcpSocket_->bytesAvailable() < expectedBufferSize_) {
 			//more data package is expecting, we need to buffer the current ones
 			waitingMorePackages_ = true;
-			incomeDataBuffer_->clear();
+			incomeDataBuffer_.clear();
 
 			readedBufferSize_ = tcpSocket_->bytesAvailable();
-			incomeDataBuffer_->append(tcpSocket_->readAll());
+			incomeDataBuffer_.append(tcpSocket_->readAll());
 		}
 	} else {
 		// more data package is coming
 		readedBufferSize_ += tcpSocket_->bytesAvailable();
-		incomeDataBuffer_->append(tcpSocket_->readAll());
+		incomeDataBuffer_.append(tcpSocket_->readAll());
 
 		if (readedBufferSize_ == expectedBufferSize_) {
 			waitingMorePackages_ = false;
 
 			inDataStream = new AMDSDataStream(incomeDataBuffer_);
+		} else {
+			// finish reading this message, waiting for the future data
+			return;
 		}
 	}
-
-	// finish reading this message, waiting for the future data
-	if (waitingMorePackages_)
-		return;
 
 	AMDSClientRequest *clientRequest = inDataStream->decodeAndInstantiateClientRequestType();
 	inDataStream->read(*clientRequest);
@@ -131,7 +129,7 @@ void AMDSClientTCPSocket::requestData(QString &bufferName)
 	}
 }
 
-void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &startTime, quint64 count)
+void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &startTime, quint64 count, bool includeStatus, bool enableFlattening)
 {
 	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::StartTimePlusCount;
 
@@ -146,12 +144,14 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &startTime,
 		clientStartTimePlusCountDataRequest->setBufferName(bufferName);
 		clientStartTimePlusCountDataRequest->setStartTime(startTime);
 		clientStartTimePlusCountDataRequest->setCount(count);
+		clientStartTimePlusCountDataRequest->setIncludeStatusData(includeStatus);
+		clientStartTimePlusCountDataRequest->setEnableFlattening(enableFlattening);
 
 		sendData(clientStartTimePlusCountDataRequest);
 	}
 }
 
-void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 relativeCount, quint64 count)
+void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 relativeCount, quint64 count, bool includeStatus, bool enableFlattening)
 {
 	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::RelativeCountPlusCount;
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
@@ -165,12 +165,14 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 relativeCount
 		clientRelativeCountPlusCountDataRequest->setBufferName(bufferName);
 		clientRelativeCountPlusCountDataRequest->setRelativeCount(relativeCount);
 		clientRelativeCountPlusCountDataRequest->setCount(count);
+		clientRelativeCountPlusCountDataRequest->setIncludeStatusData(includeStatus);
+		clientRelativeCountPlusCountDataRequest->setEnableFlattening(enableFlattening);
 
 		sendData(clientRelativeCountPlusCountDataRequest);
 	}
 }
 
-void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &startTime, QDateTime &endTime)
+void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &startTime, QDateTime &endTime, bool includeStatus, bool enableFlattening)
 {
 	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::StartTimeToEndTime;
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
@@ -184,12 +186,14 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &startTime,
 		clientStartTimeToEndTimeDataRequest->setBufferName(bufferName);
 		clientStartTimeToEndTimeDataRequest->setStartTime(startTime);
 		clientStartTimeToEndTimeDataRequest->setEndTime(endTime);
+		clientStartTimeToEndTimeDataRequest->setIncludeStatusData(includeStatus);
+		clientStartTimeToEndTimeDataRequest->setEnableFlattening(enableFlattening);
 
 		sendData(clientStartTimeToEndTimeDataRequest);
 	}
 }
 
-void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &middleTime, quint64 countBefore, quint64 countAfter)
+void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &middleTime, quint64 countBefore, quint64 countAfter, bool includeStatus, bool enableFlattening)
 {
 	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter;
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
@@ -205,12 +209,14 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &middleTime
 		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setMiddleTime(middleTime);
 		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountBefore(countBefore);
 		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountAfter(countAfter);
+		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setIncludeStatusData(includeStatus);
+		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setEnableFlattening(enableFlattening);
 
 		sendData(clientMiddleTimePlusCountBeforeAndAfterDataRequest);
 	}
 }
 
-void AMDSClientTCPSocket::requestData(QStringList &bufferNames, quint64 updateInterval, QString handShakeSocketKey)
+void AMDSClientTCPSocket::requestData(QStringList &bufferNames, quint64 updateInterval, bool includeStatus, bool enableFlattening, QString handShakeSocketKey)
 {
 	if (bufferNames.length() == 0 && handShakeSocketKey.length() == 0) {
 		AMDSErrorMon::alert(this, 0, QString("AMDSClientTCPSocket::Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
@@ -228,6 +234,8 @@ void AMDSClientTCPSocket::requestData(QStringList &bufferNames, quint64 updateIn
 	if(clientContinuousDataRequest){
 		clientContinuousDataRequest->setBufferNames(bufferNames);
 		clientContinuousDataRequest->setUpdateInterval(updateInterval);
+		clientContinuousDataRequest->setIncludeStatusData(includeStatus);
+		clientContinuousDataRequest->setEnableFlattening(enableFlattening);
 		if (handShakeSocketKey.length() > 0) {
 			clientContinuousDataRequest->setHandShakeSocketKey(handShakeSocketKey);
 		}

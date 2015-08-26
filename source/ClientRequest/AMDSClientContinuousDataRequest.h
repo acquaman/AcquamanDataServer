@@ -13,7 +13,7 @@ class AMDSClientContinuousDataRequest : public AMDSClientDataRequest
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientContinuousDataRequest(QObject *parent = 0);
-	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool enableFlattening, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientContinuousDataRequest();
 	/// Copy constructor
 	AMDSClientContinuousDataRequest(const AMDSClientContinuousDataRequest &other);
