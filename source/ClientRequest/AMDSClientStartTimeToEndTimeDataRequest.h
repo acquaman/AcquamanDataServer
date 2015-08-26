@@ -10,7 +10,7 @@ class AMDSClientStartTimeToEndTimeDataRequest : public AMDSClientDataRequest
     Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientStartTimeToEndTimeDataRequest(QObject *parent = 0);
-	explicit AMDSClientStartTimeToEndTimeDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool enableFlattening, const QDateTime &startTime, const QDateTime &endTime, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientStartTimeToEndTimeDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, const QDateTime &endTime, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientStartTimeToEndTimeDataRequest();
 
 	/// Copy constructor

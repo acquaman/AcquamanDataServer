@@ -10,15 +10,18 @@ public:
 	Q_INVOKABLE AMDSLightWeightScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, QObject *parent = 0);
 	virtual ~AMDSLightWeightScalarDataHolder();
 
+	/// implement the function to return axes information
 	virtual inline QList<AMDSAxisInfo> axes() const { return QList<AMDSAxisInfo>(); }
+	/// implement the function to return the rank information (size of Axes)
 	virtual inline quint8 rank() const { return 0; }
+	/// implement the function to return the lenght of a the specified axis
 	virtual inline quint32 size(int axisId) const;
+	/// implement the function to return the lenght of axes
 	virtual inline AMDSnDIndex size() const { return AMDSnDIndex(); }
+	/// implement the spanSize() function to return the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const { return 1; }
 
-	virtual inline bool data(AMDSFlatArray *outputValues) const;
-	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
-
+	/// overload functions to set a single value
 	virtual inline bool setSingleValue(qint8 singleValue);
 	virtual inline bool setSingleValue(quint8 singleValue);
 	virtual inline bool setSingleValue(qint16 singleValue);
@@ -30,11 +33,9 @@ public:
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
 
-	virtual inline void setData(AMDSFlatArray *inputValues);
-
-	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
+	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
+	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
@@ -45,6 +46,7 @@ public:
 	Q_INVOKABLE AMDSFullScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, AMDSDataHolder::AxesStyle axesStyle = AMDSDataHolder::UniformAxes, AMDSDataHolder::DataTypeStyle dataTypeStyle = AMDSDataHolder::UniformDataType, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>(), QObject *parent = 0);
 	virtual ~AMDSFullScalarDataHolder();
 
+	/// overload functions to set a single value
 	virtual inline bool setSingleValue(qint8 singleValue);
 	virtual inline bool setSingleValue(quint8 singleValue);
 	virtual inline bool setSingleValue(qint16 singleValue);
@@ -56,14 +58,16 @@ public:
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
 
-	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
+	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
+	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
-protected:
 };
 
+////////////////////////////////////////
+// AMDSLightWeightScalarDataHolder inline implementations
+////////////////////////////////////////
 quint32 AMDSLightWeightScalarDataHolder::size(int axisId) const{
 	Q_UNUSED(axisId)
 	return 0;
@@ -149,19 +153,9 @@ bool AMDSLightWeightScalarDataHolder::setSingleValue(double singleValue){
 	return true;
 }
 
-bool AMDSLightWeightScalarDataHolder::data(AMDSFlatArray *outputValues) const{
-	return valueFlatArray_.replaceData(outputValues);
-}
-
-bool AMDSLightWeightScalarDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
-	Q_UNUSED(axes)
-	return false;
-}
-
-void AMDSLightWeightScalarDataHolder::setData(AMDSFlatArray *inputValues){
-	inputValues->copyData(&valueFlatArray_);
-}
-
+////////////////////////////////////////
+// AMDSFullScalarDataHolder inline implementations
+////////////////////////////////////////
 bool AMDSFullScalarDataHolder::setSingleValue(qint8 singleValue){
 	AMDSLightWeightScalarDataHolder *lightWeightScalarDataHolder = qobject_cast<AMDSLightWeightScalarDataHolder*>(lightWeightDataHolder_);
 	if(lightWeightScalarDataHolder)

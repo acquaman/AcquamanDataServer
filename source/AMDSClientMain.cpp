@@ -1,8 +1,8 @@
 #include <QApplication>
 
 #include "AMDSClient.h"
-#include "source/AMDSEventDataSupport.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
+#include "source/DataElement/AMDSEventDataSupport.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
 
 void initializeRegisteredClasses() {

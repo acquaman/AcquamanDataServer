@@ -30,20 +30,13 @@ QMAKE_CXXFLAGS *= -Wextra -g
 HEADERS *= \
 	source/AMDSTCPDataServer.h \
 	source/AMDSThreadedTCPDataServer.h \
-	source/AMDSBuffer.h \
 	source/AMDSCentralServer.h \
 	source/AMDSBufferGroup.h \
 	source/AMDSThreadedBufferGroup.h \
-	source/AMDSAxisInfo.h \
-	source/AMDSnDIndex.h \
 	source/AMDSLikely.h \
 	source/AMDSDataStream.h \
-	source/AMDSEventData.h \
-	source/AMDSEventDataSupport.h \
 	source/AMDSBufferGroupInfo.h \
 	source/AMDSPacketStats.h \
-	source/AMDSDataTypeDefinitions.h \
-	source/AMDSFlatArray.h \
 	source/AMDSMetaObjectSupport.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
@@ -56,6 +49,13 @@ HEADERS *= \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
+	source/DataElement/AMDSDataTypeDefinitions.h \
+	source/DataElement/AMDSBuffer.h \
+	source/DataElement/AMDSAxisInfo.h \
+	source/DataElement/AMDSnDIndex.h \
+	source/DataElement/AMDSEventData.h \
+	source/DataElement/AMDSEventDataSupport.h \
+	source/DataElement/AMDSFlatArray.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
@@ -71,14 +71,9 @@ SOURCES *= \
 	source/AMDSCentralServer.cpp \
 	source/AMDSBufferGroup.cpp \
 	source/AMDSThreadedBufferGroup.cpp \
-	source/AMDSAxisInfo.cpp \
-	source/AMDSnDIndex.cpp \
 	source/AMDSDataStream.cpp \
-	source/AMDSEventData.cpp \
-	source/AMDSEventDataSupport.cpp \
 	source/AMDSBufferGroupInfo.cpp \
 	source/AMDSPacketStats.cpp \
-	source/AMDSFlatArray.cpp \
 	source/AMDSMetaObjectSupport.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
@@ -90,6 +85,11 @@ SOURCES *= \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
+	source/DataElement/AMDSAxisInfo.cpp \
+	source/DataElement/AMDSnDIndex.cpp \
+	source/DataElement/AMDSEventData.cpp \
+	source/DataElement/AMDSEventDataSupport.cpp \
+	source/DataElement/AMDSFlatArray.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
