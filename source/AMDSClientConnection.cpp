@@ -1,10 +1,9 @@
-#include "AMDSClient.h"
+#include "AMDSClientConnection.h"
 
-#include <QtGui>
+
 #include <QtNetwork>
-#include <QDateTimeEdit>
-#include <QDialog>
 
+#include "source/AMDSDataStream.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
@@ -15,19 +14,21 @@
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
-#include "source/Connection/AMDSDataStream.h"
 #include "source/Connection/AMDSClientTCPSocket.h"
 #include "source/Connection/AMDSClientTCPSocketManager.h"
 #include "source/util/AMDSErrorMonitor.h"
 
-#include <QDebug>
+AMDSClientConnection::AMDSClientConnection()
+{
+}
 
-AMDSClient::AMDSClient(QWidget *parent)
+AMDSClientConnection::AMDSClient(QWidget *parent)
 :   QDialog(parent), networkSession(0)
 {
 	hostLabel = new QLabel(tr("&Server name:"));
 	portLabel = new QLabel(tr("S&erver port:"));
 
+//	hostLineEdit = new QLineEdit("10.52.48.40");
 	hostLineEdit = new QLineEdit("10.51.3.5");
 	portLineEdit = new QLineEdit("28044");
 	portLineEdit->setValidator(new QIntValidator(1, 65535, this));
@@ -68,25 +69,20 @@ AMDSClient::AMDSClient(QWidget *parent)
 	requestType->addItem("Continuous");
 
 	const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestType->model());
-	for(int x = 1; x < AMDSClientRequestDefinitions::InvalidRequest; x++){
+	for(int x = 1; x < 7; x++){
 		QStandardItem* item = model->item(x);
 		item->setFlags(item->flags() & ~(Qt::ItemIsSelectable|Qt::ItemIsEnabled));
 		// visually disable by greying out - works only if combobox has been painted already and palette returns the wanted color
 		item->setData(requestType->palette().color(QPalette::Disabled, QPalette::Text), Qt::TextColorRole);
 	}
 	requestType->setCurrentIndex(0);
-	connect(requestType, SIGNAL(currentIndexChanged(QString)), this, SLOT(onRequestTypeChanged(QString)));
 
-	bufferNameListView_ = new QListView();
-	QStringList bufferNames;
-	bufferNames.append("All");
-	QStringListModel *bufferNamesModel = new QStringListModel(this);
-	bufferNamesModel->setStringList(bufferNames);
-	bufferNameListView_->setModel(bufferNamesModel);
+	bufferNameComboBox_ = new QComboBox();
+	bufferNameComboBox_->addItem("All");
+	bufferNameComboBox_->setMinimumWidth(250);
 
 	amptekIndex = new QSpinBox();
 	includeStatusDataCheckbox = new QCheckBox();
-	enableFlattenDataCheckbox = new QCheckBox();
 
 	connect(hostLineEdit, SIGNAL(textChanged(QString)),
 			this, SLOT(enableGetFortuneButton()));
@@ -106,14 +102,13 @@ AMDSClient::AMDSClient(QWidget *parent)
 
 	QFormLayout *formLayout = new QFormLayout();
 	formLayout->addRow("Request Type", requestType);
-	formLayout->addRow("Buffer", bufferNameListView_);
+	formLayout->addRow("Buffer", bufferNameComboBox_);
 	formLayout->addRow("Time1", time1Edit);
 	formLayout->addRow("Time2", time2Edit);
 	formLayout->addRow("Count1", count1Edit);
 	formLayout->addRow("Count2", count2Edit);
 	formLayout->addRow("Active continuous connection", activeContinuousConnection);
 	formLayout->addRow("Include Status", includeStatusDataCheckbox);
-	formLayout->addRow("Enable Flattening", enableFlattenDataCheckbox);
 	mainLayout->addLayout(formLayout, 4, 0, 1, 2);
 	mainLayout->addWidget(results, 5, 0, 1, 2);
 	setLayout(mainLayout);
@@ -145,39 +140,23 @@ AMDSClient::AMDSClient(QWidget *parent)
 	}
 }
 
-void AMDSClient::requestNewFortune()
+void AMDSClientConnection::requestNewFortune()
 {
-	QStringList selectedBufferNames;
-	foreach (const QModelIndex &index, bufferNameListView_->selectionModel()->selectedIndexes())
-	{
-		selectedBufferNames.append(index.data(Qt::DisplayRole).toString());
-	}
-
 	QString hostName = hostLineEdit->text();
 	quint16 portNumber = portLineEdit->text().toInt();
 	quint8 requestTypeId = (quint8)requestType->currentIndex();
-	QString bufferName = selectedBufferNames.value(0);
+	QString bufferName = bufferNameComboBox_->currentText();
 	QDateTime time1 = time1Edit->dateTime();
 	QDateTime time2 = time2Edit->dateTime();
 	QString value1 = count1Edit->text();
 	QString value2 = count2Edit->text();
 	QString continuousSocket = activeContinuousConnection->currentText();
 
-	bool includeStatus = includeStatusDataCheckbox->isChecked();
-	bool enableFlattening = enableFlattenDataCheckbox->isChecked();
-
 	AMDSClientTCPSocket * clientTCPSocket = new AMDSClientTCPSocket(hostName, portNumber);
 	connect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
 	connect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
 
 	AMDSClientRequestDefinitions::RequestType clientRequestType = (AMDSClientRequestDefinitions::RequestType)requestTypeId;
-	if (	(selectedBufferNames.count() == 0)
-		 && (clientRequestType != AMDSClientRequestDefinitions::Continuous )
-		 && (clientRequestType != AMDSClientRequestDefinitions::Statistics)) {
-		QMessageBox::information( this, "Fortune Client", "Didn't select any buffer(s)!");
-		return;
-	}
-
 	switch(clientRequestType) {
 	case AMDSClientRequestDefinitions::Introspection:
 		clientTCPSocket->requestData(bufferName);
@@ -186,19 +165,19 @@ void AMDSClient::requestNewFortune()
 		clientTCPSocket->requestData();
 		break;
 	case AMDSClientRequestDefinitions::StartTimePlusCount:
-		clientTCPSocket->requestData(bufferName, time1, value1.toInt(), includeStatus, enableFlattening);
+		clientTCPSocket->requestData(bufferName, time1, value1.toInt());
 		break;
 	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-		clientTCPSocket->requestData(bufferName, value1.toInt(), value2.toInt(), includeStatus, enableFlattening);
+		clientTCPSocket->requestData(bufferName, value1.toInt(), value1.toInt());
 		break;
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
-		clientTCPSocket->requestData(bufferName, time1, time2, includeStatus, enableFlattening);
+		clientTCPSocket->requestData(bufferName, time1, time2);
 		break;
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
-		clientTCPSocket->requestData(bufferName, time1, value1.toInt(), value2.toInt(), includeStatus, enableFlattening);
+		clientTCPSocket->requestData(bufferName, time1, value1.toInt(), value2.toInt());
 		break;
 	case AMDSClientRequestDefinitions::Continuous:
-		clientTCPSocket->requestData(selectedBufferNames, value1.toInt(), includeStatus, enableFlattening, continuousSocket);
+		clientTCPSocket->requestData(bufferName, value1.toInt(), continuousSocket);
 		if (continuousSocket.length() > 0) {
 			AMDSErrorMon::information(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
 		}
@@ -209,9 +188,9 @@ void AMDSClient::requestNewFortune()
 	}
 }
 
-void AMDSClient::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSClientRequest *clientRequest)
+void AMDSClientConnection::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSClientRequest *clientRequest)
 {
-	if (clientRequest->isContinuousMessage()) {
+	if (clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous) {
 		AMDSClientTCPSocketManager::socketManager()->appendSocket(clientTCPSocket);
 		if (activeContinuousConnection->findText(clientTCPSocket->socketKey()) == -1) {
 			activeContinuousConnection->addItem(clientTCPSocket->socketKey());
@@ -222,7 +201,7 @@ void AMDSClient::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSCli
 			if (introspectionRequest) {
 				if (introspectionRequest->readReady()) {
 					const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestType->model());
-					for(int x = 1; x < AMDSClientRequestDefinitions::InvalidRequest; x++){
+					for(int x = 1; x < 7; x++){
 						QStandardItem* item = model->item(x);
 						item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 						// visually disable by greying out - works only if combobox has been painted already and palette returns the wanted color
@@ -231,11 +210,9 @@ void AMDSClient::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSCli
 				}
 
 				if(introspectionRequest->checkAllBuffer() ){
-					QStringList bufferNames = introspectionRequest->getAllBufferNames();
-					bufferNames.insert(0, "All");
-					QStringListModel *bufferNamesModel = new QStringListModel(this);
-					bufferNamesModel->setStringList(bufferNames);
-					bufferNameListView_->setModel(bufferNamesModel);
+					bufferNameComboBox_->clear();
+					bufferNameComboBox_->addItem("All");
+					bufferNameComboBox_->addItems(introspectionRequest->getAllBufferNames());
 				}
 
 			}
@@ -245,14 +222,12 @@ void AMDSClient::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSCli
 	}
 }
 
-void AMDSClient::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketError)
+void AMDSClientConnection::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketError)
 {
 	switch (socketError) {
 	case QAbstractSocket::RemoteHostClosedError:
-		if (clientTCPSocket->socketKey().length() > 0) {
-			activeContinuousConnection->removeItem(activeContinuousConnection->findText(clientTCPSocket->socketKey()));
-			AMDSClientTCPSocketManager::socketManager()->removeSocket(clientTCPSocket->socketKey());
-		}
+		activeContinuousConnection->removeItem(activeContinuousConnection->findText(clientTCPSocket->socketKey()));
+		AMDSClientTCPSocketManager::socketManager()->removeSocket(clientTCPSocket->socketKey());
 		break;
 	case QAbstractSocket::HostNotFoundError:
 		QMessageBox::information(this, tr("Fortune Client"),
@@ -275,19 +250,7 @@ void AMDSClient::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSo
 	removeTCPSocket(clientTCPSocket);
 }
 
-void AMDSClient::onRequestTypeChanged(QString requestType)
-{
-	if (requestType == "Continuous") {
-		bufferNameListView_->setSelectionMode(QAbstractItemView::MultiSelection);
-	} else {
-		bufferNameListView_->setSelectionMode(QAbstractItemView::SingleSelection);
-
-		if (bufferNameListView_->selectionModel()->selectedIndexes().count() > 1)
-			bufferNameListView_->clearSelection();
-	}
-}
-
-void AMDSClient::enableGetFortuneButton()
+void AMDSClientConnection::enableGetFortuneButton()
 {
 	getFortuneButton->setEnabled((!networkSession || networkSession->isOpen()) &&
 								 !hostLineEdit->text().isEmpty() &&
@@ -295,7 +258,7 @@ void AMDSClient::enableGetFortuneButton()
 
 }
 
-void AMDSClient::sessionOpened()
+void AMDSClientConnection::sessionOpened()
 {
 	qDebug() << "Network session has been opened";
 
@@ -318,7 +281,7 @@ void AMDSClient::sessionOpened()
 	enableGetFortuneButton();
 }
 
-void AMDSClient::removeTCPSocket(AMDSClientTCPSocket *clientTCPSocket)
+void AMDSClientConnection::removeTCPSocket(AMDSClientTCPSocket *clientTCPSocket)
 {
 	disconnect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
 	disconnect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));

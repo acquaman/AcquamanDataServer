@@ -13,7 +13,7 @@
 #include <QSettings>
 
 #include "source/util/AMDSErrorMonitor.h"
-#include "source/AMDSPacketStats.h"
+#include "source/Connection/AMDSPacketStats.h"
 
 class QTimer;
 class AMDSClientRequest;
@@ -76,7 +76,7 @@ protected slots:
 	/// Slot to handle the newly received statics client request message
 	void onClientStaticsRequestReceived(AMDSClientRequest *clientRequest);
 	/// Slot to handle the newly received continuous client request message, return true if the message is done handle
-	bool onClientContinuousRequestReceived(AMDSClientRequest *clientRequest);
+	void onClientContinuousRequestReceived(AMDSClientRequest *clientRequest);
 	/// Slot to handle client request task accomplished, the related resouces can be released
 	void onClientRequestTaskAccomplished(AMDSClientRequest *clientRequest);
 

@@ -1,6 +1,6 @@
 #include "AMDSClientTCPSocket.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
@@ -16,6 +16,9 @@
 AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port, QObject *parent)
 	:QObject(parent)
 {
+	hostName_ = host;
+	port_ = port;
+
 	socketKey_ = "";
 	tcpSocket_ = new QTcpSocket(this);
 
@@ -23,7 +26,7 @@ AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port,
 	readedBufferSize_ = 0;
 	expectedBufferSize_ = 0;
 
-	connect(tcpSocket_, SIGNAL(readyRead()), this, SLOT(readFortune()));
+	connect(tcpSocket_, SIGNAL(readyRead()), this, SLOT(readClientRequestMessage()));
 	connect(tcpSocket_, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
 
 	tcpSocket_->connectToHost(host, port);
@@ -41,7 +44,7 @@ void AMDSClientTCPSocket::onSocketError(QAbstractSocket::SocketError error)
 	emit socketError(this, error);
 }
 
-void AMDSClientTCPSocket::readFortune()
+void AMDSClientTCPSocket::readClientRequestMessage()
 {
 	if (tcpSocket_->bytesAvailable() < (int)sizeof(quint32))
 		return;

@@ -1,6 +1,6 @@
 #include "AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)

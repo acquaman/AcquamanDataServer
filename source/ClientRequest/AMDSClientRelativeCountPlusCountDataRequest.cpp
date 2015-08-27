@@ -1,6 +1,6 @@
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientRelativeCountPlusCountDataRequest::AMDSClientRelativeCountPlusCountDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)

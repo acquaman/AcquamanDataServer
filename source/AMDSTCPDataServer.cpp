@@ -3,7 +3,6 @@
 #include <QDateTime>
 #include <QTimer>
 
-#include "source/AMDSDataStream.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
@@ -12,6 +11,7 @@
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "source/Connection/AMDSDataStream.h"
 
 #include "source/util/AMDSErrorMonitor.h"
 
@@ -342,7 +342,7 @@ void AMDSTCPDataServer::onClientStaticsRequestReceived(AMDSClientRequest *client
 	}
 }
 
-bool AMDSTCPDataServer::onClientContinuousRequestReceived(AMDSClientRequest *clientRequest)
+void AMDSTCPDataServer::onClientContinuousRequestReceived(AMDSClientRequest *clientRequest)
 {
 	AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 	if(clientContinuousDataRequest){

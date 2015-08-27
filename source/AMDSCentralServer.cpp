@@ -4,13 +4,13 @@
 #include <QTimer>
 
 #include "source/AMDSThreadedTCPDataServer.h"
-#include "source/AMDSThreadedBufferGroup.h"
-#include "source/AMDSBufferGroup.h"
-#include "source/AMDSBufferGroupInfo.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "source/DataElement/AMDSThreadedBufferGroup.h"
+#include "source/DataElement/AMDSBufferGroup.h"
+#include "source/DataElement/AMDSBufferGroupInfo.h"
 #include "source/util/AMDSErrorMonitor.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :

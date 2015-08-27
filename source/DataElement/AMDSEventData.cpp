@@ -1,6 +1,6 @@
 #include "source/DataElement/AMDSEventData.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSEventData::AMDSEventData(QObject *parent) :
 	QObject(parent)

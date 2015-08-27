@@ -1,6 +1,6 @@
 #include "AMDSClientStartTimeToEndTimeDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientStartTimeToEndTimeDataRequest::AMDSClientStartTimeToEndTimeDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)

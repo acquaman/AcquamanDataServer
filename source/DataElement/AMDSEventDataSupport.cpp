@@ -1,7 +1,7 @@
 #include "source/DataElement/AMDSEventDataSupport.h"
 
 #include "source/DataElement/AMDSEventData.h"
-#include "source/AMDSMetaObjectSupport.h"
+#include "source/util/AMDSMetaObjectSupport.h"
 
 AMDSEventDataObjectInfo::AMDSEventDataObjectInfo()
 {

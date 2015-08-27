@@ -1,6 +1,6 @@
-#include "source/ClientRequest/AMDSClientDataRequest.h"
+#include "AMDSClientDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 #include "source/DataHolder/AMDSScalarDataHolder.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
 #include "source/util/AMDSErrorMonitor.h"

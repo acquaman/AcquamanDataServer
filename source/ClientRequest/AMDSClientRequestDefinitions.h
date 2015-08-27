@@ -54,7 +54,7 @@ namespace AMDSClientRequestDefinitions {
 		InvalidRequest = 7 // NOTE: this must be the last item of the RequestType definition
 	};
 
-	static QString errorMessage(int errorCode, OperationType operType, RequestType msgType) {
+	inline static QString errorMessage(int errorCode, OperationType operType, RequestType msgType) {
 		QString fieldName;
 
 		switch (errorCode) {

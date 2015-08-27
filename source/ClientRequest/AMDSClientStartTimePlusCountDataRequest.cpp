@@ -1,6 +1,6 @@
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientStartTimePlusCountDataRequest::AMDSClientStartTimePlusCountDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)

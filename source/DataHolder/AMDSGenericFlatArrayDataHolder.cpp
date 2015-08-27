@@ -1,6 +1,6 @@
 #include "source/DataHolder/AMDSGenericFlatArrayDataHolder.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
 #include "source/util/AMDSErrorMonitor.h"
 

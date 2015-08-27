@@ -1,6 +1,6 @@
 #include "source/ClientRequest/AMDSClientRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientRequest::AMDSClientRequest(QObject *parent) :
 	QObject(parent)

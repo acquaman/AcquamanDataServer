@@ -1,6 +1,6 @@
 #include "AMDSClientContinuousDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 #include "source/util/AMDSErrorMonitor.h"
 
 AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(QObject *parent) :

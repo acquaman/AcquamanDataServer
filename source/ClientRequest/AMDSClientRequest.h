@@ -2,7 +2,7 @@
 #define AMDSCLIENTREQUEST_H
 
 #include "source/ClientRequest/AMDSClientRequestDefinitions.h"
-#include "source/AMDSBufferGroupInfo.h"
+#include "source/DataElement/AMDSBufferGroupInfo.h"
 
 class AMDSDataStream;
 
@@ -31,6 +31,8 @@ public:
 	inline bool isStatisticsMessage() { return requestType() == AMDSClientRequestDefinitions::Statistics; }
 	/// returns whether this is a data client data request
 	bool isDataClientRequest();
+	/// returns whether this is an introspection message
+	inline bool isIntrospectionMessage() { return requestType() == AMDSClientRequestDefinitions::Introspection;}
 	/// returns whether this is a continuous message
 	inline bool isContinuousMessage() { return requestType() == AMDSClientRequestDefinitions::Continuous;}
 

@@ -19,11 +19,11 @@ public:
 	virtual AMDSDataHolder* operator /(quint32 divisor);
 
 	/// implement the data function to read data from valueFlatArray_ and write data to the given outputArray
-	virtual inline bool data(AMDSFlatArray *outputArray) const { return valueFlatArray_.resetTargetArrayAndReplaceData(outputArray); }
+	virtual bool data(AMDSFlatArray *outputArray) const { return valueFlatArray_.resetTargetArrayAndReplaceData(outputArray); }
 	/// implement the setData function to update valueFlatArray_ with given inputArray
-	virtual inline void setData(AMDSFlatArray *inputArray) { inputArray->copyDataToTargetArray(&valueFlatArray_); }
+	virtual void setData(AMDSFlatArray *inputArray) { inputArray->copyDataToTargetArray(&valueFlatArray_); }
 	/// implement the function to return the data string
-	virtual inline QString printData() { return valueFlatArray_.printData(); }
+	virtual QString printData() { return valueFlatArray_.printData(); }
 
 	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;

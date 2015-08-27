@@ -14,6 +14,8 @@ public:
 	explicit AMDSClientTCPSocket(const QString host, const quint16 port, QObject *parent = 0);
 	virtual ~AMDSClientTCPSocket();
 
+	/// Returns the socket connect identifier
+	inline QString hostIdentifier() { return QString("%1:%2").arg(hostName_).arg(port_); }
 	/// Returns the socket key of this connection
 	inline QString socketKey() { return socketKey_; }
 	/// Returns the errorStrong of the encapsulated tcpSocket_
@@ -45,13 +47,18 @@ protected slots:
 	/// slot to handle the socket error signals
 	void onSocketError(QAbstractSocket::SocketError error);
 	/// slot to handle the data from server
-	void readFortune();
+	void readClientRequestMessage();
 
 private:
 	/// write request data to dataStream and socket
 	void sendData(AMDSClientRequest *clientRequest);
 
 protected:
+	/// the host name of the connection
+	QString hostName_;
+	/// the port of the connection
+	quint16 port_;
+
 	/// the handler of the socket connection
 	QTcpSocket *tcpSocket_;
 	/// the socket key
