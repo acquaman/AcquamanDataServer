@@ -36,7 +36,6 @@ HEADERS  += \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
 	source/Connection/AMDSPacketStats.h \
 	source/Connection/AMDSDataStream.h \
-	source/Connection/AMDSClientTCPSocketManager.h \
 	source/Connection/AMDSClientTCPSocket.h \
 	source/DataElement/AMDSDataTypeDefinitions.h \
 	source/DataElement/AMDSAxisInfo.h \
@@ -53,7 +52,6 @@ HEADERS  += \
 	source/util/AMDSMetaObjectSupport.h \
 	source/util/AMDSErrorMonitor.h \
 	source/Connection/AMDSServer.h
-#    source/AMDSClientConnection.h
 
 SOURCES += \
 	source/AMDSClientMain.cpp \
@@ -73,7 +71,6 @@ SOURCES += \
 	source/Connection/AMDSPacketStats.cpp \
 	source/Connection/AMDSDataStream.cpp \
 	source/Connection/AMDSClientTCPSocket.cpp \
-	source/Connection/AMDSClientTCPSocketManager.cpp \
 	source/DataElement/AMDSAxisInfo.cpp \
 	source/DataElement/AMDSnDIndex.cpp \
 	source/DataElement/AMDSEventData.cpp \
@@ -88,7 +85,6 @@ SOURCES += \
 	source/util/AMDSMetaObjectSupport.cpp \
 	source/util/AMDSErrorMonitor.cpp \
 	source/Connection/AMDSServer.cpp
-#    source/AMDSClientConnection.cpp
 
 
 
