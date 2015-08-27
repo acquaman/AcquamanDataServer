@@ -1,4 +1,4 @@
-#include "source/AMDSThreadedTCPDataServer.h"
+#include "AMDSThreadedTCPDataServer.h"
 
 #include <QCoreApplication>
 

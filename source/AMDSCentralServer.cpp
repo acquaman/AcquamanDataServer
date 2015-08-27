@@ -1,9 +1,9 @@
-#include "source/AMDSCentralServer.h"
+#include "AMDSCentralServer.h"
 
 #include <QtCore/QCoreApplication>
 #include <QTimer>
 
-#include "source/AMDSThreadedTCPDataServer.h"
+#include "source/Connection/AMDSThreadedTCPDataServer.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientDataRequest.h"

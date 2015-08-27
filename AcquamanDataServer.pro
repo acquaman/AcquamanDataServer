@@ -28,10 +28,7 @@ RCC_DIR=build_files
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
-	source/AMDSTCPDataServer.h \
-	source/AMDSThreadedTCPDataServer.h \
 	source/AMDSCentralServer.h \
-	source/AMDSLikely.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
@@ -43,8 +40,11 @@ HEADERS *= \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
+	source/Connection/AMDSTCPDataServer.h \
+	source/Connection/AMDSThreadedTCPDataServer.h \
 	source/Connection/AMDSDataStream.h \
 	source/Connection/AMDSPacketStats.h \
+	source/DataElement/AMDSLikely.h \
 	source/DataElement/AMDSDataTypeDefinitions.h \
 	source/DataElement/AMDSBuffer.h \
 	source/DataElement/AMDSAxisInfo.h \
@@ -66,8 +66,6 @@ HEADERS *= \
 
 SOURCES *= \
 	source/AMDSMain.cpp \
-	source/AMDSTCPDataServer.cpp \
-	source/AMDSThreadedTCPDataServer.cpp \
 	source/AMDSCentralServer.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
@@ -79,6 +77,8 @@ SOURCES *= \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
+	source/Connection/AMDSTCPDataServer.cpp \
+	source/Connection/AMDSThreadedTCPDataServer.cpp \
 	source/Connection/AMDSPacketStats.cpp \
 	source/Connection/AMDSDataStream.cpp \
 	source/DataElement/AMDSAxisInfo.cpp \

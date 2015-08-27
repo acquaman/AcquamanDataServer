@@ -1,4 +1,4 @@
-#include "source/AMDSTCPDataServer.h"
+#include "AMDSTCPDataServer.h"
 
 #include <QDateTime>
 #include <QTimer>
