@@ -1,4 +1,4 @@
-#include "source/AMDSDataStream.h"
+#include "AMDSDataStream.h"
 
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/DataElement/AMDSEventDataSupport.h"
