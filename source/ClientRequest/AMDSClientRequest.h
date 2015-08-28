@@ -65,7 +65,7 @@ public:
 
 private:
 	/// To set the values of all the attributes
-	void setAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
+	void setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
 
 protected:
 	/// the socket key to identify a connection

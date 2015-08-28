@@ -217,6 +217,7 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 void AMDSClientUi::onSocketError(int errorCode, QString socketKey, QString errorMessage)
 {
 	if (socketKey.length() > 0) {
+		activeServerComboBox->removeItem(activeServerComboBox->findText(socketKey));
 		resetActiveContinuousConnection(activeServerComboBox->currentText());
 	}
 

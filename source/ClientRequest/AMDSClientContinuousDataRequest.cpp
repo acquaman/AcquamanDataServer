@@ -97,6 +97,16 @@ bool AMDSClientContinuousDataRequest::isExpired()
 	return timeSpanInSecond > 60;
 }
 
+void AMDSClientContinuousDataRequest::setAttributesValues(bool includeStatusData, bool flattenResultData, QStringList &bufferNames, quint64 updateInterval, QString &handShakeSocketKey)
+{
+	setIncludeStatusData(includeStatusData);
+	setFlattenResultData(flattenResultData);
+
+	setBufferNames(bufferNames);
+	setUpdateInterval(updateInterval);
+	setHandShakeSocketKey(handShakeSocketKey);
+}
+
 int AMDSClientContinuousDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);

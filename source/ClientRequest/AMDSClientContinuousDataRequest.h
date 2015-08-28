@@ -59,6 +59,9 @@ public:
 	/// Sets the last handshake time for the data request
 	inline void setHandShakeTime(const QDateTime &handShakeTime) { lastHandShakeTime_ = handShakeTime; }
 
+	/// Sets the values of all the data attributes of client request
+	void setAttributesValues(bool includeStatusData, bool flattenResultData, QStringList &bufferNames, quint64 updateInterval, QString &handShakeSocketKey);
+
 	/// Writes this AMDSClientContinuousRequest to an AMDSDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSClientContinuousRequest from the AMDSDataStream, returns 0 if no errors are encountered
