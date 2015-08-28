@@ -142,7 +142,7 @@ AMDSClientUi::~AMDSClientUi()
 	disconnect(clientAppController_, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
 	disconnect(clientAppController_, SIGNAL(serverError(int,QString,QString)), this, SLOT(onServerError(int,QString,QString)));
 	disconnect(clientAppController_, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
-	disconnect(clientAppController_, SIGNAL(socketError(QString, QString)), this, SLOT(onSocketError(QString, QString)));
+	disconnect(clientAppController_, SIGNAL(socketError(int, QString, QString)), this, SLOT(onSocketError(int, QString, QString)));
 
 	clientAppController_->deleteLater();
 }
@@ -181,12 +181,6 @@ void AMDSClientUi::onNewServerConnected(QString serverIdentifier)
 	resetActiveContinuousConnection(serverIdentifier);
 }
 
-void AMDSClientUi::onServerError(int errorCode, QString serverIdentifier, QString errorMessage)
-{
-	QString message = QString("%1 (%2): %3").arg(errorCode).arg(serverIdentifier).arg(errorMessage);
-	QMessageBox::information(this, "AMDS Client Example", message);
-}
-
 void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 {
 	if (clientRequest->isContinuousMessage()) {
@@ -214,15 +208,17 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 	}
 }
 
-void AMDSClientUi::onSocketError(int errorCode, QString socketKey, QString errorMessage)
+void AMDSClientUi::onSocketError(int errorCode, QString serverIdentifier, QString errorMessage)
 {
-	if (socketKey.length() > 0) {
-		activeServerComboBox->removeItem(activeServerComboBox->findText(socketKey));
+	if (serverIdentifier.length() > 0) {
+		activeServerComboBox->removeItem(activeServerComboBox->findText(serverIdentifier));
 		resetActiveContinuousConnection(activeServerComboBox->currentText());
 	}
 
-	if (errorCode != QAbstractSocket::RemoteHostClosedError)
-		QMessageBox::information(this, "AMDS Client Example", errorMessage + socketKey);
+	if (errorCode != QAbstractSocket::RemoteHostClosedError) {
+		QString message = QString("%1 (%2): %3").arg(errorCode).arg(serverIdentifier).arg(errorMessage);
+		QMessageBox::information(this, "AMDS Client Example", message);
+	}
 }
 
 /// ============= SLOTS to handle UI component signals ===============

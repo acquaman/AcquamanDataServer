@@ -37,12 +37,10 @@ private slots:
 
 	/// slot to handle the signal of newServerConnected (add the serverIdentifier to the combox and update the ui displays -- buffernames and active connections)
 	void onNewServerConnected(QString serverIdentifier);
-	/// slot to handle the signal of serverError
-	void onServerError(int errorCode, QString serverIdentifier, QString errorMessage);
 	/// slot to handle the signal of request data ready
 	void onRequestDataReady(AMDSClientRequest* clientRequest);
 	/// slot to handle the signal of socketEror
-	void onSocketError(int errorCode, QString socketKey, QString errorMessage);
+	void onSocketError(int errorCode, QString serverIdentifier, QString errorMessage);
 
 	/// ============= SLOTS to handle UI component signals ===============
 	/// slot to handle the switch signal among connected servers (to refresh the buffer names and the active connections with that server)
