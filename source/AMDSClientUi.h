@@ -62,35 +62,35 @@ private:
 
 private:
 	/// ==== server section ====
-	QLabel *hostLabel;
-	QLabel *portLabel;
-	QLineEdit *hostLineEdit;
-	QLineEdit *portLineEdit;
+	QLabel *hostLabel_;
+	QLabel *portLabel_;
+	QLineEdit *hostLineEdit_;
+	QLineEdit *portLineEdit_;
 	/// comboBox to hold the active server connections (server identifier --- hostName:portNumber
-	QComboBox* activeServerComboBox;
-	QLabel *statusLabel;
+	QComboBox* activeServerComboBox_;
+	QLabel *statusLabel_;
 
 	/// ==== server section ====
-	QPushButton *connectServerButton;
-	QPushButton *requestDataButton;
-	QPushButton *quitButton;
+	QPushButton *connectServerButton_;
+	QPushButton *requestDataButton_;
+	QPushButton *quitButton_;
 
-	QDialogButtonBox *buttonBox;
+	QDialogButtonBox *buttonBox_;
 
 	/// ==== message compose section ====
-	QComboBox* requestType;
+	QComboBox* requestTypeComboBox_;
 	QListView *bufferNameListView_;
 
-	QDateTimeEdit* time1Edit;
-	QDateTimeEdit* time2Edit;
-	QLineEdit* count1Edit;
-	QLineEdit* count2Edit;
+	QDateTimeEdit* time1Edit_;
+	QDateTimeEdit* time2Edit_;
+	QLineEdit* count1Edit_;
+	QLineEdit* count2Edit_;
 //	QSpinBox* amptekIndex;
-	QCheckBox* includeStatusDataCheckbox;
-	QCheckBox* enableFlattenDataCheckbox;
+	QCheckBox* includeStatusDataCheckbox_;
+	QCheckBox* enableFlattenDataCheckbox_;
 
-	QComboBox* activeContinuousConnection;
-	QTextEdit* results;
+	QComboBox* activeContinuousConnectionComboBox_;
+	QTextEdit* resultsEdit_;
 
 	/// the handler of the clientAppController
 	AMDSClientAppController *clientAppController_;

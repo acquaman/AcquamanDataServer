@@ -15,81 +15,81 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
     QDialog(parent)
 {
 	/// ==== server section ====
-	hostLabel = new QLabel(tr("&Server name:"));
-	portLabel = new QLabel(tr("&erver port:"));
+	hostLabel_ = new QLabel(tr("&Server name:"));
+	portLabel_ = new QLabel(tr("&erver port:"));
 
-	hostLineEdit = new QLineEdit("10.51.3.5");
-	portLineEdit = new QLineEdit("28044");
-	portLineEdit->setValidator(new QIntValidator(1, 65535, this));
+	hostLineEdit_ = new QLineEdit("10.51.3.5");
+	portLineEdit_ = new QLineEdit("28044");
+	portLineEdit_->setValidator(new QIntValidator(1, 65535, this));
 
-	hostLabel->setBuddy(hostLineEdit);
-	portLabel->setBuddy(portLineEdit);
+	hostLabel_->setBuddy(hostLineEdit_);
+	portLabel_->setBuddy(portLineEdit_);
 
-	activeServerComboBox = new QComboBox;
-	activeServerComboBox->setFixedWidth(200);
-	activeServerComboBox->addItem("");
-	connect(activeServerComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(onActiveServerChanged(QString)));
+	activeServerComboBox_ = new QComboBox;
+	activeServerComboBox_->setFixedWidth(200);
+	activeServerComboBox_->addItem("");
+	connect(activeServerComboBox_, SIGNAL(currentIndexChanged(QString)), this, SLOT(onActiveServerChanged(QString)));
 
-	statusLabel = new QLabel(tr("This examples requires that you run the Acquaman Data Server example as well."));
+	statusLabel_ = new QLabel(tr("This examples requires that you run the Acquaman Data Server example as well."));
 
-	connect(hostLineEdit, SIGNAL(textChanged(QString)), this, SLOT(enableRequestDataButton()));
-	connect(portLineEdit, SIGNAL(textChanged(QString)), this, SLOT(enableRequestDataButton()));
+	connect(hostLineEdit_, SIGNAL(textChanged(QString)), this, SLOT(enableRequestDataButton()));
+	connect(portLineEdit_, SIGNAL(textChanged(QString)), this, SLOT(enableRequestDataButton()));
 
 	/// ==== buttons section ====
-	connectServerButton = new QPushButton(tr("Connect to Server"));
-	connectServerButton->setDefault(true);
+	connectServerButton_ = new QPushButton(tr("Connect to Server"));
+	connectServerButton_->setDefault(true);
 
-	requestDataButton = new QPushButton(tr("Request Data"));
-	quitButton = new QPushButton(tr("Quit"));
+	requestDataButton_ = new QPushButton(tr("Request Data"));
+	quitButton_ = new QPushButton(tr("Quit"));
 
-	buttonBox = new QDialogButtonBox;
-	buttonBox->addButton(connectServerButton, QDialogButtonBox::ActionRole);
-	buttonBox->addButton(requestDataButton, QDialogButtonBox::ActionRole);
-	buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
+	buttonBox_ = new QDialogButtonBox;
+	buttonBox_->addButton(connectServerButton_, QDialogButtonBox::ActionRole);
+	buttonBox_->addButton(requestDataButton_, QDialogButtonBox::ActionRole);
+	buttonBox_->addButton(quitButton_, QDialogButtonBox::RejectRole);
 
-	connect(connectServerButton, SIGNAL(clicked()), this, SLOT(connectToServer()));
-	connect(requestDataButton, SIGNAL(clicked()), this, SLOT(sendClientRequest()));
-	connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
+	connect(connectServerButton_, SIGNAL(clicked()), this, SLOT(connectToServer()));
+	connect(requestDataButton_, SIGNAL(clicked()), this, SLOT(sendClientRequest()));
+	connect(quitButton_, SIGNAL(clicked()), this, SLOT(close()));
 
 	/// ==== message compose section ====
-	requestType = new QComboBox;
-	requestType->addItem("Introspect");
-	requestType->addItem("Statistics");
-	requestType->addItem("Start Time + Count");
-	requestType->addItem("Relative Count + Count");
-	requestType->addItem("Start Time to End Time");
-	requestType->addItem("Middle Time + Count Before to Count After");
-	requestType->addItem("Continuous");
-	requestType->setCurrentIndex(0);
+	requestTypeComboBox_ = new QComboBox;
+	requestTypeComboBox_->addItem("Introspect");
+	requestTypeComboBox_->addItem("Statistics");
+	requestTypeComboBox_->addItem("Start Time + Count");
+	requestTypeComboBox_->addItem("Relative Count + Count");
+	requestTypeComboBox_->addItem("Start Time to End Time");
+	requestTypeComboBox_->addItem("Middle Time + Count Before to Count After");
+	requestTypeComboBox_->addItem("Continuous");
+	requestTypeComboBox_->setCurrentIndex(0);
 
-	const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestType->model());
+	const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestTypeComboBox_->model());
 	for(int x = 1; x < 7; x++){
 		QStandardItem* item = model->item(x);
 		item->setFlags(item->flags() & ~(Qt::ItemIsSelectable|Qt::ItemIsEnabled));
 		// visually disable by greying out - works only if combobox has been painted already and palette returns the wanted color
-		item->setData(requestType->palette().color(QPalette::Disabled, QPalette::Text), Qt::TextColorRole);
+		item->setData(requestTypeComboBox_->palette().color(QPalette::Disabled, QPalette::Text), Qt::TextColorRole);
 	}
 
 	bufferNameListView_ = new QListView();
 	QStringList bufferNames("All");
 	resetBufferListView(bufferNames);
 
-	time1Edit = new QDateTimeEdit(QDateTime::currentDateTime());
-	time1Edit->setDisplayFormat("HH:mm:ss.zzz");
-	time2Edit = new QDateTimeEdit(QDateTime::currentDateTime());
-	time2Edit->setDisplayFormat("HH:mm:ss.zzz");
-	count1Edit = new QLineEdit();
-	count2Edit = new QLineEdit();
-	includeStatusDataCheckbox = new QCheckBox();
-	enableFlattenDataCheckbox = new QCheckBox();
+	time1Edit_ = new QDateTimeEdit(QDateTime::currentDateTime());
+	time1Edit_->setDisplayFormat("HH:mm:ss.zzz");
+	time2Edit_ = new QDateTimeEdit(QDateTime::currentDateTime());
+	time2Edit_->setDisplayFormat("HH:mm:ss.zzz");
+	count1Edit_ = new QLineEdit();
+	count2Edit_ = new QLineEdit();
+	includeStatusDataCheckbox_ = new QCheckBox();
+	enableFlattenDataCheckbox_ = new QCheckBox();
 
-	activeContinuousConnection = new QComboBox;
-	activeContinuousConnection->setFixedWidth(200);
-	activeContinuousConnection->addItem("");
+	activeContinuousConnectionComboBox_ = new QComboBox;
+	activeContinuousConnectionComboBox_->setFixedWidth(200);
+	activeContinuousConnectionComboBox_->addItem("");
 
-	results = new QTextEdit();
+	resultsEdit_ = new QTextEdit();
 
-	connect(requestType, SIGNAL(currentIndexChanged(QString)), this, SLOT(onRequestTypeChanged(QString)));
+	connect(requestTypeComboBox_, SIGNAL(currentIndexChanged(QString)), this, SLOT(onRequestTypeChanged(QString)));
 
 
 //	amptekIndex = new QSpinBox();
@@ -97,31 +97,31 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 
 	/// ==== layout the components ====
 	QGridLayout *mainLayout = new QGridLayout;
-	mainLayout->addWidget(hostLabel, 0, 0);
-	mainLayout->addWidget(hostLineEdit, 0, 1);
-	mainLayout->addWidget(portLabel, 1, 0);
-	mainLayout->addWidget(portLineEdit, 1, 1);
+	mainLayout->addWidget(hostLabel_, 0, 0);
+	mainLayout->addWidget(hostLineEdit_, 0, 1);
+	mainLayout->addWidget(portLabel_, 1, 0);
+	mainLayout->addWidget(portLineEdit_, 1, 1);
 	mainLayout->addWidget(new QLabel("Active Servers"), 2, 0);
-	mainLayout->addWidget(activeServerComboBox, 2, 1);
-	mainLayout->addWidget(statusLabel, 3, 0, 1, 2);
-	mainLayout->addWidget(buttonBox, 4, 0, 1, 2);
+	mainLayout->addWidget(activeServerComboBox_, 2, 1);
+	mainLayout->addWidget(statusLabel_, 3, 0, 1, 2);
+	mainLayout->addWidget(buttonBox_, 4, 0, 1, 2);
 
 	QFormLayout *formLayout = new QFormLayout();
-	formLayout->addRow("Request Type", requestType);
+	formLayout->addRow("Request Type", requestTypeComboBox_);
 	formLayout->addRow("Buffer", bufferNameListView_);
-	formLayout->addRow("Time1", time1Edit);
-	formLayout->addRow("Time2", time2Edit);
-	formLayout->addRow("Count1", count1Edit);
-	formLayout->addRow("Count2", count2Edit);
-	formLayout->addRow("Include Status", includeStatusDataCheckbox);
-	formLayout->addRow("Enable Flattening", enableFlattenDataCheckbox);
+	formLayout->addRow("Time1", time1Edit_);
+	formLayout->addRow("Time2", time2Edit_);
+	formLayout->addRow("Count1", count1Edit_);
+	formLayout->addRow("Count2", count2Edit_);
+	formLayout->addRow("Include Status", includeStatusDataCheckbox_);
+	formLayout->addRow("Enable Flattening", enableFlattenDataCheckbox_);
 	mainLayout->addLayout(formLayout, 5, 0, 1, 2);
-	formLayout->addRow("Active continuous connection", activeContinuousConnection);
-	mainLayout->addWidget(results, 6, 0, 1, 2);
+	formLayout->addRow("Active continuous connection", activeContinuousConnectionComboBox_);
+	mainLayout->addWidget(resultsEdit_, 6, 0, 1, 2);
 	setLayout(mainLayout);
 
 	setWindowTitle(tr("AMDS Client Example"));
-	portLineEdit->setFocus();
+	portLineEdit_->setFocus();
 
 	/// ==== initialize the app controller ==============
 	clientAppController_ = new AMDSClientAppController();
@@ -149,8 +149,8 @@ AMDSClientUi::~AMDSClientUi()
 
 void AMDSClientUi::connectToServer()
 {
-	QString hostName = hostLineEdit->text();
-	quint16 portNumber = portLineEdit->text().toInt();
+	QString hostName = hostLineEdit_->text();
+	quint16 portNumber = portLineEdit_->text().toInt();
 
 	clientAppController_->connectToServer(hostName, portNumber);
 }
@@ -158,23 +158,23 @@ void AMDSClientUi::connectToServer()
 /// ============= SLOTs to handle AMDSClientAppController signals =========
 void AMDSClientUi::onNetworkSessionOpening()
 {
-	requestDataButton->setEnabled(false);
-	statusLabel->setText("Opening network session.");
+	requestDataButton_->setEnabled(false);
+	statusLabel_->setText("Opening network session.");
 }
 
 void AMDSClientUi::onNetworkSessionOpened()
 {
-	statusLabel->setText("This examples requires that you run the Acquaman Data Server example as well.");
+	statusLabel_->setText("This examples requires that you run the Acquaman Data Server example as well.");
 	enableRequestDataButton();
 }
 
 void AMDSClientUi::onNewServerConnected(QString serverIdentifier)
 {
-	if (activeServerComboBox->findText(serverIdentifier) == -1) {
-		activeServerComboBox->addItem(serverIdentifier);
+	if (activeServerComboBox_->findText(serverIdentifier) == -1) {
+		activeServerComboBox_->addItem(serverIdentifier);
 	}
 
-	activeServerComboBox->setCurrentIndex(activeServerComboBox->findText(serverIdentifier));
+	activeServerComboBox_->setCurrentIndex(activeServerComboBox_->findText(serverIdentifier));
 
 	QStringList bufferNames = clientAppController_->getBufferNamesByServer(serverIdentifier);
 	resetBufferListView(bufferNames);
@@ -190,13 +190,13 @@ void AMDSClientUi::onServerError(int errorCode, QString serverIdentifier, QStrin
 void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 {
 	if (clientRequest->isContinuousMessage()) {
-		resetActiveContinuousConnection(activeServerComboBox->currentText());
+		resetActiveContinuousConnection(activeServerComboBox_->currentText());
 	} else {
 		if (clientRequest->isIntrospectionMessage()) {
 			AMDSClientIntrospectionRequest *introspectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
 			if (introspectionRequest){
 				if (introspectionRequest->readReady()){
-					const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestType->model());
+					const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestTypeComboBox_->model());
 					for(int x = 1; x < AMDSClientRequestDefinitions::InvalidRequest; x++){
 						QStandardItem* item = model->item(x);
 						item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
@@ -206,7 +206,7 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 				}
 
 				if (introspectionRequest->checkAllBuffer() ){
-					QStringList bufferNames = clientAppController_->getBufferNamesByServer(activeServerComboBox->currentText());
+					QStringList bufferNames = clientAppController_->getBufferNamesByServer(activeServerComboBox_->currentText());
 					resetBufferListView(bufferNames);
 				}
 			}
@@ -217,7 +217,7 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 void AMDSClientUi::onSocketError(int errorCode, QString socketKey, QString errorMessage)
 {
 	if (socketKey.length() > 0) {
-		resetActiveContinuousConnection(activeServerComboBox->currentText());
+		resetActiveContinuousConnection(activeServerComboBox_->currentText());
 	}
 
 	if (errorCode != QAbstractSocket::RemoteHostClosedError)
@@ -247,13 +247,13 @@ void AMDSClientUi::onRequestTypeChanged(QString requestType)
 
 void AMDSClientUi::enableRequestDataButton()
 {
-	requestDataButton->setEnabled(clientAppController_->isSessionOpen() &&
-								 !activeServerComboBox->currentText().isEmpty());
+	requestDataButton_->setEnabled(clientAppController_->isSessionOpen() &&
+								 !activeServerComboBox_->currentText().isEmpty());
 }
 
 void AMDSClientUi::sendClientRequest()
 {
-	AMDSServer * server = clientAppController_->getServerByServerIdentifier(activeServerComboBox->currentText());
+	AMDSServer * server = clientAppController_->getServerByServerIdentifier(activeServerComboBox_->currentText());
 	if (!server) {
 		QMessageBox::information( this, "AMDS Client Example", "Didn't select any active server!");
 		return;
@@ -267,16 +267,16 @@ void AMDSClientUi::sendClientRequest()
 
 	QString hostName = server->hostName();
 	quint16 portNumber = server->portNumber();
-	quint8 requestTypeId = (quint8)requestType->currentIndex();
+	quint8 requestTypeId = (quint8)requestTypeComboBox_->currentIndex();
 	QString bufferName = selectedBufferNames.value(0);
-	QDateTime time1 = time1Edit->dateTime();
-	QDateTime time2 = time2Edit->dateTime();
-	QString value1 = count1Edit->text();
-	QString value2 = count2Edit->text();
-	QString continuousSocket = activeContinuousConnection->currentText();
+	QDateTime time1 = time1Edit_->dateTime();
+	QDateTime time2 = time2Edit_->dateTime();
+	QString value1 = count1Edit_->text();
+	QString value2 = count2Edit_->text();
+	QString continuousSocket = activeContinuousConnectionComboBox_->currentText();
 
-	bool includeStatus = includeStatusDataCheckbox->isChecked();
-	bool enableFlattening = enableFlattenDataCheckbox->isChecked();
+	bool includeStatus = includeStatusDataCheckbox_->isChecked();
+	bool enableFlattening = enableFlattenDataCheckbox_->isChecked();
 
 	AMDSClientRequestDefinitions::RequestType clientRequestType = (AMDSClientRequestDefinitions::RequestType)requestTypeId;
 	if (	(selectedBufferNames.count() == 0)
@@ -327,6 +327,6 @@ void AMDSClientUi::resetActiveContinuousConnection(QString serverIdentifier)
 {
 	QStringList activeContinuousClientRequestKeys = clientAppController_->getActiveSocketKeysByServer(serverIdentifier);
 
-	activeContinuousConnection->clear();
-	activeContinuousConnection->addItems(activeContinuousClientRequestKeys);
+	activeContinuousConnectionComboBox_->clear();
+	activeContinuousConnectionComboBox_->addItems(activeContinuousClientRequestKeys);
 }
