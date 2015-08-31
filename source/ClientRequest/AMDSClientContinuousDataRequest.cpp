@@ -80,8 +80,7 @@ void AMDSClientContinuousDataRequest::setSocketKey(const QString &socketKey)
 }
 
 void AMDSClientContinuousDataRequest::setBufferNames(const QStringList &names) {
-	bufferNameList_.clear();
-	bufferNameList_.append(names);
+	bufferNameList_ = names;
 }
 
 bool AMDSClientContinuousDataRequest::isExpired()
