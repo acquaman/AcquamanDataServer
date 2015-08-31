@@ -377,7 +377,8 @@ void AMDSTCPDataServer::onClientRequestTaskAccomplished(AMDSClientRequest *clien
 			activeContinuousDataRequestList_.remove(clientRequest->socketKey());
 		}
 
-		disconnectFromHost(clientRequest->socketKey());
+		QString socketKey = clientRequest->socketKey();
+		disconnectFromHost(socketKey);
 		clientRequest->deleteLater();
 	}
 }

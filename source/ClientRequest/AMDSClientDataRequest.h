@@ -46,10 +46,10 @@ public:
 	/// Clears the list of data holders
 	inline void clearData() { data_.clear(); }
 
-	/// Writes this AMDSClienDatatRequest to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientDataRequest from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// Writes this AMDSClienDatatRequest to an AMDSDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
+	/// Reads this AMDSClientDataRequest from the AMDSDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(AMDSDataStream *dataStream);
 	/// validate the message response
 	virtual bool validateResponse();
 

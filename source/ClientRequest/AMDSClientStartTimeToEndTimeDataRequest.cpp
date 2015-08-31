@@ -38,38 +38,40 @@ AMDSClientStartTimeToEndTimeDataRequest& AMDSClientStartTimeToEndTimeDataRequest
 	return (*this);
 }
 
-bool AMDSClientStartTimeToEndTimeDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientStartTimeToEndTimeDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	*dataStream << startTime();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_START_TIME;
 	*dataStream << endTime();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_END_TIME;
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientStartTimeToEndTimeDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientStartTimeToEndTimeDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	if(!AMDSClientDataRequest::readFromDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	QDateTime readStartTime;
 	QDateTime readEndTime;
 
 	*dataStream >> readStartTime;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_START_TIME;
 	*dataStream >> readEndTime;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_END_TIME;
 
 	setStartTime(readStartTime);
 	setEndTime(readEndTime);
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }

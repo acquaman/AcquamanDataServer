@@ -28,10 +28,10 @@ public:
 	/// Sets the number of data points after the start time to collect
 	inline void setCount(quint64 count) { count_ = qMax((quint64)1, count) ; }
 
-	/// Writes this AMDSClientStartTimePlusCountDataRequest to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientStartTimePlusCountDataRequest from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// Writes this AMDSClientStartTimePlusCountDataRequest to an AMDSDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
+	/// Reads this AMDSClientStartTimePlusCountDataRequest from the AMDSDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(AMDSDataStream *dataStream);
 
 protected:
 	/// Start time for data
