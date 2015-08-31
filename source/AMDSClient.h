@@ -58,6 +58,7 @@ private:
 	QSpinBox* amptekIndex;
 	QListView *bufferNameListView_;
 	QCheckBox* includeStatusDataCheckbox;
+	QCheckBox* enableFlattenDataCheckbox;
 
 	QString currentFortune;
 	quint32 blockSize;

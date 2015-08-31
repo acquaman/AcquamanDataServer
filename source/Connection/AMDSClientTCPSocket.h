@@ -31,15 +31,15 @@ public slots:
 	/// slot to request data from server for Instrospection
 	void requestData(QString &bufferName);
 	/// slot to request data from server for StartTimePlusCount
-	void requestData(QString &bufferName, QDateTime &startTime, quint64 count);
+	void requestData(QString &bufferName, QDateTime &startTime, quint64 count, bool includeStatus=false, bool enableFlattening=false);
 	/// slot to request data from server for RelativeCountPlusCount
-	void requestData(QString &bufferName, quint64 relativeCount, quint64 count);
+	void requestData(QString &bufferName, quint64 relativeCount, quint64 count, bool includeStatus=false, bool enableFlattening=false);
 	/// slot to request data from server for StartTimeToEndTime
-	void requestData(QString &bufferName, QDateTime &startTime, QDateTime &endTime);
+	void requestData(QString &bufferName, QDateTime &startTime, QDateTime &endTime, bool includeStatus=false, bool enableFlattening=false);
 	/// slot to request data from server for MiddleTimePlusCountBeforeAndAfter
-	void requestData(QString &bufferName, QDateTime &middleTime, quint64 countBefore, quint64 countAfter);
+	void requestData(QString &bufferName, QDateTime &middleTime, quint64 countBefore, quint64 countAfter, bool includeStatus=false, bool enableFlattening=false);
 	/// slot to request data from server for Continuous
-	void requestData(QStringList &bufferNames, quint64 updateInterval, QString handShakeSocketKey="");
+	void requestData(QStringList &bufferNames, quint64 updateInterval, bool includeStatus=false, bool enableFlattening=false, QString handShakeSocketKey="");
 
 protected slots:
 	/// slot to handle the socket error signals
@@ -64,7 +64,7 @@ protected:
 	/// variable to remember how many bytes we suppose to read
 	quint32 expectedBufferSize_;
 	/// byte array to save the readed bytes temporarily
-	QByteArray *incomeDataBuffer_;
+	QByteArray incomeDataBuffer_;
 };
 
 #endif // AMDSCLIENTTCPSOCKET_H
