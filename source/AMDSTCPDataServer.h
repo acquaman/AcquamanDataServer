@@ -59,7 +59,7 @@ public slots:
 
 protected slots:
 	/// to disconnect the given connection from the host
-	void disconnectFromHost(QString socketKey);
+	void disconnectFromHost(QString &socketKey);
 
 	/// Slot which sets the server to be listening. Automatically called from within the start() function, or
 	/// if a session is required, when the session is opened

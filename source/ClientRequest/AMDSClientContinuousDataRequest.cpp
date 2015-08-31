@@ -56,7 +56,6 @@ AMDSClientContinuousDataRequest& AMDSClientContinuousDataRequest::operator =(con
 		AMDSClientDataRequest::operator =(other);
 
 		setBufferNames(other.bufferNames());
-		setBufferName(other.bufferName());
 
 		setUpdateInterval(other.updateInterval());
 		setHandShakeSocketKey(other.handShakeSocketKey());
@@ -81,8 +80,7 @@ void AMDSClientContinuousDataRequest::setSocketKey(const QString &socketKey)
 }
 
 void AMDSClientContinuousDataRequest::setBufferNames(const QStringList &names) {
-	bufferNameList_.clear();
-	bufferNameList_.append(names);
+	bufferNameList_ = names;
 }
 
 bool AMDSClientContinuousDataRequest::isExpired()
