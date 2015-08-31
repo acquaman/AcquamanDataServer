@@ -39,7 +39,7 @@ public slots:
 	/// slot to request data from server for MiddleTimePlusCountBeforeAndAfter
 	void requestData(QString &bufferName, QDateTime &middleTime, quint64 countBefore, quint64 countAfter, bool includeStatus=false, bool enableFlattening=false);
 	/// slot to request data from server for Continuous
-	void requestData(QString &bufferName, quint64 updateInterval, bool includeStatus=false, bool enableFlattening=false, QString handShakeSocketKey="");
+	void requestData(QStringList &bufferNames, quint64 updateInterval, bool includeStatus=false, bool enableFlattening=false, QString handShakeSocketKey="");
 
 protected slots:
 	/// slot to handle the socket error signals

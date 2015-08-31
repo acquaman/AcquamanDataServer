@@ -53,30 +53,32 @@ QStringList AMDSClientIntrospectionRequest::getAllBufferNames()
 	return bufferNames;
 }
 
-bool AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	if(!AMDSClientRequest::writeToDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	*dataStream << bufferName_;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAME;
 
 	quint16 bufferGroupInfosCount = bufferGroupInfos_.count();
 	*dataStream << bufferGroupInfosCount;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_GROUP_INFO_COUNT;
 
 	for(int x = 0, size = bufferGroupInfos_.count(); x < size; x++)
 		dataStream->write(bufferGroupInfos_.at(x));
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	if(!AMDSClientRequest::readFromDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientRequest::readFromDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	QString readBufferName;
 	quint16 readBufferGroupInfosCount;
@@ -84,23 +86,23 @@ bool AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStre
 
 	*dataStream >> readBufferName;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAME;
 	*dataStream >> readBufferGroupInfosCount;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_GROUP_INFO_COUNT;
 
 	for(int x = 0, size = readBufferGroupInfosCount; x < size; x++){
 		AMDSBufferGroupInfo oneBufferGroupInfo("Invalid");
 		dataStream->read(oneBufferGroupInfo);
 		if(oneBufferGroupInfo.name() == "Invalid")
-			return false;
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_GROUP_INFO;
 		readBufferGroupInfos.append(oneBufferGroupInfo);
 	}
 
 	setBufferName(readBufferName);
 	bufferGroupInfos_.append(readBufferGroupInfos);
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
 bool AMDSClientIntrospectionRequest::validateResponse()

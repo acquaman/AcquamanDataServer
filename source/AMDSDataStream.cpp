@@ -327,7 +327,11 @@ void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequ
 }
 
 void AMDSDataStream::write(const AMDSClientRequest &clientRequest){
-	clientRequest.writeToDataStream(this);
+	int errorCode = clientRequest.writeToDataStream(this);
+	if (errorCode != AMDS_CLIENTREQUEST_SUCCESS) {
+		QString errorMessage = AMDSClientRequestDefinitions::errorMessage(errorCode, AMDSClientRequestDefinitions::Write, clientRequest.requestType());
+		AMDSErrorMon::alert(0, errorCode, errorMessage);
+	}
 }
 
 AMDSClientRequestDefinitions::RequestType AMDSDataStream::decodeRequestType(){
@@ -347,12 +351,16 @@ AMDSClientRequest* AMDSDataStream::decodeAndInstantiateClientRequestType(){
 
 	AMDSClientRequest* clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 	if (!clientRequest) {
-		qDebug() << QString("AMDSDataStream::Failed to parse clientRequest for type: %s").arg(clientRequestType);
+		AMDSErrorMon::information(0, 0, QString("AMDSDataStream::Failed to parse clientRequest for type: %s").arg(clientRequestType));
 	}
 
 	return clientRequest;
 }
 
 void AMDSDataStream::read(AMDSClientRequest &clientRequest){
-	clientRequest.readFromDataStream(this);
+	int errorCode = clientRequest.readFromDataStream(this);
+	if (errorCode != AMDS_CLIENTREQUEST_SUCCESS) {
+		QString errorMessage = AMDSClientRequestDefinitions::errorMessage(errorCode, AMDSClientRequestDefinitions::Read, clientRequest.requestType());
+		AMDSErrorMon::alert(0, errorCode, errorMessage);
+	}
 }

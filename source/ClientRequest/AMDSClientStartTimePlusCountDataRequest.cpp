@@ -38,38 +38,40 @@ AMDSClientStartTimePlusCountDataRequest& AMDSClientStartTimePlusCountDataRequest
 	return (*this);
 }
 
-bool AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	*dataStream << startTime();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_START_TIME;
 	*dataStream << count();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT;
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientStartTimePlusCountDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientStartTimePlusCountDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	if(!AMDSClientDataRequest::readFromDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	QDateTime readStartTime;
 	quint64 readCount;
 
 	*dataStream >> readStartTime;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_START_TIME;
 	*dataStream >> readCount;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT;
 
 	setStartTime(readStartTime);
 	setCount(readCount);
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }

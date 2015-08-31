@@ -133,7 +133,7 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimePlusCountDataRequest* clie
 	QDateTime startTime = clientDataRequest->startTime();
 	quint64 count = clientDataRequest->count();
 
-	int startIndex = lowerBound(startTime);
+	int startIndex = getDataIndexByDateTime(startTime);
 
 	if(startIndex == -1)
 		clientDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(startTime.toString()));
@@ -155,8 +155,8 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimeToEndTimeDataRequest* clie
 	QDateTime startTime = clientDataRequest->startTime();
 	QDateTime endTime = clientDataRequest->endTime();
 
-	int startIndex = lowerBound(startTime);
-	int endIndex = lowerBound(endTime);
+	int startIndex = getDataIndexByDateTime(startTime);
+	int endIndex = getDataIndexByDateTime(endTime);
 
 	if(startIndex == -1) {
 		clientDataRequest->setErrorMessage(QString("Could not locate data for start time %1 (ReqType: 4)").arg(startTime.toString()));
@@ -173,7 +173,7 @@ void AMDSBufferGroup::populateData(AMDSClientMiddleTimePlusCountBeforeAndAfterDa
 	int countBefore = clientDataRequest->countBefore();
 	int countAfter = clientDataRequest->countAfter();
 
-	int middleIndex = lowerBound(middleTime);
+	int middleIndex = getDataIndexByDateTime(middleTime);
 	if(middleIndex == -1) {
 		clientDataRequest->setErrorMessage(QString("Could not locate data for middle time %1 (ReqType: 5)").arg(middleTime.toString()));
 	} else {
@@ -183,7 +183,7 @@ void AMDSBufferGroup::populateData(AMDSClientMiddleTimePlusCountBeforeAndAfterDa
 
 void AMDSBufferGroup::populateData(AMDSClientContinuousDataRequest *clientDataRequest)
 {
-	int startIndex = lowerBound(clientDataRequest->lastFetchTime());
+	int startIndex = getDataIndexByDateTime(clientDataRequest->lastFetchTime());
 	if(startIndex == -1)
 		clientDataRequest->setErrorMessage(QString("Could not locate data for time %1").arg(clientDataRequest->lastFetchTime().toString()));
 	else {
@@ -196,7 +196,7 @@ void AMDSBufferGroup::populateData(AMDSClientContinuousDataRequest *clientDataRe
 	}
 }
 
-int AMDSBufferGroup::lowerBound(const QDateTime &dwellTime)
+int AMDSBufferGroup::getDataIndexByDateTime(const QDateTime &dwellTime)
 {
 	if (dataHolders_.isEmpty())
 		return -1;

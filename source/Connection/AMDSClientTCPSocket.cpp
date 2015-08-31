@@ -217,8 +217,13 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &middleTime
 	}
 }
 
-void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 updateInterval, bool includeStatus, bool enableFlattening, QString handShakeSocketKey)
+void AMDSClientTCPSocket::requestData(QStringList &bufferNames, quint64 updateInterval, bool includeStatus, bool enableFlattening, QString handShakeSocketKey)
 {
+	if (bufferNames.length() == 0 && handShakeSocketKey.length() == 0) {
+		AMDSErrorMon::alert(this, 0, QString("AMDSClientTCPSocket::Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
+		return;
+	}
+
 	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::Continuous;
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 	if (!clientRequest) {
@@ -228,7 +233,7 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 updateInterva
 
 	AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 	if(clientContinuousDataRequest){
-		clientContinuousDataRequest->setBufferName(bufferName);
+		clientContinuousDataRequest->setBufferNames(bufferNames);
 		clientContinuousDataRequest->setUpdateInterval(updateInterval);
 		clientContinuousDataRequest->setIncludeStatusData(includeStatus);
 		clientContinuousDataRequest->setFlattenResultData(enableFlattening);

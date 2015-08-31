@@ -39,38 +39,40 @@ AMDSClientRelativeCountPlusCountDataRequest& AMDSClientRelativeCountPlusCountDat
 	return (*this);
 }
 
-bool AMDSClientRelativeCountPlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientRelativeCountPlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
-	if(!AMDSClientDataRequest::writeToDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	*dataStream << relativeCount();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_RELATIVE_COUNT;
 	*dataStream << count();
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT;
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientRelativeCountPlusCountDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientRelativeCountPlusCountDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
-	if(!AMDSClientDataRequest::readFromDataStream(dataStream))
-		return false;
+	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
+	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
+		return errorCode;
 
 	quint64 readRelativeCount;
 	quint64 readCount;
 
 	*dataStream >> readRelativeCount;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_RELATIVE_COUNT;
 	*dataStream >> readCount;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT;
 
 	setRelativeCount(readRelativeCount);
 	setCount(readCount);
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
