@@ -210,7 +210,7 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &middleTime
 	}
 }
 
-void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 updateInterval, QString handShakeSocketKey)
+void AMDSClientTCPSocket::requestData(QStringList &bufferNames, quint64 updateInterval, QString handShakeSocketKey)
 {
 	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::Continuous;
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
@@ -221,7 +221,7 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 updateInterva
 
 	AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 	if(clientContinuousDataRequest){
-		clientContinuousDataRequest->setBufferName(bufferName);
+		clientContinuousDataRequest->setBufferNames(bufferNames);
 		clientContinuousDataRequest->setUpdateInterval(updateInterval);
 		if (handShakeSocketKey.length() > 0) {
 			clientContinuousDataRequest->setHandShakeSocketKey(handShakeSocketKey);

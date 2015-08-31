@@ -1,21 +1,32 @@
 #ifndef AMDSCLIENTCONTINUOUSDATAREQUEST_H
 #define AMDSCLIENTCONTINUOUSDATAREQUEST_H
 
-#include "source/ClientRequest/AMDSClientDataRequest.h"
+#include "AMDSClientDataRequest.h"
 
 #include <QTimer>
 #include <QDateTime>
+#include <QStringList>
+#include <QMap>
 
 class AMDSClientContinuousDataRequest : public AMDSClientDataRequest
 {
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientContinuousDataRequest(QObject *parent = 0);
-	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientContinuousDataRequest();
 	/// Copy constructor
 	AMDSClientContinuousDataRequest(const AMDSClientContinuousDataRequest &other);
 
+	AMDSClientContinuousDataRequest& operator =(const AMDSClientContinuousDataRequest &other);
+
+	/// returns whether this is a continuous message
+	virtual bool isContinuousMessage() { return true;}
+
+	/// Sets the socket key identifier
+	virtual void setSocketKey(const QString &socketKey);
+	/// Returns the list of buffernames
+	inline QStringList bufferNames() const { return bufferNameList_; }
 	/// Returns the start time for the data request
 	inline QDateTime startTime() const { return startTime_; }
 	/// Returns the update interval
@@ -28,11 +39,15 @@ public:
 	inline QDateTime lastHandShakingTime() const { return lastHandShakeTime_; }
 	/// check if it is hand shaking message
 	inline bool isHandShakingMessage() { return handShakeSocketKey_.length() > 0; }
+
+	/// Returns the buffer data request message
+	inline AMDSClientContinuousDataRequest *bufferDataRequest(QString bufferName) { return bufferDataRequestList_.value(bufferName); }
+
 	/// Returns whether message expired (didn't receive handshake in a given time interval
 	bool isExpired();
 
-	AMDSClientContinuousDataRequest& operator =(const AMDSClientContinuousDataRequest &other);
-
+	/// Sets the buffer names
+	void setBufferNames(const QStringList &names);
 	/// Sets the start time for the data request
 	inline void setStartTime(const QDateTime &startTime) { startTime_ = startTime; }
 	/// Sets the updateInterval for the data request
@@ -53,16 +68,22 @@ public:
 	bool startContinuousRequestTimer();
 
 signals:
+	/// SIGNAL of new message requst
 	void sendNewContinuousDataRequest(AMDSClientRequest* message);
 
 protected slots:
+	/// to handle the timeout message of the timer: to send the new message
 	void onDataRequestTimerTimeout();
 
 protected:
+	/// the timer of continuous request
 	QTimer continuousDataRequestTimer_;
 
-  /// Start time for data
-  QDateTime startTime_;
+	/// the list of requested buffer names
+	QStringList bufferNameList_;
+
+	/// Start time for data
+	QDateTime startTime_;
 	/// Update interval // default 500ms
 	quint32 updateInterval_;
 	/// The datetime of last fetch
@@ -72,6 +93,9 @@ protected:
 	QString handShakeSocketKey_;
 	/// The datetime of last handshake
 	QDateTime lastHandShakeTime_;
+
+	/// The list of mapped buffer data request
+	QMap<QString, AMDSClientContinuousDataRequest *> bufferDataRequestList_;
 };
 
 #endif // AMDSCLIENTCONTINUOUSDATAREQUEST_H

@@ -73,11 +73,6 @@ protected:
 	/// Fills the request with all data acquired after lastFetch
 	void populateData(AMDSClientContinuousDataRequest* clientDataRequest);
 
-//	/// Fills the request with count number of spectra either side of the entry relativeCount ago
-//	void populateData(AMDSClientRequest* request, int relativeCount, int count);
-//	/// Fills the request with countBefore entries before middleTime to countAfter entries after.
-//	void populateData(AMDSClientRequest* request, const QDateTime& middleTime, int countBefore, int countAfter);
-
 	/// Helper function that returns the index in the buffer 1 before the given dwellTime, or at the point at
 	/// which the given dwellTime would occur within the buffer, if an exact match is not found.
 	int lowerBound(const QDateTime& dwellTime);

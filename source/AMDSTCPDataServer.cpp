@@ -50,6 +50,13 @@ AMDSTCPDataServer::~AMDSTCPDataServer()
 	stop();
 }
 
+void AMDSTCPDataServer::disconnectFromHost(QString &socketKey)
+{
+	QTcpSocket* requestingSocket = clientSockets_.value(socketKey, 0);
+	if(requestingSocket)
+		requestingSocket->disconnectFromHost();
+}
+
 void AMDSTCPDataServer::displayClients()
 {
 	if(clientSockets_.isEmpty())
@@ -136,21 +143,9 @@ void AMDSTCPDataServer::stop()
 
 void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
 {
-	bool missionAccomplished = false;
-
 	QTcpSocket* requestingSocket = clientSockets_.value(processedRequest->socketKey(), 0);
 	if(requestingSocket != 0)
 	{
-		AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
-		if(processedClientDataRequest) {
-			if (processedClientDataRequest->validateResponse()) {
-				if (processedClientDataRequest->requestType() == AMDSClientRequestDefinitions::Continuous) {
-					AMDSClientContinuousDataRequest *processedClientDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(processedClientDataRequest);
-					missionAccomplished = processedClientDataRequest->startContinuousRequestTimer();
-				}
-			}
-		}
-
 		QByteArray block;
 		AMDSDataStream output(&block, QIODevice::WriteOnly);
 		output.setVersion(QDataStream::Qt_4_0);
@@ -170,9 +165,15 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 		tenSecondsStats_.setOutboundBytes(tenSecondsStats_.outboundBytes()+outboundBytes);
 	}
 
-	if (!missionAccomplished) {
+	AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
+	if(processedClientDataRequest) {
+		processedClientDataRequest->validateResponse();
+	}
+
+	if (!processedClientDataRequest || !processedClientDataRequest->isContinuousMessage()) {
 		processedRequest->deleteLater();
-		requestingSocket->disconnectFromHost();
+		if (requestingSocket)
+			requestingSocket->disconnectFromHost();
 	}
 }
 
@@ -333,7 +334,7 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 		}
 	}
 	else {
-		if(clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
+		if (   clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
 			AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
 			if(clientContinuousDataRequest){
 				if (clientContinuousDataRequest->isHandShakingMessage()) {
