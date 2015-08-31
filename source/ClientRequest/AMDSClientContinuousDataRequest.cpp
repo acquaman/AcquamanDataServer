@@ -19,8 +19,8 @@ AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(QObject *parent
 	connect(&continuousDataRequestTimer_, SIGNAL(timeout()), this, SLOT(onDataRequestTimerTimeout()));
 }
 
-AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool enableFlattening, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
-	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, "", includeStatusData, enableFlattening, bufferGroupInfo, parent)
+AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool flattenResultData, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, QString(""), includeStatusData, flattenResultData, bufferGroupInfo, parent)
 {
 	setBufferNames(bufferNames);
 	setUpdateInterval(msgUpdateInterval);
@@ -56,7 +56,6 @@ AMDSClientContinuousDataRequest& AMDSClientContinuousDataRequest::operator =(con
 		AMDSClientDataRequest::operator =(other);
 
 		setBufferNames(other.bufferNames());
-		setBufferName(other.bufferName());
 
 		setUpdateInterval(other.updateInterval());
 		setHandShakeSocketKey(other.handShakeSocketKey());
@@ -81,8 +80,7 @@ void AMDSClientContinuousDataRequest::setSocketKey(const QString &socketKey)
 }
 
 void AMDSClientContinuousDataRequest::setBufferNames(const QStringList &names) {
-	bufferNameList_.clear();
-	bufferNameList_.append(names);
+	bufferNameList_ = names;
 }
 
 bool AMDSClientContinuousDataRequest::isExpired()
@@ -136,6 +134,8 @@ int AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStre
 
 	QStringList readBufferNames;
 	*dataStream >> readBufferNames;
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAMES;
 
 	setUpdateInterval(readUpdateInterval);
 	setHandShakeSocketKey(readHandShakeSocketKey);

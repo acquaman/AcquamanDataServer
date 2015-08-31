@@ -33,7 +33,7 @@ public:
 	inline void setBufferName(const QString &bufferName) { bufferName_ = bufferName; }
 	/// Sets the flag to include status meta data
 	inline void setIncludeStatusData(bool includeStatusData) { includeStatusData_ = includeStatusData; }
-	/// Sets the flag to enable data flattening
+	/// Sets the flag to flatten data
 	inline void setFlattenResultData(bool enable) { flattenResultData_ = enable; }
 	/// Sets the bufferGroupInfo
 	inline void setBufferGroupInfo(const AMDSBufferGroupInfo &bufferGroupInfo) { bufferGroupInfo_ = bufferGroupInfo; }

@@ -68,7 +68,7 @@ int AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INCLUDE_STATUS;
 	*dataStream << flattenResultData_;
 	if(dataStream->status() != QDataStream::Ok)
-		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_ENABLE_FLATTEN;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_FLATTEN_RESULT_DATA;
 
 	bool includeData = bufferGroupInfo_.includeData();
 	*dataStream << includeData;
@@ -145,7 +145,7 @@ int AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	*dataStream >> readFlattenResultData;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_FLATTEN_RESULT_DATA;
 
 	*dataStream >> readIncludeData;
 	if(dataStream->status() != QDataStream::Ok)
