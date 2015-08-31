@@ -10,19 +10,18 @@ public:
 	Q_INVOKABLE AMDSLightWeightSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, QObject *parent = 0);
 	virtual ~AMDSLightWeightSpectralDataHolder();
 
+	/// implement the function to return axes information
 	virtual inline QList<AMDSAxisInfo> axes() const;
+	/// implement the function to return the rank information (size of Axes)
 	virtual inline quint8 rank() const { return 1; }
+	/// implement the function to return the lenght of a the specified axis
 	virtual inline quint32 size(int axisId) const;
+	/// implement the function to return the lenght of axes
 	virtual inline AMDSnDIndex size() const;
 
-	virtual inline bool data(AMDSFlatArray *outputValues) const;
-	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
-
-	virtual inline void setData(AMDSFlatArray *inputValues);
-
-	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
+	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
+	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
@@ -39,6 +38,9 @@ public:
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
+////////////////////////////////////////
+// AMDSLightWeightSpectralDataHolder inline implementations
+////////////////////////////////////////
 QList<AMDSAxisInfo> AMDSLightWeightSpectralDataHolder::axes() const{
 	QList<AMDSAxisInfo> retVal;
 	retVal << AMDSAxisInfo("Axis0", valueFlatArray_.size(), "Generic Axis 0", "Generic Value");
@@ -53,19 +55,6 @@ quint32 AMDSLightWeightSpectralDataHolder::size(int axisId) const{
 
 AMDSnDIndex AMDSLightWeightSpectralDataHolder::size() const{
 	return AMDSnDIndex(valueFlatArray_.size());
-}
-
-bool AMDSLightWeightSpectralDataHolder::data(AMDSFlatArray *outputValues) const{
-	return valueFlatArray_.replaceData(outputValues);
-}
-
-bool AMDSLightWeightSpectralDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
-	Q_UNUSED(axes)
-	return false;
-}
-
-void AMDSLightWeightSpectralDataHolder::setData(AMDSFlatArray *inputValues){
-	inputValues->copyData(&valueFlatArray_);
 }
 
 #endif // AMDSSPECTRALDATAHOLDER_H

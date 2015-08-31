@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "source/AMDSBuffer.h"
 #include "source/AMDSBufferGroupInfo.h"
+#include "source/DataElement/AMDSBuffer.h"
 #include "source/DataHolder/AMDSDataHolder.h"
 
 class AMDSClientRequest;
@@ -60,6 +60,8 @@ signals:
 protected:
 	/// Helper functions which populate request data based on the parameters passed:
 
+	/// Flatten the data based on the given flatten method
+	void flattenData(QList<AMDSDataHolder *> *dataArray);
 	/// Fills the data to the clientRequest
 	void populateData(AMDSClientDataRequest* clientDataRequest, int startIndex, int endIndex);
 	/// Fills the request with count number of spectra after (and including) startTime

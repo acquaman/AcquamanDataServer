@@ -10,7 +10,7 @@ class AMDSClientStartTimePlusCountDataRequest : public AMDSClientDataRequest
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientStartTimePlusCountDataRequest(QObject *parent = 0);
-	explicit AMDSClientStartTimePlusCountDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool enableFlattening, const QDateTime &startTime, quint64 count, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientStartTimePlusCountDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 count, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientStartTimePlusCountDataRequest();
 
 	/// Copy constructor

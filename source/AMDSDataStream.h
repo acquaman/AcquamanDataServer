@@ -3,10 +3,10 @@
 
 #include <QDataStream>
 
-#include "source/AMDSAxisInfo.h"
 #include "source/AMDSBufferGroup.h"
 #include "source/AMDSPacketStats.h"
-#include "source/AMDSFlatArray.h"
+#include "source/DataElement/AMDSAxisInfo.h"
+#include "source/DataElement/AMDSFlatArray.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 
 class AMDSDataStream : public QDataStream

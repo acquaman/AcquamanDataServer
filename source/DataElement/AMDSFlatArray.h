@@ -5,13 +5,18 @@
 
 #include <QDebug>
 
-#include "source/AMDSDataTypeDefinitions.h"
+#include "source/DataElement/AMDSDataTypeDefinitions.h"
 
 class AMDSFlatArray
 {
 public:
 	AMDSFlatArray(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::InvalidType, quint32 size = 0);
 	virtual ~AMDSFlatArray();
+
+	/// define the PLUS operation of AMDSFlatArray, which will plus the value of the two instances of AMDSFlatArray and return a new instance
+	virtual AMDSFlatArray operator +(AMDSFlatArray &dataFlatArray);
+	/// define the Division operation of AMDSFlatArray: the value of the given handler will be divided by the given divisior
+	virtual AMDSFlatArray operator /(quint32 divisor);
 
 	inline AMDSDataTypeDefinitions::DataType dataType() const { return dataType_; }
 	inline quint32 size() const;
@@ -41,8 +46,10 @@ public:
 	inline void clear();
 	inline void clearAndReset(AMDSDataTypeDefinitions::DataType dataType, quint32 size);
 
-	inline bool copyData(AMDSFlatArray *other) const;
-	inline bool replaceData(AMDSFlatArray *other) const;
+	/// copy the data array of the current dataset to the target array
+	inline bool copyDataToTargetArray(AMDSFlatArray *targetArray) const;
+	/// clear the target array and copy the data array of the current dataset to the target array
+	inline bool resetTargetArrayAndReplaceData(AMDSFlatArray *targetArray) const;
 
 	inline QString printData() const;
 
@@ -149,59 +156,60 @@ void AMDSFlatArray::clearAndReset(AMDSDataTypeDefinitions::DataType dataType, qu
 	resizeType(dataType_, size);
 }
 
-bool AMDSFlatArray::copyData(AMDSFlatArray *other) const{
-	if(other == this)
+bool AMDSFlatArray::copyDataToTargetArray(AMDSFlatArray *targetArray) const{
+	if(targetArray == this)
 		return false;
+
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:
-		if(vectorQint8_.size() != other->vectorQint8().size())
+		if(vectorQint8_.size() != targetArray->vectorQint8().size())
 			return false;
-		memcpy(other->vectorQint8().data(), vectorQint8_.constData(), vectorQint8_.size()*sizeof(qint8));
+		memcpy(targetArray->vectorQint8().data(), vectorQint8_.constData(), vectorQint8_.size()*sizeof(qint8));
 		return true;
 	case AMDSDataTypeDefinitions::Unsigned8:
-		if(vectorQuint8_.size() != other->vectorQuint8().size())
+		if(vectorQuint8_.size() != targetArray->vectorQuint8().size())
 			return false;
-		memcpy(other->vectorQuint8().data(), vectorQuint8_.constData(), vectorQuint8_.size()*sizeof(quint8));
+		memcpy(targetArray->vectorQuint8().data(), vectorQuint8_.constData(), vectorQuint8_.size()*sizeof(quint8));
 		return true;
 	case AMDSDataTypeDefinitions::Signed16:
-		if(vectorQint16_.size() != other->vectorQint16().size())
+		if(vectorQint16_.size() != targetArray->vectorQint16().size())
 			return false;
-		memcpy(other->vectorQint16().data(), vectorQint16_.constData(), vectorQint16_.size()*sizeof(qint16));
+		memcpy(targetArray->vectorQint16().data(), vectorQint16_.constData(), vectorQint16_.size()*sizeof(qint16));
 		return true;
 	case AMDSDataTypeDefinitions::Unsigned16:
-		if(vectorQuint16_.size() != other->vectorQuint16().size())
+		if(vectorQuint16_.size() != targetArray->vectorQuint16().size())
 			return false;
-		memcpy(other->vectorQuint16().data(), vectorQuint16_.constData(), vectorQuint16_.size()*sizeof(quint16));
+		memcpy(targetArray->vectorQuint16().data(), vectorQuint16_.constData(), vectorQuint16_.size()*sizeof(quint16));
 		return true;
 	case AMDSDataTypeDefinitions::Signed32:
-		if(vectorQint32_.size() != other->vectorQint32().size())
+		if(vectorQint32_.size() != targetArray->vectorQint32().size())
 			return false;
-		memcpy(other->vectorQint32().data(), vectorQint32_.constData(), vectorQint32_.size()*sizeof(qint32));
+		memcpy(targetArray->vectorQint32().data(), vectorQint32_.constData(), vectorQint32_.size()*sizeof(qint32));
 		return true;
 	case AMDSDataTypeDefinitions::Unsigned32:
-		if(vectorQuint32_.size() != other->vectorQuint32().size())
+		if(vectorQuint32_.size() != targetArray->vectorQuint32().size())
 			return false;
-		memcpy(other->vectorQuint32().data(), vectorQuint32_.constData(), vectorQuint32_.size()*sizeof(quint32));
+		memcpy(targetArray->vectorQuint32().data(), vectorQuint32_.constData(), vectorQuint32_.size()*sizeof(quint32));
 		return true;
 	case AMDSDataTypeDefinitions::Signed64:
-		if(vectorQint64_.size() != other->vectorQint64().size())
+		if(vectorQint64_.size() != targetArray->vectorQint64().size())
 			return false;
-		memcpy(other->vectorQint64().data(), vectorQint64_.constData(), vectorQint64_.size()*sizeof(qint64));
+		memcpy(targetArray->vectorQint64().data(), vectorQint64_.constData(), vectorQint64_.size()*sizeof(qint64));
 		return true;
 	case AMDSDataTypeDefinitions::Unsigned64:
-		if(vectorQuint64_.size() != other->vectorQuint64().size())
+		if(vectorQuint64_.size() != targetArray->vectorQuint64().size())
 			return false;
-		memcpy(other->vectorQuint64().data(), vectorQuint64_.constData(), vectorQuint64_.size()*sizeof(quint64));
+		memcpy(targetArray->vectorQuint64().data(), vectorQuint64_.constData(), vectorQuint64_.size()*sizeof(quint64));
 		return true;
 	case AMDSDataTypeDefinitions::Float:
-		if(vectorFloat_.size() != other->vectorFloat().size())
+		if(vectorFloat_.size() != targetArray->vectorFloat().size())
 			return false;
-		memcpy(other->vectorFloat().data(), vectorFloat_.constData(), vectorFloat_.size()*sizeof(float));
+		memcpy(targetArray->vectorFloat().data(), vectorFloat_.constData(), vectorFloat_.size()*sizeof(float));
 		return true;
 	case AMDSDataTypeDefinitions::Double:
-		if(vectorDouble_.size() != other->vectorDouble().size())
+		if(vectorDouble_.size() != targetArray->vectorDouble().size())
 			return false;
-		memcpy(other->vectorDouble().data(), vectorDouble_.constData(), vectorDouble_.size()*sizeof(double));
+		memcpy(targetArray->vectorDouble().data(), vectorDouble_.constData(), vectorDouble_.size()*sizeof(double));
 		return true;
 	case AMDSDataTypeDefinitions::InvalidType:
 		return -1;
@@ -210,9 +218,9 @@ bool AMDSFlatArray::copyData(AMDSFlatArray *other) const{
 	}
 }
 
-bool AMDSFlatArray::replaceData(AMDSFlatArray *other) const{
-	other->clearAndReset(dataType_, size());
-	return copyData(other);
+bool AMDSFlatArray::resetTargetArrayAndReplaceData(AMDSFlatArray *targetArray) const{
+	targetArray->clearAndReset(dataType_, size());
+	return copyDataToTargetArray(targetArray);
 }
 
 void AMDSFlatArray::resizeType(AMDSDataTypeDefinitions::DataType dataType, quint32 size){

@@ -69,11 +69,12 @@ void AMDSClientTCPSocket::readFortune()
 			waitingMorePackages_ = false;
 
 			inDataStream = new AMDSDataStream(incomeDataBuffer_);
-		} else {
-			// finish reading this message, waiting for the future data
-			return;
 		}
 	}
+
+	// finish reading this message, waiting for the future data
+	if (waitingMorePackages_)
+		return;
 
 	AMDSClientRequest *clientRequest = inDataStream->decodeAndInstantiateClientRequestType();
 	inDataStream->read(*clientRequest);
@@ -145,7 +146,7 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &startTime,
 		clientStartTimePlusCountDataRequest->setStartTime(startTime);
 		clientStartTimePlusCountDataRequest->setCount(count);
 		clientStartTimePlusCountDataRequest->setIncludeStatusData(includeStatus);
-		clientStartTimePlusCountDataRequest->setEnableFlattening(enableFlattening);
+		clientStartTimePlusCountDataRequest->setFlattenResultData(enableFlattening);
 
 		sendData(clientStartTimePlusCountDataRequest);
 	}
@@ -166,7 +167,7 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, quint64 relativeCount
 		clientRelativeCountPlusCountDataRequest->setRelativeCount(relativeCount);
 		clientRelativeCountPlusCountDataRequest->setCount(count);
 		clientRelativeCountPlusCountDataRequest->setIncludeStatusData(includeStatus);
-		clientRelativeCountPlusCountDataRequest->setEnableFlattening(enableFlattening);
+		clientRelativeCountPlusCountDataRequest->setFlattenResultData(enableFlattening);
 
 		sendData(clientRelativeCountPlusCountDataRequest);
 	}
@@ -187,7 +188,7 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &startTime,
 		clientStartTimeToEndTimeDataRequest->setStartTime(startTime);
 		clientStartTimeToEndTimeDataRequest->setEndTime(endTime);
 		clientStartTimeToEndTimeDataRequest->setIncludeStatusData(includeStatus);
-		clientStartTimeToEndTimeDataRequest->setEnableFlattening(enableFlattening);
+		clientStartTimeToEndTimeDataRequest->setFlattenResultData(enableFlattening);
 
 		sendData(clientStartTimeToEndTimeDataRequest);
 	}
@@ -210,7 +211,7 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &middleTime
 		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountBefore(countBefore);
 		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setCountAfter(countAfter);
 		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setIncludeStatusData(includeStatus);
-		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setEnableFlattening(enableFlattening);
+		clientMiddleTimePlusCountBeforeAndAfterDataRequest->setFlattenResultData(enableFlattening);
 
 		sendData(clientMiddleTimePlusCountBeforeAndAfterDataRequest);
 	}
@@ -235,7 +236,7 @@ void AMDSClientTCPSocket::requestData(QStringList &bufferNames, quint64 updateIn
 		clientContinuousDataRequest->setBufferNames(bufferNames);
 		clientContinuousDataRequest->setUpdateInterval(updateInterval);
 		clientContinuousDataRequest->setIncludeStatusData(includeStatus);
-		clientContinuousDataRequest->setEnableFlattening(enableFlattening);
+		clientContinuousDataRequest->setFlattenResultData(enableFlattening);
 		if (handShakeSocketKey.length() > 0) {
 			clientContinuousDataRequest->setHandShakeSocketKey(handShakeSocketKey);
 		}
