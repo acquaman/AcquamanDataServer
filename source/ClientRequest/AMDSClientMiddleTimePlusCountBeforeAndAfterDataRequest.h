@@ -32,10 +32,10 @@ public:
 	/// Sets the count after for the data request
 	inline void setCountAfter(quint64 count) { countAfter_ = count; }
 
-	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an AMDSDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
+	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the AMDSDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(AMDSDataStream *dataStream);
 
 protected:
 	/// Middle time for data

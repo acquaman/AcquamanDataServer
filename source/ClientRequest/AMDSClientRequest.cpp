@@ -29,25 +29,34 @@ AMDSClientRequest& AMDSClientRequest::operator =(const AMDSClientRequest &other)
 	if(this != &other){
 		setAttributesValues(other.socketKey(), other.errorMessage(), other.requestType(), other.responseType());
 	}
+
 	return (*this);
 }
 
-bool AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const
+bool AMDSClientRequest::isDataClientRequest() {
+	return     requestType() == AMDSClientRequestDefinitions::StartTimePlusCount
+			|| requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount
+			|| requestType() == AMDSClientRequestDefinitions::StartTimeToEndTime
+			|| requestType() == AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter
+			|| requestType() == AMDSClientRequestDefinitions::Continuous ;
+}
+
+int AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
 	*dataStream << socketKey_;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_SOCKET_KEY;
 	*dataStream << errorMessage_;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_ERROR_MESSAGE;
 	*dataStream << (quint8)responseType_;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_RESPONSE_TYPE;
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
 {
 	QString readSocketKey;
 	QString readErrorMessage;
@@ -55,18 +64,18 @@ bool AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	*dataStream >> readSocketKey;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_STATUS;
 	*dataStream >> readErrorMessage;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_ERROR_MESSAGE;
 	*dataStream >> readResponseType;
 	if(dataStream->status() != QDataStream::Ok)
-		return false;
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_RESPONSE_TYPE;
 
 	//NOTE: we won't change the requestType :)
 	setAttributesValues(readSocketKey, readErrorMessage, requestType(), (AMDSClientRequest::ResponseType)readResponseType);
 
-	return true;
+	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
 void AMDSClientRequest::setAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType)

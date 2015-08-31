@@ -13,6 +13,7 @@ class QNetworkSession;
 class QDateTimeEdit;
 class QTextEdit;
 class QComboBox;
+class QListView;
 class QSpinBox;
 class QCheckBox;
 
@@ -31,6 +32,7 @@ private slots:
 	void onSocketDataReady(AMDSClientTCPSocket* socket, AMDSClientRequest *clientRequest);
 
 	void onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketError);
+	void onRequestTypeChanged(QString);
 	void enableGetFortuneButton();
 	void sessionOpened();
 
@@ -54,7 +56,7 @@ private:
 	QTextEdit* results;
 	QComboBox* requestType;
 	QSpinBox* amptekIndex;
-	QComboBox *bufferNameComboBox_;
+	QListView *bufferNameListView_;
 	QCheckBox* includeStatusDataCheckbox;
 	QCheckBox* enableFlattenDataCheckbox;
 
