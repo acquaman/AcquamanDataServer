@@ -82,6 +82,3 @@ SOURCES += \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/util/AMDSErrorMonitor.cpp
 
-
-
-

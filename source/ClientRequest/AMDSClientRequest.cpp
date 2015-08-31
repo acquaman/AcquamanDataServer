@@ -29,7 +29,16 @@ AMDSClientRequest& AMDSClientRequest::operator =(const AMDSClientRequest &other)
 	if(this != &other){
 		setAttributesValues(other.socketKey(), other.errorMessage(), other.requestType(), other.responseType());
 	}
+
 	return (*this);
+}
+
+bool AMDSClientRequest::isDataClientRequest() {
+	return     requestType() == AMDSClientRequestDefinitions::StartTimePlusCount
+			|| requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount
+			|| requestType() == AMDSClientRequestDefinitions::StartTimeToEndTime
+			|| requestType() == AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter
+			|| requestType() == AMDSClientRequestDefinitions::Continuous ;
 }
 
 int AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const

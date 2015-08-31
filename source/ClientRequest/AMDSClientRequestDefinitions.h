@@ -36,6 +36,7 @@ namespace AMDSClientRequestDefinitions {
 	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_COUNT_AFTER 20146
 	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_UPDATE_INTERVAL 20147
 	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_HANDSHAKE_SOCKET_KEY 20148
+	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAMES 20149
 
 	enum OperationType{
 		Read = 0,
@@ -49,7 +50,7 @@ namespace AMDSClientRequestDefinitions {
 		StartTimeToEndTime = 4,
 		MiddleTimePlusCountBeforeAndAfter = 5,
 		Continuous = 6,
-		InvalidRequest = 7
+		InvalidRequest = 7 // NOTE: this must be the last item of the RequestType definition
 	};
 
 	static QString errorMessage(int errorCode, OperationType operType, RequestType msgType) {
