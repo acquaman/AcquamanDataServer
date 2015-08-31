@@ -149,12 +149,49 @@ bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 	if (messageExpired) {
 		setErrorMessage(QString("(msg %1) continuous update expired!").arg(socketKey()));
 		AMDSErrorMon::alert(this, 0, errorMessage());
+
+		emit clientRequestTaskAccomplished(this);
 	} else {
 		AMDSErrorMon::information(this, 0, QString("(msg %1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
 		continuousDataRequestTimer_.singleShot(updateInterval(), this, SLOT(onDataRequestTimerTimeout()));
 	}
 
 	return !messageExpired;
+}
+
+/**
+  Handshaking logic:
+	 - if the handShaking message contains no interested buffer name, the corresponding active message will be deregisterred;
+	 - if the handShaking message contains buffer names, the active buffer names not in the handshake buffer names will NOT be tracked anymore
+	 - if all the active buffername is deactived, the corresponding active message will be forced to be deregisterred;
+*/
+void AMDSClientContinuousDataRequest::handShaking(AMDSClientContinuousDataRequest *handShakingMessage)
+{
+	setHandShakeTime(QDateTime::currentDateTime());
+
+	QStringList handShakeBufferNames = handShakingMessage->bufferNames();
+	if (handShakeBufferNames.size() == 0) {
+		AMDSErrorMon::alert(this, 0, QString("(msg %1): deregistered by request.").arg(socketKey()));
+		emit clientRequestTaskAccomplished(this);
+	} else {
+		foreach (QString bufferName, bufferNames()) {
+			if (!handShakeBufferNames.contains(bufferName)) {
+				// this buffer name is no longer interested, removed from the active list
+				AMDSClientRequest *dataRequest = bufferDataRequestList_.value(bufferName);
+				bufferDataRequestList_.remove(bufferName);
+				dataRequest->deleteLater();
+
+				bufferNameList_.removeAt(bufferNameList_.indexOf(bufferName));
+
+				AMDSErrorMon::alert(this, 0, QString("(msg %1): buffer (%2) is no longer traced.").arg(socketKey()).arg(bufferName));
+			}
+		}
+
+		if (bufferDataRequestList_.size() == 0) {
+			AMDSErrorMon::alert(this, 0, QString("(msg %1): force-deregistered by request since no more active interested buffer.").arg(socketKey()));
+			emit clientRequestTaskAccomplished(this);
+		}
+	}
 }
 
 void AMDSClientContinuousDataRequest::onDataRequestTimerTimeout()

@@ -212,6 +212,11 @@ void AMDSClientTCPSocket::requestData(QString &bufferName, QDateTime &middleTime
 
 void AMDSClientTCPSocket::requestData(QStringList &bufferNames, quint64 updateInterval, QString handShakeSocketKey)
 {
+	if (bufferNames.length() == 0 && handShakeSocketKey.length() == 0) {
+		AMDSErrorMon::alert(this, 0, QString("AMDSClientTCPSocket::Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
+		return;
+	}
+
 	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::Continuous;
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 	if (!clientRequest) {

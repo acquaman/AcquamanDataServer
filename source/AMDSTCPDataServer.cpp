@@ -50,13 +50,6 @@ AMDSTCPDataServer::~AMDSTCPDataServer()
 	stop();
 }
 
-void AMDSTCPDataServer::disconnectFromHost(QString &socketKey)
-{
-	QTcpSocket* requestingSocket = clientSockets_.value(socketKey, 0);
-	if(requestingSocket)
-		requestingSocket->disconnectFromHost();
-}
-
 void AMDSTCPDataServer::displayClients()
 {
 	if(clientSockets_.isEmpty())
@@ -171,10 +164,15 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 	}
 
 	if (!processedClientDataRequest || !processedClientDataRequest->isContinuousMessage()) {
-		processedRequest->deleteLater();
-		if (requestingSocket)
-			requestingSocket->disconnectFromHost();
+		onClientRequestTaskAccomplished(processedRequest);
 	}
+}
+
+void AMDSTCPDataServer::disconnectFromHost(QString &socketKey)
+{
+	QTcpSocket* requestingSocket = clientSockets_.value(socketKey, 0);
+	if(requestingSocket)
+		requestingSocket->disconnectFromHost();
 }
 
 void AMDSTCPDataServer::sessionOpened()
@@ -322,42 +320,65 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 
 	clientRequest->setSocketKey(clientKey);
 
-	if(clientRequest->requestType() == AMDSClientRequestDefinitions::Statistics){
-		AMDSClientStatisticsRequest *clientStatisticsRequest = qobject_cast<AMDSClientStatisticsRequest*>(clientRequest);
-		if(clientStatisticsRequest){
-			clientStatisticsRequest->appendPacketStats(tenMillisecondsStats_);
-			clientStatisticsRequest->appendPacketStats(hundredMillisecondsStats_);
-			clientStatisticsRequest->appendPacketStats(oneSecondsStats_);
-			clientStatisticsRequest->appendPacketStats(tenSecondsStats_);
+	if(clientRequest->isStatisticsMessage()){
+		onClientStaticsRequestReceived(clientRequest);
+	} else if (clientRequest->isContinuousMessage()) {
+		onClientContinuousRequestReceived(clientRequest);
+	} else {
+		emit clientRequestRead(clientRequest);
+	}
+}
 
-			onClientRequestProcessed(clientRequest);
+void AMDSTCPDataServer::onClientStaticsRequestReceived(AMDSClientRequest *clientRequest)
+{
+	AMDSClientStatisticsRequest *clientStatisticsRequest = qobject_cast<AMDSClientStatisticsRequest*>(clientRequest);
+	if(clientStatisticsRequest){
+		clientStatisticsRequest->appendPacketStats(tenMillisecondsStats_);
+		clientStatisticsRequest->appendPacketStats(hundredMillisecondsStats_);
+		clientStatisticsRequest->appendPacketStats(oneSecondsStats_);
+		clientStatisticsRequest->appendPacketStats(tenSecondsStats_);
+
+		onClientRequestProcessed(clientRequest);
+	}
+}
+
+bool AMDSTCPDataServer::onClientContinuousRequestReceived(AMDSClientRequest *clientRequest)
+{
+	AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
+	if(clientContinuousDataRequest){
+		if (clientContinuousDataRequest->isHandShakingMessage()) {
+			QString socketKey = clientContinuousDataRequest->handShakeSocketKey();
+			AMDSClientContinuousDataRequest *activeContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(activeContinuousDataRequestList_.value(socketKey));
+			if (activeContinuousDataRequest) {
+				AMDSErrorMon::information(this, 0, QString("Hand shaking with message (%1)").arg(socketKey));
+				activeContinuousDataRequest->handShaking(clientContinuousDataRequest);
+			} else {
+				AMDSErrorMon::alert(this, 0, QString("Didn't find hand shaking message (%1)").arg(socketKey));
+			}
+
+			onClientRequestTaskAccomplished(clientContinuousDataRequest);
+		} else {
+			activeContinuousDataRequestList_.insert(clientContinuousDataRequest->socketKey(), clientContinuousDataRequest);
+			connect(clientContinuousDataRequest, SIGNAL(sendNewContinuousDataRequest(AMDSClientRequest*)), this, SIGNAL(clientRequestRead(AMDSClientRequest*)));
+			connect(clientContinuousDataRequest, SIGNAL(clientRequestTaskAccomplished(AMDSClientRequest*)), this, SLOT(onClientRequestTaskAccomplished(AMDSClientRequest*)));
+
+			emit clientRequestRead(clientRequest);
 		}
 	}
-	else {
-		if (   clientRequest->requestType() == AMDSClientRequestDefinitions::Continuous){
-			AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
-			if(clientContinuousDataRequest){
-				if (clientContinuousDataRequest->isHandShakingMessage()) {
-					QString socketKey = clientContinuousDataRequest->handShakeSocketKey();
-					AMDSClientContinuousDataRequest *handShakingclientDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(continuousDataRequests_.value(socketKey));
-					if (handShakingclientDataRequest) {
-						handShakingclientDataRequest->setHandShakeTime(QDateTime::currentDateTime());
-						AMDSErrorMon::information(this, 0, QString("Hand shaking with socketKey (%1)").arg(socketKey));
-					} else {
-						AMDSErrorMon::alert(this, 0, QString("Didn't find hand shaking message with socketKey (%1)").arg(socketKey));
-					}
+}
 
-					clientContinuousDataRequest->deleteLater();
-					requestingSocket->disconnectFromHost();
-					return;
-				} else {
-					continuousDataRequests_.insert(clientContinuousDataRequest->socketKey(), clientContinuousDataRequest);
-					connect(clientContinuousDataRequest, SIGNAL(sendNewContinuousDataRequest(AMDSClientRequest*)), this, SIGNAL(clientRequestRead(AMDSClientRequest*)));
-				}
-			}
+void AMDSTCPDataServer::onClientRequestTaskAccomplished(AMDSClientRequest *clientRequest)
+{
+	if (clientRequest) {
+		if (clientRequest->isContinuousMessage() && activeContinuousDataRequestList_.contains(clientRequest->socketKey())) {
+			disconnect(clientRequest, SIGNAL(sendNewContinuousDataRequest(AMDSClientRequest*)), this, SIGNAL(clientRequestRead(AMDSClientRequest*)));
+			disconnect(clientRequest, SIGNAL(clientRequestTaskAccomplished(AMDSClientRequest*)), this, SLOT(onClientRequestTaskAccomplished(AMDSClientRequest*)));
+
+			activeContinuousDataRequestList_.remove(clientRequest->socketKey());
 		}
 
-		emit clientRequestRead(clientRequest);
+		disconnectFromHost(clientRequest->socketKey());
+		clientRequest->deleteLater();
 	}
 }
 

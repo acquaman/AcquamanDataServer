@@ -33,6 +33,14 @@ AMDSClientRequest& AMDSClientRequest::operator =(const AMDSClientRequest &other)
 	return (*this);
 }
 
+bool AMDSClientRequest::isDataClientRequest() {
+	return     requestType() == AMDSClientRequestDefinitions::StartTimePlusCount
+			|| requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount
+			|| requestType() == AMDSClientRequestDefinitions::StartTimeToEndTime
+			|| requestType() == AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter
+			|| requestType() == AMDSClientRequestDefinitions::Continuous ;
+}
+
 bool AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
 	*dataStream << socketKey_;
