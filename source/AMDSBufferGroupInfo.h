@@ -54,9 +54,9 @@ public:
 	/// Set the axes of the bufferGroupInfo
 	void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
 	/// Set whether the bufferGroup can be flattened
-	void setFlattenEnabled(const bool enabled) { flattenEnabled_ = enabled; }
+	void setFlattenEnabled(bool enabled) { flattenEnabled_ = enabled; }
 	/// Set how the bufferGroup should be flattened
-	void setFlattenMethod(const DataFlattenMethod method) { flattenMethod_ = method; }
+	void setFlattenMethod(DataFlattenMethod method) { flattenMethod_ = method; }
 
 	/// If the bufferGrou name is "Invalid", there should be no Data
 	bool includeData() const { return name_ != "Invalid"; }
