@@ -56,7 +56,6 @@ AMDSClientContinuousDataRequest& AMDSClientContinuousDataRequest::operator =(con
 		AMDSClientDataRequest::operator =(other);
 
 		setBufferNames(other.bufferNames());
-		setBufferName(other.bufferName());
 
 		setUpdateInterval(other.updateInterval());
 		setHandShakeSocketKey(other.handShakeSocketKey());

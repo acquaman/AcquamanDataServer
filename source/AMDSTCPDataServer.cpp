@@ -50,10 +50,10 @@ AMDSTCPDataServer::~AMDSTCPDataServer()
 	stop();
 }
 
-void AMDSTCPDataServer::disconnectFromHost(QString socketKey)
+void AMDSTCPDataServer::disconnectFromHost(QString &socketKey)
 {
 	QTcpSocket* requestingSocket = clientSockets_.value(socketKey, 0);
-	if(requestingSocket != 0)
+	if(requestingSocket)
 		requestingSocket->disconnectFromHost();
 }
 

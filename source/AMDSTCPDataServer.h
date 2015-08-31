@@ -34,7 +34,7 @@ public:
 	~AMDSTCPDataServer();
 
 	/// to disconnect the given connection from the host
-	void disconnectFromHost(QString socketKey);
+	void disconnectFromHost(QString &socketKey);
 
 signals:
 	/// error signal
