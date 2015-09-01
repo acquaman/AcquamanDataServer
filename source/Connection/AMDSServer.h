@@ -36,7 +36,7 @@ public:
 
 signals:
 	/// signal to indicate that something wrong with the connection happened
-	void socketError(AMDSServer* server, int errorCode, QString socketKey, QString errorMessage);
+	void serverError(AMDSServer* server, int errorCode, QString socketKey, QString errorMessage);
 	/// signal to indicate that the data is sent from server for read
 	void requestDataReady(AMDSClientRequest*);
 
@@ -48,7 +48,7 @@ private slots:
 	/// slot to handle Socket data ready signal
 	void onSocketDataReady(AMDSClientTCPSocket* socket, AMDSClientRequest *clientRequest);
 	/// slot to handle Socket error signal
-	void onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketError);
+	void onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError serverError);
 	/// slot to handle the request to remove a given signal
 	void removeTCPSocket(AMDSClientTCPSocket *clientTCPSocket);
 

@@ -96,7 +96,7 @@ void AMDSClientAppController::openNetworkSession()
 	}
 }
 
-void AMDSClientAppController::connectToServer(QString hostName, quint16 portNumber)
+void AMDSClientAppController::connectToServer(QString &hostName, quint16 portNumber)
 {
 	QString serverIdentifier = AMDSServer::generateServerIdentifier(hostName, portNumber);
 	AMDSServer * server = getServerByServerIdentifier(serverIdentifier);
@@ -105,7 +105,7 @@ void AMDSClientAppController::connectToServer(QString hostName, quint16 portNumb
 		activeServers_.insert(serverIdentifier, server);
 
 		connect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SIGNAL(requestDataReady(AMDSClientRequest*)));
-		connect(server, SIGNAL(socketError(AMDSServer*,int,QString,QString)), this, SLOT(onSocketError(AMDSServer*,int,QString,QString)));
+		connect(server, SIGNAL(serverError(AMDSServer*,int,QString,QString)), this, SLOT(onServerError(AMDSServer*,int,QString,QString)));
 		emit newServerConnected(server->serverIdentifier());
 
 		// request the introspection data for all the buffers defined in this server
@@ -114,7 +114,17 @@ void AMDSClientAppController::connectToServer(QString hostName, quint16 portNumb
 	}
 }
 
-AMDSClientTCPSocket * AMDSClientAppController::establishSocketConnection(QString hostName, quint16 portNumber)
+void AMDSClientAppController::disconnectWithServer(QString &serverIdentifier)
+{
+	AMDSServer * server = getServerByServerIdentifier(serverIdentifier);
+	if (server) {
+		activeServers_.remove(serverIdentifier);
+		server->deleteLater();
+		emit serverError(AMDS_CLIENT_ERR_SERVER_DISCONNECTED, serverIdentifier, "Server is disconnected");
+	}
+}
+
+AMDSClientTCPSocket * AMDSClientAppController::establishSocketConnection(QString &hostName, quint16 portNumber)
 {
 	AMDSClientTCPSocket * clientTCPSocket = 0;
 
@@ -129,9 +139,11 @@ AMDSClientTCPSocket * AMDSClientAppController::establishSocketConnection(QString
 	return clientTCPSocket;
 }
 
-void AMDSClientAppController::onSocketError(AMDSServer* server, int errorCode, QString socketKey, QString errorMessage)
+void AMDSClientAppController::onServerError(AMDSServer* server, int errorCode, QString socketKey, QString errorMessage)
 {
-	emit socketError(errorCode, server->serverIdentifier(), errorMessage);
+	Q_UNUSED(socketKey)
+
+	emit serverError(errorCode, server->serverIdentifier(), errorMessage);
 	activeServers_.remove(server->serverIdentifier());
 }
 

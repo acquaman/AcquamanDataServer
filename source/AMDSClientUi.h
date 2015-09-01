@@ -28,6 +28,8 @@ public:
 private slots:
 	/// connect to a server with the input hostName and portNumber
 	void connectToServer();
+	/// disconnect with a server with the given server identifier
+	void disconnectWithServer();
 
 	/// ============= SLOTs to handle AMDSClientAppController signals =========
 	/// slot to handle the signal of networkSessionOpening
@@ -36,17 +38,17 @@ private slots:
 	void onNetworkSessionOpened();
 
 	/// slot to handle the signal of newServerConnected (add the serverIdentifier to the combox and update the ui displays -- buffernames and active connections)
-	void onNewServerConnected(QString &serverIdentifier);
+	void onNewServerConnected(QString serverIdentifier);
 	/// slot to handle the signal of request data ready
 	void onRequestDataReady(AMDSClientRequest* clientRequest);
 	/// slot to handle the signal of socketEror
-	void onSocketError(int errorCode, QString &serverIdentifier, QString &errorMessage);
+	void onServerError(int errorCode, QString serverIdentifier, QString errorMessage);
 
 	/// ============= SLOTS to handle UI component signals ===============
 	/// slot to handle the switch signal among connected servers (to refresh the buffer names and the active connections with that server)
-	void onActiveServerChanged(QString &serverIdentifier);
+	void onActiveServerChanged(QString serverIdentifier);
 	/// slot to handle the switch singal among request types (to change the selection mode of the buffer names: multi selection or signal selection)
-	void onRequestTypeChanged(QString &requestType);
+	void onRequestTypeChanged(QString requestType);
 	/// slot to check whether we should enable the button to send client request
 	void enableRequestDataButton();
 	/// slot to send client request to the server
@@ -70,6 +72,7 @@ private:
 
 	/// ==== server section ====
 	QPushButton *connectServerButton_;
+	QPushButton *disconnectServerButton_;
 	QPushButton *requestDataButton_;
 	QPushButton *quitButton_;
 

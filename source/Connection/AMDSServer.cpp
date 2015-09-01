@@ -73,7 +73,7 @@ void AMDSServer::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSo
 		errorString = QString("The following error occurred: %1.").arg(clientTCPSocket->errorString());
 	}
 
-	emit socketError(this, socketErrorCode, clientTCPSocket->socketKey(), errorString);
+	emit serverError(this, socketErrorCode, clientTCPSocket->socketKey(), errorString);
 	removeTCPSocket(clientTCPSocket);
 }
 
