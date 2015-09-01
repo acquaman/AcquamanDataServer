@@ -102,7 +102,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 			break;
 
 	default:
-		AMDSErrorMon::alert(this, 0, QString("The validateResponse() function is NOT implemented (or called) for %1").arg(clientRequest->requestType()));
+		AMDSErrorMon::alert(this, AMDS_SERVER_ALT_VALIDATE_RESPONSE_NOT_IMPLEMENTED, QString("The validateResponse() function is NOT implemented (or called) for %1").arg(clientRequest->requestType()));
 		break;
 	}
 
@@ -129,6 +129,6 @@ void AMDSClientTCPSocket::sendData(AMDSClientRequest *clientRequest)
 	outDataStream << (quint16)(block.size() - sizeof(quint16));
 	tcpSocket_->write(block);
 
-	AMDSErrorMon::information(this, 0, QString("Send %1 data to server.").arg(block.size() - sizeof(quint16)));
+	AMDSErrorMon::information(this, AMDS_SERVER_INFO_SOCKET_SEND_DATA, QString("Send %1 data to server.").arg(block.size() - sizeof(quint16)));
 }
 

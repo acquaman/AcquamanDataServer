@@ -315,11 +315,11 @@ void AMDSClientUi::sendClientRequest()
 	case AMDSClientRequestDefinitions::Continuous:
 		clientAppController_->requestClientData(hostName, portNumber, selectedBufferNames, value1.toInt(), includeStatus, enableFlattening, continuousSocket);
 		if (continuousSocket.length() > 0) {
-			AMDSErrorMon::information(this, 0, QString("Hand shake message: %1").arg(continuousSocket));
+			AMDSErrorMon::information(this, AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE, QString("Hand shake message: %1").arg(continuousSocket));
 		}
 		break;
 	default:
-		AMDSErrorMon::alert(this, 0, QString("Invalide client request type: %1").arg(clientRequestType));
+		AMDSErrorMon::alert(this, AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE, QString("Invalide client request type: %1").arg(clientRequestType));
 	}
 }
 

@@ -71,7 +71,7 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 void AMDSBufferGroup::flattenData(QList<AMDSDataHolder *> *dataArray)
 {
 	if (!bufferGroupInfo_.flattenEnabled() || bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::NoFlatten) {
-		AMDSErrorMon::alert(this, 0, QString("The given buffergroup (%1) doesn't enable flatten feature or the flatten method is %2.").arg(bufferGroupInfo_.name()).arg(bufferGroupInfo_.flattenMethod()));
+		AMDSErrorMon::alert(this, AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN, QString("The given buffergroup (%1) doesn't enable flatten feature or the flatten method is %2.").arg(bufferGroupInfo_.name()).arg(bufferGroupInfo_.flattenMethod()));
 		return;
 	}
 

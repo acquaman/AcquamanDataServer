@@ -12,6 +12,9 @@
 
 class AMDSDataStream;
 
+#define AMDS_SERVER_ERR_DATA_HOLDER 20300
+#define AMDS_SERVER_ERR_UNMATCH_DATA_HOLDER_FOR_PLUS 20301
+
 class AMDSDataHolder : public QObject
 {
 Q_OBJECT
