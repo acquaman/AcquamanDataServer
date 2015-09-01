@@ -2,12 +2,19 @@
 
 #include <QtNetwork>
 
+#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "source/ClientRequest/AMDSClientStatisticsRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
+#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "source/Connection/AMDSClientTCPSocket.h"
 #include "source/Connection/AMDSServer.h"
 #include "source/util/AMDSErrorMonitor.h"
-
 
 AMDSClientAppController::AMDSClientAppController(QObject *parent) :
 	QObject(parent)
@@ -98,7 +105,7 @@ void AMDSClientAppController::connectToServer(QString hostName, quint16 portNumb
 		activeServers_.insert(serverIdentifier, server);
 
 		connect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SIGNAL(requestDataReady(AMDSClientRequest*)));
-		connect(server, SIGNAL(socketError(int,QString,QString)), this, SIGNAL(socketError(int,QString,QString)));
+		connect(server, SIGNAL(socketError(AMDSServer*,int,QString,QString)), this, SLOT(onSocketError(AMDSServer*,int,QString,QString)));
 		emit newServerConnected(server->serverIdentifier());
 
 		// request the introspection data for all the buffers defined in this server
@@ -122,11 +129,20 @@ AMDSClientTCPSocket * AMDSClientAppController::establishSocketConnection(QString
 	return clientTCPSocket;
 }
 
+void AMDSClientAppController::onSocketError(AMDSServer* server, int errorCode, QString socketKey, QString errorMessage)
+{
+	emit socketError(errorCode, server->serverIdentifier(), errorMessage);
+	activeServers_.remove(server->serverIdentifier());
+}
+
 void AMDSClientAppController::requestClientData(QString &hostName, quint16 portNumber)
 {
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
-		clientTCPSocket->requestData();
+		AMDSClientRequest *clientRequest = instantiateClientRequest(AMDSClientRequestDefinitions::Statistics);
+		if (clientRequest) {
+			clientTCPSocket->sendClientRequest(clientRequest);
+		}
 	}
 }
 
@@ -134,7 +150,15 @@ void AMDSClientAppController::requestClientData(QString &hostName, quint16 portN
 {
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
-		clientTCPSocket->requestData(bufferName);
+		AMDSClientRequest *clientRequest = instantiateClientRequest(AMDSClientRequestDefinitions::Introspection);
+		if (clientRequest) {
+			AMDSClientIntrospectionRequest *clientIntrospectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
+			if(clientIntrospectionRequest) {
+				clientIntrospectionRequest->setBufferName(bufferName);
+
+				clientTCPSocket->sendClientRequest(clientIntrospectionRequest);
+			}
+		}
 	}
 }
 
@@ -142,7 +166,15 @@ void AMDSClientAppController::requestClientData(QString &hostName, quint16 portN
 {
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
-		clientTCPSocket->requestData(bufferName, startTime, count, includeStatus, enableFlattening);
+		AMDSClientRequest *clientRequest = instantiateClientRequest(AMDSClientRequestDefinitions::StartTimePlusCount);
+		if (clientRequest) {
+			AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
+			if(clientStartTimePlusCountDataRequest){
+				clientStartTimePlusCountDataRequest->setAttributesValues(bufferName, includeStatus, enableFlattening, startTime, count);
+
+				clientTCPSocket->sendClientRequest(clientStartTimePlusCountDataRequest);
+			}
+		}
 	}
 }
 
@@ -150,7 +182,15 @@ void AMDSClientAppController::requestClientData(QString &hostName, quint16 portN
 {
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
-		clientTCPSocket->requestData(bufferName, relativeCount, count, includeStatus, enableFlattening);
+		AMDSClientRequest *clientRequest = instantiateClientRequest(AMDSClientRequestDefinitions::RelativeCountPlusCount);
+		if (clientRequest) {
+			AMDSClientRelativeCountPlusCountDataRequest *clientRelativeCountPlusCountDataRequest = qobject_cast<AMDSClientRelativeCountPlusCountDataRequest*>(clientRequest);
+			if(clientRelativeCountPlusCountDataRequest){
+				clientRelativeCountPlusCountDataRequest->setAttributesValues(bufferName, includeStatus, enableFlattening, relativeCount, count);
+
+				clientTCPSocket->sendClientRequest(clientRelativeCountPlusCountDataRequest);
+			}
+		}
 	}
 }
 
@@ -158,7 +198,15 @@ void AMDSClientAppController::requestClientData(QString &hostName, quint16 portN
 {
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
-		clientTCPSocket->requestData(bufferName, startTime, endTime, includeStatus, enableFlattening);
+		AMDSClientRequest *clientRequest = instantiateClientRequest(AMDSClientRequestDefinitions::StartTimeToEndTime);
+		if (clientRequest) {
+			AMDSClientStartTimeToEndTimeDataRequest *clientStartTimeToEndTimeDataRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
+			if(clientStartTimeToEndTimeDataRequest){
+				clientStartTimeToEndTimeDataRequest->setAttributesValues(bufferName, includeStatus, enableFlattening, startTime, endTime);
+
+				clientTCPSocket->sendClientRequest(clientStartTimeToEndTimeDataRequest);
+			}
+		}
 	}
 }
 
@@ -166,7 +214,16 @@ void AMDSClientAppController::requestClientData(QString &hostName, quint16 portN
 {
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
-		clientTCPSocket->requestData(bufferName, middleTime, countBefore, countAfter, includeStatus, enableFlattening);
+		AMDSClientRequest *clientRequest = instantiateClientRequest(AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter);
+		if (clientRequest) {
+			AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest *clientMiddleTimePlusCountBeforeAndAfterDataRequest = qobject_cast<AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest*>(clientRequest);
+			if(clientMiddleTimePlusCountBeforeAndAfterDataRequest){
+
+				clientMiddleTimePlusCountBeforeAndAfterDataRequest->setAttributesValues(bufferName, includeStatus, enableFlattening, middleTime, countBefore, countAfter);
+
+				clientTCPSocket->sendClientRequest(clientMiddleTimePlusCountBeforeAndAfterDataRequest);
+			}
+		}
 	}
 }
 
@@ -174,7 +231,20 @@ void AMDSClientAppController::requestClientData(QString &hostName, quint16 portN
 {
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
-		clientTCPSocket->requestData(bufferNames, updateInterval, includeStatus, enableFlattening, handShakeSocketKey);
+		if (bufferNames.length() == 0 && handShakeSocketKey.length() == 0) {
+			AMDSErrorMon::alert(this, 0, QString("AMDSClientTCPSocket::Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
+			return;
+		}
+
+		AMDSClientRequest *clientRequest = instantiateClientRequest(AMDSClientRequestDefinitions::Continuous);
+		if (clientRequest) {
+			AMDSClientContinuousDataRequest *clientContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
+			if(clientContinuousDataRequest){
+				clientContinuousDataRequest->setAttributesValues(includeStatus, enableFlattening, bufferNames, updateInterval, handShakeSocketKey);
+
+				clientTCPSocket->sendClientRequest(clientContinuousDataRequest);
+			}
+		}
 	}
 }
 
@@ -196,4 +266,14 @@ void AMDSClientAppController::onNetworkSessionOpened()
 	settings.endGroup();
 
 	emit networkSessionOpened();
+}
+
+AMDSClientRequest *AMDSClientAppController::instantiateClientRequest(AMDSClientRequestDefinitions::RequestType clientRequestType)
+{
+	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
+	if (!clientRequest) {
+		AMDSErrorMon::alert(this, 0, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
+	}
+
+	return clientRequest;
 }

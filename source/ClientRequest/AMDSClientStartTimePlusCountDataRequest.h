@@ -27,6 +27,8 @@ public:
 	inline void setStartTime(const QDateTime &startTime) { startTime_ = startTime; }
 	/// Sets the number of data points after the start time to collect
 	inline void setCount(quint64 count) { count_ = qMax((quint64)1, count) ; }
+	/// Sets the values of all the data attributes of client request
+	void setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, QDateTime &startTime, quint64 count);
 
 	/// Writes this AMDSClientStartTimePlusCountDataRequest to an AMDSDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;

@@ -142,7 +142,7 @@ AMDSClientUi::~AMDSClientUi()
 	disconnect(clientAppController_, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
 	disconnect(clientAppController_, SIGNAL(serverError(int,QString,QString)), this, SLOT(onServerError(int,QString,QString)));
 	disconnect(clientAppController_, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
-	disconnect(clientAppController_, SIGNAL(socketError(QString, QString)), this, SLOT(onSocketError(QString, QString)));
+	disconnect(clientAppController_, SIGNAL(socketError(int, QString, QString)), this, SLOT(onSocketError(int, QString, QString)));
 
 	clientAppController_->deleteLater();
 }
@@ -168,7 +168,7 @@ void AMDSClientUi::onNetworkSessionOpened()
 	enableRequestDataButton();
 }
 
-void AMDSClientUi::onNewServerConnected(QString serverIdentifier)
+void AMDSClientUi::onNewServerConnected(QString &serverIdentifier)
 {
 	if (activeServerComboBox_->findText(serverIdentifier) == -1) {
 		activeServerComboBox_->addItem(serverIdentifier);
@@ -179,12 +179,6 @@ void AMDSClientUi::onNewServerConnected(QString serverIdentifier)
 	QStringList bufferNames = clientAppController_->getBufferNamesByServer(serverIdentifier);
 	resetBufferListView(bufferNames);
 	resetActiveContinuousConnection(serverIdentifier);
-}
-
-void AMDSClientUi::onServerError(int errorCode, QString serverIdentifier, QString errorMessage)
-{
-	QString message = QString("%1 (%2): %3").arg(errorCode).arg(serverIdentifier).arg(errorMessage);
-	QMessageBox::information(this, "AMDS Client Example", message);
 }
 
 void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
@@ -214,18 +208,21 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 	}
 }
 
-void AMDSClientUi::onSocketError(int errorCode, QString socketKey, QString errorMessage)
+void AMDSClientUi::onSocketError(int errorCode, QString &serverIdentifier, QString &errorMessage)
 {
-	if (socketKey.length() > 0) {
+	if (serverIdentifier.length() > 0) {
+		activeServerComboBox_->removeItem(activeServerComboBox_->findText(serverIdentifier));
 		resetActiveContinuousConnection(activeServerComboBox_->currentText());
 	}
 
-	if (errorCode != QAbstractSocket::RemoteHostClosedError)
-		QMessageBox::information(this, "AMDS Client Example", errorMessage + socketKey);
+	if (errorCode != QAbstractSocket::RemoteHostClosedError) {
+		QString message = QString("%1 (%2): %3").arg(errorCode).arg(serverIdentifier).arg(errorMessage);
+		QMessageBox::information(this, "AMDS Client Example", message);
+	}
 }
 
 /// ============= SLOTS to handle UI component signals ===============
-void AMDSClientUi::onActiveServerChanged(QString serverIdentifier)
+void AMDSClientUi::onActiveServerChanged(QString &serverIdentifier)
 {
 	QStringList bufferNames = clientAppController_->getBufferNamesByServer(serverIdentifier);
 	resetBufferListView(bufferNames);
@@ -233,7 +230,7 @@ void AMDSClientUi::onActiveServerChanged(QString serverIdentifier)
 	resetActiveContinuousConnection(serverIdentifier);
 }
 
-void AMDSClientUi::onRequestTypeChanged(QString requestType)
+void AMDSClientUi::onRequestTypeChanged(QString &requestType)
 {
 	if (requestType == "Continuous") {
 		bufferNameListView_->setSelectionMode(QAbstractItemView::MultiSelection);

@@ -12,6 +12,8 @@ class AMDSServer;
 class AMDSClientTCPSocket;
 class AMDSClientRequest;
 
+#include "source/ClientRequest/AMDSClientRequestDefinitions.h"
+
 #define AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE 10100
 #define AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE 10101
 
@@ -59,6 +61,8 @@ public slots:
 	void connectToServer(QString hostName, quint16 portNumber);
 	/// slot to establish TCP socket connection to a specific hostName and the portNumber
 	AMDSClientTCPSocket * establishSocketConnection(QString hostName, quint16 portNumber);
+	/// slot to handle socket error signal from the server
+	void onSocketError(AMDSServer* server, int errorCode, QString socketKey, QString errorMessage);
 
 	/// slot to request data from server for Statistics
 	void requestClientData(QString &hostName, quint16 portNumber);
@@ -78,6 +82,10 @@ public slots:
 private slots:
 	/// slot to handle the signal of network session opened
 	void onNetworkSessionOpened();
+
+private:
+	/// helper function to instantiate client request based on the request type
+	AMDSClientRequest *instantiateClientRequest(AMDSClientRequestDefinitions::RequestType clientRequestType);
 
 private:
 	/// the pointer of network session
