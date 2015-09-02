@@ -42,7 +42,7 @@ private slots:
 	/// slot to handle the signal of request data ready
 	void onRequestDataReady(AMDSClientRequest* clientRequest);
 	/// slot to handle the signal of socketEror
-	void onServerError(int errorCode, QString serverIdentifier, QString errorMessage);
+	void onServerError(int errorCode, bool removeServer, QString serverIdentifier, QString errorMessage);
 
 	/// ============= SLOTS to handle UI component signals ===============
 	/// slot to handle the switch signal among connected servers (to refresh the buffer names and the active connections with that server)
