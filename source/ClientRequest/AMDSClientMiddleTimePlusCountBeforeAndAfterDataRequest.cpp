@@ -1,6 +1,6 @@
 #include "AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)
@@ -39,6 +39,16 @@ AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest& AMDSClientMiddleTimePlus
 		setCountAfter(other.countAfter());
 	}
 	return (*this);
+}
+
+void AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, QDateTime &middleTime, quint64 countBefore, quint64 countAfter)
+{
+	setBufferName(bufferName);
+	setIncludeStatusData(includeStatusData);
+	setFlattenResultData(flattenResultData);
+	setMiddleTime(middleTime);
+	setCountBefore(countBefore);
+	setCountAfter(countAfter);
 }
 
 int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::writeToDataStream(AMDSDataStream *dataStream) const

@@ -1,8 +1,8 @@
-#include "source/DataHolder/AMDSDataHolder.h"
+#include "AMDSDataHolder.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
-#include "source/AMDSMetaObjectSupport.h"
+#include "source/util/AMDSMetaObjectSupport.h"
 
 AMDSDataHolder::AMDSDataHolder(QObject *parent) :
 	QObject(parent)
@@ -21,6 +21,15 @@ AMDSLightWeightDataHolder::AMDSLightWeightDataHolder(QObject *parent) :
 
 AMDSLightWeightDataHolder::~AMDSLightWeightDataHolder()
 {
+}
+
+AMDSDataTypeDefinitions::DataType AMDSLightWeightDataHolder::dataType() const{
+	if(dataTypeStyle() != AMDSDataHolder::UniformDataType)
+		return AMDSDataTypeDefinitions::InvalidType;
+
+	AMDSFlatArray oneFlatArray;
+	data(&oneFlatArray);
+	return oneFlatArray.dataType();
 }
 
 bool AMDSLightWeightDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
@@ -54,6 +63,15 @@ AMDSFullDataHolder::AMDSFullDataHolder(AMDSDataHolder::AxesStyle axesStyle, AMDS
 
 AMDSFullDataHolder::~AMDSFullDataHolder()
 {
+}
+
+AMDSDataTypeDefinitions::DataType AMDSFullDataHolder::dataType() const{
+	if(dataTypeStyle() != AMDSDataHolder::UniformDataType)
+		return AMDSDataTypeDefinitions::InvalidType;
+
+	AMDSFlatArray oneFlatArray;
+	data(&oneFlatArray);
+	return oneFlatArray.dataType();
 }
 
 bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{

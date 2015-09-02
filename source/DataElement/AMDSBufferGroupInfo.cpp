@@ -1,4 +1,4 @@
-#include "source/AMDSBufferGroupInfo.h"
+#include "AMDSBufferGroupInfo.h"
 
 AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &description, const QString &units, const bool flattenEnabled, const DataFlattenMethod flattenMethod, const QList<AMDSAxisInfo> &axes)
 {

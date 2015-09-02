@@ -165,7 +165,7 @@ protected:
 #include <QMetaType>
 Q_DECLARE_METATYPE(AMDSnDIndex)
 
-#include "source/AMDSLikely.h"
+#include "source/DataElement/AMDSLikely.h"
 
 quint32 AMDSnDIndex::at(quint8 dimIndex) const {
 	if(AMDS_LIKELY(dimIndex < 8))

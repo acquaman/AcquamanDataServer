@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "source/AMDSBufferGroupInfo.h"
 #include "source/DataElement/AMDSBuffer.h"
+#include "source/DataElement/AMDSBufferGroupInfo.h"
 #include "source/DataHolder/AMDSDataHolder.h"
 
 class AMDSClientRequest;

@@ -28,6 +28,9 @@ public:
 	/// Sets the end time for the data request
 	inline void setEndTime(const QDateTime &endTime) { endTime_ = endTime; }
 
+	/// Sets the values of all the data attributes of client request
+	void setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, QDateTime &startTime, QDateTime &endTime);
+
 	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an AMDSDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the AMDSDataStream, returns 0 if no errors are encountered

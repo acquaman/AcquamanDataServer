@@ -2,7 +2,7 @@
 #define AMDSCLIENTSTATISTICSREQUEST_H
 
 #include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/AMDSPacketStats.h"
+#include "source/Connection/AMDSPacketStats.h"
 
 class AMDSClientStatisticsRequest : public AMDSClientRequest
 {

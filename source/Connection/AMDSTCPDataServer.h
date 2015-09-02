@@ -12,8 +12,7 @@
 #include <QNetworkConfigurationManager>
 #include <QSettings>
 
-#include "source/util/AMDSErrorMonitor.h"
-#include "source/AMDSPacketStats.h"
+#include "source/Connection/AMDSPacketStats.h"
 
 class QTimer;
 class AMDSClientRequest;
@@ -21,7 +20,19 @@ class AMDSClientRequest;
 /**
  *  A class which handles incoming client connections, and handles requests from them for data
  */
-#define AMDS_TCPDATASERVER_FAIL_TO_START_SERVER 10100
+#define AMDS_SERVER_ERR_TCP_DATA_SERVER 20400
+#define AMDS_SERVER_INFO_STARTING_TCP_DATA_SERVER 20401
+#define AMDS_SERVER_INFO_NO_CONNECTED_CLIENT 20402
+#define AMDS_SERVER_INFO_ACTIVE_SESSION 20403
+#define AMDS_SERVER_INFO_SERVER_STOPPED 20404
+#define AMDS_SERVER_INFO_SERVER_NEW_CONNECTION_ESTABLISHED 20405
+#define AMDS_SERVER_INFO_SERVER_CONNECTION_DISCONNECTED 20406
+#define AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG 20407
+#define AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG_CONNECTION_NOT_FOUND 20408
+#define AMDS_SERVER_ALT_ALIVE_CONNECTION 20420
+#define AMDS_SERVER_ALT_SERVER_IS_ALIVE 20421
+#define AMDS_SERVER_ALT_SERVER_IS_NOT_ALIVE 20422
+#define AMDS_SERVER_ERR_FAIL_TO_START_TCP_DATA_SERVER 20440
 
 class AMDSTCPDataServer : public QObject
 {
@@ -76,7 +87,7 @@ protected slots:
 	/// Slot to handle the newly received statics client request message
 	void onClientStaticsRequestReceived(AMDSClientRequest *clientRequest);
 	/// Slot to handle the newly received continuous client request message, return true if the message is done handle
-	bool onClientContinuousRequestReceived(AMDSClientRequest *clientRequest);
+	void onClientContinuousRequestReceived(AMDSClientRequest *clientRequest);
 	/// Slot to handle client request task accomplished, the related resouces can be released
 	void onClientRequestTaskAccomplished(AMDSClientRequest *clientRequest);
 

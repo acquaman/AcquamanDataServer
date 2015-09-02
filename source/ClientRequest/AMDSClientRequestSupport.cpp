@@ -9,7 +9,7 @@
 #include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 
-#include "source/AMDSMetaObjectSupport.h"
+#include "source/util/AMDSMetaObjectSupport.h"
 
 AMDSClientRequestObjectInfo::AMDSClientRequestObjectInfo()
 {

@@ -1,6 +1,6 @@
-#include "source/ClientRequest/AMDSClientDataRequest.h"
+#include "AMDSClientDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 #include "source/DataHolder/AMDSScalarDataHolder.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
 #include "source/util/AMDSErrorMonitor.h"
@@ -211,16 +211,16 @@ bool AMDSClientDataRequest::validateResponse()
 {
 	bool noError = true;
 	if(responseType() == AMDSClientRequest::Error) {
-		AMDSErrorMon::alert(this, 0, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
+		AMDSErrorMon::alert(this, AMDS_CLIENTREQUEST_ERR_FAILED_TO_RETRIEVE_DATA, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
 		noError = false;
 	} else {
 		if (data().count() == 0)
-			AMDSErrorMon::information(this, 0, QString("(msg %1 --- %2) No data for this message yet!").arg(socketKey()).arg(bufferName()));
+			AMDSErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, QString("(msg %1 --- %2) No data for this message yet!").arg(socketKey()).arg(bufferName()));
 		else {
 			for(int x = 0, size = data().count(); x < size; x++){
 				AMDSFlatArray oneFlatArray = AMDSFlatArray(uniformDataType(), bufferGroupInfo().spanSize());
 				data().at(x)->data(&oneFlatArray);
-				AMDSErrorMon::information(this, 0, QString("(msg %1 --- %2) Data at %3 - %4").arg(socketKey()).arg(bufferName()).arg(x).arg(oneFlatArray.printData()));
+				AMDSErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, QString("(msg %1 --- %2) Data at %3 - %4").arg(socketKey()).arg(bufferName()).arg(x).arg(oneFlatArray.printData()));
 			}
 		}
 	}

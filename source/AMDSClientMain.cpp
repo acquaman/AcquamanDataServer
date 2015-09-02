@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include "AMDSClient.h"
+#include "AMDSClientUi.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/DataElement/AMDSEventDataSupport.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	initializeRegisteredClasses();
-	AMDSClient client;
+	AMDSClientUi client;
 	client.show();
 	
 	return a.exec();

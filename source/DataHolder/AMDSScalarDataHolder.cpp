@@ -1,6 +1,6 @@
-#include "source/DataHolder/AMDSScalarDataHolder.h"
+#include "AMDSScalarDataHolder.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSLightWeightScalarDataHolder::AMDSLightWeightScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType, QObject *parent) :
 	AMDSLightWeightGenericFlatArrayDataHolder(dataType, 1, parent)

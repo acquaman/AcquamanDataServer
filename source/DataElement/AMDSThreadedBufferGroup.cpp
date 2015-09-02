@@ -1,6 +1,6 @@
-#include "source/AMDSThreadedBufferGroup.h"
+#include "AMDSThreadedBufferGroup.h"
 
-#include "source/AMDSBufferGroup.h"
+#include "source/DataElement/AMDSBufferGroup.h"
 
 AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroup *bufferGroup, QObject *parent) :
 	QObject(parent)

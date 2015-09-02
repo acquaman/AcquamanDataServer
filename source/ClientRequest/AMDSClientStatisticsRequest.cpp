@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(QObject *parent) :
 	AMDSClientRequest(parent)

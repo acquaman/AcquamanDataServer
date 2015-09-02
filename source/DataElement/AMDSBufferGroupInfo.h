@@ -4,6 +4,9 @@
 #include "source/DataElement/AMDSAxisInfo.h"
 #include "source/DataElement/AMDSnDIndex.h"
 
+#define AMDS_SERVER_ERR_BUFFER_GROUP 20200
+#define AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN 20201
+
 class AMDSBufferGroupInfo
 {
 public:
