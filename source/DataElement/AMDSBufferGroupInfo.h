@@ -64,6 +64,9 @@ public:
 	/// If the bufferGrou name is "Invalid", there should be no Data
 	bool includeData() const { return name_ != "Invalid"; }
 
+	/// convert the buffer group to a string
+	QString toString();
+
 protected:
 	/// the name of the bufferGroupInfo
 	QString name_;

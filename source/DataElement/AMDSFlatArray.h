@@ -3,8 +3,6 @@
 
 #include <QVector>
 
-#include <QDebug>
-
 #include "source/DataElement/AMDSDataTypeDefinitions.h"
 
 class AMDSFlatArray

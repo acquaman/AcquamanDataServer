@@ -60,8 +60,12 @@ public:
 	/// Reads this AMDSClientRequest from the AMDSDataStream, returns 0 if no errors are encountered
 	virtual int readFromDataStream(AMDSDataStream *dataStream);
 
+	/// print out the message data
+	void printData();
 	/// validate the message response
 	virtual bool validateResponse() {return true;}
+	/// pure virtual to return a data string of the message
+	virtual QString toString() = 0;
 
 private:
 	/// To set the values of all the attributes

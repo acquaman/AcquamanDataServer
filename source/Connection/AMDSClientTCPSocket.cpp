@@ -97,8 +97,10 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
 	case AMDSClientRequestDefinitions::Continuous:
-			if (clientRequest->validateResponse())
+			if (clientRequest->validateResponse()) {
 				socketKey_ = clientRequest->socketKey();
+				clientRequest->printData();
+			}
 			break;
 
 	default:

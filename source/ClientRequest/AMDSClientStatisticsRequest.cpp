@@ -1,7 +1,5 @@
 #include "source/ClientRequest/AMDSClientStatisticsRequest.h"
 
-#include <QDebug>
-
 #include "source/Connection/AMDSDataStream.h"
 
 AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(QObject *parent) :
@@ -78,10 +76,12 @@ int AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientStatisticsRequest::validateResponse()
+QString AMDSClientStatisticsRequest::toString()
 {
-	for(int x = 0, size = packetStats().count(); x < size; x++)
-		qDebug() << "Packet Stats " << packetStats().at(x).name() << ": " << packetStats().at(x).allStats();
+	QString messageData = QString("Data of Statistics message (%1):").arg(socketKey());
+	for(int x = 0, size = packetStats().count(); x < size; x++) {
+		messageData = QString("%1\n\tPacket Stats %2").arg(messageData).arg(packetStats().at(x).toString());
+	}
 
-	return true;
+	return messageData;
 }

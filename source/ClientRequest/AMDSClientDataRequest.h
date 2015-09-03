@@ -54,8 +54,11 @@ public:
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSClientDataRequest from the AMDSDataStream, returns 0 if no errors are encountered
 	virtual int readFromDataStream(AMDSDataStream *dataStream);
+
 	/// validate the message response
 	virtual bool validateResponse();
+	/// implement the function to return a data string of the message
+	virtual QString toString();
 
 protected:
 	/// The string identifier for the buffer data is being request from or received from

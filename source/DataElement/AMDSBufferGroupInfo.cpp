@@ -25,3 +25,16 @@ AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& o
 
 	return *this;
 }
+
+QString AMDSBufferGroupInfo::toString()
+{
+	QString bufferGroupInfoDef = QString("%1 %2 %3 %4 %5 %6 %7").arg(name()).arg(description()).arg(units()).arg(rank()).arg(size().toString()).arg(flattenEnabled()?"true":"false").arg(flattenMethod());
+
+	for(int x = 0, size = axes().count(); x < size; x++){
+		AMDSAxisInfo axisInfo = axes().at(x);
+		QString axisDef = QString("\tAxis (%1): %2").arg(x).arg(axisInfo.toString());
+		bufferGroupInfoDef = QString("%1\n%2").arg(bufferGroupInfoDef).arg(axisDef);
+	}
+
+	return bufferGroupInfoDef;
+}
