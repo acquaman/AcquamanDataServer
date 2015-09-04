@@ -104,8 +104,6 @@ public:
 
 	/// implement the function to copy the data of the source eventData to the current instance
 	virtual void cloneData(AMDSEventData *sourceEventData);
-//	/// implementationt the function to copy the data of the source eventData to the target instance
-//	virtual AMDSFullEventData& operator =(AMDSFullEventData &sourceEventData);
 
 	/// Writes this AMDSEventData to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
