@@ -1,7 +1,9 @@
 #include "source/DataElement/AMDSEventData.h"
 
 #include "source/Connection/AMDSDataStream.h"
+#include "source/DataElement/AMDSEventDataSupport.h"
 
+// ======== implementation of AMDSEventData  ===========
 AMDSEventData::AMDSEventData(QObject *parent) :
 	QObject(parent)
 {
@@ -11,15 +13,45 @@ AMDSEventData::~AMDSEventData()
 {
 }
 
+AMDSEventData& AMDSEventData::operator =(AMDSEventData &sourceEventData) {
+	if (this != &sourceEventData) {
+		cloneData(&sourceEventData);
+	}
+
+	return *this;
+}
+
+// ======== implementation of AMDSLightWeightEventData  ===========
+
 AMDSLightWeightEventData::AMDSLightWeightEventData(QDateTime eventTime, QObject *parent) :
 	AMDSEventData(parent)
 {
 	eventTime_ = eventTime;
 }
 
+AMDSLightWeightEventData::AMDSLightWeightEventData(AMDSLightWeightEventData &eventData, QObject *parent)
+	:AMDSEventData(parent)
+{
+	(*this) = eventData;
+}
+
 AMDSLightWeightEventData::~AMDSLightWeightEventData()
 {
 }
+
+void AMDSLightWeightEventData::cloneData(AMDSEventData *sourceEventData)
+{
+	setEventTime(sourceEventData->eventTime());
+}
+
+//AMDSLightWeightEventData& AMDSLightWeightEventData::operator =(AMDSLightWeightEventData &sourceEventData)
+//{
+//	if (this != &sourceEventData) {
+//		cloneData(&sourceEventData);
+//	}
+
+//	return *this;
+//}
 
 bool AMDSLightWeightEventData::writeToDataStream(AMDSDataStream *dataStream) const{
 	*dataStream << eventTime_;
@@ -40,6 +72,8 @@ bool AMDSLightWeightEventData::readFromDataStream(AMDSDataStream *dataStream){
 	return true;
 }
 
+// ======== implementation of AMDSFullEventData  ===========
+
 AMDSFullEventData::AMDSFullEventData(QDateTime eventTime, AMDSEventData::EventType eventType, AMDSEventData::TimeScale timeScale, quint16 timeUncertainty, QObject *parent) :
 	AMDSEventData(parent)
 {
@@ -50,9 +84,44 @@ AMDSFullEventData::AMDSFullEventData(QDateTime eventTime, AMDSEventData::EventTy
 	Q_UNUSED(eventTime)
 }
 
+AMDSFullEventData::AMDSFullEventData(AMDSFullEventData &eventData, QObject *parent)
+	:AMDSEventData(parent)
+{
+	(*this) = eventData;
+}
+
 AMDSFullEventData::~AMDSFullEventData()
 {
+	if (lightWeightEventData_)
+		lightWeightEventData_->deleteLater();
 }
+
+void AMDSFullEventData::cloneData(AMDSEventData *sourceEventData)
+{
+	AMDSFullEventData *sourceFullEventData = qobject_cast<AMDSFullEventData *>(sourceEventData);
+	if (sourceFullEventData) {
+		if (lightWeightEventData_)
+			lightWeightEventData_->deleteLater();
+
+		AMDSEventData *newEventData = AMDSEventDataSupport::instantiateEventDataFromInstance(sourceFullEventData->lightWeightEventData_);
+		lightWeightEventData_ = qobject_cast<AMDSLightWeightEventData *>(newEventData);
+		if (lightWeightEventData_)
+			(*lightWeightEventData_) = (*sourceFullEventData->lightWeightEventData_);
+
+		setEventType(sourceFullEventData->eventType());
+		setTimeScale(sourceFullEventData->timeScale());
+		setTimeUncertainty(sourceFullEventData->timeUncertainty());
+	}
+}
+
+//AMDSFullEventData& AMDSFullEventData::operator =(AMDSFullEventData &sourceEventData)
+//{
+//	if (this != &sourceEventData) {
+//		cloneData(&sourceEventData);
+//	}
+
+//	return *this;
+//}
 
 bool AMDSFullEventData::writeToDataStream(AMDSDataStream *dataStream) const{
 	if(!lightWeightEventData_->writeToDataStream(dataStream))
@@ -72,6 +141,9 @@ bool AMDSFullEventData::writeToDataStream(AMDSDataStream *dataStream) const{
 }
 
 bool AMDSFullEventData::readFromDataStream(AMDSDataStream *dataStream){
+	if (lightWeightEventData_)
+		lightWeightEventData_->deleteLater();
+
 	if(!lightWeightEventData_->readFromDataStream(dataStream))
 		return false;
 

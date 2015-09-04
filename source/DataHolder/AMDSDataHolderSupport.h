@@ -47,6 +47,8 @@ namespace AMDSDataHolderSupport {
 
 	/// helper function to instantiate client request from the give type
 	AMDSDataHolder* instantiateDataHolderFromClassName(const QString &className);
+	/// helper function to instantiate client request from the give instance
+	AMDSDataHolder* instantiateDataHolderFromInstance(const AMDSDataHolder *dataHolder);
 
 	bool inheritsDataHolder(const QMetaObject *queryMetaObject);
 

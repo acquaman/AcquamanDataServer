@@ -46,6 +46,7 @@ namespace AMDSEventDataSupport {
 	const QHash<QString, AMDSEventDataObjectInfo>* registeredClasses();
 
 	AMDSEventData* instantiateEventDataFromClassName(const QString &className);
+	AMDSEventData* instantiateEventDataFromInstance(const AMDSEventData *instance);
 
 	bool inheritsEventData(const QMetaObject *queryMetaObject);
 

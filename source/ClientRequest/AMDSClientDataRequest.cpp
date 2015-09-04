@@ -27,6 +27,7 @@ AMDSClientDataRequest::AMDSClientDataRequest(const QString &socketKey, const QSt
 
 AMDSClientDataRequest::~AMDSClientDataRequest()
 {
+	clearData();
 }
 
 AMDSClientDataRequest::AMDSClientDataRequest(const AMDSClientDataRequest &other) :
@@ -49,9 +50,25 @@ AMDSClientDataRequest& AMDSClientDataRequest::operator =(const AMDSClientDataReq
 		uniformDataType_ = other.uniformDataType();
 		clearData();
 		for(int x = 0, size = other.data().count(); x < size; x++)
-			appendData(other.data().at(x));
+			copyAndAppendData(other.data().at(x));
 	}
 	return (*this);
+}
+
+void AMDSClientDataRequest::copyAndAppendData(AMDSDataHolder *dataHolder)
+{
+	AMDSDataHolder *cloneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dataHolder);
+	(*cloneDataHolder) = (*dataHolder);
+
+	data_.append(cloneDataHolder);
+}
+
+void AMDSClientDataRequest::clearData()
+{
+	foreach(AMDSDataHolder *dataHolder, data_) {
+		dataHolder->deleteLater();
+	}
+	data_.clear();
 }
 
 int AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const

@@ -41,6 +41,11 @@ public:
 	virtual inline bool setTimeScale(AMDSEventData::TimeScale timeScale) = 0;
 	virtual inline bool setTimeUncertainty(quint16 timeUncertainty) = 0;
 
+	/// virtual function to copy the data of the source eventData to the current instance
+	virtual void cloneData(AMDSEventData *sourceEventData) = 0;
+	/// implementationt the function to copy the data of the source eventData to the target instance
+	virtual AMDSEventData& operator =(AMDSEventData &sourceEventData);
+
 	/// Writes this AMDSEventData to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const = 0;
 	/// Reads this AMDSEventData from the AMDSDataStream, returns true if no errors are encountered
@@ -52,6 +57,7 @@ class AMDSLightWeightEventData : public AMDSEventData
 Q_OBJECT
 public:
 	Q_INVOKABLE AMDSLightWeightEventData(QDateTime eventTime = QDateTime::currentDateTime(), QObject *parent = 0);
+	Q_INVOKABLE AMDSLightWeightEventData(AMDSLightWeightEventData &eventData, QObject *parent = 0);
 	virtual ~AMDSLightWeightEventData();
 
 	virtual QDateTime eventTime() const { return eventTime_; }
@@ -63,6 +69,11 @@ public:
 	virtual inline bool setEventType(AMDSEventData::EventType eventType);
 	virtual inline bool setTimeScale(AMDSEventData::TimeScale timeScale);
 	virtual inline bool setTimeUncertainty(quint16 timeUncertainty);
+
+	/// implement the function to copy the data of the source eventData to the current instance
+	virtual void cloneData(AMDSEventData *sourceEventData);
+//	/// implementationt the function to copy the data of the source eventData to the target instance
+//	virtual AMDSLightWeightEventData& operator =(AMDSLightWeightEventData &sourceEventData);
 
 	/// Writes this AMDSEventData to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
@@ -78,6 +89,7 @@ class AMDSFullEventData : public AMDSEventData
 Q_OBJECT
 public:
 	Q_INVOKABLE AMDSFullEventData(QDateTime eventTime = QDateTime::currentDateTime(), AMDSEventData::EventType eventType = AMDSEventData::SingleEvent, AMDSEventData::TimeScale timeScale = AMDSEventData::SecondsScale, quint16 timeUncertainty = 0, QObject *parent = 0);
+	Q_INVOKABLE AMDSFullEventData(AMDSFullEventData &eventData, QObject *parent = 0);
 	virtual ~AMDSFullEventData();
 
 	virtual QDateTime eventTime() const { return lightWeightEventData_->eventTime(); }
@@ -89,6 +101,11 @@ public:
 	virtual inline bool setEventType(AMDSEventData::EventType eventType);
 	virtual inline bool setTimeScale(AMDSEventData::TimeScale timeScale);
 	virtual inline bool setTimeUncertainty(quint16 timeUncertainty);
+
+	/// implement the function to copy the data of the source eventData to the current instance
+	virtual void cloneData(AMDSEventData *sourceEventData);
+//	/// implementationt the function to copy the data of the source eventData to the target instance
+//	virtual AMDSFullEventData& operator =(AMDSFullEventData &sourceEventData);
 
 	/// Writes this AMDSEventData to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
