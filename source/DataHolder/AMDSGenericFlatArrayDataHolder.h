@@ -22,7 +22,7 @@ public:
 	/// implement the data function to read data from valueFlatArray_ and write data to the given outputArray
 	virtual bool data(AMDSFlatArray *outputArray) const { return valueFlatArray_.resetTargetArrayAndReplaceData(outputArray); }
 	/// implement the setData function to update valueFlatArray_ with given inputArray
-	virtual void setData(AMDSFlatArray *inputArray) { inputArray->copyDataToTargetArray(&valueFlatArray_); }
+	virtual void setData(AMDSFlatArray *inputArray) { inputArray->resetTargetArrayAndReplaceData(&valueFlatArray_); }
 	/// implement the function to return the data string
 	virtual QString printData() { return valueFlatArray_.printData(); }
 
