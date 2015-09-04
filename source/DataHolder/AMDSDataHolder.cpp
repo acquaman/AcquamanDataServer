@@ -64,19 +64,6 @@ void AMDSLightWeightDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 	}
 }
 
-//AMDSLightWeightDataHolder& AMDSLightWeightDataHolder::operator =(const AMDSLightWeightDataHolder &sourceDataHolder)
-//{
-//	if(this != &sourceDataHolder){
-//		if (eventData_)
-//			eventData_->deleteLater();
-
-//		eventData_ = AMDSEventDataSupport::instantiateEventDataFromInstance(sourceDataHolder.eventData());
-//		(*eventData_) = *(sourceDataHolder.eventData_); // copy the values of the eventData over
-//	}
-
-//	return (*this);
-//}
-
 bool AMDSLightWeightDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
 	Q_UNUSED(encodeDataType)
 	dataStream->encodeEventDataType(*eventData_);
@@ -151,34 +138,6 @@ void AMDSFullDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 		dataTypeStyle_ = sourceFullDataHolder->dataTypeStyle();
 	}
 }
-
-//AMDSFullDataHolder& AMDSFullDataHolder::operator =(const AMDSFullDataHolder &sourceDataHolder)
-//{
-//	if(this != &sourceDataHolder){
-//		if (lightWeightDataHolder_)
-//			lightWeightDataHolder_->deleteLater();
-
-////			foreach (AMDSAxisInfo axisInfo, axes_) {
-////				axes_.removeOne(axisInfo);
-////				delete &axisInfo;
-////			}
-//			axes_.clear();
-
-//		AMDSDataHolder *newDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(sourceDataHolder.lightWeightDataHolder_);
-//		lightWeightDataHolder_ = qobject_cast<AMDSLightWeightDataHolder *>(newDataHolder);
-//		(*lightWeightDataHolder_) = (*sourceDataHolder.lightWeightDataHolder_);
-
-//		foreach (AMDSAxisInfo axisInfo, sourceDataHolder.axes()) {
-//			AMDSAxisInfo copyAxisInfo(axisInfo);
-//			axes_.append(copyAxisInfo);
-//		}
-
-//		axesStyle_ = sourceDataHolder.axesStyle();
-//		dataTypeStyle_ = sourceDataHolder.dataTypeStyle();
-//	}
-
-//	return (*this);
-//}
 
 bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
 	dataStream->encodeDataHolderType(*lightWeightDataHolder_);

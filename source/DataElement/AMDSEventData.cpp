@@ -114,15 +114,6 @@ void AMDSFullEventData::cloneData(AMDSEventData *sourceEventData)
 	}
 }
 
-//AMDSFullEventData& AMDSFullEventData::operator =(AMDSFullEventData &sourceEventData)
-//{
-//	if (this != &sourceEventData) {
-//		cloneData(&sourceEventData);
-//	}
-
-//	return *this;
-//}
-
 bool AMDSFullEventData::writeToDataStream(AMDSDataStream *dataStream) const{
 	if(!lightWeightEventData_->writeToDataStream(dataStream))
 		return false;

@@ -115,8 +115,6 @@ public:
 
 	/// implement the function copy the value of source instance to the current instance
 	virtual void cloneData(AMDSDataHolder *dataHolder);
-//	/// implement the = operation of AMDSDataHolder, which will copy the value of source instance to the target one
-//	virtual AMDSLightWeightDataHolder& operator =(const AMDSLightWeightDataHolder &dataHolder);
 
 	/// implement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
@@ -173,8 +171,6 @@ public:
 
 	/// implement the function copy the value of source instance to the current instance
 	virtual void cloneData(AMDSDataHolder *dataHolder);
-//	/// implement the = operation of AMDSDataHolder, which will copy the value of source instance to the target one
-//	virtual AMDSFullDataHolder& operator =(const AMDSFullDataHolder &dataHolder);
 
 	/// implement the PLUS operation of AMDSDataHolder, which will plus the value of the two instances of AMDSDataHolder and return the new instance
 	virtual AMDSDataHolder* operator +(AMDSDataHolder &dataHolder) { return lightWeightDataHolder_->operator +(dataHolder); }
