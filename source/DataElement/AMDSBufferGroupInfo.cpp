@@ -26,7 +26,7 @@ AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& o
 	return *this;
 }
 
-QString AMDSBufferGroupInfo::toString()
+QString AMDSBufferGroupInfo::toString() const
 {
 	QString bufferGroupInfoDef = QString("%1 %2 %3 %4 %5 %6 %7").arg(name()).arg(description()).arg(units()).arg(rank()).arg(size().toString()).arg(flattenEnabled()?"true":"false").arg(flattenMethod());
 

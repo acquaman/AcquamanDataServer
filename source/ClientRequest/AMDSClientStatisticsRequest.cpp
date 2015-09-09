@@ -76,7 +76,7 @@ int AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-QString AMDSClientStatisticsRequest::toString()
+QString AMDSClientStatisticsRequest::toString() const
 {
 	QString messageData = QString("Data of Statistics message (%1):").arg(socketKey());
 	for(int x = 0, size = packetStats().count(); x < size; x++) {

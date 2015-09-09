@@ -218,7 +218,7 @@ bool AMDSClientDataRequest::validateResponse()
 	return noError;
 }
 
-QString AMDSClientDataRequest::toString()
+QString AMDSClientDataRequest::toString() const
 {
 	QString messageData = QString("Data of Data message (%1 -- %2):").arg(socketKey()).arg(bufferName());
 

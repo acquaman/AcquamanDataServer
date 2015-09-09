@@ -105,7 +105,7 @@ int AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStrea
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-QString AMDSClientIntrospectionRequest::toString()
+QString AMDSClientIntrospectionRequest::toString() const
 {
 	QString messageData = QString("Data of Introspection message (%1):").arg(socketKey());
 	for(int y = 0, ySize = bufferGroupInfos_.count(); y < ySize; y++){

@@ -42,7 +42,7 @@ public:
 	void setIncrement(quint16 increment) { increment_ = increment; }
 
 	/// return the axis information as string
-	QString toString();
+	QString toString() const;
 
 protected:
 	/// Size: number of elements along the axis

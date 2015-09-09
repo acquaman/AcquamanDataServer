@@ -65,7 +65,7 @@ public:
 	/// validate the message response
 	virtual bool validateResponse() {return true;}
 	/// pure virtual to return a data string of the message
-	virtual QString toString() = 0;
+	virtual QString toString() const = 0;
 
 private:
 	/// To set the values of all the attributes

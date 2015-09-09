@@ -31,7 +31,7 @@ public:
 	virtual int readFromDataStream(AMDSDataStream *dataStream);
 
 	/// implement the function to return a data string of the message
-	virtual QString toString();
+	virtual QString toString() const;
 
 protected:
 	QList<AMDSPacketStats> packetStats_;

@@ -2,6 +2,7 @@
 #define AMDSFLATARRAY_H
 
 #include <QVector>
+#include <QString>
 
 #include "source/DataElement/AMDSDataTypeDefinitions.h"
 

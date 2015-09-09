@@ -16,7 +16,7 @@ AMDSAxisInfo::~AMDSAxisInfo()
 {
 }
 
-QString AMDSAxisInfo::toString()
+QString AMDSAxisInfo::toString() const
 {
 	return QString("%1 %2 %3 %4 %5 %6 %7").arg(name()).arg(description()).arg(units()).arg(size()).arg(isUniform()).arg(start()).arg(increment());
 }

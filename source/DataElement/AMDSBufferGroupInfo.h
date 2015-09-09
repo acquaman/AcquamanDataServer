@@ -65,7 +65,7 @@ public:
 	bool includeData() const { return name_ != "Invalid"; }
 
 	/// convert the buffer group to a string
-	QString toString();
+	QString toString() const;
 
 protected:
 	/// the name of the bufferGroupInfo

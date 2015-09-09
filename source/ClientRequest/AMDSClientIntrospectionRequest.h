@@ -44,7 +44,7 @@ public:
 	virtual int readFromDataStream(AMDSDataStream *dataStream);
 
 	/// implement the function to return a data string of the message
-	virtual QString toString();
+	virtual QString toString() const;
 
 protected:
 	/// The string identifier for the buffer or buffers being introspected
