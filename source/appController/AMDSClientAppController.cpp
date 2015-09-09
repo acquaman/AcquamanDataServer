@@ -36,6 +36,7 @@ AMDSClientAppController::~AMDSClientAppController()
 	if (networkSession_) {
 		disconnect(networkSession_, SIGNAL(opened()), this, SLOT(onNetworkSessionOpened()));
 		networkSession_->deleteLater();
+		networkSession_ = 0;
 	}
 }
 

@@ -39,8 +39,10 @@ AMDSLightWeightDataHolder::AMDSLightWeightDataHolder(AMDSLightWeightDataHolder &
 
 AMDSLightWeightDataHolder::~AMDSLightWeightDataHolder()
 {
-	if (eventData_)
+	if (eventData_) {
 		eventData_->deleteLater();
+		eventData_ = 0;
+	}
 }
 
 AMDSDataTypeDefinitions::DataType AMDSLightWeightDataHolder::dataType() const{
@@ -102,8 +104,10 @@ AMDSFullDataHolder::AMDSFullDataHolder(AMDSFullDataHolder &sourceFullDataHolder,
 
 AMDSFullDataHolder::~AMDSFullDataHolder()
 {
-	if (lightWeightDataHolder_)
+	if (lightWeightDataHolder_) {
 		lightWeightDataHolder_->deleteLater();
+		lightWeightDataHolder_ = 0;
+	}
 
 	axes_.clear();
 }

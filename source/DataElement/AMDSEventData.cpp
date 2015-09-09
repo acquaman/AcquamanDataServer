@@ -83,8 +83,10 @@ AMDSFullEventData::AMDSFullEventData(AMDSFullEventData &eventData, QObject *pare
 
 AMDSFullEventData::~AMDSFullEventData()
 {
-	if (lightWeightEventData_)
+	if (lightWeightEventData_) {
 		lightWeightEventData_->deleteLater();
+		lightWeightEventData_ = 0;
+	}
 }
 
 void AMDSFullEventData::cloneData(AMDSEventData *sourceEventData)
@@ -123,9 +125,12 @@ bool AMDSFullEventData::writeToDataStream(AMDSDataStream *dataStream) const{
 }
 
 bool AMDSFullEventData::readFromDataStream(AMDSDataStream *dataStream){
-	if (lightWeightEventData_)
+	if (lightWeightEventData_) {
 		lightWeightEventData_->deleteLater();
+	}
 
+	AMDSEventData *newEventData = AMDSEventDataSupport::instantiateEventDataFromClassName(AMDSLightWeightEventData::staticMetaObject.className());
+	lightWeightEventData_ = qobject_cast<AMDSLightWeightEventData *>(newEventData);
 	if(!lightWeightEventData_->readFromDataStream(dataStream))
 		return false;
 

@@ -23,7 +23,10 @@ AMDSThreadedTCPDataServer::~AMDSThreadedTCPDataServer()
 		thread_->quit();
 
 	server_->deleteLater();
+	server_ = 0;
+
 	thread_->deleteLater();
+	thread_ = 0;
 }
 
 AMDSTCPDataServer* AMDSThreadedTCPDataServer::server()

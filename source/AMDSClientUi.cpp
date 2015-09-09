@@ -148,6 +148,7 @@ AMDSClientUi::~AMDSClientUi()
 	disconnect(clientAppController_, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
 
 	clientAppController_->deleteLater();
+	clientAppController_ = 0;
 }
 
 void AMDSClientUi::connectToServer()
