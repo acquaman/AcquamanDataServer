@@ -44,15 +44,6 @@ void AMDSLightWeightEventData::cloneData(AMDSEventData *sourceEventData)
 	setEventTime(sourceEventData->eventTime());
 }
 
-//AMDSLightWeightEventData& AMDSLightWeightEventData::operator =(AMDSLightWeightEventData &sourceEventData)
-//{
-//	if (this != &sourceEventData) {
-//		cloneData(&sourceEventData);
-//	}
-
-//	return *this;
-//}
-
 bool AMDSLightWeightEventData::writeToDataStream(AMDSDataStream *dataStream) const{
 	*dataStream << eventTime_;
 	if(dataStream->status() != QDataStream::Ok)
