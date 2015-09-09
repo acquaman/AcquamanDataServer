@@ -183,6 +183,11 @@ public:
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
 protected:
+	/// getter function to get the lightweightDataHolder of AMDSFullDataHolder.
+	/// The reason to encapsulate this as protected is that the user of AMDSFullDataHolder should NOT be aware the existence of the instance of lightweightDataHolder
+	inline AMDSLightWeightDataHolder * lightWeightDataHolder() { return AMDSLightWeightDataHolder; }
+
+protected:
 	/// instance of AMDSLightWightDataHolder as the real holder for data
 	AMDSLightWeightDataHolder *lightWeightDataHolder_;
 

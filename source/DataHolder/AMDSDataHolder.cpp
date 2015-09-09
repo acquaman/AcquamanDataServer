@@ -129,9 +129,9 @@ void AMDSFullDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 		if (lightWeightDataHolder_)
 			lightWeightDataHolder_->deleteLater();
 
-		AMDSDataHolder *newDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(sourceFullDataHolder->lightWeightDataHolder_);
+		AMDSDataHolder *newDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(sourceFullDataHolder->lightWeightDataHolder());
 		lightWeightDataHolder_ = qobject_cast<AMDSLightWeightDataHolder *>(newDataHolder);
-		(*lightWeightDataHolder_) = (*sourceFullDataHolder->lightWeightDataHolder_);
+		(*lightWeightDataHolder_) = (*sourceFullDataHolder->lightWeightDataHolder());
 
 		foreach (AMDSAxisInfo axisInfo, sourceFullDataHolder->axes()) {
 			AMDSAxisInfo copyAxisInfo(axisInfo);
