@@ -39,7 +39,7 @@ AMDSClientRelativeCountPlusCountDataRequest& AMDSClientRelativeCountPlusCountDat
 	return (*this);
 }
 
-void AMDSClientRelativeCountPlusCountDataRequest::setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, quint64 relativeCount, quint64 count) {
+void AMDSClientRelativeCountPlusCountDataRequest::setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, quint64 relativeCount, quint64 count) {
 	setBufferName(bufferName);
 	setIncludeStatusData(includeStatusData);
 	setFlattenResultData(flattenResultData);

@@ -7,7 +7,6 @@
 #include <QTcpSocket>
 #include <QHash>
 #include <QSignalMapper>
-#include <QDebug>
 #include <QStringList>
 #include <QNetworkConfigurationManager>
 #include <QSettings>

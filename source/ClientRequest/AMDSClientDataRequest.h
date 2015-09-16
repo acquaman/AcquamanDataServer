@@ -3,8 +3,10 @@
 
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/DataElement/AMDSDataTypeDefinitions.h"
+#include "source/DataHolder/AMDSDataHolder.h"
+#include "source/DataHolder/AMDSDataHolderSupport.h"
 
-class AMDSDataHolder;
+//class AMDSDataHolder;
 
 class AMDSClientDataRequest : public AMDSClientRequest
 {
@@ -46,16 +48,19 @@ public:
 	/// Sets the uniform data type
 	inline void setUniformDataType(AMDSDataTypeDefinitions::DataType uniformDataType) { uniformDataType_ = uniformDataType; }
 	/// Adds some data to the list of data holders
-	inline void appendData(AMDSDataHolder *dataHolder) { data_.append(dataHolder); }
+	void copyAndAppendData(AMDSDataHolder *dataHolder) ;
 	/// Clears the list of data holders
-	inline void clearData() { data_.clear(); }
+	void clearData();
 
 	/// Writes this AMDSClienDatatRequest to an AMDSDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSClientDataRequest from the AMDSDataStream, returns 0 if no errors are encountered
 	virtual int readFromDataStream(AMDSDataStream *dataStream);
+
 	/// validate the message response
 	virtual bool validateResponse();
+	/// implement the function to return a data string of the message
+	virtual QString toString() const;
 
 protected:
 	/// The string identifier for the buffer data is being request from or received from

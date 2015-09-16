@@ -95,7 +95,7 @@ bool AMDSClientContinuousDataRequest::isExpired()
 	return timeSpanInSecond > 60;
 }
 
-void AMDSClientContinuousDataRequest::setAttributesValues(bool includeStatusData, bool flattenResultData, QStringList &bufferNames, quint64 updateInterval, QString &handShakeSocketKey)
+void AMDSClientContinuousDataRequest::setAttributesValues(bool includeStatusData, bool flattenResultData, const QStringList &bufferNames, quint64 updateInterval, const QString &handShakeSocketKey)
 {
 	setIncludeStatusData(includeStatusData);
 	setFlattenResultData(flattenResultData);
