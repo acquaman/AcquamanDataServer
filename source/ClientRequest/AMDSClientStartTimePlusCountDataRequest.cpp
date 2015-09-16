@@ -38,7 +38,7 @@ AMDSClientStartTimePlusCountDataRequest& AMDSClientStartTimePlusCountDataRequest
 	return (*this);
 }
 
-void AMDSClientStartTimePlusCountDataRequest::setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, QDateTime &startTime, quint64 count) {
+void AMDSClientStartTimePlusCountDataRequest::setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 count) {
 	setBufferName(bufferName);
 	setIncludeStatusData(includeStatusData);
 	setFlattenResultData(flattenResultData);

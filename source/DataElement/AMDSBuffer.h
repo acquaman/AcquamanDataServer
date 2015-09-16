@@ -3,7 +3,6 @@
 
 #include <QVector>
 #include <QReadWriteLock>
-#include <QDebug>
 
 /**
   * Templated class which provides automatic AMDSBuffering of classes of type T. Allows for constant time additions to the

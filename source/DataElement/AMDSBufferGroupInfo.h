@@ -4,6 +4,9 @@
 #include "source/DataElement/AMDSAxisInfo.h"
 #include "source/DataElement/AMDSnDIndex.h"
 
+#define AMDS_SERVER_ERR_BUFFER_GROUP 20200
+#define AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN 20201
+
 class AMDSBufferGroupInfo
 {
 public:
@@ -13,7 +16,7 @@ public:
 		NoFlatten = 2
 	};
 
-	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), const bool flattenEnabled=false, const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
+	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
 	/// Copy constructor
 	AMDSBufferGroupInfo(const AMDSBufferGroupInfo& other);
 	/// Assignment operator
@@ -26,7 +29,7 @@ public:
 	/// returns the units of the bufferGroupInfo
 	inline QString units() const { return units_; }
 	/// returns whether the bufferGroup is enabled flatten
-	inline bool flattenEnabled() const { return flattenEnabled_; }
+	inline bool isFlattenEnabled() const { return flattenMethod_ != NoFlatten; }
 	/// returns the flatten method of the bufferGroup
 	inline DataFlattenMethod flattenMethod()const { return flattenMethod_; }
 
@@ -53,13 +56,14 @@ public:
 	void setUnits(const QString &units) { units_ = units; }
 	/// Set the axes of the bufferGroupInfo
 	void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
-	/// Set whether the bufferGroup can be flattened
-	void setFlattenEnabled(const bool enabled) { flattenEnabled_ = enabled; }
 	/// Set how the bufferGroup should be flattened
-	void setFlattenMethod(const DataFlattenMethod method) { flattenMethod_ = method; }
+	void setFlattenMethod(DataFlattenMethod method) { flattenMethod_ = method; }
 
 	/// If the bufferGrou name is "Invalid", there should be no Data
 	bool includeData() const { return name_ != "Invalid"; }
+
+	/// convert the buffer group to a string
+	QString toString() const;
 
 protected:
 	/// the name of the bufferGroupInfo
@@ -68,8 +72,6 @@ protected:
 	QString description_;
 	/// the unit of the bufferGroupInfo
 	QString units_;
-	/// the flag whether this buffer group allows to flatten data
-	bool flattenEnabled_;
 	/// the definition on how the data should be flattened
 	DataFlattenMethod flattenMethod_;
 

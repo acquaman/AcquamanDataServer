@@ -16,7 +16,7 @@
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
-	AMDSErrorMon::information(this, 0, "Starting Acquaman Data Server application ...");
+	AMDSErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
 
 	dataServer_ = new AMDSThreadedTCPDataServer(this);
 	fiftyMillisecondTimer_ = new QTimer(this);
@@ -34,7 +34,7 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	startTimer();
 }
 
-void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, QString errorMessage)
+void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, const QString &errorMessage)
 {
 	switch(errorLevel) {
 	case AMDSErrorReport::Serious:
@@ -55,7 +55,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 				QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroups_.constBegin();
 				while (i != bufferGroups_.constEnd()) {
 					AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
-					AMDSErrorMon::debug(this, 0, QString("%1 definition is %2 %3 %4 %5 %6 %7").arg(i.key()).arg(oneInfo.name()).arg(oneInfo.description()).arg(oneInfo.units()).arg(oneInfo.size().toString()).arg(oneInfo.flattenEnabled()?"true":"false").arg(oneInfo.flattenMethod()));
+					AMDSErrorMon::information(this, AMDS_SERVER_INFO_BUFFER_DEF, QString("%1 definition is %2 %3 %4 %5 %6 %7").arg(i.key()).arg(oneInfo.name()).arg(oneInfo.description()).arg(oneInfo.units()).arg(oneInfo.size().toString()).arg(oneInfo.isFlattenEnabled()?"true":"false").arg(oneInfo.flattenMethod()));
 					clientIntrospectionRequest->appendBufferGroupInfo(oneInfo);
 					++i;
 				}
@@ -86,7 +86,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 						dataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
 						bufferGroup->processClientRequest(dataRequest);
 					} else {
-						AMDSErrorMon::alert(this, 0, QString("Invalid client data request with buffer name: %1").arg(dataRequest->bufferName()));
+						AMDSErrorMon::alert(this, AMDS_SERVER_ALT_INVALID_REQUEST, QString("Invalid client data request with buffer name: %1").arg(dataRequest->bufferName()));
 						emit clientRequestProcessed(dataRequest);
 					}
 				}
@@ -98,7 +98,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 					clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
 					bufferGroup->processClientRequest(clientRequest);
 				} else {
-					AMDSErrorMon::alert(this, 0, QString("Invalid client data request with buffer name: %1").arg(clientDataRequest->bufferName()));
+					AMDSErrorMon::alert(this, AMDS_SERVER_ALT_INVALID_REQUEST, QString("Invalid client data request with buffer name: %1").arg(clientDataRequest->bufferName()));
 					emit clientRequestProcessed(clientRequest);
 				}
 			}
@@ -136,19 +136,19 @@ void AMDSCentralServer::initializeBufferGroup(quint64 maxCountSize)
 	QList<AMDSAxisInfo> mcpBufferGroupAxes;
 	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
 	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
-	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", false, AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
+	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
 	AMDSBufferGroup *mcpBufferGroup = new AMDSBufferGroup(mcpBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroup);
 	bufferGroups_.insert(mcpThreadedBufferGroup->bufferGroupInfo().name(), mcpThreadedBufferGroup);
 
 	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
 	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
-	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", false, AMDSBufferGroupInfo::NoFlatten, amptek1BufferGroupAxes);
+	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", AMDSBufferGroupInfo::Summary, amptek1BufferGroupAxes);
 	amptek1BufferGroup_ = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup_);
 	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
 
-	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", true, AMDSBufferGroupInfo::Average);
+	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", AMDSBufferGroupInfo::Average);
 	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
 	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
@@ -161,7 +161,7 @@ void AMDSCentralServer::initializeBufferGroup(quint64 maxCountSize)
 
 void AMDSCentralServer::startTimer()
 {
-	AMDSErrorMon::information(this, 0, "Starting the timer to update data buffer ...");
+	AMDSErrorMon::information(this, AMDS_SERVER_INFO_START_BUFFER_TIMER, "Starting the timer to update data buffer ...");
 	simpleCounter_ = 0;
 	spectralCounter_ = 0;
 

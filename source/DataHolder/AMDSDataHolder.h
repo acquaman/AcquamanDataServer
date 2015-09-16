@@ -12,6 +12,9 @@
 
 class AMDSDataStream;
 
+#define AMDS_SERVER_ERR_DATA_HOLDER 20300
+#define AMDS_SERVER_ERR_UNMATCH_DATA_HOLDER_FOR_PLUS 20301
+
 class AMDSDataHolder : public QObject
 {
 Q_OBJECT
@@ -74,6 +77,11 @@ public:
 	/// pure virtual function to define the Division operation of AMDSDataHolder: the value of the given handler will be divided by the given divisior
 	virtual AMDSDataHolder* operator /(quint32 divisor) = 0;
 
+	/// pure virtual function copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder) = 0;
+	/// implement the = operation of AMDSDataHolder, which will copy the value of source instance to the target one
+	virtual AMDSDataHolder& operator =(AMDSDataHolder &dataHolder);
+
 	/// pure virtual function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered. By default the data type is encoded into the stream; however, this can be disabled and moved to a higher level if need be.
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType = true) const = 0;
 	/// pure virtual function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered. By default the data type is decoded from the stream; however, passing a particular data type will assume that there is no data type encoded in the stream.
@@ -85,6 +93,7 @@ class AMDSLightWeightDataHolder : public AMDSDataHolder
 Q_OBJECT
 public:
 	AMDSLightWeightDataHolder(QObject *parent = 0);
+	AMDSLightWeightDataHolder(AMDSLightWeightDataHolder &sourceLightWeightDataHolder, QObject *parent = 0);
 	virtual ~AMDSLightWeightDataHolder();
 
 	/// implement the axesStyle function
@@ -104,10 +113,17 @@ public:
 	virtual bool operator >(const QDateTime &rhs) { return eventData()->eventTime() > rhs; }
 	virtual bool operator ==(const QDateTime &rhs) { return eventData()->eventTime() == rhs; }
 
+	/// implement the function copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder);
+
 	/// implement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// implement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
+
+	/// getter function to get the eventData_ of AMDSEventData.
+	/// The reason to encapsulate this as protected is that the user of AMDSEventData should NOT be aware the existence of the instance of eventData_
+	inline AMDSEventData * eventData() { return eventData_; }
 
 protected:
 	/// the instance of event data, which provides the event information about the dataHolder
@@ -119,6 +135,7 @@ class AMDSFullDataHolder : public AMDSDataHolder
 Q_OBJECT
 public:
 	AMDSFullDataHolder(AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>(), QObject *parent = 0);
+	AMDSFullDataHolder(AMDSFullDataHolder &sourceFullDataHolder, QObject *parent = 0);
 	virtual ~AMDSFullDataHolder();
 
 	/// implement the axesStyle() function
@@ -156,6 +173,9 @@ public:
 	virtual bool operator >(const QDateTime &rhs) { return lightWeightDataHolder_->operator >(rhs); }
 	virtual bool operator ==(const QDateTime &rhs) { return lightWeightDataHolder_->operator ==(rhs); }
 
+	/// implement the function copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder);
+
 	/// implement the PLUS operation of AMDSDataHolder, which will plus the value of the two instances of AMDSDataHolder and return the new instance
 	virtual AMDSDataHolder* operator +(AMDSDataHolder &dataHolder) { return lightWeightDataHolder_->operator +(dataHolder); }
 	/// implement the Division operation of AMDSDataHolder: the value of the given handler will be divided by the given divisior
@@ -165,6 +185,11 @@ public:
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// implent the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
+
+protected:
+	/// getter function to get the lightweightDataHolder of AMDSFullDataHolder.
+	/// The reason to encapsulate this as protected is that the user of AMDSFullDataHolder should NOT be aware the existence of the instance of lightweightDataHolder
+	inline AMDSLightWeightDataHolder * lightWeightDataHolder() { return lightWeightDataHolder_; }
 
 protected:
 	/// instance of AMDSLightWightDataHolder as the real holder for data

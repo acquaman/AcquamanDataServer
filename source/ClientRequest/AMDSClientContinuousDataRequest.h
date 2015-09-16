@@ -13,7 +13,7 @@ class AMDSClientContinuousDataRequest : public AMDSClientDataRequest
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientContinuousDataRequest(QObject *parent = 0);
-	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool enableFlattening, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool flattenResultData, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientContinuousDataRequest();
 	/// Copy constructor
 	AMDSClientContinuousDataRequest(const AMDSClientContinuousDataRequest &other);
@@ -41,7 +41,7 @@ public:
 	inline bool isHandShakingMessage() { return handShakeSocketKey_.length() > 0; }
 
 	/// Returns the buffer data request message
-	inline AMDSClientContinuousDataRequest *bufferDataRequest(QString bufferName) { return bufferDataRequestList_.value(bufferName); }
+	inline AMDSClientContinuousDataRequest *bufferDataRequest(const QString &bufferName) { return bufferDataRequestList_.value(bufferName); }
 
 	/// Returns whether message expired (didn't receive handshake in a given time interval
 	bool isExpired();
@@ -60,7 +60,7 @@ public:
 	inline void setHandShakeTime(const QDateTime &handShakeTime) { lastHandShakeTime_ = handShakeTime; }
 
 	/// Sets the values of all the data attributes of client request
-	void setAttributesValues(bool includeStatusData, bool flattenResultData, QStringList &bufferNames, quint64 updateInterval, QString &handShakeSocketKey);
+	void setAttributesValues(bool includeStatusData, bool flattenResultData, const QStringList &bufferNames, quint64 updateInterval, const QString &handShakeSocketKey);
 
 	/// Writes this AMDSClientContinuousRequest to an AMDSDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;

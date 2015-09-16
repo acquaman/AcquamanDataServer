@@ -1,6 +1,7 @@
 #include "source/ClientRequest/AMDSClientRequest.h"
 
 #include "source/Connection/AMDSDataStream.h"
+#include "source/util/AMDSErrorMonitor.h"
 
 AMDSClientRequest::AMDSClientRequest(QObject *parent) :
 	QObject(parent)
@@ -31,6 +32,14 @@ AMDSClientRequest& AMDSClientRequest::operator =(const AMDSClientRequest &other)
 	}
 
 	return (*this);
+}
+
+bool AMDSClientRequest::isDataClientRequest() {
+	return     requestType() == AMDSClientRequestDefinitions::StartTimePlusCount
+			|| requestType() == AMDSClientRequestDefinitions::RelativeCountPlusCount
+			|| requestType() == AMDSClientRequestDefinitions::StartTimeToEndTime
+			|| requestType() == AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter
+			|| requestType() == AMDSClientRequestDefinitions::Continuous ;
 }
 
 int AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const
@@ -68,6 +77,11 @@ int AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
 	setBaseAttributesValues(readSocketKey, readErrorMessage, requestType(), (AMDSClientRequest::ResponseType)readResponseType);
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
+}
+
+void AMDSClientRequest::printData()
+{
+	AMDSErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
 }
 
 void AMDSClientRequest::setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType)

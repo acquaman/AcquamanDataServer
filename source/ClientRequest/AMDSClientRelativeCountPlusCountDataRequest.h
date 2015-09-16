@@ -27,7 +27,7 @@ public:
 	inline void setCount(quint64 count) { count_ = (count==0 ? 1 : count); }
 
 	/// Sets the values of all the data attributes of client request
-	void setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, quint64 relativeCount, quint64 count);
+	void setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, quint64 relativeCount, quint64 count);
 	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an AMDSDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the AMDSDataStream, returns 0 if no errors are encountered

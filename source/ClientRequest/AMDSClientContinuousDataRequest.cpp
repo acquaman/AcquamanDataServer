@@ -19,8 +19,8 @@ AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(QObject *parent
 	connect(&continuousDataRequestTimer_, SIGNAL(timeout()), this, SLOT(onDataRequestTimerTimeout()));
 }
 
-AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool enableFlattening, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
-	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, "", includeStatusData, enableFlattening, bufferGroupInfo, parent)
+AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool flattenResultData, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, QString(""), includeStatusData, flattenResultData, bufferGroupInfo, parent)
 {
 	setBufferNames(bufferNames);
 	setUpdateInterval(msgUpdateInterval);
@@ -56,7 +56,6 @@ AMDSClientContinuousDataRequest& AMDSClientContinuousDataRequest::operator =(con
 		AMDSClientDataRequest::operator =(other);
 
 		setBufferNames(other.bufferNames());
-		setBufferName(other.bufferName());
 
 		setUpdateInterval(other.updateInterval());
 		setHandShakeSocketKey(other.handShakeSocketKey());
@@ -81,8 +80,7 @@ void AMDSClientContinuousDataRequest::setSocketKey(const QString &socketKey)
 }
 
 void AMDSClientContinuousDataRequest::setBufferNames(const QStringList &names) {
-	bufferNameList_.clear();
-	bufferNameList_.append(names);
+	bufferNameList_ = names;
 }
 
 bool AMDSClientContinuousDataRequest::isExpired()
@@ -91,13 +89,13 @@ bool AMDSClientContinuousDataRequest::isExpired()
 	quint64 timeSpanInSecond =  nowDateTime.toTime_t() - lastHandShakingTime().toTime_t();
 
 	if (timeSpanInSecond > 60)
-		AMDSErrorMon::debug(this, 0, QString("%1::isExpired(): clientKey %2 --- lastHandShake: %3 vs. now: %4")
+		AMDSErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_EXPIRED, QString("%1::isExpired(): clientKey %2 --- lastHandShake: %3 vs. now: %4")
 							.arg(metaObject()->className()).arg(socketKey()).arg(lastHandShakingTime().toString()).arg(nowDateTime.toString()));
 
 	return timeSpanInSecond > 60;
 }
 
-void AMDSClientContinuousDataRequest::setAttributesValues(bool includeStatusData, bool flattenResultData, QStringList &bufferNames, quint64 updateInterval, QString &handShakeSocketKey)
+void AMDSClientContinuousDataRequest::setAttributesValues(bool includeStatusData, bool flattenResultData, const QStringList &bufferNames, quint64 updateInterval, const QString &handShakeSocketKey)
 {
 	setIncludeStatusData(includeStatusData);
 	setFlattenResultData(flattenResultData);
@@ -146,6 +144,8 @@ int AMDSClientContinuousDataRequest::readFromDataStream(AMDSDataStream *dataStre
 
 	QStringList readBufferNames;
 	*dataStream >> readBufferNames;
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAMES;
 
 	setUpdateInterval(readUpdateInterval);
 	setHandShakeSocketKey(readHandShakeSocketKey);
@@ -166,11 +166,11 @@ bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 	bool messageExpired = isExpired();
 	if (messageExpired) {
 		setErrorMessage(QString("(msg %1) continuous update expired!").arg(socketKey()));
-		AMDSErrorMon::alert(this, 0, errorMessage());
+		AMDSErrorMon::alert(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_EXPIRED, errorMessage());
 
 		emit clientRequestTaskAccomplished(this);
 	} else {
-		AMDSErrorMon::information(this, 0, QString("(msg %1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
+		AMDSErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE, QString("(msg %1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
 		continuousDataRequestTimer_.singleShot(updateInterval(), this, SLOT(onDataRequestTimerTimeout()));
 	}
 
@@ -189,7 +189,7 @@ void AMDSClientContinuousDataRequest::handShaking(AMDSClientContinuousDataReques
 
 	QStringList handShakeBufferNames = handShakingMessage->bufferNames();
 	if (handShakeBufferNames.size() == 0) {
-		AMDSErrorMon::alert(this, 0, QString("(msg %1): deregistered by request.").arg(socketKey()));
+		AMDSErrorMon::alert(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): deregistered by request.").arg(socketKey()));
 		emit clientRequestTaskAccomplished(this);
 	} else {
 		foreach (QString bufferName, bufferNames()) {
@@ -201,12 +201,12 @@ void AMDSClientContinuousDataRequest::handShaking(AMDSClientContinuousDataReques
 
 				bufferNameList_.removeAt(bufferNameList_.indexOf(bufferName));
 
-				AMDSErrorMon::alert(this, 0, QString("(msg %1): buffer (%2) is no longer traced.").arg(socketKey()).arg(bufferName));
+				AMDSErrorMon::alert(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): buffer (%2) is no longer traced.").arg(socketKey()).arg(bufferName));
 			}
 		}
 
 		if (bufferDataRequestList_.size() == 0) {
-			AMDSErrorMon::alert(this, 0, QString("(msg %1): force-deregistered by request since no more active interested buffer.").arg(socketKey()));
+			AMDSErrorMon::alert(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): force-deregistered by request since no more active interested buffer.").arg(socketKey()));
 			emit clientRequestTaskAccomplished(this);
 		}
 	}

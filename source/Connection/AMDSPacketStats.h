@@ -24,7 +24,7 @@ public:
 	inline void setMaxOutboundBytes(quint64 maxOutboundBytes) { maxOutboundBytes_ = maxOutboundBytes; }
 	inline void setMaxTotalBytes(quint64 maxTotalBytes) { maxTotalBytes_ = maxTotalBytes; }
 
-	inline QString allStats() const { return QString("%1 %2 %3 %4 %5").arg(inboundBytes_).arg(outboundBytes_).arg(maxInboundBytes_).arg(maxOutboundBytes_).arg(maxTotalBytes_); }
+	inline QString toString() const { return QString("%1: %2 %3 %4 %5 %6").arg(name_).arg(inboundBytes_).arg(outboundBytes_).arg(maxInboundBytes_).arg(maxOutboundBytes_).arg(maxTotalBytes_); }
 
 protected:
 	QString name_;

@@ -35,6 +35,7 @@ AMDSClientTCPSocket * AMDSServer::establishSocketConnection()
 	return clientTCPSocket;
 }
 
+
 void AMDSServer::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSClientRequest *clientRequest)
 {
 	if (clientRequest->isContinuousMessage()) {
@@ -73,8 +74,8 @@ void AMDSServer::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSo
 		errorString = QString("The following error occurred: %1.").arg(clientTCPSocket->errorString());
 	}
 
-	emit socketError(this, socketErrorCode, clientTCPSocket->socketKey(), errorString);
 	removeTCPSocket(clientTCPSocket);
+	emit AMDSServerError(this, socketErrorCode, clientTCPSocket->socketKey(), errorString);
 }
 
 void AMDSServer::removeTCPSocket(AMDSClientTCPSocket *clientTCPSocket)
