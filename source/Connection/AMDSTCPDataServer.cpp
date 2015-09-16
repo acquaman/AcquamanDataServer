@@ -13,7 +13,7 @@
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "source/Connection/AMDSDataStream.h"
 
-#include "source/util/AMDSErrorMonitor.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSTCPDataServer::AMDSTCPDataServer(QObject *parent) :
 	QObject(parent)
@@ -53,7 +53,7 @@ AMDSTCPDataServer::~AMDSTCPDataServer()
 void AMDSTCPDataServer::displayClients()
 {
 	if(clientSockets_.isEmpty())
-		AMDSErrorMon::information(this, AMDS_SERVER_INFO_NO_CONNECTED_CLIENT, "No clients connected");
+		AMErrorMon::information(this, AMDS_SERVER_INFO_NO_CONNECTED_CLIENT, "No clients connected");
 	else
 	{
 		QStringList keys =  clientSockets_.keys();
@@ -61,7 +61,7 @@ void AMDSTCPDataServer::displayClients()
 		{
 			QTcpSocket* currentSocket = clientSockets_.value(keys.at(iClientKey));
 			if(currentSocket)
-				AMDSErrorMon::alert(this, AMDS_SERVER_ALT_ALIVE_CONNECTION, QString("Alive connection: %1:%2").arg(currentSocket->peerAddress().toString()).arg(currentSocket->peerPort()));
+				AMErrorMon::alert(this, AMDS_SERVER_ALT_ALIVE_CONNECTION, QString("Alive connection: %1:%2").arg(currentSocket->peerAddress().toString()).arg(currentSocket->peerPort()));
 		}
 	}
 
@@ -70,10 +70,10 @@ void AMDSTCPDataServer::displayClients()
 void AMDSTCPDataServer::displayDetails()
 {
 	if(!server_->isListening())
-		AMDSErrorMon::alert(this, AMDS_SERVER_ALT_SERVER_IS_NOT_ALIVE, QString("Server is failing to listen: %1").arg(server_->errorString()));
+		AMErrorMon::alert(this, AMDS_SERVER_ALT_SERVER_IS_NOT_ALIVE, QString("Server is failing to listen: %1").arg(server_->errorString()));
 	else
 	{
-		AMDSErrorMon::alert(this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Server is listening on %1 (%2:%3)").arg(interfaceName_).arg(server_->serverAddress().toString()).arg(server_->serverPort()));
+		AMErrorMon::alert(this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Server is listening on %1 (%2:%3)").arg(interfaceName_).arg(server_->serverAddress().toString()).arg(server_->serverPort()));
 	}
 }
 
@@ -131,7 +131,7 @@ void AMDSTCPDataServer::stop()
 	if(session_)
 		session_->close();
 
-	AMDSErrorMon::information(this, AMDS_SERVER_INFO_SERVER_STOPPED, "AMDS TCP Data Server stopped");
+	AMErrorMon::information(this, AMDS_SERVER_INFO_SERVER_STOPPED, "AMDS TCP Data Server stopped");
 }
 
 void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
@@ -212,7 +212,7 @@ void AMDSTCPDataServer::sessionOpened()
 
 	QList<QNetworkAddressEntry> associatedIPV4Addresses;
 	for(int x = 0, size = associatedAddresses.count(); x < size; x++){
-		AMDSErrorMon::information(this, AMDS_SERVER_INFO_ACTIVE_SESSION, QString("At %1 %2 %3").arg(x).arg(associatedAddresses.at(x).ip().toString()).arg(associatedAddresses.at(x).ip().toIPv4Address()));
+		AMErrorMon::information(this, AMDS_SERVER_INFO_ACTIVE_SESSION, QString("At %1 %2 %3").arg(x).arg(associatedAddresses.at(x).ip().toString()).arg(associatedAddresses.at(x).ip().toIPv4Address()));
 		if(associatedAddresses.at(x).ip().toIPv4Address()) {
 			associatedIPV4Addresses.append(associatedAddresses.at(x));
 		}
@@ -225,11 +225,11 @@ void AMDSTCPDataServer::sessionOpened()
 	connect(server_, SIGNAL(newConnection()), this, SLOT(onNewClientConnected()));
 	if(!server_->listen(address, port_))
 	{
-		emit error(AMDSErrorReport::Serious, AMDS_SERVER_ERR_FAIL_TO_START_TCP_DATA_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
+		emit error(AMErrorReport::Serious, AMDS_SERVER_ERR_FAIL_TO_START_TCP_DATA_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
 		return;
 	}
 
-	AMDSErrorMon::information(this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Listening on %1:%2").arg(server_->serverAddress().toString()).arg(server_->serverPort()));
+	AMErrorMon::information(this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Listening on %1:%2").arg(server_->serverAddress().toString()).arg(server_->serverPort()));
 }
 
 
@@ -240,7 +240,7 @@ void AMDSTCPDataServer::onNewClientConnected()
 	if(clientSocket)
 	{
 		QString socketDescription = QString("%1:%2").arg(clientSocket->peerAddress().toString()).arg(clientSocket->peerPort());
-		AMDSErrorMon::information(this, AMDS_SERVER_INFO_SERVER_NEW_CONNECTION_ESTABLISHED, QString("Connection with %1 established").arg(socketDescription));
+		AMErrorMon::information(this, AMDS_SERVER_INFO_SERVER_NEW_CONNECTION_ESTABLISHED, QString("Connection with %1 established").arg(socketDescription));
 		clientSockets_.insert(socketDescription, clientSocket);
 
 		clientDisconnectSignalMapper_->setMapping(clientSocket, socketDescription);
@@ -257,7 +257,7 @@ void AMDSTCPDataServer::onClientDisconnect(const QString &clientKey)
 		return;
 
 	clientSockets_.remove(clientKey);
-	AMDSErrorMon::information(this, AMDS_SERVER_INFO_SERVER_CONNECTION_DISCONNECTED, QString("Disconnection from %1").arg(clientKey));
+	AMErrorMon::information(this, AMDS_SERVER_INFO_SERVER_CONNECTION_DISCONNECTED, QString("Disconnection from %1").arg(clientKey));
 
 	clientDisconnectSignalMapper_->removeMappings(socketToDisconnect);
 	clientRequestSignalMapper_->removeMappings(socketToDisconnect);
@@ -350,10 +350,10 @@ void AMDSTCPDataServer::onClientContinuousRequestReceived(AMDSClientRequest *cli
 			QString socketKey = clientContinuousDataRequest->handShakeSocketKey();
 			AMDSClientContinuousDataRequest *activeContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(activeContinuousDataRequestList_.value(socketKey));
 			if (activeContinuousDataRequest) {
-				AMDSErrorMon::information(this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG, QString("Hand shaking with message (%1)").arg(socketKey));
+				AMErrorMon::information(this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG, QString("Hand shaking with message (%1)").arg(socketKey));
 				activeContinuousDataRequest->handShaking(clientContinuousDataRequest);
 			} else {
-				AMDSErrorMon::alert(this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG_CONNECTION_NOT_FOUND, QString("Didn't find hand shaking message (%1)").arg(socketKey));
+				AMErrorMon::alert(this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG_CONNECTION_NOT_FOUND, QString("Didn't find hand shaking message (%1)").arg(socketKey));
 			}
 
 			onClientRequestTaskAccomplished(clientContinuousDataRequest);

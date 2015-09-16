@@ -2,7 +2,7 @@
 
 #include <QCoreApplication>
 
-#include "source/util/AMDSErrorMonitor.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QObject *parent) :
 	QObject(parent)
@@ -42,7 +42,7 @@ void AMDSThreadedTCPDataServer::onThreadStarted()
 	quint16 port = settings.value("port").toUInt();
 	settings.endGroup();
 
-	AMDSErrorMon::information(this, AMDS_SERVER_INFO_STARTING_TCP_DATA_SERVER, QString("Starting TCP data server at (%1, %2)").arg(interface).arg(port));
+	AMErrorMon::information(this, AMDS_SERVER_INFO_STARTING_TCP_DATA_SERVER, QString("Starting TCP data server at (%1, %2)").arg(interface).arg(port));
 
 	emit startServer(interface, port);
 }

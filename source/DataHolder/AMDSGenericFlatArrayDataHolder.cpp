@@ -2,7 +2,7 @@
 
 #include "source/Connection/AMDSDataStream.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
-#include "source/util/AMDSErrorMonitor.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, QObject *parent)
 	:AMDSLightWeightDataHolder(parent), valueFlatArray_(dataType, size)
@@ -23,7 +23,7 @@ AMDSDataHolder* AMDSLightWeightGenericFlatArrayDataHolder::operator +(AMDSDataHo
 {
 	AMDSLightWeightGenericFlatArrayDataHolder *addInputDataHolder = qobject_cast<AMDSLightWeightGenericFlatArrayDataHolder *>(&dataHolder);
 	if (!addInputDataHolder) {
-		AMDSErrorMon::alert(this, AMDS_SERVER_ERR_UNMATCH_DATA_HOLDER_FOR_PLUS, QString("Invalid class type (%1) to do the PLUS operation").arg(dataHolder.metaObject()->className()));
+		AMErrorMon::alert(this, AMDS_SERVER_ERR_UNMATCH_DATA_HOLDER_FOR_PLUS, QString("Invalid class type (%1) to do the PLUS operation").arg(dataHolder.metaObject()->className()));
 		return 0;
 	}
 

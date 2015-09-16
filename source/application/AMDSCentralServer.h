@@ -23,6 +23,10 @@ public:
 	/// Constructor: to initialize the TCP Data server thread and the timers for buffer groups
 	AMDSCentralServer(QObject *parent = 0);
 
+public:
+	/// initialize and start the timer to update bufferGroups
+	void startDataServerUpdate();
+
 signals:
 	/// The signal when the AMDSCenterServer finished processing a client request, then the TCP data suppose to wrap the msg and send back to client
 	void clientRequestProcessed(AMDSClientRequest *processedRequest);
@@ -33,28 +37,19 @@ protected slots:
 	/// slot to handle the client request from the TCP Data server
 	void onDataServerClientRequestReady(AMDSClientRequest *clientRequest);
 
-	/// slot to handle the 50 ms timer, to fetch and update the scaler data buffer
-	void onFiftyMillisecondTimerUpdate();
-	/// slot to handle the 100 ms timer, to fetch and update the amptek data buffer
-	void onHundredMillisecondTimerUpdate();
-
 protected:
-	/// function to initialize the buffer groups, with the given buffer size
-	virtual void initializeBufferGroup(quint64 maxCountSize);
+	/// pure virtual function to initialize the buffer groups, with the given buffer size
+	virtual void initializeBufferGroup(quint64 maxCountSize) = 0;
+	/// pure virtual function to initialize the timer to update the buffer groups
+	virtual void initializeTimer() = 0;
 	/// function to start the timer of data buffer update
-	virtual void startTimer();
+	virtual void startTimer() = 0;
 
 protected:
 	AMDSThreadedTCPDataServer *dataServer_;
 	QMap<QString, AMDSThreadedBufferGroup*> bufferGroups_;
-
-	AMDSBufferGroup *energyBufferGroup_;
-	quint64 simpleCounter_;
-	QTimer *fiftyMillisecondTimer_;
-
-	AMDSBufferGroup *amptek1BufferGroup_;
-	quint64 spectralCounter_;
-	QTimer *hundredMillisecondTimer_;
 };
+
+Q_DECLARE_INTERFACE(AMDSCentralServer, "AMDS.AMDSCentralServer/1.0")
 
 #endif // AMDSCENTRALSERVER_H

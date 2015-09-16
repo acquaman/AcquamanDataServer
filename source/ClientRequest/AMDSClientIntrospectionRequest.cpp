@@ -1,7 +1,6 @@
 #include "AMDSClientIntrospectionRequest.h"
 
 #include "source/Connection/AMDSDataStream.h"
-#include "source/util/AMDSErrorMonitor.h"
 
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(QObject *parent) :
 	AMDSClientRequest(parent)

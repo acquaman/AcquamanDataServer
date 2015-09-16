@@ -3,7 +3,7 @@
 #include "source/Connection/AMDSDataStream.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/util/AMDSErrorMonitor.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port, QObject *parent)
 	:QObject(parent)
@@ -104,7 +104,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 			break;
 
 	default:
-		AMDSErrorMon::alert(this, AMDS_SERVER_ALT_VALIDATE_RESPONSE_NOT_IMPLEMENTED, QString("The validateResponse() function is NOT implemented (or called) for %1").arg(clientRequest->requestType()));
+		AMErrorMon::alert(this, AMDS_SERVER_ALT_VALIDATE_RESPONSE_NOT_IMPLEMENTED, QString("The validateResponse() function is NOT implemented (or called) for %1").arg(clientRequest->requestType()));
 		break;
 	}
 
@@ -131,6 +131,6 @@ void AMDSClientTCPSocket::sendData(AMDSClientRequest *clientRequest)
 	outDataStream << (quint16)(block.size() - sizeof(quint16));
 	tcpSocket_->write(block);
 
-	AMDSErrorMon::information(this, AMDS_SERVER_INFO_SOCKET_SEND_DATA, QString("Send %1 data to server.").arg(block.size() - sizeof(quint16)));
+	AMErrorMon::information(this, AMDS_SERVER_INFO_SOCKET_SEND_DATA, QString("Send %1 data to server.").arg(block.size() - sizeof(quint16)));
 }
 
