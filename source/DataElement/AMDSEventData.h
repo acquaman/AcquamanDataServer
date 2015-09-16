@@ -72,8 +72,6 @@ public:
 
 	/// implement the function to copy the data of the source eventData to the current instance
 	virtual void cloneData(AMDSEventData *sourceEventData);
-//	/// implementationt the function to copy the data of the source eventData to the target instance
-//	virtual AMDSLightWeightEventData& operator =(AMDSLightWeightEventData &sourceEventData);
 
 	/// Writes this AMDSEventData to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
@@ -109,6 +107,11 @@ public:
 	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSEventData from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+
+protected:
+	/// getter function to get the lightWeightEventData_ of AMDSFullEventData.
+	/// The reason to encapsulate this as protected is that the user of AMDSFullEventData should NOT be aware the existence of the instance of lightWeightEventData_
+	inline AMDSLightWeightEventData * lightWeightEventData() { return lightWeightEventData_; }
 
 protected:
 	AMDSLightWeightEventData *lightWeightEventData_;

@@ -121,6 +121,10 @@ public:
 	/// implement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
+	/// getter function to get the eventData_ of AMDSEventData.
+	/// The reason to encapsulate this as protected is that the user of AMDSEventData should NOT be aware the existence of the instance of eventData_
+	inline AMDSEventData * eventData() { return eventData_; }
+
 protected:
 	/// the instance of event data, which provides the event information about the dataHolder
 	AMDSEventData *eventData_;
@@ -185,7 +189,7 @@ public:
 protected:
 	/// getter function to get the lightweightDataHolder of AMDSFullDataHolder.
 	/// The reason to encapsulate this as protected is that the user of AMDSFullDataHolder should NOT be aware the existence of the instance of lightweightDataHolder
-	inline AMDSLightWeightDataHolder * lightWeightDataHolder() { return AMDSLightWeightDataHolder; }
+	inline AMDSLightWeightDataHolder * lightWeightDataHolder() { return lightWeightDataHolder_; }
 
 protected:
 	/// instance of AMDSLightWightDataHolder as the real holder for data
