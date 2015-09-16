@@ -338,11 +338,10 @@ void AMDSClientUi::resetActiveContinuousConnection(const QString &serverIdentifi
 
 	bool updateActiveContiuousConnectionComboBox = false;
 	if (activeContinuousClientRequestKeys.length() == activeContinuousConnectionComboBox_->count()) {
-		for (int i = 0; i < activeContinuousConnectionComboBox_->count(); i++) {
+		for (int i = 0; (i < activeContinuousConnectionComboBox_->count()) && (!updateActiveContiuousConnectionComboBox); i++) {
 			QString itemText = activeContinuousConnectionComboBox_->itemText(i);
 			if (!activeContinuousClientRequestKeys.contains(itemText)) {
 				updateActiveContiuousConnectionComboBox = true;
-				break;
 			}
 		}
 	} else {
