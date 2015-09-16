@@ -9,6 +9,7 @@ class AMDSAxisInfo
 public:
 	/// Constructor.
 	AMDSAxisInfo(const QString& name, quint32 size, const QString& description = QString(), const QString& units = QString(), bool isUniform = true );
+	AMDSAxisInfo(const AMDSAxisInfo &axisInfo );
 	/// Destructor.
 	virtual ~AMDSAxisInfo();
 

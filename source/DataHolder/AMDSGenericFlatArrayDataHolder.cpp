@@ -4,9 +4,15 @@
 #include "source/DataHolder/AMDSDataHolderSupport.h"
 #include "source/util/AMDSErrorMonitor.h"
 
-AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, QObject *parent) :
-	AMDSLightWeightDataHolder(parent), valueFlatArray_(dataType, size)
+AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, QObject *parent)
+	:AMDSLightWeightDataHolder(parent), valueFlatArray_(dataType, size)
 {
+}
+
+AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHolder(AMDSLightWeightGenericFlatArrayDataHolder* sourceDataHolder, QObject *parent)
+	:AMDSLightWeightDataHolder(parent), valueFlatArray_(sourceDataHolder->valueFlatArray_.dataType(), sourceDataHolder->valueFlatArray_.size())
+{
+	cloneData(sourceDataHolder);
 }
 
 AMDSLightWeightGenericFlatArrayDataHolder::~AMDSLightWeightGenericFlatArrayDataHolder()
@@ -35,6 +41,14 @@ AMDSDataHolder* AMDSLightWeightGenericFlatArrayDataHolder::operator /(const quin
 	AMDSDataHolder* targetDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(metaObject()->className());
 	targetDataHolder->setData(&data);
 	return targetDataHolder;
+}
+
+void AMDSLightWeightGenericFlatArrayDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
+{
+	AMDSLightWeightDataHolder::cloneData(sourceDataHolder);
+
+	AMDSLightWeightGenericFlatArrayDataHolder *sourceLightWeightGenericFlatArrayDataHolder = qobject_cast<AMDSLightWeightGenericFlatArrayDataHolder *>(sourceDataHolder);
+	sourceLightWeightGenericFlatArrayDataHolder->dataArray().resetTargetArrayAndReplaceData(&valueFlatArray_);
 }
 
 bool AMDSLightWeightGenericFlatArrayDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{

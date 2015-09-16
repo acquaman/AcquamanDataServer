@@ -3,8 +3,10 @@
 
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/DataElement/AMDSDataTypeDefinitions.h"
+#include "source/DataHolder/AMDSDataHolder.h"
+#include "source/DataHolder/AMDSDataHolderSupport.h"
 
-class AMDSDataHolder;
+//class AMDSDataHolder;
 
 class AMDSClientDataRequest : public AMDSClientRequest
 {
@@ -46,9 +48,9 @@ public:
 	/// Sets the uniform data type
 	inline void setUniformDataType(AMDSDataTypeDefinitions::DataType uniformDataType) { uniformDataType_ = uniformDataType; }
 	/// Adds some data to the list of data holders
-	inline void appendData(AMDSDataHolder *dataHolder) { data_.append(dataHolder); }
+	void copyAndAppendData(AMDSDataHolder *dataHolder) ;
 	/// Clears the list of data holders
-	inline void clearData() { data_.clear(); }
+	void clearData();
 
 	/// Writes this AMDSClienDatatRequest to an AMDSDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;

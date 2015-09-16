@@ -8,6 +8,7 @@ class AMDSLightWeightGenericFlatArrayDataHolder : public AMDSLightWeightDataHold
 Q_OBJECT
 public:
 	AMDSLightWeightGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, QObject *parent = 0);
+	AMDSLightWeightGenericFlatArrayDataHolder(AMDSLightWeightGenericFlatArrayDataHolder* sourceDataHolder, QObject *parent = 0);
 	virtual ~AMDSLightWeightGenericFlatArrayDataHolder();
 
 	/// Implement the function to return the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
@@ -21,10 +22,12 @@ public:
 	/// implement the data function to read data from valueFlatArray_ and write data to the given outputArray
 	virtual bool data(AMDSFlatArray *outputArray) const { return valueFlatArray_.resetTargetArrayAndReplaceData(outputArray); }
 	/// implement the setData function to update valueFlatArray_ with given inputArray
-	virtual void setData(AMDSFlatArray *inputArray) { inputArray->copyDataToTargetArray(&valueFlatArray_); }
+	virtual void setData(AMDSFlatArray *inputArray) { inputArray->resetTargetArrayAndReplaceData(&valueFlatArray_); }
 	/// implement the function to return the data string
 	virtual QString printData() { return valueFlatArray_.printData(); }
 
+	/// reimplement the function copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder);
 	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
