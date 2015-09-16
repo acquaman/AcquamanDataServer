@@ -142,7 +142,7 @@ AMDSClientUi::~AMDSClientUi()
 	disconnect(clientAppController_, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
 	disconnect(clientAppController_, SIGNAL(serverError(int,QString,QString)), this, SLOT(onServerError(int,QString,QString)));
 	disconnect(clientAppController_, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
-	disconnect(clientAppController_, SIGNAL(socketError(QString, QString)), this, SLOT(onSocketError(QString, QString)));
+	disconnect(clientAppController_, SIGNAL(socketError(int, QString, QString)), this, SLOT(onSocketError(int, QString, QString)));
 
 	clientAppController_->deleteLater();
 }
