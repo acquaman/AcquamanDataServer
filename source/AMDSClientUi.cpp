@@ -32,9 +32,6 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 
 	statusLabel_ = new QLabel(tr("This examples requires that you run the Acquaman Data Server example as well."));
 
-	connect(hostLineEdit_, SIGNAL(textChanged(QString)), this, SLOT(enableRequestDataButton()));
-	connect(portLineEdit_, SIGNAL(textChanged(QString)), this, SLOT(enableRequestDataButton()));
-
 	/// ==== buttons section ====
 	connectServerButton_ = new QPushButton(tr("Connect to Server"));
 	connectServerButton_->setDefault(true);
@@ -149,6 +146,10 @@ AMDSClientUi::~AMDSClientUi()
 
 	clientAppController_->deleteLater();
 	clientAppController_ = 0;
+
+	QAbstractItemModel *currentListModel = bufferNameListView_->model();
+	if (currentListModel)
+		currentListModel->deleteLater();
 }
 
 void AMDSClientUi::connectToServer()
@@ -327,7 +328,11 @@ void AMDSClientUi::sendClientRequest()
 
 void AMDSClientUi::resetBufferListView(const QStringList &bufferNames)
 {
-	QStringListModel *bufferNamesModel = new QStringListModel(this);
+	QAbstractItemModel *currentListModel = bufferNameListView_->model();
+	if (currentListModel)
+		currentListModel->deleteLater();
+
+	QStringListModel *bufferNamesModel = new QStringListModel();
 	bufferNamesModel->setStringList(bufferNames);
 	bufferNameListView_->setModel(bufferNamesModel);
 }

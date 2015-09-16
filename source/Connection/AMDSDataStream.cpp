@@ -329,8 +329,8 @@ void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequ
 void AMDSDataStream::write(const AMDSClientRequest &clientRequest){
 	int errorCode = clientRequest.writeToDataStream(this);
 	if (errorCode != AMDS_CLIENTREQUEST_SUCCESS) {
-		QString errMessage = AMDSClientRequestDefinitions::errorMessage(errorCode, AMDSClientRequestDefinitions::Write, clientRequest.requestType());
-		AMDSErrorMon::alert(0, errorCode, errMessage);
+		QString errorMessage = AMDSClientRequestDefinitions::errorMessage(errorCode, AMDSClientRequestDefinitions::Write, clientRequest.requestType());
+		AMDSErrorMon::alert(0, errorCode, errorMessage);
 	}
 }
 

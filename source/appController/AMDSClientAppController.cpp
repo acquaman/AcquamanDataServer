@@ -42,7 +42,7 @@ AMDSClientAppController::~AMDSClientAppController()
 
 bool AMDSClientAppController::isSessionOpen()
 {
-	return (!networkSession_ || networkSession_->isOpen());
+	return (networkSession_ && networkSession_->isOpen());
 }
 
 QStringList AMDSClientAppController::getBufferNamesByServer(const QString &serverIdentifier)
@@ -78,8 +78,8 @@ void AMDSClientAppController::openNetworkSession()
 		QNetworkConfigurationManager manager;
 		if (manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired) {
 			// Get saved network configuration
-			QSettings settings(QSettings::UserScope, QLatin1String("Trolltech"));
-			settings.beginGroup(QLatin1String("QtNetwork"));
+			QSettings settings(QSettings::UserScope, QLatin1String("AMDSClient"));
+			settings.beginGroup(QLatin1String("Network"));
 			const QString id = settings.value(QLatin1String("DefaultNetworkConfiguration")).toString();
 			settings.endGroup();
 
@@ -267,8 +267,8 @@ void AMDSClientAppController::onNetworkSessionOpened()
 	else
 		id = config.identifier();
 
-	QSettings settings(QSettings::UserScope, QLatin1String("Trolltech"));
-	settings.beginGroup(QLatin1String("QtNetwork"));
+	QSettings settings(QSettings::UserScope, QLatin1String("AMDSClient"));
+	settings.beginGroup(QLatin1String("Network"));
 	settings.setValue(QLatin1String("DefaultNetworkConfiguration"), id);
 	settings.endGroup();
 
