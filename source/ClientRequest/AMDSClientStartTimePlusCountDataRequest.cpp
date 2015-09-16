@@ -38,6 +38,14 @@ AMDSClientStartTimePlusCountDataRequest& AMDSClientStartTimePlusCountDataRequest
 	return (*this);
 }
 
+void AMDSClientStartTimePlusCountDataRequest::setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 count) {
+	setBufferName(bufferName);
+	setIncludeStatusData(includeStatusData);
+	setFlattenResultData(flattenResultData);
+	setStartTime(startTime);
+	setCount(count);
+}
+
 int AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);

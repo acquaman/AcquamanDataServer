@@ -38,6 +38,15 @@ AMDSClientStartTimeToEndTimeDataRequest& AMDSClientStartTimeToEndTimeDataRequest
 	return (*this);
 }
 
+void AMDSClientStartTimeToEndTimeDataRequest::setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, const QDateTime &endTime)
+{
+	setBufferName(bufferName);
+	setIncludeStatusData(includeStatusData);
+	setFlattenResultData(flattenResultData);
+	setStartTime(startTime);
+	setEndTime(endTime);
+}
+
 int AMDSClientStartTimeToEndTimeDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);

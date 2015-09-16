@@ -8,6 +8,11 @@ AMDSLightWeightScalarDataHolder::AMDSLightWeightScalarDataHolder(AMDSDataTypeDef
 	eventData_ = new AMDSLightWeightEventData();
 }
 
+AMDSLightWeightScalarDataHolder::AMDSLightWeightScalarDataHolder(AMDSLightWeightScalarDataHolder *sourceDataHolder, QObject *parent )
+	:AMDSLightWeightGenericFlatArrayDataHolder(sourceDataHolder, parent)
+{
+}
+
 AMDSLightWeightScalarDataHolder::~AMDSLightWeightScalarDataHolder()
 {
 }

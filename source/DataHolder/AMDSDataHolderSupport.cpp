@@ -61,6 +61,13 @@ namespace AMDSDataHolderSupport{
 		return 0;
 	}
 
+	AMDSDataHolder* instantiateDataHolderFromInstance(const AMDSDataHolder *dataHolder){
+		if (dataHolder)
+			return instantiateDataHolderFromClassName(dataHolder->metaObject()->className());
+		else
+			return 0;
+	}
+
 	bool inheritsDataHolder(const QMetaObject *queryMetaObject){
 		const QMetaObject *dataHolderMetaObject = &(AMDSDataHolder::staticMetaObject);
 		return AMDSMetaObjectSupport::inheritsClass(queryMetaObject, dataHolderMetaObject);

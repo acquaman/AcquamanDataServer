@@ -8,6 +8,7 @@ AMDSFlatArray::AMDSFlatArray(AMDSDataTypeDefinitions::DataType dataType, quint32
 
 AMDSFlatArray::~AMDSFlatArray()
 {
+	clear();
 }
 
 AMDSFlatArray AMDSFlatArray::operator +(AMDSFlatArray &dataFlatArray)

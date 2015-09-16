@@ -9,6 +9,9 @@
 #include "source/DataElement/AMDSBufferGroup.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 
+#define AMDS_SERVER_ERR_DATA_STREAM 20500
+#define AMDS_SERVER_INFO_DS_FAILED_TO_PARSE_REQUEST 20501
+
 class AMDSDataStream : public QDataStream
 {
 public:

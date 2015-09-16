@@ -23,7 +23,10 @@ AMDSThreadedTCPDataServer::~AMDSThreadedTCPDataServer()
 		thread_->quit();
 
 	server_->deleteLater();
+	server_ = 0;
+
 	thread_->deleteLater();
+	thread_ = 0;
 }
 
 AMDSTCPDataServer* AMDSThreadedTCPDataServer::server()
@@ -39,7 +42,7 @@ void AMDSThreadedTCPDataServer::onThreadStarted()
 	quint16 port = settings.value("port").toUInt();
 	settings.endGroup();
 
-	AMDSErrorMon::information(this, 0, QString("Starting TCP data server at (%1, %2)").arg(interface).arg(port));
+	AMDSErrorMon::information(this, AMDS_SERVER_INFO_STARTING_TCP_DATA_SERVER, QString("Starting TCP data server at (%1, %2)").arg(interface).arg(port));
 
 	emit startServer(interface, port);
 }

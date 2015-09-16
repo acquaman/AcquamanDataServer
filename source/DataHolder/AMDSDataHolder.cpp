@@ -2,10 +2,12 @@
 
 #include "source/Connection/AMDSDataStream.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
+#include "source/DataElement/AMDSEventDataSupport.h"
 #include "source/util/AMDSMetaObjectSupport.h"
 
-AMDSDataHolder::AMDSDataHolder(QObject *parent) :
-	QObject(parent)
+// ======== implementation of AMDSDataHolder ===========
+AMDSDataHolder::AMDSDataHolder(QObject *parent)
+	:QObject(parent)
 {
 }
 
@@ -13,14 +15,34 @@ AMDSDataHolder::~AMDSDataHolder()
 {
 }
 
+AMDSDataHolder& AMDSDataHolder::operator =(AMDSDataHolder &dataHolder)
+{
+	if (this != &dataHolder) {
+		cloneData(&dataHolder);
+	}
+
+	return (*this);
+}
+
+// ======== implementation of AMDSLightWeightDataHolder ===========
 AMDSLightWeightDataHolder::AMDSLightWeightDataHolder(QObject *parent) :
 	AMDSDataHolder(parent)
 {
 	eventData_ = 0;
 }
 
+AMDSLightWeightDataHolder::AMDSLightWeightDataHolder(AMDSLightWeightDataHolder &sourceLightWeightDataHolder, QObject *parent)
+	:AMDSDataHolder(parent)
+{
+	(*this) = sourceLightWeightDataHolder;
+}
+
 AMDSLightWeightDataHolder::~AMDSLightWeightDataHolder()
 {
+	if (eventData_) {
+		eventData_->deleteLater();
+		eventData_ = 0;
+	}
 }
 
 AMDSDataTypeDefinitions::DataType AMDSLightWeightDataHolder::dataType() const{
@@ -30,6 +52,18 @@ AMDSDataTypeDefinitions::DataType AMDSLightWeightDataHolder::dataType() const{
 	AMDSFlatArray oneFlatArray;
 	data(&oneFlatArray);
 	return oneFlatArray.dataType();
+}
+
+void AMDSLightWeightDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
+{
+	AMDSLightWeightDataHolder *sourceLightWeightDataHolder = qobject_cast<AMDSLightWeightDataHolder *>(sourceDataHolder);
+	if (sourceLightWeightDataHolder) {
+		if (eventData_)
+			eventData_->deleteLater();
+
+		eventData_ = AMDSEventDataSupport::instantiateEventDataFromInstance(sourceLightWeightDataHolder->eventData());
+		(*eventData_) = *(sourceLightWeightDataHolder->eventData()); // copy the values of the eventData over
+	}
 }
 
 bool AMDSLightWeightDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
@@ -52,8 +86,9 @@ bool AMDSLightWeightDataHolder::readFromDataStream(AMDSDataStream *dataStream, A
 	return true;
 }
 
-AMDSFullDataHolder::AMDSFullDataHolder(AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo> &axes, QObject *parent) :
-	AMDSDataHolder(parent)
+// ======== implementation of AMDSFullDataHolder ===========
+AMDSFullDataHolder::AMDSFullDataHolder(AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo> &axes, QObject *parent)
+	: AMDSDataHolder(parent)
 {
 	axesStyle_ = axesStyle;
 	dataTypeStyle_ = dataTypeStyle;
@@ -61,8 +96,20 @@ AMDSFullDataHolder::AMDSFullDataHolder(AMDSDataHolder::AxesStyle axesStyle, AMDS
 	lightWeightDataHolder_ = 0;
 }
 
+AMDSFullDataHolder::AMDSFullDataHolder(AMDSFullDataHolder &sourceFullDataHolder, QObject *parent)
+	:AMDSDataHolder(parent)
+{
+	(*this) = sourceFullDataHolder;
+}
+
 AMDSFullDataHolder::~AMDSFullDataHolder()
 {
+	if (lightWeightDataHolder_) {
+		lightWeightDataHolder_->deleteLater();
+		lightWeightDataHolder_ = 0;
+	}
+
+	axes_.clear();
 }
 
 AMDSDataTypeDefinitions::DataType AMDSFullDataHolder::dataType() const{
@@ -72,6 +119,28 @@ AMDSDataTypeDefinitions::DataType AMDSFullDataHolder::dataType() const{
 	AMDSFlatArray oneFlatArray;
 	data(&oneFlatArray);
 	return oneFlatArray.dataType();
+}
+
+void AMDSFullDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
+{
+	AMDSFullDataHolder *sourceFullDataHolder = qobject_cast<AMDSFullDataHolder *>(sourceDataHolder);
+	if (sourceFullDataHolder) {
+		axes_.clear();
+		if (lightWeightDataHolder_)
+			lightWeightDataHolder_->deleteLater();
+
+		AMDSDataHolder *newDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(sourceFullDataHolder->lightWeightDataHolder());
+		lightWeightDataHolder_ = qobject_cast<AMDSLightWeightDataHolder *>(newDataHolder);
+		(*lightWeightDataHolder_) = (*sourceFullDataHolder->lightWeightDataHolder());
+
+		foreach (AMDSAxisInfo axisInfo, sourceFullDataHolder->axes()) {
+			AMDSAxisInfo copyAxisInfo(axisInfo);
+			axes_.append(copyAxisInfo);
+		}
+
+		axesStyle_ = sourceFullDataHolder->axesStyle();
+		dataTypeStyle_ = sourceFullDataHolder->dataTypeStyle();
+	}
 }
 
 bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
