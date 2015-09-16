@@ -179,7 +179,7 @@ void AMDSClientUi::onNetworkSessionOpened()
 	enableRequestDataButton();
 }
 
-void AMDSClientUi::onNewServerConnected(QString serverIdentifier)
+void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
 {
 	if (activeServerComboBox_->findText(serverIdentifier) == -1) {
 		activeServerComboBox_->addItem(serverIdentifier);
@@ -219,7 +219,7 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 	}
 }
 
-void AMDSClientUi::onServerError(int errorCode, bool removeServer, QString serverIdentifier, QString errorMessage)
+void AMDSClientUi::onServerError(int errorCode, bool removeServer, const QString &serverIdentifier, const QString &errorMessage)
 {
 	if (serverIdentifier.length() > 0) {
 		if (removeServer)
@@ -234,7 +234,7 @@ void AMDSClientUi::onServerError(int errorCode, bool removeServer, QString serve
 }
 
 /// ============= SLOTS to handle UI component signals ===============
-void AMDSClientUi::onActiveServerChanged(QString serverIdentifier)
+void AMDSClientUi::onActiveServerChanged(const QString &serverIdentifier)
 {
 	QStringList bufferNames = clientAppController_->getBufferNamesByServer(serverIdentifier);
 	resetBufferListView(bufferNames);
@@ -242,7 +242,7 @@ void AMDSClientUi::onActiveServerChanged(QString serverIdentifier)
 	resetActiveContinuousConnection(serverIdentifier);
 }
 
-void AMDSClientUi::onRequestTypeChanged(QString requestType)
+void AMDSClientUi::onRequestTypeChanged(const QString &requestType)
 {
 	if (requestType == "Continuous") {
 		bufferNameListView_->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -325,14 +325,14 @@ void AMDSClientUi::sendClientRequest()
 	}
 }
 
-void AMDSClientUi::resetBufferListView(QStringList &bufferNames)
+void AMDSClientUi::resetBufferListView(const QStringList &bufferNames)
 {
 	QStringListModel *bufferNamesModel = new QStringListModel(this);
 	bufferNamesModel->setStringList(bufferNames);
 	bufferNameListView_->setModel(bufferNamesModel);
 }
 
-void AMDSClientUi::resetActiveContinuousConnection(QString serverIdentifier)
+void AMDSClientUi::resetActiveContinuousConnection(const QString &serverIdentifier)
 {
 	QStringList activeContinuousClientRequestKeys = clientAppController_->getActiveSocketKeysByServer(serverIdentifier);
 

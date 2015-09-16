@@ -38,7 +38,7 @@ AMDSClientStartTimeToEndTimeDataRequest& AMDSClientStartTimeToEndTimeDataRequest
 	return (*this);
 }
 
-void AMDSClientStartTimeToEndTimeDataRequest::setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, QDateTime &startTime, QDateTime &endTime)
+void AMDSClientStartTimeToEndTimeDataRequest::setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, const QDateTime &endTime)
 {
 	setBufferName(bufferName);
 	setIncludeStatusData(includeStatusData);

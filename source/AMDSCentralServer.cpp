@@ -34,7 +34,7 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	startTimer();
 }
 
-void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, QString errorMessage)
+void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, const QString &errorMessage)
 {
 	switch(errorLevel) {
 	case AMDSErrorReport::Serious:

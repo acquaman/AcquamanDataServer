@@ -33,7 +33,7 @@ public:
 	inline void setCountAfter(quint64 count) { countAfter_ = count; }
 
 	/// Sets the values of all the data attributes of client request
-	void setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, QDateTime &MiddleTime, quint64 countBefore, quint64 countAfter);
+	void setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &MiddleTime, quint64 countBefore, quint64 countAfter);
 
 	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an AMDSDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
