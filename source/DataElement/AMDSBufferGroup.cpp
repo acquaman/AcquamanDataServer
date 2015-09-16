@@ -1,4 +1,4 @@
-#include "source/AMDSBufferGroup.h"
+#include "AMDSBufferGroup.h"
 
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
@@ -68,37 +68,48 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	emit clientRequestProcessed(clientRequest);
 }
 
-void AMDSBufferGroup::flattenData(QList<AMDSDataHolder *> *dataArray)
+bool AMDSBufferGroup::flattenData(QList<AMDSDataHolder *> *dataArray)
 {
-	if (!bufferGroupInfo_.flattenEnabled() || bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::NoFlatten) {
-		AMDSErrorMon::alert(this, 0, QString("The given buffergroup (%1) doesn't enable flatten feature or the flatten method is %2.").arg(bufferGroupInfo_.name()).arg(bufferGroupInfo_.flattenMethod()));
-		return;
+	if (!bufferGroupInfo_.isFlattenEnabled() || bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::NoFlatten) {
+		AMDSErrorMon::alert(this, AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN, QString("The given buffergroup (%1) doesn't enable flatten feature or the flatten method is %2.").arg(bufferGroupInfo_.name()).arg(bufferGroupInfo_.flattenMethod()));
+		return false;
 	}
 
 	// make the summarization operation
 	int totalDataSize = dataArray->size();
-	AMDSDataHolder *flattenDataHolder = dataArray->at(0);
-	for (int i = 1; i < totalDataSize; i++) {
-		AMDSDataHolder * dataHolder = dataArray->at(i);
-		if (flattenDataHolder && dataHolder) {
-			flattenDataHolder = (*flattenDataHolder) + (*dataHolder);
+	if (totalDataSize > 0) {
+		// make a copy of the first data holder
+		AMDSDataHolder *flattenDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance( dataArray->at(0) );
+		(*flattenDataHolder) = (*dataArray->at(0));
+		for (int i = 1; i < totalDataSize; i++) {
+			AMDSDataHolder * dataHolder = dataArray->at(i);
+			if (flattenDataHolder && dataHolder) {
+				AMDSDataHolder *tempDataHolder = flattenDataHolder;
+				flattenDataHolder = (*flattenDataHolder) + (*dataHolder);
+				tempDataHolder->deleteLater();
+			}
 		}
+
+		if (flattenDataHolder) {
+			switch (bufferGroupInfo_.flattenMethod()) {
+			case AMDSBufferGroupInfo::Summary:
+				break; // do nothing, since we already summrized the data
+			case AMDSBufferGroupInfo::Average: {
+				AMDSDataHolder *tempDataHolder = flattenDataHolder;
+				flattenDataHolder = (*flattenDataHolder) / totalDataSize;
+				tempDataHolder->deleteLater();
+				break;
+			}
+			default:
+				break;
+			}
+		}
+
+		dataArray->clear();
+		dataArray->append(flattenDataHolder);
 	}
 
-	if (flattenDataHolder) {
-		switch (bufferGroupInfo_.flattenMethod()) {
-		case AMDSBufferGroupInfo::Summary:
-			break; // do nothing, since we already summrized the data
-		case AMDSBufferGroupInfo::Average:
-			flattenDataHolder = (*flattenDataHolder) / totalDataSize;
-			break;
-		default:
-			break;
-		}
-	}
-
-	dataArray->clear();
-	dataArray->append(flattenDataHolder);
+	return true;
 }
 
 void AMDSBufferGroup::populateData(AMDSClientDataRequest* clientDataRequest, int startIndex, int endIndex)
@@ -119,12 +130,22 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* clientDataRequest, int
 		targetDataArray.append(dataHolder);
 	}
 
+	// when doing flattening, the data holders in the targetDataArray are new instances, which need to be released after usage
+	// if not, the array hosts original data holder, which should NOT be released
+	bool releaseDataHolders = false;
 	if (clientDataRequest->flattenResultData()) {
-		flattenData(&targetDataArray);
+		releaseDataHolders = flattenData(&targetDataArray);
 	}
 
 	foreach (AMDSDataHolder * dataHolder, targetDataArray) {
-		clientDataRequest->appendData(dataHolder);
+		clientDataRequest->copyAndAppendData(dataHolder);
+	}
+
+	if (releaseDataHolders) {
+		foreach (AMDSDataHolder *dataHolder, targetDataArray) {
+			dataHolder->deleteLater();
+		}
+		targetDataArray.clear();
 	}
 }
 

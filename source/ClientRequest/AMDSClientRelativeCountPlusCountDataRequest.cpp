@@ -1,6 +1,6 @@
 #include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientRelativeCountPlusCountDataRequest::AMDSClientRelativeCountPlusCountDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)
@@ -38,6 +38,15 @@ AMDSClientRelativeCountPlusCountDataRequest& AMDSClientRelativeCountPlusCountDat
 	}
 	return (*this);
 }
+
+void AMDSClientRelativeCountPlusCountDataRequest::setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, quint64 relativeCount, quint64 count) {
+	setBufferName(bufferName);
+	setIncludeStatusData(includeStatusData);
+	setFlattenResultData(flattenResultData);
+	setRelativeCount(relativeCount);
+	setCount(count);
+}
+
 
 int AMDSClientRelativeCountPlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 {

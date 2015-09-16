@@ -1,4 +1,4 @@
-#include "source/AMDSMetaObjectSupport.h"
+#include "AMDSMetaObjectSupport.h"
 
 #include <QString>
 

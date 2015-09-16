@@ -1,11 +1,17 @@
-#include "source/DataHolder/AMDSSpectralDataHolder.h"
+#include "AMDSSpectralDataHolder.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSLightWeightSpectralDataHolder::AMDSLightWeightSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, QObject *parent) :
 	AMDSLightWeightGenericFlatArrayDataHolder(dataType, size, parent)
 {
 	eventData_ = new AMDSLightWeightEventData();
+}
+
+AMDSLightWeightSpectralDataHolder::AMDSLightWeightSpectralDataHolder(AMDSLightWeightSpectralDataHolder *sourceDataHolder, QObject *parent)
+	:AMDSLightWeightGenericFlatArrayDataHolder(sourceDataHolder, parent)
+{
+
 }
 
 AMDSLightWeightSpectralDataHolder::~AMDSLightWeightSpectralDataHolder()

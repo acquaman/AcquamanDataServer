@@ -7,6 +7,10 @@
 
 class AMDSClientRequest;
 
+#define AMDS_SERVER_ERR_TCP_SOCKET 20600
+#define AMDS_SERVER_INFO_SOCKET_SEND_DATA 20601
+#define AMDS_SERVER_ALT_VALIDATE_RESPONSE_NOT_IMPLEMENTED 20621
+
 class AMDSClientTCPSocket: public QObject
 {
 	Q_OBJECT
@@ -14,6 +18,8 @@ public:
 	explicit AMDSClientTCPSocket(const QString host, const quint16 port, QObject *parent = 0);
 	virtual ~AMDSClientTCPSocket();
 
+	/// Returns the socket connect identifier
+	inline QString hostIdentifier() { return QString("%1:%2").arg(hostName_).arg(port_); }
 	/// Returns the socket key of this connection
 	inline QString socketKey() { return socketKey_; }
 	/// Returns the errorStrong of the encapsulated tcpSocket_
@@ -26,36 +32,34 @@ signals:
 	void newRequestDataReady(AMDSClientTCPSocket* socket, AMDSClientRequest *clientRequest);
 
 public slots:
-	/// slot to request data from server for Statistics
-	void requestData();
-	/// slot to request data from server for Instrospection
-	void requestData(QString &bufferName);
-	/// slot to request data from server for StartTimePlusCount
-	void requestData(QString &bufferName, QDateTime &startTime, quint64 count, bool includeStatus=false, bool enableFlattening=false);
-	/// slot to request data from server for RelativeCountPlusCount
-	void requestData(QString &bufferName, quint64 relativeCount, quint64 count, bool includeStatus=false, bool enableFlattening=false);
-	/// slot to request data from server for StartTimeToEndTime
-	void requestData(QString &bufferName, QDateTime &startTime, QDateTime &endTime, bool includeStatus=false, bool enableFlattening=false);
-	/// slot to request data from server for MiddleTimePlusCountBeforeAndAfter
-	void requestData(QString &bufferName, QDateTime &middleTime, quint64 countBefore, quint64 countAfter, bool includeStatus=false, bool enableFlattening=false);
-	/// slot to request data from server for Continuous
-	void requestData(QStringList &bufferNames, quint64 updateInterval, bool includeStatus=false, bool enableFlattening=false, QString handShakeSocketKey="");
+	/// slot to send client request to server
+	void sendClientRequest(AMDSClientRequest *clientRequest);
 
 protected slots:
+	/// slot to handle the socket state changed signal
+	void onSocketStateChanged(QAbstractSocket::SocketState);
 	/// slot to handle the socket error signals
 	void onSocketError(QAbstractSocket::SocketError error);
 	/// slot to handle the data from server
-	void readFortune();
+	void readClientRequestMessage();
 
 private:
 	/// write request data to dataStream and socket
 	void sendData(AMDSClientRequest *clientRequest);
 
 protected:
+	/// the host name of the connection
+	QString hostName_;
+	/// the port of the connection
+	quint16 port_;
+
 	/// the handler of the socket connection
 	QTcpSocket *tcpSocket_;
 	/// the socket key
 	QString socketKey_;
+
+	/// the messages to be sent
+	QList<AMDSClientRequest *> clientRequestsToSend;
 
 	/// flag to identify whether we are waiting for the second data package or not
 	bool waitingMorePackages_;

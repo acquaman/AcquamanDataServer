@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QThread>
 
-#include "source/AMDSBufferGroup.h"
+#include "source/DataElement/AMDSBufferGroup.h"
 
 class AMDSThreadedBufferGroup : public QObject
 {

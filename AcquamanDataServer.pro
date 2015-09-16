@@ -28,16 +28,7 @@ RCC_DIR=build_files
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
-	source/AMDSTCPDataServer.h \
-	source/AMDSThreadedTCPDataServer.h \
 	source/AMDSCentralServer.h \
-	source/AMDSBufferGroup.h \
-	source/AMDSThreadedBufferGroup.h \
-	source/AMDSLikely.h \
-	source/AMDSDataStream.h \
-	source/AMDSBufferGroupInfo.h \
-	source/AMDSPacketStats.h \
-	source/AMDSMetaObjectSupport.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
@@ -49,6 +40,11 @@ HEADERS *= \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
+	source/Connection/AMDSTCPDataServer.h \
+	source/Connection/AMDSThreadedTCPDataServer.h \
+	source/Connection/AMDSDataStream.h \
+	source/Connection/AMDSPacketStats.h \
+	source/DataElement/AMDSLikely.h \
 	source/DataElement/AMDSDataTypeDefinitions.h \
 	source/DataElement/AMDSBuffer.h \
 	source/DataElement/AMDSAxisInfo.h \
@@ -56,25 +52,21 @@ HEADERS *= \
 	source/DataElement/AMDSEventData.h \
 	source/DataElement/AMDSEventDataSupport.h \
 	source/DataElement/AMDSFlatArray.h \
+	source/DataElement/AMDSBufferGroup.h \
+	source/DataElement/AMDSBufferGroupInfo.h \
+	source/DataElement/AMDSThreadedBufferGroup.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h \
+	source/util/AMDSMetaObjectSupport.h \
 	source/util/AMDSErrorMonitor.h
 
 SOURCES *= \
 	source/AMDSMain.cpp \
-	source/AMDSTCPDataServer.cpp \
-	source/AMDSThreadedTCPDataServer.cpp \
 	source/AMDSCentralServer.cpp \
-	source/AMDSBufferGroup.cpp \
-	source/AMDSThreadedBufferGroup.cpp \
-	source/AMDSDataStream.cpp \
-	source/AMDSBufferGroupInfo.cpp \
-	source/AMDSPacketStats.cpp \
-	source/AMDSMetaObjectSupport.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
 	source/ClientRequest/AMDSClientDataRequest.cpp \
@@ -85,15 +77,23 @@ SOURCES *= \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
+	source/Connection/AMDSTCPDataServer.cpp \
+	source/Connection/AMDSThreadedTCPDataServer.cpp \
+	source/Connection/AMDSPacketStats.cpp \
+	source/Connection/AMDSDataStream.cpp \
 	source/DataElement/AMDSAxisInfo.cpp \
 	source/DataElement/AMDSnDIndex.cpp \
 	source/DataElement/AMDSEventData.cpp \
 	source/DataElement/AMDSEventDataSupport.cpp \
 	source/DataElement/AMDSFlatArray.cpp \
+	source/DataElement/AMDSBufferGroup.cpp \
+	source/DataElement/AMDSBufferGroupInfo.cpp \
+	source/DataElement/AMDSThreadedBufferGroup.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
+	source/util/AMDSMetaObjectSupport.cpp \
 	source/util/AMDSErrorMonitor.cpp

@@ -2,7 +2,7 @@
 #define AMDSCLIENTREQUEST_H
 
 #include "source/ClientRequest/AMDSClientRequestDefinitions.h"
-#include "source/AMDSBufferGroupInfo.h"
+#include "source/DataElement/AMDSBufferGroupInfo.h"
 
 class AMDSDataStream;
 
@@ -31,6 +31,8 @@ public:
 	inline bool isStatisticsMessage() { return requestType() == AMDSClientRequestDefinitions::Statistics; }
 	/// returns whether this is a data client data request
 	bool isDataClientRequest();
+	/// returns whether this is an introspection message
+	inline bool isIntrospectionMessage() { return requestType() == AMDSClientRequestDefinitions::Introspection;}
 	/// returns whether this is a continuous message
 	inline bool isContinuousMessage() { return requestType() == AMDSClientRequestDefinitions::Continuous;}
 
@@ -58,12 +60,16 @@ public:
 	/// Reads this AMDSClientRequest from the AMDSDataStream, returns 0 if no errors are encountered
 	virtual int readFromDataStream(AMDSDataStream *dataStream);
 
+	/// print out the message data
+	void printData();
 	/// validate the message response
 	virtual bool validateResponse() {return true;}
+	/// pure virtual to return a data string of the message
+	virtual QString toString() const = 0;
 
 private:
 	/// To set the values of all the attributes
-	void setAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
+	void setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
 
 protected:
 	/// the socket key to identify a connection

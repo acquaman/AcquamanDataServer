@@ -1,7 +1,7 @@
 #include "source/DataElement/AMDSEventDataSupport.h"
 
 #include "source/DataElement/AMDSEventData.h"
-#include "source/AMDSMetaObjectSupport.h"
+#include "source/util/AMDSMetaObjectSupport.h"
 
 AMDSEventDataObjectInfo::AMDSEventDataObjectInfo()
 {
@@ -41,6 +41,8 @@ namespace AMDSEventDataSupport{
 	{
 		if(!AMDSEventDataSupport::registeredClasses()->contains(AMDSLightWeightEventData::staticMetaObject.className()))
 			AMDSEventDataSupport::registerClass<AMDSLightWeightEventData>();
+		if(!AMDSEventDataSupport::registeredClasses()->contains(AMDSFullEventData::staticMetaObject.className()))
+			AMDSEventDataSupport::registerClass<AMDSFullEventData>();
 	}
 
 	const QHash<QString, AMDSEventDataObjectInfo>* registeredClasses() {
@@ -54,6 +56,13 @@ namespace AMDSEventDataSupport{
 				return eventData;
 		}
 		return 0;
+	}
+
+	AMDSEventData* instantiateEventDataFromInstance(const AMDSEventData *instance){
+		if (instance)
+			return instantiateEventDataFromClassName(instance->metaObject()->className());
+		else
+			return 0;
 	}
 
 	bool inheritsEventData(const QMetaObject *queryMetaObject){

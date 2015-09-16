@@ -42,8 +42,9 @@ public:
 	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
 	/// Reads this AMDSClientIntrospectionRequest from the AMDSDataStream, returns 0 if no errors are encountered
 	virtual int readFromDataStream(AMDSDataStream *dataStream);
-	/// validate the message response
-	virtual bool validateResponse();
+
+	/// implement the function to return a data string of the message
+	virtual QString toString() const;
 
 protected:
 	/// The string identifier for the buffer or buffers being introspected

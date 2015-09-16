@@ -1,6 +1,6 @@
 #include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
 
-#include "source/AMDSDataStream.h"
+#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientStartTimePlusCountDataRequest::AMDSClientStartTimePlusCountDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)
@@ -36,6 +36,14 @@ AMDSClientStartTimePlusCountDataRequest& AMDSClientStartTimePlusCountDataRequest
 		setCount(other.count());
 	}
 	return (*this);
+}
+
+void AMDSClientStartTimePlusCountDataRequest::setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 count) {
+	setBufferName(bufferName);
+	setIncludeStatusData(includeStatusData);
+	setFlattenResultData(flattenResultData);
+	setStartTime(startTime);
+	setCount(count);
 }
 
 int AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const

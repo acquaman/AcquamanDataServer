@@ -1,10 +1,10 @@
-#include "source/DataHolder/AMDSDataHolderSupport.h"
-
-#include "source/AMDSMetaObjectSupport.h"
+#include "AMDSDataHolderSupport.h"
 
 #include "source/DataHolder/AMDSDataHolder.h"
 #include "source/DataHolder/AMDSScalarDataHolder.h"
 #include "source/DataHolder/AMDSSpectralDataHolder.h"
+
+#include "source/util/AMDSMetaObjectSupport.h"
 
 AMDSDataHolderObjectInfo::AMDSDataHolderObjectInfo()
 {
@@ -59,6 +59,13 @@ namespace AMDSDataHolderSupport{
 				return dataHolder;
 		}
 		return 0;
+	}
+
+	AMDSDataHolder* instantiateDataHolderFromInstance(const AMDSDataHolder *dataHolder){
+		if (dataHolder)
+			return instantiateDataHolderFromClassName(dataHolder->metaObject()->className());
+		else
+			return 0;
 	}
 
 	bool inheritsDataHolder(const QMetaObject *queryMetaObject){

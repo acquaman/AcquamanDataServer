@@ -12,6 +12,9 @@
 
 class AMDSDataStream;
 
+#define AMDS_SERVER_ERR_DATA_HOLDER 20300
+#define AMDS_SERVER_ERR_UNMATCH_DATA_HOLDER_FOR_PLUS 20301
+
 class AMDSDataHolder : public QObject
 {
 Q_OBJECT
@@ -40,7 +43,7 @@ public:
 	/// pure virtual function to return the eventData
 	inline virtual const AMDSEventData* eventData() const = 0;
 	/// pure virtual function to return the dataType
-	inline virtual AMDSDataTypeDefinitions::DataType dataType() const = 0;
+	virtual AMDSDataTypeDefinitions::DataType dataType() const = 0;
 
 	/// pure virtual function to return the axes
 	virtual inline QList<AMDSAxisInfo> axes() const = 0;
@@ -54,25 +57,30 @@ public:
 	virtual inline quint64 spanSize() const  = 0;
 
 	/// pure virtual function to copy the data of the instance to outputArray
-	virtual inline bool data(AMDSFlatArray *outputArray) const = 0;
+	virtual bool data(AMDSFlatArray *outputArray) const = 0;
 	/// pure virtual function to copy the data of inputArray to local instance
-	virtual inline void setData(AMDSFlatArray *inputArray) = 0;
+	virtual void setData(AMDSFlatArray *inputArray) = 0;
 	/// pure virtual function to return the data in the dataholder
-	virtual inline QString printData() = 0;
+	virtual QString printData() = 0;
 
 	/// pure virtual function to set the Axes information
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes) = 0;
 
 	/// pure virtual functions to get the eventTime and event time related comparation operations
-	virtual inline QDateTime eventTime() = 0;
-	virtual inline bool operator <(const QDateTime &rhs) = 0;
-	virtual inline bool operator >(const QDateTime &rhs) = 0;
-	virtual inline bool operator ==(const QDateTime &rhs) = 0;
+	virtual QDateTime eventTime() = 0;
+	virtual bool operator <(const QDateTime &rhs) = 0;
+	virtual bool operator >(const QDateTime &rhs) = 0;
+	virtual bool operator ==(const QDateTime &rhs) = 0;
 
 	/// pure virtual function to define the PLUS operation of AMDSDataHolder, which will plus the value of the two instances of AMDSDataHolder and return the new instance
 	virtual AMDSDataHolder* operator +(AMDSDataHolder &dataHolder) = 0;
 	/// pure virtual function to define the Division operation of AMDSDataHolder: the value of the given handler will be divided by the given divisior
 	virtual AMDSDataHolder* operator /(quint32 divisor) = 0;
+
+	/// pure virtual function copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder) = 0;
+	/// implement the = operation of AMDSDataHolder, which will copy the value of source instance to the target one
+	virtual AMDSDataHolder& operator =(AMDSDataHolder &dataHolder);
 
 	/// pure virtual function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered. By default the data type is encoded into the stream; however, this can be disabled and moved to a higher level if need be.
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType = true) const = 0;
@@ -85,6 +93,7 @@ class AMDSLightWeightDataHolder : public AMDSDataHolder
 Q_OBJECT
 public:
 	AMDSLightWeightDataHolder(QObject *parent = 0);
+	AMDSLightWeightDataHolder(AMDSLightWeightDataHolder &sourceLightWeightDataHolder, QObject *parent = 0);
 	virtual ~AMDSLightWeightDataHolder();
 
 	/// implement the axesStyle function
@@ -94,20 +103,27 @@ public:
 	/// implement the eventData() function
 	inline const AMDSEventData* eventData() const { return eventData_; }
 	/// implement the dataType() function
-	inline virtual AMDSDataTypeDefinitions::DataType dataType() const;
+	virtual AMDSDataTypeDefinitions::DataType dataType() const;
 	/// implement the setAxes function
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
 	/// implement the event time and related comparison functions
-	virtual inline QDateTime eventTime() { return eventData()->eventTime(); }
-	virtual inline bool operator <(const QDateTime &rhs) { return eventData()->eventTime() < rhs; }
-	virtual inline bool operator >(const QDateTime &rhs) { return eventData()->eventTime() > rhs; }
-	virtual inline bool operator ==(const QDateTime &rhs) { return eventData()->eventTime() == rhs; }
+	virtual QDateTime eventTime() { return eventData()->eventTime(); }
+	virtual bool operator <(const QDateTime &rhs) { return eventData()->eventTime() < rhs; }
+	virtual bool operator >(const QDateTime &rhs) { return eventData()->eventTime() > rhs; }
+	virtual bool operator ==(const QDateTime &rhs) { return eventData()->eventTime() == rhs; }
+
+	/// implement the function copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder);
 
 	/// implement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// implement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
+
+	/// getter function to get the eventData_ of AMDSEventData.
+	/// The reason to encapsulate this as protected is that the user of AMDSEventData should NOT be aware the existence of the instance of eventData_
+	inline AMDSEventData * eventData() { return eventData_; }
 
 protected:
 	/// the instance of event data, which provides the event information about the dataHolder
@@ -119,6 +135,7 @@ class AMDSFullDataHolder : public AMDSDataHolder
 Q_OBJECT
 public:
 	AMDSFullDataHolder(AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>(), QObject *parent = 0);
+	AMDSFullDataHolder(AMDSFullDataHolder &sourceFullDataHolder, QObject *parent = 0);
 	virtual ~AMDSFullDataHolder();
 
 	/// implement the axesStyle() function
@@ -128,7 +145,7 @@ public:
 	/// implement the eventData() function
 	inline const AMDSEventData* eventData() const { return lightWeightDataHolder_->eventData(); }
 	/// implement the dataType() function
-	inline virtual AMDSDataTypeDefinitions::DataType dataType() const;
+	virtual AMDSDataTypeDefinitions::DataType dataType() const;
 
 	/// implement the axes() function to retun the axes information
 	virtual inline QList<AMDSAxisInfo> axes() const { return axes_; }
@@ -142,19 +159,22 @@ public:
 	virtual inline quint64 spanSize() const;
 
 	/// implement the data() function to copy the data of the instance to outputArray
-	virtual inline bool data(AMDSFlatArray *outputValues) const { return lightWeightDataHolder_->data(outputValues); }
+	virtual bool data(AMDSFlatArray *outputValues) const { return lightWeightDataHolder_->data(outputValues); }
 	/// implement the setData() function to copy the data of inputArray to local instance
-	virtual inline void setData(AMDSFlatArray *inputValues) { return lightWeightDataHolder_->setData(inputValues); }
+	virtual void setData(AMDSFlatArray *inputValues) { return lightWeightDataHolder_->setData(inputValues); }
 	/// implement the function to return the data string
-	virtual inline QString printData() { return lightWeightDataHolder_->printData(); }
+	virtual QString printData() { return lightWeightDataHolder_->printData(); }
 	/// implement the setAxes() function to set the axes information of the instance
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
 	/// implement the eventTime() function and related comparison operators
-	virtual inline QDateTime eventTime() { return eventData()->eventTime(); }
-	virtual inline bool operator <(const QDateTime &rhs) { return lightWeightDataHolder_->operator <(rhs); }
-	virtual inline bool operator >(const QDateTime &rhs) { return lightWeightDataHolder_->operator >(rhs); }
-	virtual inline bool operator ==(const QDateTime &rhs) { return lightWeightDataHolder_->operator ==(rhs); }
+	virtual QDateTime eventTime() { return eventData()->eventTime(); }
+	virtual bool operator <(const QDateTime &rhs) { return lightWeightDataHolder_->operator <(rhs); }
+	virtual bool operator >(const QDateTime &rhs) { return lightWeightDataHolder_->operator >(rhs); }
+	virtual bool operator ==(const QDateTime &rhs) { return lightWeightDataHolder_->operator ==(rhs); }
+
+	/// implement the function copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder);
 
 	/// implement the PLUS operation of AMDSDataHolder, which will plus the value of the two instances of AMDSDataHolder and return the new instance
 	virtual AMDSDataHolder* operator +(AMDSDataHolder &dataHolder) { return lightWeightDataHolder_->operator +(dataHolder); }
@@ -165,6 +185,11 @@ public:
 	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
 	/// implent the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
+
+protected:
+	/// getter function to get the lightweightDataHolder of AMDSFullDataHolder.
+	/// The reason to encapsulate this as protected is that the user of AMDSFullDataHolder should NOT be aware the existence of the instance of lightweightDataHolder
+	inline AMDSLightWeightDataHolder * lightWeightDataHolder() { return lightWeightDataHolder_; }
 
 protected:
 	/// instance of AMDSLightWightDataHolder as the real holder for data
@@ -181,15 +206,6 @@ protected:
 ////////////////////////////////////////
 // AMDSDataHolder inline implementations
 ////////////////////////////////////////
-AMDSDataTypeDefinitions::DataType AMDSLightWeightDataHolder::dataType() const{
-	if(dataTypeStyle() != AMDSDataHolder::UniformDataType)
-		return AMDSDataTypeDefinitions::InvalidType;
-
-	AMDSFlatArray oneFlatArray;
-	data(&oneFlatArray);
-	return oneFlatArray.dataType();
-}
-
 bool AMDSLightWeightDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
 	Q_UNUSED(axes)
 	return false;
@@ -211,15 +227,6 @@ quint64 AMDSFullDataHolder::spanSize() const {
 	for(qint8 i=axes_.count()-1; i>=0; --i)
 		aSize *= axes_.at(i).size();
 	return aSize;
-}
-
-AMDSDataTypeDefinitions::DataType AMDSFullDataHolder::dataType() const{
-	if(dataTypeStyle() != AMDSDataHolder::UniformDataType)
-		return AMDSDataTypeDefinitions::InvalidType;
-
-	AMDSFlatArray oneFlatArray;
-	data(&oneFlatArray);
-	return oneFlatArray.dataType();
 }
 
 bool AMDSFullDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
