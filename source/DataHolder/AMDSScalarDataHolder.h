@@ -8,6 +8,7 @@ class AMDSLightWeightScalarDataHolder : public AMDSLightWeightGenericFlatArrayDa
 Q_OBJECT
 public:
 	Q_INVOKABLE AMDSLightWeightScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, QObject *parent = 0);
+	Q_INVOKABLE AMDSLightWeightScalarDataHolder(AMDSLightWeightScalarDataHolder *sourceDataHolder, QObject *parent = 0);
 	virtual ~AMDSLightWeightScalarDataHolder();
 
 	/// implement the function to return axes information

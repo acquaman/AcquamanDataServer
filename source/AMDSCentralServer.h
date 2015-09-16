@@ -29,7 +29,7 @@ signals:
 
 protected slots:
 	/// slot to handle the errors information from the TCP Data server
-	void onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, QString errorMessage);
+	void onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, const QString &errorMessage);
 	/// slot to handle the client request from the TCP Data server
 	void onDataServerClientRequestReady(AMDSClientRequest *clientRequest);
 

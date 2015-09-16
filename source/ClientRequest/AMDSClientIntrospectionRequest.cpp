@@ -105,16 +105,13 @@ int AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStrea
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-bool AMDSClientIntrospectionRequest::validateResponse()
+QString AMDSClientIntrospectionRequest::toString() const
 {
+	QString messageData = QString("Data of Introspection message (%1):").arg(socketKey());
 	for(int y = 0, ySize = bufferGroupInfos_.count(); y < ySize; y++){
 		AMDSBufferGroupInfo bufferGroupInfo = bufferGroupInfos_.at(y);
-		AMDSErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, QString("%1 %2 %3 %4 %5 %6 %7").arg(bufferGroupInfo.name()).arg(bufferGroupInfo.description()).arg(bufferGroupInfo.units()).arg(bufferGroupInfo.rank()).arg(bufferGroupInfo.size().toString()).arg(bufferGroupInfo.flattenEnabled()?"true":"false").arg(bufferGroupInfo.flattenMethod()));
-		for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++){
-			AMDSAxisInfo axisInfo = bufferGroupInfo.axes().at(x);
-			AMDSErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, QString("\tAxis info at %1 %2 %3 %4 %5 %6 %7 %8").arg(x).arg(axisInfo.name()).arg(axisInfo.description()).arg(axisInfo.units()).arg(axisInfo.size()).arg(axisInfo.isUniform()).arg(axisInfo.start()).arg(axisInfo.increment()));
-		}
+		messageData = QString("%1\n%2").arg(messageData).arg(bufferGroupInfo.toString());
 	}
 
-	return true;
+	return messageData;
 }

@@ -41,7 +41,7 @@ AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest& AMDSClientMiddleTimePlus
 	return (*this);
 }
 
-void AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::setAttributesValues(QString &bufferName, bool includeStatusData, bool flattenResultData, QDateTime &middleTime, quint64 countBefore, quint64 countAfter)
+void AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &middleTime, quint64 countBefore, quint64 countAfter)
 {
 	setBufferName(bufferName);
 	setIncludeStatusData(includeStatusData);
