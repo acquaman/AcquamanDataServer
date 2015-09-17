@@ -1,19 +1,18 @@
 
-PATH_TO_ACQUAMAN = /home/liux0/beamline/programming/acquaman/source
-PATH_TO_MPLOT = /home/liux0/beamline/programming/MPlot/src
 
 # EPICS Dependencies:
 EPICS_INCLUDE_DIRS = /home/epics/src/R3.14.12/base/include \
 					/home/epics/src/R3.14.12/base/include/os/Linux
 EPICS_LIB_DIR = /home/epics/src/R3.14.12/base/lib/linux-x86_64
 
-INCLUDEPATH += $$PATH_TO_ACQUAMAN
-INCLUDEPATH += $$PATH_TO_MPLOT
 INCLUDEPATH += $$EPICS_INCLUDE_DIRS
 
 LIBS += -L$$EPICS_LIB_DIR -lca -lCom
 
+QMAKE_LFLAGS_DEBUG *= "-Wl,-rpath,$$EPICS_LIB_DIR"
+QMAKE_LFLAGS_RELEASE *= "-Wl,-rpath,$$EPICS_LIB_DIR"
 
+# Acuqaman and MPlot files
 HEADERS *= \
 	$$PATH_TO_ACQUAMAN/acquaman.h \
 	$$PATH_TO_ACQUAMAN/beamline/AMProcessVariable.h \

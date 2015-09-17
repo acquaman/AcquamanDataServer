@@ -17,11 +17,6 @@ MOC_DIR=build_files
 UI_DIR=build_files
 RCC_DIR=build_files
 
-#TEMPLATE = app
-
-#HOME_FOLDER = $$system(echo $HOME)
-#DEV_PATH = beamline/programming
-
 # Set standard level of compiler warnings for everyone. (Otherwise the warnings shown will be system-dependent.)
 QMAKE_CXXFLAGS *= -Wextra -g
 
