@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include "AMDSClientUi.h"
+#include "source/ui/AMDSClientUi.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/DataElement/AMDSEventDataSupport.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"

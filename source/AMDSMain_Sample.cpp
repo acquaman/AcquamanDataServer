@@ -2,24 +2,23 @@
 
 #include <QStringList>
 #include <QRegExp>
+#include <QDebug>
 #include <QSettings>
 
-#include "source/AMDSCentralServer.h"
+#include "source/application/AMDSCentralServerSample.h"
 #include "source/ClientRequest/AMDSClientRequestSupport.h"
 #include "source/DataElement/AMDSEventDataSupport.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
-#include "source/util/AMDSErrorMonitor.h"
 
 /*
  * Print the usage of the application
  */
 void printUsage()
 {
-	QString usage = "\n\nUsages:\n"
-			 "\tAcquamanDataServer --intf=[interface name] [--port=[portnumber]]\n"
-			 "\tAcquamanDataServer --help\n"
-			 "\n";
-	AMDSErrorMon::information(0, 0, usage);
+	qDebug() << "\nUsages:" << "\n"
+			 << "	AcquamanDataServer --intf=[interface name] [--port=[portnumber]]\n"
+			 << "	AcquamanDataServer --help\n"
+			 << "\n";
 }
 
 /*
@@ -68,13 +67,14 @@ int main(int argc, char *argv[])
 	}
 
 	if (interfaceType == 0) {
-		AMDSErrorMon::error(0, 0, "\nERROR: Missing or invalid interface argument. \n");
+		qDebug() << "\nERROR: Missing or invalid interface argument. \n";
 		printUsage();
 	} else {
 		initializeAppSettings(interfaceType, port);
 		initializeRegisteredClasses();
 
-		new AMDSCentralServer();
+		AMDSCentralServerSample *dataServer = new AMDSCentralServerSample();
+		dataServer->startDataServerUpdate();
 		return app.exec();
 	}
 

@@ -3,7 +3,7 @@
 #include "source/Connection/AMDSDataStream.h"
 #include "source/DataHolder/AMDSScalarDataHolder.h"
 #include "source/DataHolder/AMDSDataHolderSupport.h"
-#include "source/util/AMDSErrorMonitor.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	AMDSClientRequest(parent)
@@ -228,7 +228,7 @@ bool AMDSClientDataRequest::validateResponse()
 {
 	bool noError = true;
 	if(responseType() == AMDSClientRequest::Error) {
-		AMDSErrorMon::alert(this, AMDS_CLIENTREQUEST_ERR_FAILED_TO_RETRIEVE_DATA, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
+		AMErrorMon::alert(this, AMDS_CLIENTREQUEST_ERR_FAILED_TO_RETRIEVE_DATA, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
 		noError = false;
 	}
 

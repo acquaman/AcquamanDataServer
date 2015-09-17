@@ -5,7 +5,7 @@
 #include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
-#include "source/util/AMDSErrorMonitor.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
 	QObject(parent), dataHolders_(maxSize)
@@ -71,7 +71,7 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 bool AMDSBufferGroup::flattenData(QList<AMDSDataHolder *> *dataArray)
 {
 	if (!bufferGroupInfo_.isFlattenEnabled() || bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::NoFlatten) {
-		AMDSErrorMon::alert(this, AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN, QString("The given buffergroup (%1) doesn't enable flatten feature or the flatten method is %2.").arg(bufferGroupInfo_.name()).arg(bufferGroupInfo_.flattenMethod()));
+		AMErrorMon::alert(this, AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN, QString("The given buffergroup (%1) doesn't enable flatten feature or the flatten method is %2.").arg(bufferGroupInfo_.name()).arg(bufferGroupInfo_.flattenMethod()));
 		return false;
 	}
 

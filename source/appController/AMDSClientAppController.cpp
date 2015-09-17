@@ -14,7 +14,7 @@
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "source/Connection/AMDSClientTCPSocket.h"
 #include "source/Connection/AMDSServer.h"
-#include "source/util/AMDSErrorMonitor.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSClientAppController::AMDSClientAppController(QObject *parent) :
 	QObject(parent)
@@ -227,7 +227,7 @@ void AMDSClientAppController::requestClientData(const QString &hostName, quint16
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
 		if (bufferNames.length() == 0 && handShakeSocketKey.length() == 0) {
-			AMDSErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG, QString("Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
+			AMErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG, QString("Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
 			return;
 		}
 
@@ -257,7 +257,7 @@ void AMDSClientAppController::onAMDSServerError(AMDSServer* server, int errorCod
 
 void AMDSClientAppController::onNetworkSessionOpened()
 {
-	AMDSErrorMon::information(this, AMDS_CLIENT_INFO_NETWORK_SESSION_STARTED, "Network session has been opened");
+	AMErrorMon::information(this, AMDS_CLIENT_INFO_NETWORK_SESSION_STARTED, "Network session has been opened");
 
 	// Save the used configuration
 	QNetworkConfiguration config = networkSession_->configuration();
@@ -294,7 +294,7 @@ AMDSClientRequest *AMDSClientAppController::instantiateClientRequest(AMDSClientR
 {
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 	if (!clientRequest) {
-		AMDSErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
+		AMErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
 	}
 
 	return clientRequest;

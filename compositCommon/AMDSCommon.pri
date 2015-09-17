@@ -4,11 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core network
 
-QT       += gui
+QT       += core network gui sql
 
-TARGET = AcquamanDataServer
 CONFIG   += console
 CONFIG   -= app_bundle
 
@@ -19,16 +17,10 @@ MOC_DIR=build_files
 UI_DIR=build_files
 RCC_DIR=build_files
 
-#TEMPLATE = app
-
-#PATH_TO_ACQUAMAN = ../acquaman
-#INCLUDEPATH *= $$PATH_TO_ACQUAMAN/source/
-
 # Set standard level of compiler warnings for everyone. (Otherwise the warnings shown will be system-dependent.)
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
-	source/AMDSCentralServer.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
@@ -42,8 +34,8 @@ HEADERS *= \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
 	source/Connection/AMDSTCPDataServer.h \
 	source/Connection/AMDSThreadedTCPDataServer.h \
-	source/Connection/AMDSDataStream.h \
 	source/Connection/AMDSPacketStats.h \
+	source/Connection/AMDSDataStream.h \
 	source/DataElement/AMDSLikely.h \
 	source/DataElement/AMDSDataTypeDefinitions.h \
 	source/DataElement/AMDSBuffer.h \
@@ -60,13 +52,10 @@ HEADERS *= \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
-	source/DataHolder/AMDSImageDataHolder.h \
-	source/util/AMDSMetaObjectSupport.h \
-	source/util/AMDSErrorMonitor.h
+	source/DataHolder/AMDSImageDataHolder.h  \
+	source/util/AMDSMetaObjectSupport.h
 
 SOURCES *= \
-	source/AMDSMain.cpp \
-	source/AMDSCentralServer.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
 	source/ClientRequest/AMDSClientDataRequest.cpp \
@@ -95,5 +84,5 @@ SOURCES *= \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
-	source/util/AMDSMetaObjectSupport.cpp \
-	source/util/AMDSErrorMonitor.cpp
+	source/util/AMDSMetaObjectSupport.cpp
+

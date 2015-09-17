@@ -1,7 +1,7 @@
 #include "source/ClientRequest/AMDSClientRequest.h"
 
 #include "source/Connection/AMDSDataStream.h"
-#include "source/util/AMDSErrorMonitor.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSClientRequest::AMDSClientRequest(QObject *parent) :
 	QObject(parent)
@@ -81,7 +81,7 @@ int AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 void AMDSClientRequest::printData()
 {
-	AMDSErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
+	AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
 }
 
 void AMDSClientRequest::setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType)
