@@ -3,28 +3,19 @@
 #include <QtCore/QCoreApplication>
 #include <QTimer>
 
-#include "source/AMDSThreadedTCPDataServer.h"
-#include "source/AMDSThreadedBufferGroup.h"
-#include "source/AMDSBufferGroup.h"
-#include "source/AMDSBufferGroupInfo.h"
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
-#include "source/ClientRequest/AMDSClientDataRequest.h"
-#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "Connection/AMDSThreadedTCPDataServer.h"
+#include "DataElement/AMDSThreadedBufferGroup.h"
+#include "DataElement/AMDSBufferGroup.h"
+#include "DataElement/AMDSBufferGroupInfo.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "ClientRequest/AMDSClientDataRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 	AMDSCentralServer(parent)
 {
-	fiftyMillisecondTimer_ = new QTimer(this);
-	hundredMillisecondTimer_ = new QTimer(this);
-
-	initializeBufferGroup(1000*60*60*10); // 10 hours of 1kHz signal
-
-	connect(fiftyMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onFiftyMillisecondTimerUpdate()));
-	connect(hundredMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondTimerUpdate()));
-
-	startTimer();
 }
 
 #include "source/DataHolder/AMDSScalarDataHolder.h"
@@ -57,19 +48,19 @@ void AMDSCentralServerSGM::initializeBufferGroup(quint64 maxCountSize)
 	QList<AMDSAxisInfo> mcpBufferGroupAxes;
 	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
 	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
-	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", false, AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
+	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
 	AMDSBufferGroup *mcpBufferGroup = new AMDSBufferGroup(mcpBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroup);
 	bufferGroups_.insert(mcpThreadedBufferGroup->bufferGroupInfo().name(), mcpThreadedBufferGroup);
 
 	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
 	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
-	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", false, AMDSBufferGroupInfo::NoFlatten, amptek1BufferGroupAxes);
+	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", AMDSBufferGroupInfo::NoFlatten, amptek1BufferGroupAxes);
 	amptek1BufferGroup_ = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup_);
 	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
 
-	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", true, AMDSBufferGroupInfo::Average);
+	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", AMDSBufferGroupInfo::Average);
 	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
 	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
 	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
@@ -78,6 +69,14 @@ void AMDSCentralServerSGM::initializeBufferGroup(quint64 maxCountSize)
 	connect(amptek1BufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 	connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
+}
+
+void AMDSCentralServerSGM::initializeTimer()
+{
+	fiftyMillisecondTimer_ = new QTimer(this);
+	hundredMillisecondTimer_ = new QTimer(this);
+	connect(fiftyMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onFiftyMillisecondTimerUpdate()));
+	connect(hundredMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondTimerUpdate()));
 }
 
 void AMDSCentralServerSGM::startTimer()

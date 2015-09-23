@@ -5,10 +5,10 @@
 #include <QDebug>
 #include <QSettings>
 
-#include "source/application/AMDSCentralServerSGM.h"
-#include "source/ClientRequest/AMDSClientRequestSupport.h"
-#include "source/DataElement/AMDSEventDataSupport.h"
-#include "source/DataHolder/AMDSDataHolderSupport.h"
+#include "application/AMDSCentralServerSGM.h"
+#include "ClientRequest/AMDSClientRequestSupport.h"
+#include "DataElement/AMDSEventDataSupport.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
 
 /*
  * Print the usage of the application
@@ -73,7 +73,8 @@ int main(int argc, char *argv[])
 		initializeAppSettings(interfaceType, port);
 		initializeRegisteredClasses();
 
-		new AMDSCentralServerSGM();
+		AMDSCentralServerSGM *dataServer = new AMDSCentralServerSGM();
+		dataServer->startDataServerUpdate();
 		return app.exec();
 	}
 

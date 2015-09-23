@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMap>
 
-#include "source/AMDSCentralServer.h"
+#include "application/AMDSCentralServer.h"
 
 class AMDSCentralServerSGM : public AMDSCentralServer
 {
@@ -22,6 +22,8 @@ protected slots:
 protected:
 	/// function to initialize the buffer groups, with the given buffer size
 	virtual void initializeBufferGroup(quint64 maxCountSize);
+	/// pure virtual function to initialize the timer to update the buffer groups
+	virtual void initializeTimer();
 	/// function to start the timer of data buffer update
 	virtual void startTimer();
 

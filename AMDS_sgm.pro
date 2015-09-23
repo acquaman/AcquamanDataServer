@@ -14,15 +14,15 @@ TARGET = AcquamanDataServerSGM
 
 HEADERS *= \
 		source/application/AMDSCentralServer.h \
-        source/application/AMDSCentralServerSGM.h \
-        source/Detector/Amptek/AmptekEventDefinitions.h \
-        source/Detector/Amptek/Buffer.h \
-        source/Detector/Amptek/SGM/AmptekSDD123Detector.h \
-        source/Detector/Amptek/SGM/AmptekSDD123Histogram.h
+		source/application/AMDSCentralServerSGM.h
+#        source/Detector/Amptek/AmptekEventDefinitions.h \
+#        source/Detector/Amptek/Buffer.h \
+#        source/Detector/Amptek/SGM/AmptekSDD123Detector.h \
+#        source/Detector/Amptek/SGM/AmptekSDD123Histogram.h
 
 SOURCES *= \
         source/AMDSMain_SGM.cpp \
 		source/application/AMDSCentralServer.cpp \
-        source/application/AMDSCentralServerSGM.cpp \
-        source/Detector/Amptek/SGM/AmptekSDD123Detector.cpp \
-        source/Detector/Amptek/SGM/AmptekSDD123Histogram.cpp
+		source/application/AMDSCentralServerSGM.cpp
+#        source/Detector/Amptek/SGM/AmptekSDD123Detector.cpp \
+#        source/Detector/Amptek/SGM/AmptekSDD123Histogram.cpp
