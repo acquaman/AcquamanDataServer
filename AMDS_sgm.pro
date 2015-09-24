@@ -13,16 +13,44 @@ include ( compositCommon/AMDSCommon.pri )
 TARGET = AcquamanDataServerSGM
 
 HEADERS *= \
-		source/application/AMDSCentralServer.h \
-		source/application/AMDSCentralServerSGM.h
-#        source/Detector/Amptek/AmptekEventDefinitions.h \
+	source/application/AMDSCentralServer.h \
+	source/application/AMDSCentralServerSGM.h \
+	source/Detector/Amptek/AmptekEventDefinitions.h \
+	source/Detector/Amptek/AmptekCommand.h \
+	source/Detector/Amptek/AmptekSDD123Server.h \
+    source/Detector/Amptek/AmptekSDD123Application.h \
+    source/Detector/Amptek/AmptekSDD123Packet.h \
+	source/Detector/Amptek/AmptekSDD123ConfigurationMap.h
+#       source/Detector/Amptek/AmptekEventDefinitions.h \
 #        source/Detector/Amptek/Buffer.h \
 #        source/Detector/Amptek/SGM/AmptekSDD123Detector.h \
 #        source/Detector/Amptek/SGM/AmptekSDD123Histogram.h
 
 SOURCES *= \
-        source/AMDSMain_SGM.cpp \
-		source/application/AMDSCentralServer.cpp \
-		source/application/AMDSCentralServerSGM.cpp
+	source/AMDSMain_SGM.cpp \
+	source/application/AMDSCentralServer.cpp \
+	source/application/AMDSCentralServerSGM.cpp \
+	source/Detector/Amptek/AmptekCommand.cpp \
+	source/Detector/Amptek/AmptekSDD123Server.cpp \
+    source/Detector/Amptek/AmptekSDD123Application.cpp \
+    source/Detector/Amptek/AmptekSDD123Packet.cpp \
+	source/Detector/Amptek/AmptekSDD123ConfigurationMap.cpp
 #        source/Detector/Amptek/SGM/AmptekSDD123Detector.cpp \
 #        source/Detector/Amptek/SGM/AmptekSDD123Histogram.cpp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
