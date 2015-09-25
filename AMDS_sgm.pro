@@ -15,15 +15,16 @@ TARGET = AcquamanDataServerSGM
 HEADERS *= \
 	source/application/AMDSCentralServer.h \
 	source/application/AMDSCentralServerSGM.h \
-	source/Detector/Amptek/AmptekSDD123Application.h \
 	source/Detector/Amptek/AmptekEventDefinitions.h \
+	source/Detector/Amptek/AmptekSDD123Application.h \
 	source/Detector/Amptek/AmptekSDD123ConfigurationMap.h \
 	source/Detector/Amptek/AmptekCommandManager.h \
     source/Detector/Amptek/AmptekSDD123Packet.h \
 	source/Detector/Amptek/AmptekSDD123Server.h \
+	source/Detector/Amptek/AmptekSDD123ServerGroup.h \
 #	source/Detector/Amptek/AmptekSDD123DetectorManager.h \
 	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.h \
-	source/Detector/Amptek/AmptekSDD123ServerGroup.h
+    source/Detector/Amptek/AmptekSDD123DetectorGroup.h
 #       source/Detector/Amptek/AmptekEventDefinitions.h \
 #        source/Detector/Amptek/Buffer.h \
 #        source/Detector/Amptek/SGM/AmptekSDD123Detector.h \
@@ -38,11 +39,14 @@ SOURCES *= \
 	source/Detector/Amptek/AmptekCommandManager.cpp \
     source/Detector/Amptek/AmptekSDD123Packet.cpp \
 	source/Detector/Amptek/AmptekSDD123Server.cpp \
+	source/Detector/Amptek/AmptekSDD123ServerGroup.cpp \
 #	source/Detector/Amptek/AmptekSDD123DetectorManager.cpp \
 	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.cpp \
-    source/Detector/Amptek/AmptekSDD123ServerGroup.cpp
+    source/Detector/Amptek/AmptekSDD123DetectorGroup.cpp
 #        source/Detector/Amptek/SGM/AmptekSDD123Detector.cpp \
 #        source/Detector/Amptek/SGM/AmptekSDD123Histogram.cpp
+
+
 
 
 

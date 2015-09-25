@@ -40,20 +40,26 @@ protected:
 	void connectBufferGroupAndDataServer();
 
 protected:
+	/// the list of configuration map of SGM amptek
 	QList<AmptekSDD123ConfigurationMap*> configurationMaps_;
 
+	/// the QThread of amptek data server, which will fetch the UDP data from the amptek host to grab the data
 	QThread *amptekDataServerGroupThread_;
+	/// the serverGroup to manage the AmptekServer
 	AmptekSDD123ServerGroup *serverGroup_;
 
+	/// the AmptekDetector group, which will manange and hold the Amptek data and manage the communications with the PVs
+//	AmptekSDD123DetectorGroup *detectorGroup_;
 
 
-	AMDSBufferGroup *energyBufferGroup_;
-	quint64 simpleCounter_;
-	QTimer *fiftyMillisecondTimer_;
 
-	AMDSBufferGroup *amptek1BufferGroup_;
-	quint64 spectralCounter_;
-	QTimer *hundredMillisecondTimer_;
+//	AMDSBufferGroup *energyBufferGroup_;
+//	quint64 simpleCounter_;
+//	QTimer *fiftyMillisecondTimer_;
+
+//	AMDSBufferGroup *amptek1BufferGroup_;
+//	quint64 spectralCounter_;
+//	QTimer *hundredMillisecondTimer_;
 };
 
 #endif // AMDSCENTRALSERVERSGM_H
