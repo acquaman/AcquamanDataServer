@@ -17,18 +17,31 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
-
-	dataServer_ = new AMDSThreadedTCPDataServer(this);
-	connect(dataServer_->server(), SIGNAL(error(quint8,quint16,QString)), this, SLOT(onDataServerErrorHandler(quint8,quint16,QString)));
-	connect(dataServer_->server(), SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SLOT(onDataServerClientRequestReady(AMDSClientRequest*)));
-	connect(this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 }
 
-void AMDSCentralServer::startDataServerUpdate()
+AMDSCentralServer::~AMDSCentralServer()
 {
-	initializeBufferGroup(1000*60*60*10); // 10 hours of 1kHz signal
-	initializeTimer();
-	startTimer();
+	tcpDataServer_->deleteLater();
+}
+
+void AMDSCentralServer::initializeAndStartServices()
+{
+	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the TCP server ...");
+	initializeAndStartTCPServer();
+
+	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the bufferGroup ...");
+	initializeBufferGroup();
+
+	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the Data server...");
+	initializeAndStartDataServer();
+}
+
+void AMDSCentralServer::initializeAndStartTCPServer()
+{
+	tcpDataServer_ = new AMDSThreadedTCPDataServer(this);
+	connect(tcpDataServer_->server(), SIGNAL(error(quint8,quint16,QString)), this, SLOT(onDataServerErrorHandler(quint8,quint16,QString)));
+	connect(tcpDataServer_->server(), SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SLOT(onDataServerClientRequestReady(AMDSClientRequest*)));
+	connect(this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 }
 
 void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, const QString &errorMessage)

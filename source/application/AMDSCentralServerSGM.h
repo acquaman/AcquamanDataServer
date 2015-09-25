@@ -6,28 +6,47 @@
 
 #include "application/AMDSCentralServer.h"
 
+class AmptekSDD123ConfigurationMap;
+class AmptekSDD123ServerGroup;
+
 class AMDSCentralServerSGM : public AMDSCentralServer
 {
 Q_OBJECT
 public:
 	/// Constructor: to initialize the TCP Data server thread and the timers for buffer groups
 	AMDSCentralServerSGM(QObject *parent = 0);
+	~AMDSCentralServerSGM();
+
+signals:
+	void serverChangedToConfigurationState(int index);
+	void serverChangedToDwellState(int index);
 
 protected slots:
-	/// slot to handle the 50 ms timer, to fetch and update the scaler data buffer
-	void onFiftyMillisecondTimerUpdate();
-	/// slot to handle the 100 ms timer, to fetch and update the amptek data buffer
-	void onHundredMillisecondTimerUpdate();
+	void onServerChangedToConfigurationState(int index);
+	void onServerChangedToDwellState(int index);
+
+//	/// slot to handle the 50 ms timer, to fetch and update the scaler data buffer
+//	void onFiftyMillisecondTimerUpdate();
+//	/// slot to handle the 100 ms timer, to fetch and update the amptek data buffer
+//	void onHundredMillisecondTimerUpdate();
 
 protected:
-	/// function to initialize the buffer groups, with the given buffer size
-	virtual void initializeBufferGroup(quint64 maxCountSize);
-	/// pure virtual function to initialize the timer to update the buffer groups
-	virtual void initializeTimer();
-	/// function to start the timer of data buffer update
-	virtual void startTimer();
+	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
+	virtual void initializeBufferGroup(quint64 maxCountSize = 1000*60*60*10);
+	/// function to initialize the data server to update the buffer groups
+	virtual void initializeAndStartDataServer();
+
+	/// helper function to connect the qEvent between BufferGroup and DataServer to update data
+	void connectBufferGroupAndDataServer();
 
 protected:
+	QList<AmptekSDD123ConfigurationMap*> configurationMaps_;
+
+	QThread *amptekDataServerGroupThread_;
+	AmptekSDD123ServerGroup *serverGroup_;
+
+
+
 	AMDSBufferGroup *energyBufferGroup_;
 	quint64 simpleCounter_;
 	QTimer *fiftyMillisecondTimer_;

@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 		initializeRegisteredClasses();
 
 		AMDSCentralServerSample *dataServer = new AMDSCentralServerSample();
-		dataServer->startDataServerUpdate();
+		dataServer->initializeAndStartServices();
 		return app.exec();
 	}
 

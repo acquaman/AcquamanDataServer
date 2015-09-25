@@ -22,10 +22,11 @@ Q_OBJECT
 public:
 	/// Constructor: to initialize the TCP Data server thread and the timers for buffer groups
 	AMDSCentralServer(QObject *parent = 0);
+	~AMDSCentralServer();
 
 public:
-	/// initialize and start the timer to update bufferGroups
-	void startDataServerUpdate();
+	/// interface to initialize and start the services
+	void initializeAndStartServices();
 
 signals:
 	/// The signal when the AMDSCenterServer finished processing a client request, then the TCP data suppose to wrap the msg and send back to client
@@ -38,15 +39,16 @@ protected slots:
 	void onDataServerClientRequestReady(AMDSClientRequest *clientRequest);
 
 protected:
-	/// pure virtual function to initialize the buffer groups, with the given buffer size
-	virtual void initializeBufferGroup(quint64 maxCountSize) = 0;
-	/// pure virtual function to initialize the timer to update the buffer groups
-	virtual void initializeTimer() = 0;
-	/// function to start the timer of data buffer update
-	virtual void startTimer() = 0;
+	/// initialize and start the TCPServer to handle clientRequest
+	void initializeAndStartTCPServer();
+
+	/// pure virtual function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
+	virtual void initializeBufferGroup(quint64 maxCountSize = 1000*60*60*10) = 0;
+	/// pure virtual function to initialize the data server to update the buffer groups
+	virtual void initializeAndStartDataServer() = 0;
 
 protected:
-	AMDSThreadedTCPDataServer *dataServer_;
+	AMDSThreadedTCPDataServer *tcpDataServer_;
 	QMap<QString, AMDSThreadedBufferGroup*> bufferGroups_;
 };
 

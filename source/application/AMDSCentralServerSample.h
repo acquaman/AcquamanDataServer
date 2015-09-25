@@ -20,12 +20,10 @@ protected slots:
 	void onHundredMillisecondTimerUpdate();
 
 protected:
-	/// function to initialize the buffer groups, with the given buffer size
-	virtual void initializeBufferGroup(quint64 maxCountSize);
-	/// function to initialize the timer to update the buffer groups
-	virtual void initializeTimer();
-	/// function to start the timer of data buffer update
-	virtual void startTimer();
+	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
+	virtual void initializeBufferGroup(quint64 maxCountSize = 1000*60*60*10);
+	/// function to initialize the data server to update the buffer groups
+	virtual void initializeAndStartDataServer();
 
 protected:
 	AMDSBufferGroup *energyBufferGroup_;
