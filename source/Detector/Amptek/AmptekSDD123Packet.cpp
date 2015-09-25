@@ -50,7 +50,7 @@ QString AmptekSDD123Packet::commandString() const{
 }
 
 QString AmptekSDD123Packet::commandText() const{
-	return AmptekCommand::sddCommands()->textFromHex(commandString());
+	return AmptekCommandManagerSGM::sddCommands()->textFromHex(commandString());
 }
 
 QString AmptekSDD123Packet::lengthString() const{
@@ -76,11 +76,11 @@ QString AmptekSDD123Packet::fullString() const{
 }
 
 int AmptekSDD123Packet::timeout() const{
-	return AmptekCommand::sddCommands()->timeoutFromText(commandText());
+	return AmptekCommandManagerSGM::sddCommands()->amptekCommand(commandText()).timeout();
 }
 
 int AmptekSDD123Packet::maxRetries() const{
-	return AmptekCommand::sddCommands()->retriesFromText(commandText());
+	return AmptekCommandManagerSGM::sddCommands()->amptekCommand(commandText()).retries();
 }
 
 int AmptekSDD123Packet::currentRetries() const{
@@ -88,7 +88,7 @@ int AmptekSDD123Packet::currentRetries() const{
 }
 
 QStringList AmptekSDD123Packet::possibleResponses() const{
-	return AmptekCommand::sddCommands()->responsesFromText(commandText());
+	return AmptekCommandManagerSGM::sddCommands()->amptekCommand(commandText()).responseHexes();
 }
 
 int AmptekSDD123Packet::dataLength() const{

@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "AmptekCommand.h"
+#include "Detector/Amptek/SGM/AmptekCommandManagerSGM.h"
 
 class AmptekSDD123Packet : public QObject
 {

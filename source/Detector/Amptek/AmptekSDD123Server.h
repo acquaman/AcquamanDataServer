@@ -32,12 +32,13 @@ public slots:
 	/// Returns id of newly created packet or -1 in case of failure
 	int forwardDatagram(const QByteArray &datagram);
 
-	void requestStatus();
-	void fakeRequestStatus();
-	void requestSpectrum();
-	void requestSpectrumAndClear();
-	void clearSpectrum();
-	void enableMCAMCS();
+	void requestDataPacket(AmptekCommandManagerSGM::AmptekCommandDefSGM command, const QString &dataStringHex="", bool fakeSendRequest=false, bool sendSyncRequest=false, int overrideTimeout=-1);
+//	void requestStatus();
+//	void fakeRequestStatus();
+//	void requestSpectrum();
+//	void requestSpectrumAndClear();
+//	void clearSpectrum();
+//	void enableMCAMCS();
 	void disableMCAMCS();
 	void mcaChannelsCount();
 	void presetTime();
@@ -47,9 +48,9 @@ public slots:
 	/// Sets a text configuration value. Must be the format of CMD=VALUE;
 	void textConfigurationSet(QString singleCommandRequest);
 
-	void requestCommTestAckPacket(const QString &hexCommand);
-	void requestCommTestEchoPacket(const QString &hashTag = QString());
-	void fakeRequestCommTestEchoPacket(const QString &hashTag = QString());
+//	void requestCommTestAckPacket(const QString &hexCommand);
+//	void requestCommTestEchoPacket(const QString &hashTag = QString());
+//	void fakeRequestCommTestEchoPacket(const QString &hashTag = QString());
 
 
 	bool readReplyDatagram(int &id, QByteArray &datagram);
