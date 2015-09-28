@@ -1,22 +1,22 @@
 #include "AmptekSDD123DetectorGroup.h"
 
 #include "AmptekSDD123ConfigurationMap.h"
-#include "AmptekSDD123Detector.h"
+//#include "AmptekSDD123Detector.h"
 //#include "AmptekSDD123EPICSDetectorManager.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
 
 AmptekSDD123DetectorGroup::AmptekSDD123DetectorGroup(QList<AmptekSDD123ConfigurationMap *> configurationMaps, QObject *parent) :
 	QObject(parent)
 {
-	AmptekSDD123Detector *oneDetector;
+//	AmptekSDD123Detector *oneDetector;
 	AmptekSDD123DetectorManager *oneDetectorManager;
 	for(int x = 0, size = configurationMaps.count(); x < size; x++){
-		oneDetector = new AmptekSDD123Detector();
-		oneDetector->setName(configurationMaps.at(x)->detectorName());
+//		oneDetector = new AmptekSDD123Detector();
+//		oneDetector->setName(configurationMaps.at(x)->detectorName());
 
-		oneDetectorManager = new AmptekSDD123EPICSDetectorManager(oneDetector, configurationMaps.at(x)->detectorBasePVName());
-		connect(oneDetectorManager, SIGNAL(dataRequestReady(ClientDataRequest*)), this, SIGNAL(dataRequestReady(ClientDataRequest*)));
-		detectorManagers_.append(oneDetectorManager);
+//		oneDetectorManager = new AmptekSDD123EPICSDetectorManager(oneDetector, configurationMaps.at(x)->detectorBasePVName());
+//		connect(oneDetectorManager, SIGNAL(dataRequestReady(ClientDataRequest*)), this, SIGNAL(dataRequestReady(ClientDataRequest*)));
+//		detectorManagers_.append(oneDetectorManager);
 	}
 }
 
