@@ -18,6 +18,12 @@ AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
 {
 }
 
+AMDSBufferGroup::~AMDSBufferGroup()
+{
+	clear();
+}
+
+
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	QReadLocker readLock(&lock_);
 

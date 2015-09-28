@@ -11,6 +11,7 @@ class AMDSBufferGroupManager : public QObject
 Q_OBJECT
 public:
 	AMDSBufferGroupManager(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent = 0);
+	~AMDSBufferGroupManager();
 
 	AMDSBufferGroupInfo bufferGroupInfo() const;
 	AMDSBufferGroup * bufferGroup() const;

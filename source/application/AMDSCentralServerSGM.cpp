@@ -4,9 +4,9 @@
 #include <QTimer>
 
 #include "Connection/AMDSThreadedTCPDataServer.h"
-#include "DataElement/AMDSThreadedBufferGroup.h"
 #include "DataElement/AMDSBufferGroup.h"
 #include "DataElement/AMDSBufferGroupInfo.h"
+#include "DataElement/AMDSBufferGroupManager.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
@@ -42,7 +42,7 @@ AMDSCentralServerSGM::~AMDSCentralServerSGM()
 
 
 	if (amptekDataServerGroupThread_->isRunning())
-		amptekDataServerGroupThread_->terminate();
+		amptekDataServerGroupThread_->quit();
 
 	serverGroup_->deleteLater();
 	amptekDataServerGroupThread_->deleteLater();

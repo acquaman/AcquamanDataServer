@@ -28,6 +28,7 @@ public:
 	AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent = 0);
 	/// Copy constructor
 	AMDSBufferGroup(const AMDSBufferGroup& other);
+	~AMDSBufferGroup();
 
 	/// Returns the data dimension and other information included in the bufferGroupInfo
 	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
@@ -80,8 +81,10 @@ protected:
 	int getDataIndexByDateTime(const QDateTime& dwellTime);
 
 protected:
-	AMDSBufferGroupInfo bufferGroupInfo_;
 	mutable QReadWriteLock lock_;
+	/// the buffergroup information about this buffer group
+	AMDSBufferGroupInfo bufferGroupInfo_;
+
 	/// A buffer which contains histogram data collection, sorted by the startDwellTime
 	AMDSBuffer<AMDSDataHolder*> dataHolders_;
 };
