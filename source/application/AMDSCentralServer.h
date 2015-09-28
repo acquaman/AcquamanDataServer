@@ -6,7 +6,7 @@
 
 class QTimer;
 
-class AMDSThreadedBufferGroup;
+class AMDSBufferGroupManager;
 class AMDSThreadedTCPDataServer;
 class AMDSBufferGroup;
 class AMDSClientRequest;
@@ -49,7 +49,7 @@ protected:
 
 protected:
 	AMDSThreadedTCPDataServer *tcpDataServer_;
-	QMap<QString, AMDSThreadedBufferGroup*> bufferGroups_;
+	QMap<QString, AMDSBufferGroupManager*> bufferGroupManagers_;
 };
 
 Q_DECLARE_INTERFACE(AMDSCentralServer, "AMDS.AMDSCentralServer/1.0")

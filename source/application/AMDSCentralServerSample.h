@@ -26,11 +26,9 @@ protected:
 	virtual void initializeAndStartDataServer();
 
 protected:
-	AMDSBufferGroup *energyBufferGroup_;
 	quint64 simpleCounter_;
 	QTimer *fiftyMillisecondTimer_;
 
-	AMDSBufferGroup *amptek1BufferGroup_;
 	quint64 spectralCounter_;
 	QTimer *hundredMillisecondTimer_;
 };

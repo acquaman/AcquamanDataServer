@@ -8,9 +8,9 @@
 #include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "source/ClientRequest/AMDSClientDataRequest.h"
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
-#include "source/DataElement/AMDSThreadedBufferGroup.h"
 #include "source/DataElement/AMDSBufferGroup.h"
 #include "source/DataElement/AMDSBufferGroupInfo.h"
+#include "source/DataElement/AMDSBufferGroupManager.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
@@ -62,16 +62,16 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 		AMDSClientIntrospectionRequest *clientIntrospectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
 		if(clientIntrospectionRequest){
 			if(clientIntrospectionRequest->bufferName() == "All"){
-				QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroups_.constBegin();
-				while (i != bufferGroups_.constEnd()) {
+				QMap<QString, AMDSBufferGroupManager*>::const_iterator i = bufferGroupManagers_.constBegin();
+				while (i != bufferGroupManagers_.constEnd()) {
 					AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
 					AMErrorMon::information(this, AMDS_SERVER_INFO_BUFFER_DEF, QString("%1 definition is %2 %3 %4 %5 %6 %7").arg(i.key()).arg(oneInfo.name()).arg(oneInfo.description()).arg(oneInfo.units()).arg(oneInfo.size().toString()).arg(oneInfo.isFlattenEnabled()?"true":"false").arg(oneInfo.flattenMethod()));
 					clientIntrospectionRequest->appendBufferGroupInfo(oneInfo);
 					++i;
 				}
 			}
-			else if(bufferGroups_.contains(clientIntrospectionRequest->bufferName()))
-				clientIntrospectionRequest->appendBufferGroupInfo(bufferGroups_.value(clientIntrospectionRequest->bufferName())->bufferGroupInfo());
+			else if(bufferGroupManagers_.contains(clientIntrospectionRequest->bufferName()))
+				clientIntrospectionRequest->appendBufferGroupInfo(bufferGroupManagers_.value(clientIntrospectionRequest->bufferName())->bufferGroupInfo());
 			else
 				clientIntrospectionRequest->setErrorMessage(QString("No buffer named %1, cannot introspect").arg(clientIntrospectionRequest->bufferName()));
 
@@ -90,7 +90,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 				QStringList requestedBufferNames = continuousDataRequest->bufferNames();
 				foreach (QString bufferName, requestedBufferNames) {
 					AMDSClientDataRequest *dataRequest = continuousDataRequest->bufferDataRequest(bufferName);
-					AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(bufferName, 0);
+					AMDSBufferGroupManager *threadedBufferGroup = bufferGroupManagers_.value(bufferName, 0);
 					if (threadedBufferGroup) {
 						AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
 						dataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
@@ -102,7 +102,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 				}
 
 			} else {
-				AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroups_.value(clientDataRequest->bufferName(), 0);
+				AMDSBufferGroupManager *threadedBufferGroup = bufferGroupManagers_.value(clientDataRequest->bufferName(), 0);
 				if (threadedBufferGroup) {
 					AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
 					clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());

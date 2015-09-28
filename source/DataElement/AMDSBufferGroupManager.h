@@ -1,16 +1,16 @@
-#ifndef AMDSTHREADEDBUFFERGROUP_H
-#define AMDSTHREADEDBUFFERGROUP_H
+#ifndef AMDSBUFFERGROUPMANAGER_H
+#define AMDSBUFFERGROUPMANAGER_H
 
 #include <QObject>
 #include <QThread>
 
 #include "source/DataElement/AMDSBufferGroup.h"
 
-class AMDSThreadedBufferGroup : public QObject
+class AMDSBufferGroupManager : public QObject
 {
 Q_OBJECT
 public:
-	AMDSThreadedBufferGroup(AMDSBufferGroup *bufferGroup, QObject *parent = 0);
+	AMDSBufferGroupManager(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent = 0);
 
 	AMDSBufferGroupInfo bufferGroupInfo() const;
 	AMDSBufferGroup * bufferGroup() const;
@@ -28,4 +28,4 @@ protected:
 	mutable QReadWriteLock lock_;
 };
 
-#endif // AMDSTHREADEDBUFFERGROUP_H
+#endif // AMDSBUFFERGROUPMANAGER_H

@@ -46,14 +46,14 @@ HEADERS *= \
 	source/DataElement/AMDSFlatArray.h \
 	source/DataElement/AMDSBufferGroup.h \
 	source/DataElement/AMDSBufferGroupInfo.h \
-	source/DataElement/AMDSThreadedBufferGroup.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h  \
-	source/util/AMDSMetaObjectSupport.h
+	source/util/AMDSMetaObjectSupport.h \
+    source/DataElement/AMDSBufferGroupManager.h
 
 SOURCES *= \
 	source/ClientRequest/AMDSClientRequest.cpp \
@@ -77,12 +77,16 @@ SOURCES *= \
 	source/DataElement/AMDSFlatArray.cpp \
 	source/DataElement/AMDSBufferGroup.cpp \
 	source/DataElement/AMDSBufferGroupInfo.cpp \
-	source/DataElement/AMDSThreadedBufferGroup.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
-	source/util/AMDSMetaObjectSupport.cpp
+	source/util/AMDSMetaObjectSupport.cpp \
+    source/DataElement/AMDSBufferGroupManager.cpp
+
+
+
+
 
