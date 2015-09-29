@@ -12,6 +12,7 @@ Q_OBJECT
 public:
 	/// Constructor: to initialize the TCP Data server thread and the timers for buffer groups
 	AMDSCentralServerSample(QObject *parent = 0);
+	~AMDSCentralServerSample();
 
 protected slots:
 	/// slot to handle the 50 ms timer, to fetch and update the scaler data buffer

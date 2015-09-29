@@ -6,9 +6,11 @@
 
 #include "source/DataElement/AMDSBufferGroup.h"
 
+class AMDSClientRequest;
+
 class AMDSBufferGroupManager : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	AMDSBufferGroupManager(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent = 0);
 	~AMDSBufferGroupManager();
@@ -26,6 +28,8 @@ public:
 signals:
 	/// signal to indicate the bufferGroupManager is ready to use
 	void bufferGroupReady();
+	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
+	void clientRequestProcessed(AMDSClientRequest *clientRequest);
 
 protected slots:
 	/// Slot to handle the threated started signal

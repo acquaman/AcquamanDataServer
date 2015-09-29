@@ -17,6 +17,16 @@ AMDSCentralServerSample::AMDSCentralServerSample(QObject *parent) :
 {
 }
 
+AMDSCentralServerSample::~AMDSCentralServerSample()
+{
+	if (fiftyMillisecondTimer_->isActive())
+		fiftyMillisecondTimer_->stop();
+	if (hundredMillisecondTimer_->isActive())
+		hundredMillisecondTimer_->stop();
+
+	fiftyMillisecondTimer_->deleteLater();
+	hundredMillisecondTimer_->deleteLater();
+}
 
 void AMDSCentralServerSample::onFiftyMillisecondTimerUpdate(){
 	AMDSLightWeightScalarDataHolder *oneScalerDataHolder = new AMDSLightWeightScalarDataHolder();
@@ -61,7 +71,7 @@ void AMDSCentralServerSample::initializeBufferGroup(quint64 maxCountSize)
 	bufferGroupManagers_.insert(energyBufferGroupManager->bufferGroupName(), energyBufferGroupManager);
 
 	foreach(AMDSBufferGroupManager *bufferGroupManager, bufferGroupManagers_) {
-		connect(bufferGroupManager->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+		connect(bufferGroupManager, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 	}
 }
 

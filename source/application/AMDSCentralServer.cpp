@@ -21,6 +21,11 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 
 AMDSCentralServer::~AMDSCentralServer()
 {
+	foreach (AMDSBufferGroupManager *bufferGroupManager, bufferGroupManagers_) {
+		bufferGroupManager->deleteLater();
+	}
+	bufferGroupManagers_.clear();
+
 	tcpDataServer_->deleteLater();
 }
 
