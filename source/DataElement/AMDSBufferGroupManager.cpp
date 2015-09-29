@@ -31,6 +31,16 @@ AMDSBufferGroup * AMDSBufferGroupManager::bufferGroup() const
 	return bufferGroup_;
 }
 
+QString AMDSBufferGroupManager::bufferGroupName() const
+{
+	return bufferGroupInfo().name();
+}
+
+void AMDSBufferGroupManager::append(AMDSDataHolder *value)
+{
+	bufferGroup_->append(value);
+}
+
 void AMDSBufferGroupManager::onBufferGroupThreadStarted(){
 	emit bufferGroupReady();
 }
