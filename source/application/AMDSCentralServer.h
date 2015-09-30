@@ -8,7 +8,6 @@ class QTimer;
 
 class AMDSBufferGroupManager;
 class AMDSThreadedTCPDataServer;
-class AMDSBufferGroup;
 class AMDSClientRequest;
 
 #define AMDS_SERVER_INFO_START_SERVER_APP 20100

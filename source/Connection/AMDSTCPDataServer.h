@@ -46,7 +46,6 @@ public:
 signals:
 	/// error signal
 	void error(quint8 errorLevel, quint16 errorCode, const QString &errorString);
-	void requestInfo();
 
 	/// the signal of new client request read from socket
 	void clientRequestRead(AMDSClientRequest*);

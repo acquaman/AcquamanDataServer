@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 
+#include "ClientRequest/AMDSClientDataRequest.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QObject *parent) :
@@ -11,7 +12,10 @@ AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QObject *parent) :
 	server_ = new AMDSTCPDataServer;
 
 	connect(thread_, SIGNAL(started()), this, SLOT(onThreadStarted()));
+
 	connect(this, SIGNAL(startServer(QString,quint16)), server_, SLOT(start(QString,quint16)));
+	connect(server_, SIGNAL(error(quint8,quint16,QString)), this, SIGNAL(error(quint8,quint16,QString)));
+	connect(server_, SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SIGNAL(clientRequestRead(AMDSClientRequest*)));
 
 	server_->moveToThread(thread_);
 	thread_->start(QThread::LowPriority);
@@ -29,9 +33,9 @@ AMDSThreadedTCPDataServer::~AMDSThreadedTCPDataServer()
 	thread_ = 0;
 }
 
-AMDSTCPDataServer* AMDSThreadedTCPDataServer::server()
+void AMDSThreadedTCPDataServer::onClientRequestProcessed(AMDSClientRequest* clientRequest)
 {
-	return server_;
+	server_->onClientRequestProcessed(clientRequest);
 }
 
 void AMDSThreadedTCPDataServer::onThreadStarted()

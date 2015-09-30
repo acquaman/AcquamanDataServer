@@ -71,7 +71,7 @@ void AMDSCentralServerSample::initializeBufferGroup(quint64 maxCountSize)
 	bufferGroupManagers_.insert(energyBufferGroupManager->bufferGroupName(), energyBufferGroupManager);
 
 	foreach(AMDSBufferGroupManager *bufferGroupManager, bufferGroupManagers_) {
-		connect(bufferGroupManager, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+		connect(bufferGroupManager, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_, SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 	}
 }
 
