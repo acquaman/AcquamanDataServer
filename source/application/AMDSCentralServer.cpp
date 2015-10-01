@@ -10,7 +10,7 @@
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "source/DataElement/AMDSBufferGroup.h"
 #include "source/DataElement/AMDSBufferGroupInfo.h"
-#include "source/DataElement/AMDSBufferGroupManager.h"
+#include "source/DataElement/AMDSThreadedBufferGroup.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
@@ -21,7 +21,7 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 
 AMDSCentralServer::~AMDSCentralServer()
 {
-	foreach (AMDSBufferGroupManager *bufferGroupManager, bufferGroupManagers_) {
+	foreach (AMDSThreadedBufferGroup *bufferGroupManager, bufferGroupManagers_) {
 		bufferGroupManager->deleteLater();
 	}
 	bufferGroupManagers_.clear();
@@ -68,7 +68,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 		AMDSClientIntrospectionRequest *clientIntrospectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
 		if(clientIntrospectionRequest){
 			if(clientIntrospectionRequest->bufferName() == "All"){
-				QMap<QString, AMDSBufferGroupManager*>::const_iterator i = bufferGroupManagers_.constBegin();
+				QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroupManagers_.constBegin();
 				while (i != bufferGroupManagers_.constEnd()) {
 					AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
 					AMErrorMon::information(this, AMDS_SERVER_INFO_BUFFER_DEF, QString("%1 definition is %2 %3 %4 %5 %6 %7").arg(i.key()).arg(oneInfo.name()).arg(oneInfo.description()).arg(oneInfo.units()).arg(oneInfo.size().toString()).arg(oneInfo.isFlattenEnabled()?"true":"false").arg(oneInfo.flattenMethod()));
@@ -96,7 +96,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 				QStringList requestedBufferNames = continuousDataRequest->bufferNames();
 				foreach (QString bufferName, requestedBufferNames) {
 					AMDSClientDataRequest *dataRequest = continuousDataRequest->bufferDataRequest(bufferName);
-					AMDSBufferGroupManager *threadedBufferGroup = bufferGroupManagers_.value(bufferName, 0);
+					AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroupManagers_.value(bufferName, 0);
 					if (threadedBufferGroup) {
 						AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
 						dataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());
@@ -108,7 +108,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 				}
 
 			} else {
-				AMDSBufferGroupManager *threadedBufferGroup = bufferGroupManagers_.value(clientDataRequest->bufferName(), 0);
+				AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroupManagers_.value(clientDataRequest->bufferName(), 0);
 				if (threadedBufferGroup) {
 					AMDSBufferGroup * bufferGroup = threadedBufferGroup->bufferGroup();
 					clientDataRequest->setBufferGroupInfo(threadedBufferGroup->bufferGroupInfo());

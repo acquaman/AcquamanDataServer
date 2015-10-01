@@ -1,8 +1,8 @@
-#include "AMDSBufferGroupManager.h"
+#include "AMDSThreadedBufferGroup.h"
 
 #include "source/DataElement/AMDSBufferGroup.h"
 
-AMDSBufferGroupManager::AMDSBufferGroupManager(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent) :
+AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent) :
 	QObject(parent)
 {
 	bufferGroup_ = new AMDSBufferGroup(bufferGroupInfo, maxCountSize);
@@ -15,7 +15,7 @@ AMDSBufferGroupManager::AMDSBufferGroupManager(AMDSBufferGroupInfo bufferGroupIn
 	bufferGroupThread_->start();
 }
 
-AMDSBufferGroupManager::~AMDSBufferGroupManager()
+AMDSThreadedBufferGroup::~AMDSThreadedBufferGroup()
 {
 	if (bufferGroupThread_->isRunning())
 		bufferGroupThread_->quit();
@@ -24,26 +24,26 @@ AMDSBufferGroupManager::~AMDSBufferGroupManager()
 	bufferGroupThread_->deleteLater();
 }
 
-AMDSBufferGroupInfo AMDSBufferGroupManager::bufferGroupInfo() const{
+AMDSBufferGroupInfo AMDSThreadedBufferGroup::bufferGroupInfo() const{
 	QReadLocker readLock(&lock_);
 	return bufferGroup_->bufferGroupInfo();
 }
 
-AMDSBufferGroup * AMDSBufferGroupManager::bufferGroup() const
+AMDSBufferGroup * AMDSThreadedBufferGroup::bufferGroup() const
 {
 	return bufferGroup_;
 }
 
-QString AMDSBufferGroupManager::bufferGroupName() const
+QString AMDSThreadedBufferGroup::bufferGroupName() const
 {
 	return bufferGroupInfo().name();
 }
 
-void AMDSBufferGroupManager::append(AMDSDataHolder *value)
+void AMDSThreadedBufferGroup::append(AMDSDataHolder *value)
 {
 	bufferGroup_->append(value);
 }
 
-void AMDSBufferGroupManager::onBufferGroupThreadStarted(){
+void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){
 	emit bufferGroupReady();
 }

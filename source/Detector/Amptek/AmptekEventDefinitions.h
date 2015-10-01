@@ -70,11 +70,15 @@ class AmptekSpectrumEvent : public QEvent
 public:
 	AmptekSpectrumEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumEvent) {}
 
-	inline QString detectorSourceName() const { return detectorSourceName_; }
-	inline QVector<double> spectrum() { return spectrum_; }
-	inline AmptekStatusData statusData() { return statusData_; }
+//	inline QString detectorSourceName() const { return detectorSourceName_; }
+//	inline QVector<double> spectrum() { return spectrum_; }
+//	inline AmptekStatusData statusData() { return statusData_; }
 
-protected:
+//	inline void setDetectorSourceName(const QString &detectorSourceName) { detectorSourceName_ = detectorSourceName; }
+//	inline void setSpectrum(QVector<double> spectrums) { spectrum_.clear(); spectrum_ = spectrums; }
+//	inline void setStatusData(AmptekStatusData statusData) { statusData_ = statusData; }
+
+//protected:
 	QString detectorSourceName_;
 	QVector<double> spectrum_;
 	AmptekStatusData statusData_;

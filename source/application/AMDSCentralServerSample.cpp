@@ -6,7 +6,7 @@
 #include "source/Connection/AMDSThreadedTCPDataServer.h"
 #include "source/DataElement/AMDSBufferGroup.h"
 #include "source/DataElement/AMDSBufferGroupInfo.h"
-#include "source/DataElement/AMDSBufferGroupManager.h"
+#include "source/DataElement/AMDSThreadedBufferGroup.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 #include "source/DataHolder/AMDSScalarDataHolder.h"
 #include "source/DataHolder/AMDSSpectralDataHolder.h"
@@ -57,20 +57,20 @@ void AMDSCentralServerSample::initializeBufferGroup(quint64 maxCountSize)
 	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
 	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
 	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
-	AMDSBufferGroupManager *mcpBufferGroupManager = new AMDSBufferGroupManager(mcpBufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *mcpBufferGroupManager = new AMDSThreadedBufferGroup(mcpBufferGroupInfo, maxCountSize);
 	bufferGroupManagers_.insert(mcpBufferGroupManager->bufferGroupName(), mcpBufferGroupManager);
 
 	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
 	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
 	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", AMDSBufferGroupInfo::Summary, amptek1BufferGroupAxes);
-	AMDSBufferGroupManager *amptek1BufferGroupName = new AMDSBufferGroupManager(amptek1BufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *amptek1BufferGroupName = new AMDSThreadedBufferGroup(amptek1BufferGroupInfo, maxCountSize);
 	bufferGroupManagers_.insert(amptek1BufferGroupName->bufferGroupName(), amptek1BufferGroupName);
 
 	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", AMDSBufferGroupInfo::Average);
-	AMDSBufferGroupManager *energyBufferGroupManager = new AMDSBufferGroupManager(energyBufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *energyBufferGroupManager = new AMDSThreadedBufferGroup(energyBufferGroupInfo, maxCountSize);
 	bufferGroupManagers_.insert(energyBufferGroupManager->bufferGroupName(), energyBufferGroupManager);
 
-	foreach(AMDSBufferGroupManager *bufferGroupManager, bufferGroupManagers_) {
+	foreach(AMDSThreadedBufferGroup *bufferGroupManager, bufferGroupManagers_) {
 		connect(bufferGroupManager, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_, SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 	}
 }
@@ -89,4 +89,9 @@ void AMDSCentralServerSample::initializeAndStartDataServer()
 
 	fiftyMillisecondTimer_->start(50);
 	hundredMillisecondTimer_->start(100);
+}
+
+void AMDSCentralServerSample::wrappingUpInitialization()
+{
+
 }

@@ -25,6 +25,8 @@ protected:
 	virtual void initializeBufferGroup(quint64 maxCountSize = 1000*60*60*10);
 	/// function to initialize the data server to update the buffer groups
 	virtual void initializeAndStartDataServer();
+	/// function to finalize the initialization
+	virtual void wrappingUpInitialization();
 
 protected:
 	quint64 simpleCounter_;

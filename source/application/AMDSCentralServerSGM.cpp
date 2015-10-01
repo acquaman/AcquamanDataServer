@@ -4,17 +4,13 @@
 #include <QTimer>
 
 #include "Connection/AMDSThreadedTCPDataServer.h"
-#include "DataElement/AMDSBufferGroup.h"
-#include "DataElement/AMDSBufferGroupInfo.h"
-#include "DataElement/AMDSBufferGroupManager.h"
 #include "ClientRequest/AMDSClientRequest.h"
-#include "ClientRequest/AMDSClientIntrospectionRequest.h"
-#include "ClientRequest/AMDSClientDataRequest.h"
-#include "ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "Detector/Amptek/AmptekSDD123Application.h"
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
-//#include "Detector/Amptek/AmptekSDD123DetectorGroup.h"
+#include "Detector/Amptek/AmptekSDD123DetectorGroup.h"
+#include "Detector/Amptek/AmptekSDD123DetectorManager.h"
 #include "Detector/Amptek/AmptekSDD123ServerGroup.h"
+#include "Detector/Amptek/AmptekSDD123Server.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
@@ -36,64 +32,40 @@ AMDSCentralServerSGM::~AMDSCentralServerSGM()
 {
 	foreach (AmptekSDD123ConfigurationMap *configuration, configurationMaps_) {
 		configuration->deleteLater();
-		configurationMaps_.removeOne(configuration);
 	}
 	configurationMaps_.clear();
 
 
-	if (amptekDataServerGroupThread_->isRunning())
-		amptekDataServerGroupThread_->quit();
-
-	serverGroup_->deleteLater();
-	amptekDataServerGroupThread_->deleteLater();
-
+	amptekThreadedDataServerGroup_->deleteLater();
+	amptekThreadedDataServerGroup_ = 0;
 }
 
 void AMDSCentralServerSGM::initializeBufferGroup(quint64 maxCountSize)
 {
-	//	detectorGroup_ = new AmptekSDD123DetectorGroup(configurationMaps);
-	//	connect(detectorGroup_, SIGNAL(dataRequestReady(ClientDataRequest*)), tcpServer_.server(), SLOT(dataRequestReady(ClientDataRequest*)));
+	detectorGroup_ = new AmptekSDD123DetectorGroup(configurationMaps_, maxCountSize);
+	connect(detectorGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_, SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 }
 
 void AMDSCentralServerSGM::initializeAndStartDataServer()
 {
-//	serverGroup_ = new AmptekSDD123ServerGroup(detectorGroup_->detectorManagers(), configurationMaps);
-	serverGroup_ = new AmptekSDD123ServerGroup(configurationMaps_);
+	amptekThreadedDataServerGroup_ = new AmptekSDD123ThreadedServerGroup(configurationMaps_);
 
-	connectBufferGroupAndDataServer();
-
-	amptekDataServerGroupThread_ = new QThread();
-	serverGroup_->moveToThread(amptekDataServerGroupThread_);
-	amptekDataServerGroupThread_->start();
-
-	connect(serverGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SLOT(onServerChangedToConfigurationState(int)));
-	connect(serverGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));
+	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SLOT(onServerChangedToConfigurationState(int)));
+	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));
 }
 
-void AMDSCentralServerSGM::connectBufferGroupAndDataServer()
+void AMDSCentralServerSGM::wrappingUpInitialization()
 {
-	//	AmptekSDD123Server *oneServer;
-	//	for(int x = 0, size = detectorManagers_.count(); x < size; x++){
-	//		oneServer = new AmptekSDD123Server(configurationMaps.at(x), QString("%1 Server").arg(detectorManagers_.at(x)->detector()->name()), this);
-	//		oneServer->setSpectrumPacketReceiver(detectorManagers_.at(x)->detector());
-	//		oneServer->setConfirmationPacketReceiver(detectorManagers_.at(x));
-	//		oneServer->setRequestIntervalTimer(masterRequestInterval_);
-	//		servers_.append(oneServer);
-	//		serversInDwellMode_.append(oneServer);
+	// connect the event among the amptek data servers and the detectors
+	for(int x = 0, size = detectorGroup_->detectorManagers().count(); x < size; x++){
+		AmptekSDD123DetectorManager *amptekDetectorManager = detectorGroup_->detectorManagers().at(x);
+		AmptekSDD123Server *amptekServer = amptekThreadedDataServerGroup_->servers().at(x);
 
-	//		connect(oneServer, SIGNAL(serverAboutToChangeToConfigurationState()), serverAboutToConfigurationStateMapper_, SLOT(map()));
-	//		serverAboutToConfigurationStateMapper_->setMapping(oneServer, x);
+		amptekServer->setSpectrumPacketReceiver((QObject *)amptekDetectorManager->detector());
+		amptekServer->setConfirmationPacketReceiver(amptekDetectorManager);
 
-	//		connect(oneServer, SIGNAL(serverChangedToConfigurationState()), serverConfigurationStateMapper_, SLOT(map()));
-	//		serverConfigurationStateMapper_->setMapping(oneServer, x);
-
-	//		connect(oneServer, SIGNAL(serverChangedToDwellState()), serverDwellStateMapper_, SLOT(map()));
-	//		serverDwellStateMapper_->setMapping(oneServer, x);
-	//	}
-
-	//	for(int x = 0, size = detectorManagers().count(); x < size; x++)
-	//		detectorManagers().at(x)->setRequestEventReceiver((QObject*)(servers().at(x)));
-
+		amptekDetectorManager->setRequestEventReceiver(amptekServer);
+	}
 }
 
 void AMDSCentralServerSGM::onServerChangedToConfigurationState(int index){
@@ -109,71 +81,3 @@ void AMDSCentralServerSGM::onServerChangedToDwellState(int index){
 
 	emit serverChangedToDwellState(index);
 }
-
-
-//#include "source/DataHolder/AMDSScalarDataHolder.h"
-//void AMDSCentralServerSGM::onFiftyMillisecondTimerUpdate(){
-//	AMDSLightWeightScalarDataHolder *oneScalerDataHolder = new AMDSLightWeightScalarDataHolder();
-//	double valueAsDouble = (double)simpleCounter_++;
-//	oneScalerDataHolder->setSingleValue(valueAsDouble);
-
-//	energyBufferGroup_->append(oneScalerDataHolder);
-//}
-
-//#include "source/DataHolder/AMDSSpectralDataHolder.h"
-//void AMDSCentralServerSGM::onHundredMillisecondTimerUpdate(){
-//	AMDSLightWeightSpectralDataHolder *oneSpectralDataHolder = new AMDSLightWeightSpectralDataHolder(AMDSDataTypeDefinitions::Signed64, amptek1BufferGroup_->bufferGroupInfo().size(0));
-
-//	AMDSFlatArray oneSpectralFlatArray(AMDSDataTypeDefinitions::Signed64, amptek1BufferGroup_->bufferGroupInfo().size(0));
-//	spectralCounter_++;
-//	qint64 oneValue;
-//	for(int x = 0; x < oneSpectralFlatArray.constVectorQint64().size(); x++){
-//		oneValue = (spectralCounter_+x)*2;
-//		oneSpectralFlatArray.vectorQint64()[x] = oneValue;
-//	}
-//	oneSpectralDataHolder->setData(&oneSpectralFlatArray);
-
-//	amptek1BufferGroup_->append(oneSpectralDataHolder);
-//}
-
-//void AMDSCentralServerSGM::initializeBufferGroup(quint64 maxCountSize)
-//{
-//	QList<AMDSAxisInfo> mcpBufferGroupAxes;
-//	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
-//	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
-//	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
-//	AMDSBufferGroup *mcpBufferGroup = new AMDSBufferGroup(mcpBufferGroupInfo, maxCountSize);
-//	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroup);
-//	bufferGroups_.insert(mcpThreadedBufferGroup->bufferGroupInfo().name(), mcpThreadedBufferGroup);
-
-//	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
-//	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
-//	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", AMDSBufferGroupInfo::NoFlatten, amptek1BufferGroupAxes);
-//	amptek1BufferGroup_ = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
-//	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup_);
-//	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
-
-//	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", AMDSBufferGroupInfo::Average);
-//	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
-//	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
-//	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
-
-//	connect(mcpBufferGroup, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-//	connect(amptek1BufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-//	connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-
-//}
-
-//virtual void AMDSCentralServerSGM::initializeAndStartDataServer()
-//{
-//	fiftyMillisecondTimer_ = new QTimer(this);
-//	hundredMillisecondTimer_ = new QTimer(this);
-//	connect(fiftyMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onFiftyMillisecondTimerUpdate()));
-//	connect(hundredMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondTimerUpdate()));
-
-//	simpleCounter_ = 0;
-//	spectralCounter_ = 0;
-
-//	fiftyMillisecondTimer_->start(50);
-//	hundredMillisecondTimer_->start(100);
-//}

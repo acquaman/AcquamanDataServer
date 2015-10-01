@@ -1,5 +1,5 @@
-#ifndef AMDSBUFFERGROUPMANAGER_H
-#define AMDSBUFFERGROUPMANAGER_H
+#ifndef AMDSTHREADEDBUFFERGROUP_H
+#define AMDSTHREADEDBUFFERGROUP_H
 
 #include <QObject>
 #include <QThread>
@@ -8,12 +8,12 @@
 
 class AMDSClientRequest;
 
-class AMDSBufferGroupManager : public QObject
+class AMDSThreadedBufferGroup : public QObject
 {
 	Q_OBJECT
 public:
-	AMDSBufferGroupManager(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent = 0);
-	~AMDSBufferGroupManager();
+	AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent = 0);
+	~AMDSThreadedBufferGroup();
 
 	/// returns the bufferGroupInfo of the bufferGroupManager
 	AMDSBufferGroupInfo bufferGroupInfo() const;
@@ -45,4 +45,4 @@ protected:
 	mutable QReadWriteLock lock_;
 };
 
-#endif // AMDSBUFFERGROUPMANAGER_H
+#endif // AMDSTHREADEDBUFFERGROUP_H

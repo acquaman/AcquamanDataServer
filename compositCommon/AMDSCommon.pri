@@ -53,7 +53,7 @@ HEADERS *= \
 	source/DataHolder/AMDSSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h  \
 	source/util/AMDSMetaObjectSupport.h \
-    source/DataElement/AMDSBufferGroupManager.h
+    source/DataElement/AMDSThreadedBufferGroup.h
 
 SOURCES *= \
 	source/ClientRequest/AMDSClientRequest.cpp \
@@ -84,7 +84,11 @@ SOURCES *= \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp \
-    source/DataElement/AMDSBufferGroupManager.cpp
+    source/DataElement/AMDSThreadedBufferGroup.cpp
+
+
+
+
 
 
 

@@ -2,28 +2,32 @@
 #define AMPTEKSDD123DETECTORGROUP_H
 
 #include <QObject>
-//#include "AmptekSDD123Histogram.h"
+#include <QMap>
 
-class ClientDataRequest;
+class AMDSClientDataRequest;
 class AmptekSDD123ConfigurationMap;
 class AmptekSDD123DetectorManager;
 
 class AmptekSDD123DetectorGroup : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-	AmptekSDD123DetectorGroup(QList<AmptekSDD123ConfigurationMap*> configurationMaps, QObject *parent = 0);
+	AmptekSDD123DetectorGroup(QList<AmptekSDD123ConfigurationMap*> configurationMaps, quint64 maxCountSize, QObject *parent = 0);
 
+	/// returns the list of AmptekDetectorManager
 	QList<AmptekSDD123DetectorManager*> detectorManagers();
 
 signals:
-	void dataRequestReady(ClientDataRequest*);
+	/// signal to indicate that dataRequest is Ready
+	void clientRequestProcessed(AMDSClientDataRequest*);
 
-//public slots:
-//	void requestData(ClientDataRequest *data);
+public slots:
+	/// slot to handle the request data event
+	void requestData(AMDSClientDataRequest *data);
 
 protected:
-	QList<AmptekSDD123DetectorManager*> detectorManagers_;
+	/// the mapping of detector names with detector managers
+	QMap<QString, AmptekSDD123DetectorManager*> detectorManagers_;
 };
 
 #endif // AMPTEKSDD123DETECTORGROUP_H

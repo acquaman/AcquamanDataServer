@@ -6,7 +6,7 @@
 
 class QTimer;
 
-class AMDSBufferGroupManager;
+class AMDSThreadedBufferGroup;
 class AMDSThreadedTCPDataServer;
 class AMDSClientRequest;
 
@@ -45,10 +45,12 @@ protected:
 	virtual void initializeBufferGroup(quint64 maxCountSize = 1000*60*60*10) = 0;
 	/// pure virtual function to initialize the data server to update the buffer groups
 	virtual void initializeAndStartDataServer() = 0;
+	/// pure virtual function to finalize the initialization
+	virtual void wrappingUpInitialization() = 0;
 
 protected:
 	AMDSThreadedTCPDataServer *tcpDataServer_;
-	QMap<QString, AMDSBufferGroupManager*> bufferGroupManagers_;
+	QMap<QString, AMDSThreadedBufferGroup*> bufferGroupManagers_;
 };
 
 Q_DECLARE_INTERFACE(AMDSCentralServer, "AMDS.AMDSCentralServer/1.0")
