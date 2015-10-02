@@ -48,8 +48,15 @@ protected:
 	/// pure virtual function to finalize the initialization
 	virtual void wrappingUpInitialization() = 0;
 
+	/// function to process the instrospection client request from the TCP Data server
+	void processIntrospectionClientRequest(AMDSClientRequest *clientRequest);
+	/// function to process the client data request from the TCP Data server
+	void processClientDataRequest(AMDSClientRequest *clientRequest);
+
 protected:
+	/// the instance of threaded TCP data server
 	AMDSThreadedTCPDataServer *tcpDataServer_;
+	/// the list of bufferGroup managers
 	QMap<QString, AMDSThreadedBufferGroup*> bufferGroupManagers_;
 };
 
