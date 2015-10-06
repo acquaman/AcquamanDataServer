@@ -1,5 +1,6 @@
 #include "AmptekSDD123EPICSDetectorManager.h"
 
+#include "DataElement/AMDSBufferGroup.h"
 #include "beamline/AMPVControl.h"
 #include "beamline/AMControlSet.h"
 #include "Detector/Amptek/AmptekSDD123Detector.h"
@@ -322,7 +323,8 @@ void AmptekSDD123EPICSDetectorManager::onStopDwellControlValueChange(double newV
 void AmptekSDD123EPICSDetectorManager::onClearSpectrumControlValueChange(double newValue){
 	Q_UNUSED(newValue)
 	if(clearSpectrumControl_->withinTolerance(1)){
-		clear();
+//		clearDwellData();
+		dwellData_->clear();
 		clearSpectrumControl_->move(0);
 	}
 }

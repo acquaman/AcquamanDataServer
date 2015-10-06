@@ -6,8 +6,9 @@
 #include "application/AMDSCentralServer.h"
 
 class AmptekSDD123ConfigurationMap;
-class AmptekSDD123ThreadedServerGroup;
+class AmptekSDD123ThreadedDataServerGroup;
 class AmptekSDD123DetectorGroup;
+class AMDSDataHolder;
 
 class AMDSCentralServerSGM : public AMDSCentralServer
 {
@@ -41,8 +42,11 @@ protected:
 	/// the list of configuration map of SGM amptek
 	QList<AmptekSDD123ConfigurationMap*> configurationMaps_;
 
+	QMap<QString, AMDSThreadedBufferGroup*> dwellBufferGroupManagers_;
+
+
 	/// the threaded serverGroup to manage the AmptekServers, which will fetch the UDP data from the amptek host to grab the data
-	AmptekSDD123ThreadedServerGroup *amptekThreadedDataServerGroup_;
+	AmptekSDD123ThreadedDataServerGroup *amptekThreadedDataServerGroup_;
 
 	/// the AmptekDetector group, which will manange and hold the Amptek data and manage the communications with the PVs
 	AmptekSDD123DetectorGroup *detectorGroup_;

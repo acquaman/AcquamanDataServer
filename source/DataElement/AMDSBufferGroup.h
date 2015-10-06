@@ -25,7 +25,7 @@ class AMDSBufferGroup : public QObject
 	Q_OBJECT
 public:
 	/// Creates a new buffer group with a maximum capacity maxSize and data dimensions based on the bufferGroupInfo
-	AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent = 0);
+	AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, bool enableCumulative = false, QObject *parent = 0);
 	/// Copy constructor
 	AMDSBufferGroup(const AMDSBufferGroup& other);
 	~AMDSBufferGroup();
@@ -33,17 +33,19 @@ public:
 	/// Returns the data dimension and other information included in the bufferGroupInfo
 	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
 
+	AMDSDataHolder* at(int index) { return dataHolders_[index]; }
 	/// Subscript operator for use in lhs assignment (ie b[i] = 5)
 	/// Returns the pointer at provided index
-	inline AMDSDataHolder* operator[](int index);
+//	inline AMDSDataHolder* operator[](int index);
 	/// Subscript operator for use in rhs assignment (ie x = b[i])
 	/// Returns the pointer at provided index
-	inline const AMDSDataHolder* operator[](int index) const;
+//	inline const AMDSDataHolder* operator[](int index) const;
+	inline AMDSDataHolder *cumulativeDataHolder() {return cumulativeDataHolder_; }
 	/// The total capacity of the buffer
 	inline quint64 maxSize() const;
 	/// Adds a new AMDSDataHolder pointer to the end of the buffer. The buffer group takes ownership
 	/// of the passed AMDSDataHolder, becoming responsible for its destruction
-	inline void append(AMDSDataHolder* value);
+	void append(AMDSDataHolder* value);
 	/// Clears the buffer of all its members, and frees their resources
 	inline void clear();
 	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will always return maxSize)
@@ -59,8 +61,6 @@ signals:
 	void clientRequestProcessed(AMDSClientRequest *clientRequest);
 
 protected:
-	/// Helper functions which populate request data based on the parameters passed:
-
 	/// Flatten the data based on the given flatten method, return True if no error happened
 	bool flattenData(QList<AMDSDataHolder *> *dataArray);
 	/// Fills the data to the clientRequest
@@ -81,9 +81,15 @@ protected:
 	int getDataIndexByDateTime(const QDateTime& dwellTime);
 
 protected:
+	/// the flag to indicate whether we enabled the cumultive feature
+	bool enableCumulative_;
+
 	mutable QReadWriteLock lock_;
 	/// the buffergroup information about this buffer group
 	AMDSBufferGroupInfo bufferGroupInfo_;
+
+	/// the Dataholder to holder the cumulative data
+	AMDSDataHolder *cumulativeDataHolder_;
 
 	/// A buffer which contains histogram data collection, sorted by the startDwellTime
 	AMDSBuffer<AMDSDataHolder*> dataHolders_;
@@ -95,14 +101,6 @@ quint64 AMDSBufferGroup::maxSize() const
 	return dataHolders_.maxSize();
 }
 
-void AMDSBufferGroup::append(AMDSDataHolder *value)
-{
-	QWriteLocker writeLock(&lock_);
-	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(value);
-	if(dataHolderRemoved)
-		delete dataHolderRemoved;
-}
-
 void AMDSBufferGroup::clear()
 {
 	QWriteLocker writeLock(&lock_);
@@ -110,6 +108,9 @@ void AMDSBufferGroup::clear()
 		delete dataHolders_[iElement];
 
 	dataHolders_.clear();
+
+//	if (enableCumulative_)
+//		cumulativeDataHolder_->clear();
 }
 
 int AMDSBufferGroup::count() const

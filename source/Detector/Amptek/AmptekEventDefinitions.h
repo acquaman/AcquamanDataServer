@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QTime>
 #include <QStringList>
+#include "DataElement/AMDSFlatArray.h"
 
 namespace AmptekEventDefinitions{
 	enum EventType{
@@ -80,7 +81,8 @@ public:
 
 //protected:
 	QString detectorSourceName_;
-	QVector<double> spectrum_;
+//	QVector<double> spectrum_;
+	AMDSFlatArray spectrum_;
 	AmptekStatusData statusData_;
 };
 

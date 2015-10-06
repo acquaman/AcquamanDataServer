@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QThread>
 
-#include "source/DataElement/AMDSBufferGroup.h"
+#include "DataElement/AMDSBufferGroup.h"
 
 class AMDSClientRequest;
 
@@ -12,7 +12,7 @@ class AMDSThreadedBufferGroup : public QObject
 {
 	Q_OBJECT
 public:
-	AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent = 0);
+	AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, bool enableCumulative = false, QObject *parent = 0);
 	~AMDSThreadedBufferGroup();
 
 	/// returns the bufferGroupInfo of the bufferGroupManager
@@ -23,6 +23,8 @@ public:
 	QString bufferGroupName() const;
 	/// appends a data to the bufferGroup of the bufferGroupManager
 	void append(AMDSDataHolder *value);
+	/// to clear the data of the buffer group
+	void clear();
 
 
 signals:
@@ -30,6 +32,10 @@ signals:
 	void bufferGroupReady();
 	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
 	void clientRequestProcessed(AMDSClientRequest *clientRequest);
+
+public slots:
+	/// slot to forward clientRequest to the bufferGroup
+	void forwardClientRequest(AMDSClientRequest *clientRequest);
 
 protected slots:
 	/// Slot to handle the threated started signal

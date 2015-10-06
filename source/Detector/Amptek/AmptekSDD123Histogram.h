@@ -2,8 +2,11 @@
 #define AMPTEKSDD123HISTOGRAM_H
 
 #include <QReadWriteLock>
+
+#include "DataHolder/AMDSDataHolder.h"
+
 #include "AmptekEventDefinitions.h"
-#include "Buffer.h"
+#include "DataElement/AMDSBuffer.h"
 
 class AMDSClientDataRequest;
 /**
@@ -12,37 +15,36 @@ class AMDSClientDataRequest;
   */
 class AmptekSDD123Histogram : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
+	/// Creates a new instance of a data histogram using the provided spectrum and status data
+	AmptekSDD123Histogram(const QVector<int> &spectrum = QVector<int>(), const AmptekStatusData &statusData = AmptekStatusData(), QObject *parent = 0);
 
-		/// Creates a new instance of a data histogram using the provided spectrum and status data
-		AmptekSDD123Histogram(const QVector<int> &spectrum = QVector<int>(), const AmptekStatusData &statusData = AmptekStatusData(), QObject *parent = 0);
-
-		/// The spectrum data relating to this data item. A QVector<int> of size 1024
+	/// The spectrum data relating to this data item. A QVector<int> of size 1024
 	QVector<int> spectrum() const;
 
-		/// The status data relating to the detector response
+	/// The status data relating to the detector response
 	AmptekStatusData statusData() const;
 
-		/// The time the detector starting collecting data for this paricular spectrum
+	/// The time the detector starting collecting data for this paricular spectrum
 	QTime dwellStartTime() const;
-		/// The time the detector finished collecting data for this particular spectrum
-		QTime dwellEndTime() const;
-		/// The time taken after the detector finished collecting data for the server to receive it
+	/// The time the detector finished collecting data for this particular spectrum
+	QTime dwellEndTime() const;
+	/// The time taken after the detector finished collecting data for the server to receive it
 	QTime dwellReplyTime() const;
-		/// Some operator overloads which allow the histogram to be compared to a QTime. Allows for ease
-		/// of doing searches for histograms based on time. Comparison is taken against the dwellStartTime
-		inline bool operator <(const QTime& rhs);
-		inline bool operator >(const QTime& rhs);
-		inline bool operator ==(const QTime& rhs);
+	/// Some operator overloads which allow the histogram to be compared to a QTime. Allows for ease
+	/// of doing searches for histograms based on time. Comparison is taken against the dwellStartTime
+	inline bool operator <(const QTime& rhs);
+	inline bool operator >(const QTime& rhs);
+	inline bool operator ==(const QTime& rhs);
+
 public slots:
-		/// Sets the spectrum data for the histogram
+	/// Sets the spectrum data for the histogram
 	void setSpectrum(const QVector<int> &spectrum);
-		/// Sets the status data for the histogram
+	/// Sets the status data for the histogram
 	void setStatusData(const AmptekStatusData &statusData);
 
 protected:
-
 	QVector<int> spectrum_;
 	AmptekStatusData statusData_;
 };
@@ -60,10 +62,12 @@ public:
 		AmptekSDD123DwellHistogramGroup(const AmptekSDD123DwellHistogramGroup& other);
 		/// Adds a new histogram to the end of the group, also recalculates the cumulative and
 		/// average data
-		void append(AmptekSDD123Histogram *histogram);
+//		void append(AmptekSDD123Histogram *histogram);
+		void append(AMDSDataHolder *histogram);
 
 		/// Returns the single histogram at the given index of the group
-		AmptekSDD123Histogram* at(int index) const;
+//		AmptekSDD123Histogram* at(int index) const;
+		AMDSDataHolder* at(int index) const;
 
 		/// Empties the histogram group of all its data
 	void clear();
@@ -72,12 +76,12 @@ public:
 	int count() const;
 
 		/// A total of the spectrum data collected for this particular group
-		QVector<int> cumulativeSpectrum() const;
+		AMDSFlatArray cumulativeSpectrum() const;
 		/// A total of the status data collected for this particular group
 		AmptekStatusData cumulativeStatusData() const;
 
 		/// An averate of the spectrum data collected for this particular group
-		QVector<int> averageSpectrum() const;
+		AMDSFlatArray averageSpectrum() const;
 		/// An averate of the status data collected for this particular group
 		AmptekStatusData averageStatusData() const;
 
@@ -85,9 +89,11 @@ public:
 		AmptekSDD123DwellHistogramGroup& operator =(const AmptekSDD123DwellHistogramGroup& other);
 
 protected:
-		QList<AmptekSDD123Histogram*> histograms_;
+//	QList<AmptekSDD123Histogram*> histograms_;
+	QList<AMDSDataHolder*> histograms_;
 
-	QVector<int> cumulativeSpectrum_;
+//	QVector<int> cumulativeSpectrum_;
+	AMDSFlatArray cumulativeSpectrum_;
 	AmptekStatusData cumulativeStatusData_;
 
 
@@ -118,7 +124,8 @@ public:
 	int maxSize() const;
 	/// Adds a new histogram pointer to the end of the buffer. The buffered histogram group takes ownership
 	/// of the passed histogram, becoming responsible for its destruction
-	void append(AmptekSDD123Histogram* value);
+//	void append(AmptekSDD123Histogram* value);
+	void append(AMDSDataHolder* value);
 	/// Clears the buffer of all its members, and frees their resources
 	void clear();
 	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will
@@ -136,7 +143,7 @@ protected:
 private:
 	mutable QReadWriteLock lock_;
 	/// A buffer which contains histogram data collection, sorted by the startDwellTime
-	Buffer<AmptekSDD123Histogram*> histograms_;
+	AMDSBuffer<AMDSDataHolder*> histograms_;
 
 	/// Helper functions which populate request data based on the parameters passed:
 	/// Fills the request with all data acquired after lastFetch

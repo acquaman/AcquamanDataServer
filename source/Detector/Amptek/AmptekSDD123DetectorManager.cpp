@@ -13,8 +13,11 @@
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 #include "Detector/Amptek/AmptekSDD123ThreadedHistogramGroup.h"
 #include "beamline/AMPVControl.h"
+#include "DataHolder/Amptek/AMDSAmptekSDD123SpectralDataHolder.h"
+#include "DataElement/AMDSBufferGroupInfo.h"
+#include "DataElement/AMDSThreadedBufferGroup.h"
 
-AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Detector *detector, quint64 maxCountSize, QObject *parent) :
+AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Detector *detector, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
 	QObject(parent)
 {
 	initialized_ = false;
@@ -33,8 +36,10 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Detector *d
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
 
-	allData_ = new AmptekSDD123ThreadedHistogramGroup(maxHistogramStackSize_, this);
-	dwellData_ = new AmptekSDD123DwellHistogramGroup(this);
+//	allData_ = new AmptekSDD123ThreadedHistogramGroup(AMDSBufferGroupInfo(), maxHistogramStackSize_, this);
+	allData_ = new AMDSThreadedBufferGroup(AMDSBufferGroupInfo(), maxHistogramStackSize_, false, this);
+//	dwellData_ = new AmptekSDD123DwellHistogramGroup(this);
+	dwellData_ = new AMDSBufferGroup(AMDSBufferGroupInfo(), maxHistogramStackSize_, true, this);
 
 	connect(this, SIGNAL(requestData(AMDSClientDataRequest*)), allData_, SIGNAL(requestData(AMDSClientDataRequest*)));
 	connect(allData_, SIGNAL(clientRequestProcessed(AMDSClientDataRequest*)), this, SIGNAL(clientRequestProcessed(AMDSClientDataRequest*)));
@@ -88,14 +93,14 @@ void AmptekSDD123DetectorManager::setRequestEventReceiver(QObject *requestEventR
 	requestEventReceiver_ = requestEventReceiver;
 }
 
-void AmptekSDD123DetectorManager::clear(){
+void AmptekSDD123DetectorManager::clearDwellData(){
 	dwellData_->clear();
 }
 
 void AmptekSDD123DetectorManager::startDwell(){
 	dwellActive_ = true;
 	if(dwellMode_ == AmptekSDD123DetectorManager::PresetDwell){
-		clear();
+		clearDwellData();
 		setPresetDwellEndTimeOnNextEvent_ = true;
 	}
 }
@@ -253,14 +258,16 @@ void AmptekSDD123DetectorManager::initiateRequestConfigurationModeHelper(){
 }
 
 void AmptekSDD123DetectorManager::spectrumEventHelper(QEvent *e){
-	QVector<double> spectrumVector = ((AmptekSpectrumEvent*)e)->spectrum_;
+//	QVector<double> spectrumVector = ((AmptekSpectrumEvent*)e)->spectrum_;
+	AMDSFlatArray spectrumVector = ((AmptekSpectrumEvent*)e)->spectrum_;
 	AmptekStatusData statusData = ((AmptekSpectrumEvent*)e)->statusData_;
 
 	int totalCounts = 0;
 	QVector<int> spectrumIntVector;
-	for(int x = 0; x < spectrumVector.count(); x++){
-		spectrumIntVector.append(spectrumVector.at(x));
-		totalCounts += spectrumVector.at(x);
+	for(int x = 0; x < spectrumVector.size(); x++){
+//		spectrumIntVector.append(spectrumVector.at(x));
+//TODO: caculate the total count
+//		totalCounts += spectrumVector.at(x);
 	}
 
 	if(setPresetDwellEndTimeOnNextEvent_){
@@ -270,25 +277,36 @@ void AmptekSDD123DetectorManager::spectrumEventHelper(QEvent *e){
 
 		//qDebug() << "Local start time was " << presetDwellLocalStartTime_.toString("hh:mm:ss.zzz") << "I want to end after " << presetDwellEndTime_.toString("hh:mm:ss.zzz");
 	}
-	else if((dwellMode_ == AmptekSDD123DetectorManager::PresetDwell) && dwellActive_ && dwellData_->at(dwellData_->count()-1) && (dwellData_->at(dwellData_->count()-1)->statusData().dwellEndTime_ >= presetDwellEndTime_)){
-		dwellActive_ = false;
+	else {
+//		AMDSAmptekSDD123SpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_[dwellData_->count()-1]);
+		AMDSAmptekSDD123SpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_->at(dwellData_->count()-1));
+		if((dwellMode_ == AmptekSDD123DetectorManager::PresetDwell) && dwellActive_ && spectrumDataHolder && (spectrumDataHolder->statusData().dwellEndTime_ >= presetDwellEndTime_)){
+			dwellActive_ = false;
 
-		presetDwellLocalEndTime_ = dwellData_->at(dwellData_->count()-1)->statusData().dwellEndTime_;
+			presetDwellLocalEndTime_ = spectrumDataHolder->statusData().dwellEndTime_;
 
-		//qDebug() << "I actually stopped dwelling at " << presetDwellLocalEndTime_.toString("hh:mm:ss.zzz") << " for a difference of " << ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
+			//qDebug() << "I actually stopped dwelling at " << presetDwellLocalEndTime_.toString("hh:mm:ss.zzz") << " for a difference of " << ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
 
-		emit dwellFinishedDataUpdate(dwellData_->cumulativeSpectrum());
-		emit dwellFinishedStatusDataUpdate(dwellData_->cumulativeStatusData(), dwellData_->count());
+			AMDSAmptekSDD123SpectralDataHolder * cumulativeSpectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_->cumulativeDataHolder());
+//			emit dwellFinishedDataUpdate(dwellData_->cumulativeSpectrum());
+//			emit dwellFinishedStatusDataUpdate(dwellData_->cumulativeStatusData(), dwellData_->count());
+			emit dwellFinishedDataUpdate(cumulativeSpectrumDataHolder);
+			emit dwellFinishedStatusDataUpdate(cumulativeSpectrumDataHolder->statusData(), dwellData_->count());
 
-		double elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
-		emit dwellFinishedAllDataUpdate(dwellData_->cumulativeSpectrum(), dwellData_->cumulativeStatusData(), dwellData_->count(), elapsedTime);
+			double elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
+//			emit dwellFinishedAllDataUpdate(dwellData_->cumulativeSpectrum(), dwellData_->cumulativeStatusData(), dwellData_->count(), elapsedTime);
+			emit dwellFinishedAllDataUpdate(cumulativeSpectrumDataHolder, cumulativeSpectrumDataHolder->statusData(), dwellData_->count(), elapsedTime);
 
-		emit dwellFinishedTimeUpdate(elapsedTime);
+			emit dwellFinishedTimeUpdate(elapsedTime);
+		}
+		//else if((dwellMode_ == AmptekSDD123DetectorManager::PresetDwell) && dwellActive_ && (dwellData_->at(dwellData_->count()-1)->statusData().dwellEndTime_ < presetDwellEndTime_))
+		//	qDebug() << "Couldn't stop dwelling because current time is " << QTime::currentTime().toString("hh:mm:ss.zzz") << "(" << QTime::currentTime().addMSecs(-statusData.dwellEndTime_.msecsTo(statusData.dwellReplyTime_)).toString("hh:mm:ss.zzz") << ")";
 	}
-	//else if((dwellMode_ == AmptekSDD123DetectorManager::PresetDwell) && dwellActive_ && (dwellData_->at(dwellData_->count()-1)->statusData().dwellEndTime_ < presetDwellEndTime_))
-	//	qDebug() << "Couldn't stop dwelling because current time is " << QTime::currentTime().toString("hh:mm:ss.zzz") << "(" << QTime::currentTime().addMSecs(-statusData.dwellEndTime_.msecsTo(statusData.dwellReplyTime_)).toString("hh:mm:ss.zzz") << ")";
 
-	AmptekSDD123Histogram *oneHistogram = new AmptekSDD123Histogram(spectrumIntVector, statusData, this);
+	AMDSAmptekSDD123SpectralDataHolder *oneHistogram = new AMDSAmptekSDD123SpectralDataHolder(detector_->dataType(), detector_->bufferSize(), this);
+	oneHistogram->setData(&spectrumVector);
+	oneHistogram->setStatusData(statusData);
+
 	allData_->append(oneHistogram);
 	if(!initialized_ || dwellActive_)
 		dwellData_->append(oneHistogram);
@@ -299,14 +317,20 @@ void AmptekSDD123DetectorManager::spectrumEventHelper(QEvent *e){
 		initialized_ = true;
 	}
 	else if(dwellActive_){
+		AMDSAmptekSDD123SpectralDataHolder * cumulativeSpectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_->cumulativeDataHolder());
+
 		//emit continuousDataUpdate(allData_->cumulativeSpectrum());
 		//emit cumulativeStatusDataUpdate(allData_->cumulativeStatusData(), allData_->count());
-		emit continuousDataUpdate(dwellData_->cumulativeSpectrum());
-		emit cumulativeStatusDataUpdate(dwellData_->cumulativeStatusData(), dwellData_->count());
+//		emit continuousDataUpdate(dwellData_->cumulativeSpectrum());
+//		emit cumulativeStatusDataUpdate(dwellData_->cumulativeStatusData(), dwellData_->count());
+		emit continuousDataUpdate(cumulativeSpectrumDataHolder);
+		emit cumulativeStatusDataUpdate(cumulativeSpectrumDataHolder->statusData(), dwellData_->count());
 
-		QTime elapsedEndTime_ = dwellData_->at(dwellData_->count()-1)->statusData().dwellEndTime_;
+//		AMDSAmptekSDD123SpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_[dwellData_->count()-1]);
+		AMDSAmptekSDD123SpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_->at(dwellData_->count()-1));
+		QTime elapsedEndTime_ = spectrumDataHolder->statusData().dwellEndTime_;
 		double elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(elapsedEndTime_))/1000;
-		emit continuousAllDataUpdate(dwellData_->cumulativeSpectrum(), dwellData_->cumulativeStatusData(), dwellData_->count(), elapsedTime);
+		emit continuousAllDataUpdate(cumulativeSpectrumDataHolder, cumulativeSpectrumDataHolder->statusData(), dwellData_->count(), elapsedTime);
 	}
 
 	/*

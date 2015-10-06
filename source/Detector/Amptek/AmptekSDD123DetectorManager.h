@@ -7,12 +7,21 @@
 
 #include "AmptekEventDefinitions.h"
 
+#include "DataElement/AMDSFlatArray.h"
+
+class AmptekSDD123ThreadedBufferGroupManager;
+
+
 class QSignalMapper;
+class AMDSClientRequest;
 class AMDSClientDataRequest;
 class AmptekSDD123Detector;
-class AmptekSDD123Histogram;
+//class AmptekSDD123Histogram;
 class AmptekSDD123DwellHistogramGroup;
-class AmptekSDD123ThreadedHistogramGroup;
+//class AmptekSDD123ThreadedHistogramGroup;
+class AMDSThreadedBufferGroup;
+class AMDSBufferGroup;
+class AMDSDataHolder;
 
 class AmptekSDD123ConfigurationMap;
 
@@ -37,7 +46,7 @@ public:
 		FastPeakingTime400 = 2
 	};
 
-	AmptekSDD123DetectorManager(AmptekSDD123Detector *detector, quint64 maxCountSize, QObject *parent = 0);
+	AmptekSDD123DetectorManager(AmptekSDD123Detector *detector, quint64 maxCountSize, bool enableCumulative = false, QObject *parent = 0);
 
 //	QString name() const;
 //	bool dwellActive() const;
@@ -56,7 +65,7 @@ public slots:
 	/// function to set the event receiver to handle the request
 	void setRequestEventReceiver(QObject *requestEventReceiver);
 
-	void clear();
+	void clearDwellData();
 	void startDwell();
 	void stopDwell();
 
@@ -82,14 +91,19 @@ public slots:
 	void forwardDataRequest(AMDSClientDataRequest*);
 
 signals:
-	void requestData(AMDSClientDataRequest*);
-	void continuousDataUpdate(QVector<int> continuousSpectrum);
+	void requestData(AMDSClientRequest*);
+//	void requestData(AMDSClientDataRequest*);
+//	void continuousDataUpdate(AMDSFlatArray continuousSpectrum);
+	void continuousDataUpdate(AMDSDataHolder *continuousSpectrum);
 	void cumulativeStatusDataUpdate(AmptekStatusData statusData, int count);
-	void continuousAllDataUpdate(QVector<int> spectrum, AmptekStatusData statusData, int count, double elapsedTime);
+//	void continuousAllDataUpdate(AMDSFlatArray spectrum, AmptekStatusData statusData, int count, double elapsedTime);
+	void continuousAllDataUpdate(AMDSDataHolder *spectrum, AmptekStatusData statusData, int count, double elapsedTime);
 
-	void dwellFinishedDataUpdate(QVector<int> continuousSpectrum);
+//	void dwellFinishedDataUpdate(AMDSFlatArray continuousSpectrum);
+	void dwellFinishedDataUpdate(AMDSDataHolder *continuousSpectrum);
 	void dwellFinishedStatusDataUpdate(AmptekStatusData statusData, int count);
-	void dwellFinishedAllDataUpdate(QVector<int> spectrum, AmptekStatusData statusData, int count, double elapsedTime);
+//	void dwellFinishedAllDataUpdate(AMDSFlatArray spectrum, AmptekStatusData statusData, int count, double elapsedTime);
+	void dwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AmptekStatusData statusData, int count, double elapsedTime);
 
 	void dwellFinishedTimeUpdate(double dwellTime);
 
@@ -118,10 +132,13 @@ protected:
 	QTime presetDwellLocalEndTime_;
 	AmptekSDD123DetectorManager::DwellMode dwellMode_;
 
-	AmptekSDD123ThreadedHistogramGroup *allData_;
+//	AmptekSDD123ThreadedHistogramGroup *allData_;
+	AMDSThreadedBufferGroup *allData_;
+//	AmptekSDD123DwellHistogramGroup *dwellData_;
+	AMDSBufferGroup *dwellData_;
+
 	int maxHistogramStackSize_;
 
-	AmptekSDD123DwellHistogramGroup *dwellData_;
 	bool presetDwellActive_;
 
 	bool initialized_;

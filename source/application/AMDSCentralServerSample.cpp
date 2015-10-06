@@ -57,18 +57,18 @@ void AMDSCentralServerSample::initializeBufferGroup(quint64 maxCountSize)
 	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
 	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
 	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
-	AMDSThreadedBufferGroup *mcpBufferGroupManager = new AMDSThreadedBufferGroup(mcpBufferGroupInfo, maxCountSize);
-	bufferGroupManagers_.insert(mcpBufferGroupManager->bufferGroupName(), mcpBufferGroupManager);
+	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroupInfo, maxCountSize);
+	bufferGroupManagers_.insert(mcpThreadedBufferGroup->bufferGroupName(), mcpThreadedBufferGroup);
 
 	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
 	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
 	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", AMDSBufferGroupInfo::Summary, amptek1BufferGroupAxes);
-	AMDSThreadedBufferGroup *amptek1BufferGroupName = new AMDSThreadedBufferGroup(amptek1BufferGroupInfo, maxCountSize);
-	bufferGroupManagers_.insert(amptek1BufferGroupName->bufferGroupName(), amptek1BufferGroupName);
+	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroupInfo, maxCountSize);
+	bufferGroupManagers_.insert(amptek1ThreadedBufferGroup->bufferGroupName(), amptek1ThreadedBufferGroup);
 
 	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", AMDSBufferGroupInfo::Average);
-	AMDSThreadedBufferGroup *energyBufferGroupManager = new AMDSThreadedBufferGroup(energyBufferGroupInfo, maxCountSize);
-	bufferGroupManagers_.insert(energyBufferGroupManager->bufferGroupName(), energyBufferGroupManager);
+	AMDSThreadedBufferGroup *energyThreadedBufferGroup= new AMDSThreadedBufferGroup(energyBufferGroupInfo, maxCountSize);
+	bufferGroupManagers_.insert(energyThreadedBufferGroup->bufferGroupName(), energyThreadedBufferGroup);
 
 	foreach(AMDSThreadedBufferGroup *bufferGroupManager, bufferGroupManagers_) {
 		connect(bufferGroupManager, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_, SLOT(onClientRequestProcessed(AMDSClientRequest*)));

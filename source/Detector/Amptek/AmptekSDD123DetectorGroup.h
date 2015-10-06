@@ -7,6 +7,7 @@
 class AMDSClientDataRequest;
 class AmptekSDD123ConfigurationMap;
 class AmptekSDD123DetectorManager;
+class AMDSDataHolder;
 
 class AmptekSDD123DetectorGroup : public QObject
 {

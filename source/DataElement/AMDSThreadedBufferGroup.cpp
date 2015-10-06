@@ -1,11 +1,12 @@
 #include "AMDSThreadedBufferGroup.h"
 
-#include "source/DataElement/AMDSBufferGroup.h"
+#include "DataElement/AMDSBufferGroup.h"
+#include "ClientRequest/AMDSClientDataRequest.h"
 
-AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, QObject *parent) :
+AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
 	QObject(parent)
 {
-	bufferGroup_ = new AMDSBufferGroup(bufferGroupInfo, maxCountSize);
+	bufferGroup_ = new AMDSBufferGroup(bufferGroupInfo, maxCountSize, enableCumulative);
 	bufferGroupThread_= new QThread();
 	bufferGroup_->moveToThread(bufferGroupThread_);
 
@@ -41,9 +42,25 @@ QString AMDSThreadedBufferGroup::bufferGroupName() const
 
 void AMDSThreadedBufferGroup::append(AMDSDataHolder *value)
 {
+	QWriteLocker writeLock(&lock_);
 	bufferGroup_->append(value);
+}
+
+void AMDSThreadedBufferGroup::clear() {
+	QWriteLocker writeLock(&lock_);
+	bufferGroup_->clear();
 }
 
 void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){
 	emit bufferGroupReady();
 }
+
+void AMDSThreadedBufferGroup::forwardClientRequest(AMDSClientRequest *clientRequest)
+{
+	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest *>(clientRequest);
+	if (clientDataRequest)
+		clientDataRequest->setBufferGroupInfo(bufferGroupInfo());
+
+	bufferGroup_->processClientRequest(clientRequest);
+}
+

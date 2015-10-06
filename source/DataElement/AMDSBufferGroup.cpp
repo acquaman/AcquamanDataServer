@@ -7,15 +7,22 @@
 #include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "util/AMErrorMonitor.h"
 
-AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
+AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, bool enableCumulative, QObject *parent) :
 	QObject(parent), dataHolders_(maxSize)
 {
 	bufferGroupInfo_ = bufferGroupInfo;
+
+	enableCumulative_ = enableCumulative;
+	cumulativeDataHolder_ = 0;
 }
 
 AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
-	QObject(other.parent()), dataHolders_(other.dataHolders_)
+	QObject(other.parent()), dataHolders_(other.dataHolders_.maxSize())
 {
+	bufferGroupInfo_ = other.bufferGroupInfo();
+
+	enableCumulative_ = other.enableCumulative_;
+	cumulativeDataHolder_ = other.cumulativeDataHolder_;
 }
 
 AMDSBufferGroup::~AMDSBufferGroup()
@@ -23,6 +30,24 @@ AMDSBufferGroup::~AMDSBufferGroup()
 	clear();
 }
 
+
+void AMDSBufferGroup::append(AMDSDataHolder *value)
+{
+	QWriteLocker writeLock(&lock_);
+
+	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(value);
+	if(dataHolderRemoved)
+		delete dataHolderRemoved;
+
+	if (enableCumulative_) {
+		if (cumulativeDataHolder_) {
+			cumulativeDataHolder_ = (*cumulativeDataHolder_) + (*value);
+		} else {
+			cumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromClassName(value->metaObject()->className());
+			cumulativeDataHolder_->cloneData(value);
+		}
+	}
+}
 
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	QReadLocker readLock(&lock_);

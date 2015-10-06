@@ -1,5 +1,6 @@
 #include "AmptekSDD123Histogram.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
+#include "DataHolder/Amptek/AMDSAmptekSDD123SpectralDataHolder.h"
 #include <QDebug>
 AmptekSDD123Histogram::AmptekSDD123Histogram(const QVector<int> &spectrum, const AmptekStatusData &statusData, QObject *parent) :
 	QObject(parent)
@@ -65,42 +66,53 @@ AmptekSDD123DwellHistogramGroup::AmptekSDD123DwellHistogramGroup(const AmptekSDD
 
 }
 
-void AmptekSDD123DwellHistogramGroup::append(AmptekSDD123Histogram *histogram){
-	QVector<int> histogramSpectrum = histogram->spectrum();
-	AmptekStatusData histogramStatusData = histogram->statusData();
+//void AmptekSDD123DwellHistogramGroup::append(AmptekSDD123Histogram *histogram){
+void AmptekSDD123DwellHistogramGroup::append(AMDSDataHolder *histogram){
+//	QVector<int> histogramSpectrum = histogram->spectrum();
+	AMDSFlatArray histogramSpectrum;
+	histogram->data(&histogramSpectrum);
 
-	histograms_.append(histogram);
+	AMDSAmptekSDD123SpectralDataHolder * amptekDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(histogram);
 
-	if(!initialized_){
-		cumulativeStatusData_ = histogramStatusData;
-		cumulativeStatusData_.dwellReplyTime_.setHMS(0, 0, 0, 0);
+	if (amptekDataHolder) {
+		AmptekStatusData histogramStatusData = amptekDataHolder->statusData();
 
-		cumulativeSpectrum_.resize(histogramSpectrum.size());
-		for(int x = 0, size = histogramSpectrum.size(); x < size; x++)
-			cumulativeSpectrum_[x] = histogramSpectrum.at(x);
-		initialized_ = true;
-	}
-	else{
-		cumulativeStatusData_.fastCounts_ += histogramStatusData.fastCounts_;
-		cumulativeStatusData_.slowCounts_ += histogramStatusData.slowCounts_;
-		cumulativeStatusData_.detectorTemperature_ += histogramStatusData.detectorTemperature_;
-		cumulativeStatusData_.accumulationTime_ += histogramStatusData.accumulationTime_;
-		cumulativeStatusData_.liveTime_ += histogramStatusData.liveTime_;
-		cumulativeStatusData_.realTime_ += histogramStatusData.realTime_;
-		cumulativeStatusData_.generalPurposeCounter_ += histogramStatusData.generalPurposeCounter_;
-		if(cumulativeStatusData_.dwellEndTime_ < histogramStatusData.dwellEndTime_)
-			cumulativeStatusData_.dwellEndTime_.setHMS(histogramStatusData.dwellEndTime_.hour(), histogramStatusData.dwellEndTime_.minute(), histogramStatusData.dwellEndTime_.second(), histogramStatusData.dwellEndTime_.msec());
-		else if(histogramStatusData.dwellStartTime_ < cumulativeStatusData_.dwellStartTime_)
-			cumulativeStatusData_.dwellStartTime_.setHMS(histogramStatusData.dwellStartTime_.hour(), histogramStatusData.dwellStartTime_.minute(), histogramStatusData.dwellStartTime_.second(), histogramStatusData.dwellStartTime_.msec());
+		histograms_.append(histogram);
 
-		cumulativeStatusData_.dwellReplyTime_ = cumulativeStatusData_.dwellReplyTime_.addMSecs(histogramStatusData.dwellEndTime_.msecsTo(histogramStatusData.dwellReplyTime_));
+		if(!initialized_){
+			cumulativeStatusData_ = histogramStatusData;
+			cumulativeStatusData_.dwellReplyTime_.setHMS(0, 0, 0, 0);
 
-		for(int x = 0, size = histogramSpectrum.size(); x < size; x++)
-			cumulativeSpectrum_[x] += histogramSpectrum.at(x);
+			histogramSpectrum.copyDataToTargetArray(&cumulativeSpectrum_);
+//			cumulativeSpectrum_.resize(histogramSpectrum.size());
+//			for(int x = 0, size = histogramSpectrum.size(); x < size; x++)
+//				cumulativeSpectrum_[x] = histogramSpectrum.at(x);
+			initialized_ = true;
+		}
+		else{
+			cumulativeStatusData_.fastCounts_ += histogramStatusData.fastCounts_;
+			cumulativeStatusData_.slowCounts_ += histogramStatusData.slowCounts_;
+			cumulativeStatusData_.detectorTemperature_ += histogramStatusData.detectorTemperature_;
+			cumulativeStatusData_.accumulationTime_ += histogramStatusData.accumulationTime_;
+			cumulativeStatusData_.liveTime_ += histogramStatusData.liveTime_;
+			cumulativeStatusData_.realTime_ += histogramStatusData.realTime_;
+			cumulativeStatusData_.generalPurposeCounter_ += histogramStatusData.generalPurposeCounter_;
+			if(cumulativeStatusData_.dwellEndTime_ < histogramStatusData.dwellEndTime_)
+				cumulativeStatusData_.dwellEndTime_.setHMS(histogramStatusData.dwellEndTime_.hour(), histogramStatusData.dwellEndTime_.minute(), histogramStatusData.dwellEndTime_.second(), histogramStatusData.dwellEndTime_.msec());
+			else if(histogramStatusData.dwellStartTime_ < cumulativeStatusData_.dwellStartTime_)
+				cumulativeStatusData_.dwellStartTime_.setHMS(histogramStatusData.dwellStartTime_.hour(), histogramStatusData.dwellStartTime_.minute(), histogramStatusData.dwellStartTime_.second(), histogramStatusData.dwellStartTime_.msec());
+
+			cumulativeStatusData_.dwellReplyTime_ = cumulativeStatusData_.dwellReplyTime_.addMSecs(histogramStatusData.dwellEndTime_.msecsTo(histogramStatusData.dwellReplyTime_));
+
+			cumulativeSpectrum_ = cumulativeSpectrum_ + histogramSpectrum;
+//			for(int x = 0, size = histogramSpectrum.size(); x < size; x++)
+//				cumulativeSpectrum_[x] += histogramSpectrum.at(x);
+		}
 	}
 }
 
-AmptekSDD123Histogram* AmptekSDD123DwellHistogramGroup::at(int index) const{
+//AmptekSDD123Histogram* AmptekSDD123DwellHistogramGroup::at(int index) const{
+AMDSDataHolder* AmptekSDD123DwellHistogramGroup::at(int index) const{
 	if(index < 0 || index >= count())
 		return 0;
 	return histograms_[index];
@@ -110,7 +122,7 @@ void AmptekSDD123DwellHistogramGroup::clear(){
 	histograms_.clear();
 	initialized_ = false;
 	cumulativeSpectrum_.clear();
-		cumulativeSpectrum_.resize(0);
+//		cumulativeSpectrum_.resize(0);
 
 }
 
@@ -118,7 +130,7 @@ int AmptekSDD123DwellHistogramGroup::count() const{
 	return histograms_.count();
 }
 
-QVector<int> AmptekSDD123DwellHistogramGroup::cumulativeSpectrum() const{
+AMDSFlatArray AmptekSDD123DwellHistogramGroup::cumulativeSpectrum() const{
 	return cumulativeSpectrum_;
 }
 
@@ -126,11 +138,15 @@ AmptekStatusData AmptekSDD123DwellHistogramGroup::cumulativeStatusData() const {
 	return cumulativeStatusData_;
 }
 
-QVector<int> AmptekSDD123DwellHistogramGroup::averageSpectrum() const{
-	QVector<int> retVal;
-	for(int x = 0, size = cumulativeSpectrum_.size(); x < size; x++)
-				retVal.append(cumulativeSpectrum_.at(x)/histograms_.count());
-	return retVal;
+AMDSFlatArray AmptekSDD123DwellHistogramGroup::averageSpectrum() const{
+	AMDSFlatArray averageSpectrum = cumulativeSpectrum() / histograms_.count();
+	return averageSpectrum;
+
+//	QVector<int> retVal;
+//	for(int x = 0, size = cumulativeSpectrum_.size(); x < size; x++)
+//				retVal.append(cumulativeSpectrum_.at(x)/histograms_.count());
+//	return retVal;
+
 }
 
 AmptekStatusData AmptekSDD123DwellHistogramGroup::averageStatusData() const{
@@ -171,10 +187,12 @@ int AmptekSDD123BufferedHistogramGroup::maxSize() const
 	return histograms_.maxSize();
 }
 
-void AmptekSDD123BufferedHistogramGroup::append(AmptekSDD123Histogram *value)
+//void AmptekSDD123BufferedHistogramGroup::append(AmptekSDD123Histogram *value)
+void AmptekSDD123BufferedHistogramGroup::append(AMDSDataHolder *value)
 {
 	QWriteLocker writeLock(&lock_);
-	AmptekSDD123Histogram* histogramRemoved = histograms_.append(value);
+//	AmptekSDD123Histogram* histogramRemoved = histograms_.append(value);
+	AMDSDataHolder* histogramRemoved = histograms_.append(value);
 	if(histogramRemoved)
 	{
 		histogramRemoved->deleteLater();
@@ -219,135 +237,138 @@ void AmptekSDD123BufferedHistogramGroup::requestData(AMDSClientDataRequest *requ
 	emit dataRequestReady(request);
 }
 
-int AmptekSDD123BufferedHistogramGroup::lowerBound(const QTime &dwellTime)
-{
-	if (histograms_.isEmpty())
-		return -1;
+//int AmptekSDD123BufferedHistogramGroup::lowerBound(const QTime &dwellTime)
+//{
+//	if (histograms_.isEmpty())
+//		return -1;
 
-	int start = 0;
-	int end = histograms_.count() -1;
-	int middle = (start + end) / 2;
+//	int start = 0;
+//	int end = histograms_.count() -1;
+//	int middle = (start + end) / 2;
 
-	bool found = false;
+//	//// TODO
 
-	while(!found)
-	{
-		if(middle == 0 || middle == start)
-			found = true;
-		else if (*(histograms_[middle]) == dwellTime)
-		{
-			while(*(histograms_[middle -1]) > dwellTime && middle > 0)
-			{
-				middle--;
-			}
-			found = true;
-		}
-		else if (*(histograms_[middle]) < dwellTime && *(histograms_[middle - 1]) > dwellTime)
-			found = true;
-		else if (*(histograms_[middle]) < dwellTime)
-		{
-			start = middle;
-			middle = (start + end) / 2;
-		}
-		else if (*(histograms_[middle]) > dwellTime)
-		{
-			end = middle;
-			middle = (start + end) / 2;
-		}
-	}
+////	bool found = false;
 
-	return middle;
-}
+////	while(!found)
+////	{
+////		if(middle == 0 || middle == start)
+////			found = true;
+////		else if (*(histograms_[middle]) == dwellTime)
+////		{
+////			while(*(histograms_[middle -1]) > dwellTime && middle > 0)
+////			{
+////				middle--;
+////			}
+////			found = true;
+////		}
+////		else if (*(histograms_[middle]) < dwellTime && *(histograms_[middle - 1]) > dwellTime)
+////			found = true;
+////		else if (*(histograms_[middle]) < dwellTime)
+////		{
+////			start = middle;
+////			middle = (start + end) / 2;
+////		}
+////		else if (*(histograms_[middle]) > dwellTime)
+////		{
+////			end = middle;
+////			middle = (start + end) / 2;
+////		}
+////	}
 
-void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest *request, const QTime &lastFetch)
-{
-	int startIndex = lowerBound(lastFetch);
+//	return middle;
+//}
 
-	if(startIndex == -1)
-;//		request->setError(QString("Could not locate spectrum data for time %1").arg(lastFetch.toString()));
-	else
-	{
-		// Since the last fetch actually included the spectrum at the given time, we need to increment the index
-		// by one, to start from the one following:
-		startIndex++;
-		for(int iCurrent = startIndex, size = histograms_.count();iCurrent < size; iCurrent++)
-		{
-			AmptekSDD123Histogram* hist = histograms_[iCurrent];
-//			request->histogramData()->append(hist);
-		}
-	}
-}
+//void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest *request, const QTime &lastFetch)
+//{
+//	int startIndex = lowerBound(lastFetch);
 
-void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest* request, const QTime& startTime, int count)
-{
-	int startIndex = lowerBound(startTime);
+//	if(startIndex == -1)
+//;//		request->setError(QString("Could not locate spectrum data for time %1").arg(lastFetch.toString()));
+//	else
+//	{
+//		// Since the last fetch actually included the spectrum at the given time, we need to increment the index
+//		// by one, to start from the one following:
+//		startIndex++;
+//		for(int iCurrent = startIndex, size = histograms_.count();iCurrent < size; iCurrent++)
+//		{
+//			AMDSDataHolder *hist = histograms_[iCurrent];
+////			AmptekSDD123Histogram* hist = histograms_[iCurrent];
+////			request->histogramData()->append(hist);
+//		}
+//	}
+//}
 
-	if(startIndex == -1)
-;//		request->setError(QString("Could not locate spectrum data for time %1").arg(startTime.toString()));
-	else
-	{
-		count = startIndex + count;
-		for (int iCurrent = startIndex, limit = histograms_.count(); iCurrent < count && iCurrent < limit; iCurrent++)
-		{
-//			request->histogramData()->append(histograms_[iCurrent]);
-		}
-	}
-}
-void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest* request, int relativeCount, int count)
-{
-	int startIndex = histograms_.count() - 1 - relativeCount - count;
-	int endIndex = histograms_.count() - 1 - relativeCount + count;
-	if(startIndex < 0)
-		startIndex = 0;
+//void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest* request, const QTime& startTime, int count)
+//{
+//	int startIndex = lowerBound(startTime);
 
-	if(endIndex >= histograms_.count())
-		endIndex = histograms_.count() - 1;
+//	if(startIndex == -1)
+//;//		request->setError(QString("Could not locate spectrum data for time %1").arg(startTime.toString()));
+//	else
+//	{
+//		count = startIndex + count;
+//		for (int iCurrent = startIndex, limit = histograms_.count(); iCurrent < count && iCurrent < limit; iCurrent++)
+//		{
+////			request->histogramData()->append(histograms_[iCurrent]);
+//		}
+//	}
+//}
+//void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest* request, int relativeCount, int count)
+//{
+//	int startIndex = histograms_.count() - 1 - relativeCount - count;
+//	int endIndex = histograms_.count() - 1 - relativeCount + count;
+//	if(startIndex < 0)
+//		startIndex = 0;
 
-	for (int iCurrent = startIndex; iCurrent < endIndex; iCurrent++)
-	{
-//		request->histogramData()->append(histograms_[iCurrent]);
-	}
-}
+//	if(endIndex >= histograms_.count())
+//		endIndex = histograms_.count() - 1;
 
-void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest* request, const QTime& startTime, const QTime& endTime)
-{
-	int startIndex = lowerBound(startTime);
-	int endIndex = lowerBound(endTime);
+//	for (int iCurrent = startIndex; iCurrent < endIndex; iCurrent++)
+//	{
+////		request->histogramData()->append(histograms_[iCurrent]);
+//	}
+//}
 
-	if(startIndex == -1)
-;//		request->setError(QString("Could not locate spectrum data for time %1").arg(startTime.toString()));
-	else if(endIndex == -1)
-;//		request->setError(QString("Could not locate spectrum data for time %1").arg(endTime.toString()));
-	else
-	{
-		for (int iCurrent = startIndex; iCurrent < endIndex; iCurrent++)
-		{
-//			request->histogramData()->append(histograms_[iCurrent]);
-		}
-	}
-}
+//void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest* request, const QTime& startTime, const QTime& endTime)
+//{
+//	int startIndex = lowerBound(startTime);
+//	int endIndex = lowerBound(endTime);
 
-void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest* request, const QTime& middleTime, int countBefore, int countAfter)
-{
-	int middleIndex = lowerBound(middleTime);
-	if(middleIndex == -1)
-;//		request->setError(QString("Could not locate spectrum data for time %1").arg(middleTime.toString()));
-	else
-	{
-		int startIndex = middleIndex - countBefore;
-		if(startIndex < 0)
-			startIndex = 0;
+//	if(startIndex == -1)
+//;//		request->setError(QString("Could not locate spectrum data for time %1").arg(startTime.toString()));
+//	else if(endIndex == -1)
+//;//		request->setError(QString("Could not locate spectrum data for time %1").arg(endTime.toString()));
+//	else
+//	{
+//		for (int iCurrent = startIndex; iCurrent < endIndex; iCurrent++)
+//		{
+////			request->histogramData()->append(histograms_[iCurrent]);
+//		}
+//	}
+//}
 
-		int endIndex = middleIndex + countAfter;
-		if(endIndex >= histograms_.count())
-			endIndex = histograms_.count() - 1;
+//void AmptekSDD123BufferedHistogramGroup::populateData(AMDSClientDataRequest* request, const QTime& middleTime, int countBefore, int countAfter)
+//{
+//	int middleIndex = lowerBound(middleTime);
+//	if(middleIndex == -1)
+//;//		request->setError(QString("Could not locate spectrum data for time %1").arg(middleTime.toString()));
+//	else
+//	{
+//		int startIndex = middleIndex - countBefore;
+//		if(startIndex < 0)
+//			startIndex = 0;
 
-		for (int iCurrent = startIndex; iCurrent < endIndex; iCurrent++)
-		{
-//			request->histogramData()->append(histograms_[iCurrent]);
-		}
-	}
-}
+//		int endIndex = middleIndex + countAfter;
+//		if(endIndex >= histograms_.count())
+//			endIndex = histograms_.count() - 1;
+
+//		for (int iCurrent = startIndex; iCurrent < endIndex; iCurrent++)
+//		{
+////			request->histogramData()->append(histograms_[iCurrent]);
+//		}
+//	}
+//}
 
 
 

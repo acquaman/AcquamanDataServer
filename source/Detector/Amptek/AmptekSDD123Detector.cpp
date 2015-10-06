@@ -2,11 +2,15 @@
 
 #include <QCoreApplication>
 
+#include "DataElement/AMDSFlatArray.h"
 #include "Detector/Amptek/AmptekEventDefinitions.h"
 
-AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &basePVName, QObject *parent) :
-		QObject(parent)
+//AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, QObject *parent);
+AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, QObject *parent)
+	:QObject(parent)
 {
+	dataType_ = dataType;
+	bufferSize_ = bufferSize;
 	setName(name);
 	setBasePVName(basePVName);
 
@@ -75,7 +79,7 @@ bool AmptekSDD123Detector::event(QEvent *e){
 
 		if(spectrumReceiver_){
 			AmptekSpectrumEvent *spectrumEvent = new AmptekSpectrumEvent();
-			spectrumEvent->spectrum_ = lastSpectrumVector_;
+			spectrumEvent->spectrum_ = *lastSpectrumVector_;
 			spectrumEvent->detectorSourceName_ = name_;
 			AmptekStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), ((AmptekSpectrumPacketEvent*)e)->dwellStartTime_, ((AmptekSpectrumPacketEvent*)e)->dwellEndTime_, ((AmptekSpectrumPacketEvent*)e)->dwellReplyTime_);
 			spectrumEvent->statusData_ = statusData;
@@ -147,11 +151,12 @@ void AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrumData, int 
 	bool ok;
 	//qDebug() << spectrumData.size();
 
-	lastSpectrumVector_.clear();
+	lastSpectrumVector_->clear();
 	for(int x = 0; x < numChannels; x++){
 		backwardsMid(x*3, 3, spectrumData, tmpData);
 		spectrum.append(tmpData.toHex().toInt(&ok, 16));
-		lastSpectrumVector_.append(tmpData.toHex().toInt(&ok, 16));
+//TODO read data
+//		lastSpectrumVector_->append(tmpData.toHex().toInt(&ok, 16));
 	}
 
 	//qDebug() << "Spectrum ready:\n " << spectrum;

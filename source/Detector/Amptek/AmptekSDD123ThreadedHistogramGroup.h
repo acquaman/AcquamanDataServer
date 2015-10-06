@@ -5,15 +5,19 @@
 #include <QThread>
 #include <QReadWriteLock>
 #include "AmptekSDD123Histogram.h"
-class AmptekSDD123Histogram;
+//class AmptekSDD123Histogram;
+class AMDSDataHolder;
 class AmptekStatusData;
+class AMDSBufferGroup;
+class AMDSBufferGroupInfo;
 
 class AmptekSDD123ThreadedHistogramGroup : public QObject
 {
 	Q_OBJECT
 public:
-	explicit AmptekSDD123ThreadedHistogramGroup(int maxBufferSize, QObject *parent = 0);
-	void append(AmptekSDD123Histogram *histogram);
+	explicit AmptekSDD123ThreadedHistogramGroup(AMDSBufferGroupInfo bufferGroupInfo, int maxCountSize, QObject *parent = 0);
+//	void append(AmptekSDD123Histogram *histogram);
+	void append(AMDSDataHolder *histogram);
 
 
 	void clear();
@@ -28,7 +32,9 @@ protected slots:
 protected:
 private slots:
 private:
-	AmptekSDD123BufferedHistogramGroup allData_;
+//	AmptekSDD123BufferedHistogramGroup allData_;
+	AMDSBufferGroup *allData_;
+
 	mutable QReadWriteLock lock_;
 	QThread thread_;
 };

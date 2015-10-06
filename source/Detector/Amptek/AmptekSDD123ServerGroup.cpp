@@ -5,31 +5,32 @@
 #include "AmptekSDD123Application.h"
 #include "AmptekSDD123Server.h"
 
-AmptekSDD123ThreadedServerGroup::AmptekSDD123ThreadedServerGroup(QList<AmptekSDD123ConfigurationMap*> configurationMaps, QObject *parent)
+AmptekSDD123ThreadedDataServerGroup::AmptekSDD123ThreadedDataServerGroup(QList<AmptekSDD123ConfigurationMap*> configurationMaps, QObject *parent)
 {
 	amptekServerGroup_ = new AmptekSDD123ServerGroup(configurationMaps);
 
-	serverGroupThread_ = new QThread();
-	amptekServerGroup_->moveToThread(serverGroupThread_);
+	amptekServerGroupThread_ = new QThread();
+	amptekServerGroup_->moveToThread(amptekServerGroupThread_);
 
 	connect(amptekServerGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SIGNAL(serverChangedToConfigurationState(int)));
 	connect(amptekServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SIGNAL(serverChangedToDwellState(int)));
 
-	serverGroupThread_->start();
+	amptekServerGroupThread_->start();
 }
 
-AmptekSDD123ThreadedServerGroup::~AmptekSDD123ThreadedServerGroup()
+AmptekSDD123ThreadedDataServerGroup::~AmptekSDD123ThreadedDataServerGroup()
 {
-	if (serverGroupThread_->isRunning()) {
-		serverGroupThread_->quit();
+	if (amptekServerGroupThread_->isRunning()) {
+		amptekServerGroupThread_->quit();
 	}
 
 	amptekServerGroup_->deleteLater();
+	amptekServerGroupThread_->deleteLater();
 }
 
-QList<AmptekSDD123Server*> AmptekSDD123ThreadedServerGroup::servers()
+AmptekSDD123Server*  AmptekSDD123ThreadedDataServerGroup::serverAt(int index)
 {
-	return amptekServerGroup_->servers();
+	return amptekServerGroup_->serverAt(index);
 }
 
 
@@ -39,22 +40,25 @@ AmptekSDD123ServerGroup::AmptekSDD123ServerGroup(QList<AmptekSDD123Configuration
 {
 	requestSpectraTimer_ = 0;
 	masterRequestInterval_ = 50;
-	serverState_ = AmptekSDD123ServerGroup::DwellState;
+//	serverState_ = AmptekSDD123ServerGroup::DwellState;
 
 	serverAboutToConfigurationStateMapper_ = new QSignalMapper();
 	serverConfigurationStateMapper_ = new QSignalMapper();
 	serverDwellStateMapper_ = new QSignalMapper();
 
 	AmptekSDD123Server *amptekServer;
-	for(int x = 0, size = configurationMaps.count(); x < size; x++){
-		amptekServer = new AmptekSDD123Server(configurationMaps.at(x), QString("%1 Server").arg(configurationMaps.at(x)->detectorName()), this);
+	for(int index = 0, size = configurationMaps.count(); index < size; index++){
+		AmptekSDD123ConfigurationMap *amptekConfiguration = configurationMaps.at(index);
+
+		amptekServer = new AmptekSDD123Server(amptekConfiguration, QString("%1 Server").arg(amptekConfiguration->detectorName()), this);
 		amptekServer->setRequestIntervalTimer(masterRequestInterval_);
+
 		servers_.append(amptekServer);
 		serversInDwellMode_.append(amptekServer);
 
-		serverAboutToConfigurationStateMapper_->setMapping(amptekServer, x);
-		serverConfigurationStateMapper_->setMapping(amptekServer, x);
-		serverDwellStateMapper_->setMapping(amptekServer, x);
+		serverAboutToConfigurationStateMapper_->setMapping(amptekServer, index);
+		serverConfigurationStateMapper_->setMapping(amptekServer, index);
+		serverDwellStateMapper_->setMapping(amptekServer, index);
 
 		connect(amptekServer, SIGNAL(serverAboutToChangeToConfigurationState()), serverAboutToConfigurationStateMapper_, SLOT(map()));
 		connect(amptekServer, SIGNAL(serverChangedToConfigurationState()), serverConfigurationStateMapper_, SLOT(map()));
@@ -70,14 +74,7 @@ AmptekSDD123ServerGroup::AmptekSDD123ServerGroup(QList<AmptekSDD123Configuration
 
 AmptekSDD123ServerGroup::~AmptekSDD123ServerGroup()
 {
-	if (requestSpectraTimer_) {
-		if (requestSpectraTimer_->isActive())
-			requestSpectraTimer_->stop();
-
-		disconnect(requestSpectraTimer_, SIGNAL(timeout()), this, SLOT(requestAllSpectra()));
-		requestSpectraTimer_->deleteLater();
-		requestSpectraTimer_ = 0;
-	}
+	releaseRequestSpectrualTimer();
 
 	foreach (AmptekSDD123Server *amptekServer, servers_) {
 		disconnect(amptekServer, SIGNAL(serverAboutToChangeToConfigurationState()), serverAboutToConfigurationStateMapper_, SLOT(map()));
@@ -99,64 +96,79 @@ AmptekSDD123ServerGroup::~AmptekSDD123ServerGroup()
 	serverDwellStateMapper_->deleteLater();
 }
 
-QList<AmptekSDD123Server*> AmptekSDD123ServerGroup::servers(){
-	return servers_;
+AmptekSDD123Server* AmptekSDD123ServerGroup::serverAt(int index){
+	return servers_.at(index);
 }
 
 void AmptekSDD123ServerGroup::setServerState(int index, AmptekSDD123ServerGroup::ServerState serverState){
-	if(serverState == AmptekSDD123ServerGroup::ConfigurationState){
-		if(serversInDwellMode_.contains(servers_.at(index)))
-			serversInDwellMode_.removeAll(servers_.at(index));
+	AmptekSDD123Server *amptekServer = serverAt(index);
 
-		QTimer::singleShot(masterRequestInterval_+5, servers_.at(index), SLOT(disableMCAMCS()));
+	if(serverState == AmptekSDD123ServerGroup::ConfigurationState){
+		if(serversInDwellMode_.contains(amptekServer))
+			serversInDwellMode_.removeAll(amptekServer);
+
+		QTimer::singleShot(masterRequestInterval_+5, amptekServer, SLOT(disableMCAMCS()));
 	}
 	else if(serverState == AmptekSDD123ServerGroup::DwellState)
-		servers_.at(index)->requestDataPacket(AmptekCommandManagerSGM::RequestEnableMCAMCS);
+		amptekServer->requestDataPacket(AmptekCommandManagerSGM::RequestEnableMCAMCS);
 }
 
 void AmptekSDD123ServerGroup::setConfigurationValueFrom(const QString &configurationValueCommand, int index){
-	servers_.at(index)->requestDataPacket(AmptekCommandManagerSGM::RequestTextConfiguration, configurationValueCommand.toAscii().toHex());
+	serverAt(index)->requestDataPacket(AmptekCommandManagerSGM::RequestTextConfiguration, configurationValueCommand.toAscii().toHex());
 }
 
-void AmptekSDD123ServerGroup::initiateAllRequestSpectrum(){
-	if (requestSpectraTimer_) {
-		if (requestSpectraTimer_->isActive())
-			requestSpectraTimer_->stop();
-
-		disconnect(requestSpectraTimer_, SIGNAL(timeout()), this, SLOT(requestAllSpectra()));
-		requestSpectraTimer_->deleteLater();
-		requestSpectraTimer_ = 0;
-	}
-
-	requestSpectraTimer_ = new QTimer(this);
-	connect(requestSpectraTimer_, SIGNAL(timeout()), this, SLOT(requestAllSpectra()));
-
-	requestSpectraTimer_->setInterval(masterRequestInterval_);
-	requestSpectraTimer_->start();
-}
-
-void AmptekSDD123ServerGroup::requestAllSpectra(){
-	for(int x = 0, size = serversInDwellMode_.count(); x < size; x++)
-		serversInDwellMode_.at(x)->requestDataPacket(AmptekCommandManagerSGM::RequestAndClearSpecturmPlusStatus);
+void AmptekSDD123ServerGroup::onRequestAllSpectra(){
+	foreach(AmptekSDD123Server *dwellModeServer, serversInDwellMode_)
+		dwellModeServer->requestDataPacket(AmptekCommandManagerSGM::RequestAndClearSpecturmPlusStatus);
 }
 
 void AmptekSDD123ServerGroup::onServerAboutToChangeToConfigurationState(int index){
 	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
 		qDebug() << "Heard server at " << index << " is about to change to configuration mode";
-	if(serversInDwellMode_.contains(servers_.at(index)))
-		serversInDwellMode_.removeAll(servers_.at(index));
+
+	AmptekSDD123Server *amptekServer = serverAt(index);
+	if(serversInDwellMode_.contains(amptekServer))
+		serversInDwellMode_.removeAll(amptekServer);
 }
 
 void AmptekSDD123ServerGroup::onServerChangedToConfigurationState(int index){
 	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
 		qDebug() << "Heard server at " << index << " changed to configuration state";
+
 	emit serverChangedToConfigurationState(index);
 }
 
 void AmptekSDD123ServerGroup::onServerChangedToDwellState(int index){
 	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
 		qDebug() << "Heard server at " << index << " changed to dwell state";
-	if(!serversInDwellMode_.contains(servers_.at(index)))
-		serversInDwellMode_.append(servers_.at(index));
+
+
+	AmptekSDD123Server *amptekServer = serverAt(index);
+	if(!serversInDwellMode_.contains(amptekServer))
+		serversInDwellMode_.append(amptekServer);
+
 	emit serverChangedToDwellState(index);
 }
+
+void AmptekSDD123ServerGroup::initiateAllRequestSpectrum(){
+	releaseRequestSpectrualTimer();
+
+	requestSpectraTimer_ = new QTimer(this);
+	connect(requestSpectraTimer_, SIGNAL(timeout()), this, SLOT(onRequestAllSpectra()));
+
+	requestSpectraTimer_->setInterval(masterRequestInterval_);
+	requestSpectraTimer_->start();
+}
+
+void AmptekSDD123ServerGroup::releaseRequestSpectrualTimer()
+{
+	if (requestSpectraTimer_) {
+		if (requestSpectraTimer_->isActive())
+			requestSpectraTimer_->stop();
+
+		disconnect(requestSpectraTimer_, SIGNAL(timeout()), this, SLOT(onRequestAllSpectra()));
+		requestSpectraTimer_->deleteLater();
+		requestSpectraTimer_ = 0;
+	}
+}
+

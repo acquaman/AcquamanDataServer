@@ -5,12 +5,20 @@
 #include <QStringList>
 #include <QVector>
 
+#include "DataElement/AMDSDataTypeDefinitions.h"
+
+class AMDSFlatArray;
+class AMDSBufferGroupInfo;
+
 class AmptekSDD123Detector : public QObject
 {
 	Q_OBJECT
 
 public:
-	AmptekSDD123Detector(const QString &name, const QString &basePVName, QObject *parent = 0);
+	AmptekSDD123Detector(const QString &name, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, QObject *parent = 0);
+
+	AMDSDataTypeDefinitions::DataType dataType() { return dataType(); }
+	int bufferSize() { return bufferSize_; }
 
 	QString name() const { return name_;}
 	QString basePVName() const { return basePVName_;}
@@ -180,6 +188,9 @@ protected:
 	void internalSetMCAChannels(int mcaChannels);
 
 protected:
+	AMDSDataTypeDefinitions::DataType dataType_;
+	int bufferSize_;
+
 	//// START OF STATUS PACKET PARAMETERS ////
 	int fastCounts_;
 	int slowCounts_;
@@ -245,7 +256,8 @@ protected:
 	bool configurationParametersInitialized_;
 
 	QObject *spectrumReceiver_;
-	QVector<double> lastSpectrumVector_;
+//	QVector<double> lastSpectrumVector_;
+	AMDSFlatArray *lastSpectrumVector_;
 };
 
 #endif // AMPTEKSDD123DETECTOR_H

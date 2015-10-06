@@ -1,8 +1,9 @@
 #ifndef AMDSBUFFERGROUPINFO_H
 #define AMDSBUFFERGROUPINFO_H
 
-#include "source/DataElement/AMDSAxisInfo.h"
-#include "source/DataElement/AMDSnDIndex.h"
+#include "DataElement/AMDSAxisInfo.h"
+#include "DataElement/AMDSnDIndex.h"
+#include "DataElement/AMDSDataTypeDefinitions.h"
 
 #define AMDS_SERVER_ERR_BUFFER_GROUP 20200
 #define AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN 20201
@@ -16,7 +17,7 @@ public:
 		NoFlatten = 2
 	};
 
-	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
+	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), AMDSDataTypeDefinitions::DataType dataType=AMDSDataTypeDefinitions::Double, int bufferSize=2, const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
 	/// Copy constructor
 	AMDSBufferGroupInfo(const AMDSBufferGroupInfo& other);
 	/// Assignment operator
@@ -28,6 +29,8 @@ public:
 	inline QString description() const { return description_; }
 	/// returns the units of the bufferGroupInfo
 	inline QString units() const { return units_; }
+	inline AMDSDataTypeDefinitions::DataType dataType() { return dataType_; }
+	inline int bufferSize() { return bufferSize_; }
 	/// returns whether the bufferGroup is enabled flatten
 	inline bool isFlattenEnabled() const { return flattenMethod_ != NoFlatten; }
 	/// returns the flatten method of the bufferGroup
@@ -72,6 +75,10 @@ protected:
 	QString description_;
 	/// the unit of the bufferGroupInfo
 	QString units_;
+	/// the type of the data
+	AMDSDataTypeDefinitions::DataType dataType_;
+	/// the size of the data
+	int bufferSize_;
 	/// the definition on how the data should be flattened
 	DataFlattenMethod flattenMethod_;
 

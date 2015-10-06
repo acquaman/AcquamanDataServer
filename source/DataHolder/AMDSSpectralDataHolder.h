@@ -1,7 +1,7 @@
 #ifndef AMDSSPECTRALDATAHOLDER_H
 #define AMDSSPECTRALDATAHOLDER_H
 
-#include "source/DataHolder/AMDSGenericFlatArrayDataHolder.h"
+#include "DataHolder/AMDSGenericFlatArrayDataHolder.h"
 
 class AMDSLightWeightSpectralDataHolder : public AMDSLightWeightGenericFlatArrayDataHolder
 {
