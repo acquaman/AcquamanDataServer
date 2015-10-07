@@ -22,7 +22,7 @@ protected slots:
 
 protected:
 	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
-	virtual void initializeBufferGroup(quint64 maxCountSize = 1000*60*60*10);
+	virtual void initializeBufferGroup();
 	/// function to initialize the data server to update the buffer groups
 	virtual void initializeAndStartDataServer();
 	/// function to finalize the initialization

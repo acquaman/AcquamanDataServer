@@ -21,38 +21,12 @@ namespace AmptekEventDefinitions{
 	};
 }
 
-class AmptekStatusData{
+class AmptekStatusData
+{
 public:
-	AmptekStatusData(int fastCounts = -1, int slowCounts = -1, double detectorTemperature = -1, double accumulationTime = -1, double liveTime = -1, double realTime = -1, int generalPurposeCounter = -1, const QTime &dwellStartTime = QTime(), const QTime &dwellEndTime = QTime(), const QTime &dwellReplyTime = QTime()) :
-		fastCounts_(fastCounts), slowCounts_(slowCounts), detectorTemperature_(detectorTemperature), accumulationTime_(accumulationTime), liveTime_(liveTime), realTime_(realTime), generalPurposeCounter_(generalPurposeCounter)
-	{
-		dwellStartTime_.setHMS(dwellStartTime.hour(), dwellStartTime.minute(), dwellStartTime.second(), dwellStartTime.msec());
-		dwellEndTime_.setHMS(dwellEndTime.hour(), dwellEndTime.minute(), dwellEndTime.second(), dwellEndTime.msec());
-		dwellReplyTime_.setHMS(dwellReplyTime.hour(), dwellReplyTime.minute(), dwellReplyTime.second(), dwellReplyTime.msec());
-	}
-
-	AmptekStatusData(const AmptekStatusData &other)
-	{
-		this->operator =(other);
-	}
-
-	AmptekStatusData& operator =(const AmptekStatusData &other)
-	{
-		if(this != &other){
-			fastCounts_ = other.fastCounts_;
-			slowCounts_ = other.slowCounts_;
-			detectorTemperature_ = other.detectorTemperature_;
-			accumulationTime_ = other.accumulationTime_;
-			liveTime_ = other.liveTime_;
-			realTime_ = other.realTime_;
-			generalPurposeCounter_ = other.generalPurposeCounter_;
-			dwellStartTime_.setHMS(other.dwellStartTime_.hour(), other.dwellStartTime_.minute(), other.dwellStartTime_.second(), other.dwellStartTime_.msec());
-			dwellEndTime_.setHMS(other.dwellEndTime_.hour(), other.dwellEndTime_.minute(), other.dwellEndTime_.second(), other.dwellEndTime_.msec());
-			dwellReplyTime_.setHMS(other.dwellReplyTime_.hour(), other.dwellReplyTime_.minute(), other.dwellReplyTime_.second(), other.dwellReplyTime_.msec());
-
-		}
-		return *this;
-	}
+	AmptekStatusData(int fastCounts = -1, int slowCounts = -1, double detectorTemperature = -1, double accumulationTime = -1, double liveTime = -1, double realTime = -1, int generalPurposeCounter = -1, const QTime &dwellStartTime = QTime(), const QTime &dwellEndTime = QTime(), const QTime &dwellReplyTime = QTime());
+	AmptekStatusData(const AmptekStatusData &other);
+	AmptekStatusData& operator =(const AmptekStatusData &other);
 
 	int fastCounts_;
 	int slowCounts_;
@@ -79,7 +53,7 @@ public:
 //	inline void setSpectrum(QVector<double> spectrums) { spectrum_.clear(); spectrum_ = spectrums; }
 //	inline void setStatusData(AmptekStatusData statusData) { statusData_ = statusData; }
 
-//protected:
+protected:
 	QString detectorSourceName_;
 //	QVector<double> spectrum_;
 	AMDSFlatArray spectrum_;
@@ -109,60 +83,18 @@ public:
 	QString configurationReadback_;
 };
 
-class AmptekConfigurationData{
+class AmptekConfigurationData
+{
 public:
-	AmptekConfigurationData(int analogGainIndex = -1, double fineGain = -1, double totalGain = -1, QString hvSet = "NULL", int mcaCount = -1, QString mcaEnabled = "NULL", QString mcaSource = "NULL", QString preampState = "NULL", QString peakDetectMode = "NULL", QString pileUpRejection = "NULL", QList<int> scaIndices = QList<int>(), QList<int> scaHighIndices = QList<int>(), QList<int> scaLowIndices = QList<int>(), QString coolerSetting = "NULL", int fastThreshold = -1, double slowThreshold = -1, double peakingTime = -1, int fastChannelPeakingTime = -1)
-	{
-		analogGainIndex_ = analogGainIndex;
-		fineGain_ = fineGain;
-		totalGain_ = totalGain;
-		hvSet_ = hvSet;
-		mcaCount_ = mcaCount;
-		mcaEnabled_ = mcaEnabled;
-		mcaSource_ = mcaSource;
-		preampState_ = preampState;
-		peakDetectMode_ = peakDetectMode;
-		pileUpRejection_ = pileUpRejection;
-		scaIndices_ = scaIndices;
-		scaHighIndices_ = scaHighIndices;
-		scaLowIndices_ = scaLowIndices;
-		coolerSetting_ = coolerSetting;
-		fastThreshold_ = fastThreshold;
-		slowThreshold_ = slowThreshold;
-		peakingTime_ = peakingTime;
-		fastChannelPeakingTime_ = fastChannelPeakingTime;
-	}
+	AmptekConfigurationData(int analogGainIndex = -1, double fineGain = -1, double totalGain = -1, QString hvSet = "NULL", int mcaCount = -1, QString mcaEnabled = "NULL", QString mcaSource = "NULL", QString preampState = "NULL", QString peakDetectMode = "NULL", QString pileUpRejection = "NULL", QList<int> scaIndices = QList<int>(), QList<int> scaHighIndices = QList<int>(), QList<int> scaLowIndices = QList<int>(), QString coolerSetting = "NULL", double fastThreshold = -1, double slowThreshold = -1, double peakingTime = -1, int fastChannelPeakingTime = -1);
+	AmptekConfigurationData(const AmptekConfigurationData &other);
 
-	AmptekConfigurationData(const AmptekConfigurationData &other)
-	{
-		this->operator =(other);
-	}
+	AmptekConfigurationData& operator =(const AmptekConfigurationData &other);
 
-	AmptekConfigurationData& operator =(const AmptekConfigurationData &other)
-	{
-		if(this != &other){
-			analogGainIndex_ = other.analogGainIndex_;
-			fineGain_ = other.fineGain_;
-			totalGain_ = other.totalGain_;
-			hvSet_ = other.hvSet_;
-			mcaCount_ = other.mcaCount_;
-			mcaEnabled_ = other.mcaEnabled_;
-			mcaSource_ = other.mcaSource_;
-			preampState_ = other.preampState_;
-			peakDetectMode_ = other.peakDetectMode_;
-			pileUpRejection_ = other.pileUpRejection_;
-			coolerSetting_ = other.coolerSetting_;
-			scaIndices_ = other.scaIndices_;
-			scaHighIndices_ = other.scaHighIndices_;
-			scaLowIndices_ = other.scaLowIndices_;
-			fastThreshold_ = other.fastThreshold_;
-			slowThreshold_ = other.slowThreshold_;
-			peakingTime_ = other.peakingTime_;
-			fastChannelPeakingTime_ = other.fastChannelPeakingTime_;
-		}
-		return *this;
-	}
+	/// helper function to pase the configurations
+	void parseConfiguration(QString configuration);
 
+//protected:
 	int analogGainIndex_; //GAIA
 	double fineGain_; //GAIF
 	double totalGain_; //GAIN
@@ -177,18 +109,22 @@ public:
 	QList<int> scaHighIndices_; //SCAH
 	QList<int> scaLowIndices_; //SCAL
 	QString coolerSetting_; //TECS
-	int fastThreshold_; //THFA
+	double fastThreshold_; //THFA
 	double slowThreshold_; //THSL
 	double peakingTime_; //TPEA
 	int fastChannelPeakingTime_; //TPFA
 };
 
-class AmptekConfigurationValuesEvent : public QEvent
+class AmptekConfigurationValuesEvent: public QEvent
 {
 public:
-	AmptekConfigurationValuesEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::ConfigurationValuesEvent)
-	{}
+	AmptekConfigurationValuesEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::ConfigurationValuesEvent) {}
 
+	/// helper function to pase the list of configurations in the event
+	void parseConfigurations(QStringList configurationList);
+
+protected:
+	/// the configuraiton data
 	AmptekConfigurationData configurationData_;
 };
 

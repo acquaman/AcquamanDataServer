@@ -17,6 +17,8 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
+
+	maxBufferSize_ = 1000*60*60*10;
 }
 
 AMDSCentralServer::~AMDSCentralServer()

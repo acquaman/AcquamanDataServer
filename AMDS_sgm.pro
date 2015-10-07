@@ -21,12 +21,12 @@ HEADERS *= \
 	source/Detector/Amptek/AmptekCommandManager.h \
     source/Detector/Amptek/AmptekSDD123Packet.h \
 	source/Detector/Amptek/AmptekSDD123Server.h \
-	source/Detector/Amptek/AmptekSDD123ServerGroup.h \
 	source/Detector/Amptek/AmptekSDD123DetectorManager.h \
-	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.h \
-    source/Detector/Amptek/AmptekSDD123DetectorGroup.h \
+	source/Detector/Amptek/AmptekSDD123ServerGroup.h \
+	source/Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.h \
 	source/Detector/Amptek/AmptekSDD123Detector.h \
-    source/Detector/Amptek/AmptekSDD123EPICSDetectorManager.h \
+	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.h \
+	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.h \
 #    source/Detector/Amptek/AmptekSDD123ThreadedHistogramGroup.h \
 #    source/Detector/Amptek/AmptekSDD123Histogram.h \
 	source/DataHolder/Amptek/AMDSAmptekSDD123SpectralDataHolder.h
@@ -45,15 +45,21 @@ SOURCES *= \
 	source/Detector/Amptek/AmptekSDD123Server.cpp \
 	source/Detector/Amptek/AmptekSDD123ServerGroup.cpp \
 	source/Detector/Amptek/AmptekSDD123DetectorManager.cpp \
+	source/Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.cpp \
 	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.cpp \
-    source/Detector/Amptek/AmptekSDD123DetectorGroup.cpp \
 	source/Detector/Amptek/AmptekSDD123Detector.cpp \
-    source/Detector/Amptek/AmptekSDD123EPICSDetectorManager.cpp \
+	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.cpp \
 #    source/Detector/Amptek/AmptekSDD123ThreadedHistogramGroup.cpp \
 #    source/Detector/Amptek/AmptekSDD123Histogram.cpp \
-	source/DataHolder/Amptek/AMDSAmptekSDD123SpectralDataHolder.cpp
+	source/DataHolder/Amptek/AMDSAmptekSDD123SpectralDataHolder.cpp \
+    source/Detector/Amptek/AmptekEventDefinitions.cpp
 #    source/DataElement/SGM/AmptekSDD123ThreadedBufferGroupManager.cpp
 #        source/Detector/Amptek/SGM/AmptekSDD123Histogram.cpp
+
+
+
+
+
 
 
 

@@ -51,23 +51,23 @@ void AMDSCentralServerSample::onHundredMillisecondTimerUpdate(){
 	bufferGroupManagers_.value("Amptek1")->append(oneSpectralDataHolder);
 }
 
-void AMDSCentralServerSample::initializeBufferGroup(quint64 maxCountSize)
+void AMDSCentralServerSample::initializeBufferGroup()
 {
 	QList<AMDSAxisInfo> mcpBufferGroupAxes;
 	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
 	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
 	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
-	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroupInfo, maxBufferSize_);
 	bufferGroupManagers_.insert(mcpThreadedBufferGroup->bufferGroupName(), mcpThreadedBufferGroup);
 
 	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
 	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
 	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", AMDSBufferGroupInfo::Summary, amptek1BufferGroupAxes);
-	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroupInfo, maxBufferSize_);
 	bufferGroupManagers_.insert(amptek1ThreadedBufferGroup->bufferGroupName(), amptek1ThreadedBufferGroup);
 
 	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", AMDSBufferGroupInfo::Average);
-	AMDSThreadedBufferGroup *energyThreadedBufferGroup= new AMDSThreadedBufferGroup(energyBufferGroupInfo, maxCountSize);
+	AMDSThreadedBufferGroup *energyThreadedBufferGroup= new AMDSThreadedBufferGroup(energyBufferGroupInfo, maxBufferSize_);
 	bufferGroupManagers_.insert(energyThreadedBufferGroup->bufferGroupName(), energyThreadedBufferGroup);
 
 	foreach(AMDSThreadedBufferGroup *bufferGroupManager, bufferGroupManagers_) {

@@ -3,16 +3,15 @@
 #include <QCoreApplication>
 
 #include "DataElement/AMDSFlatArray.h"
-#include "Detector/Amptek/AmptekEventDefinitions.h"
+#include "util/AMErrorMonitor.h"
 
-//AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, QObject *parent);
 AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, QObject *parent)
 	:QObject(parent)
 {
+	name_ = name;
+	basePVName_ = basePVName;
 	dataType_ = dataType;
 	bufferSize_ = bufferSize;
-	setName(name);
-	setBasePVName(basePVName);
 
 	configurationParametersInitialized_ = false;
 
@@ -67,113 +66,89 @@ AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &b
 	deviceID_ = -1;
 }
 
-#include <QThread>
 bool AmptekSDD123Detector::event(QEvent *e){
 	if(e->type() == (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent){
-		QByteArray spectrumByteArray = ((AmptekSpectrumPacketEvent*)e)->spectrumByteArray_;
-		int channelCount = ((AmptekSpectrumPacketEvent*)e)->channelCount_;
-		QByteArray statusDataArray = ((AmptekSpectrumPacketEvent*)e)->statusDataArray_;
-
-		readSpectrumData(spectrumByteArray, channelCount);
-		readStatusData(statusDataArray);
-
-		if(spectrumReceiver_){
-			AmptekSpectrumEvent *spectrumEvent = new AmptekSpectrumEvent();
-			spectrumEvent->spectrum_ = *lastSpectrumVector_;
-			spectrumEvent->detectorSourceName_ = name_;
-			AmptekStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), ((AmptekSpectrumPacketEvent*)e)->dwellStartTime_, ((AmptekSpectrumPacketEvent*)e)->dwellEndTime_, ((AmptekSpectrumPacketEvent*)e)->dwellReplyTime_);
-			spectrumEvent->statusData_ = statusData;
-			QCoreApplication::postEvent(spectrumReceiver_, spectrumEvent);
-		}
+		onSpectrumPacketEventReceived((AmptekSpectrumPacketEvent*)e);
 
 		e->accept();
 		return true;
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationReadbackEvent){
-		if(spectrumReceiver_){
-			QString configurationReadback = ((AmptekConfigurationReadbackEvent*)e)->configurationReadback_;
-
-			AmptekConfigurationValuesEvent *configurationValuesEvent = new AmptekConfigurationValuesEvent();
-			QStringList allConfigurationValues = configurationReadback.split(';');
-			for(int x = 0, size = allConfigurationValues.count(); x < size; x++){
-				if(allConfigurationValues.at(x).contains("GAIA"))
-					configurationValuesEvent->configurationData_.analogGainIndex_ = allConfigurationValues.at(x).section('=', -1).toInt();
-				else if(allConfigurationValues.at(x).contains("GAIF"))
-					configurationValuesEvent->configurationData_.fineGain_ = allConfigurationValues.at(x).section('=', -1).toDouble();
-				else if(allConfigurationValues.at(x).contains("GAIN"))
-					configurationValuesEvent->configurationData_.totalGain_ = allConfigurationValues.at(x).section('=', -1).toDouble();
-				else if(allConfigurationValues.at(x).contains("HVSE"))
-					configurationValuesEvent->configurationData_.hvSet_ = allConfigurationValues.at(x).section('=', -1);
-				else if(allConfigurationValues.at(x).contains("MCAC"))
-					configurationValuesEvent->configurationData_.mcaCount_ = allConfigurationValues.at(x).section('=', -1).toInt();
-				else if(allConfigurationValues.at(x).contains("MCAE"))
-					configurationValuesEvent->configurationData_.mcaEnabled_ = allConfigurationValues.at(x).section('=', -1);
-				else if(allConfigurationValues.at(x).contains("MCAS"))
-					configurationValuesEvent->configurationData_.mcaSource_ = allConfigurationValues.at(x).section('=', -1);
-				else if(allConfigurationValues.at(x).contains("PAPS"))
-					configurationValuesEvent->configurationData_.preampState_ = allConfigurationValues.at(x).section('=', -1);
-				else if(allConfigurationValues.at(x).contains("PDMD"))
-					configurationValuesEvent->configurationData_.peakDetectMode_ = allConfigurationValues.at(x).section('=', -1);
-				else if(allConfigurationValues.at(x).contains("PURE"))
-					configurationValuesEvent->configurationData_.pileUpRejection_ = allConfigurationValues.at(x).section('=', -1);
-				else if(allConfigurationValues.at(x).contains("SCAI")){
-					configurationValuesEvent->configurationData_.scaIndices_.append(allConfigurationValues.at(x).section('=', -1).toInt());
-					configurationValuesEvent->configurationData_.scaHighIndices_.append(allConfigurationValues.at(x+1).section('=', -1).toInt());
-					configurationValuesEvent->configurationData_.scaLowIndices_.append(allConfigurationValues.at(x+2).section('=', -1).toInt());
-				}
-				else if(allConfigurationValues.at(x).contains("SCAH")){
-					//ignore this
-				}
-				else if(allConfigurationValues.at(x).contains("SCAL")){
-					//ignore this
-				}
-				else if(allConfigurationValues.at(x).contains("TECS"))
-					configurationValuesEvent->configurationData_.coolerSetting_ = allConfigurationValues.at(x).section('=', -1);
-				else if(allConfigurationValues.at(x).contains("THFA"))
-					configurationValuesEvent->configurationData_.fastThreshold_ = allConfigurationValues.at(x).section('=', -1).toDouble();
-				else if(allConfigurationValues.at(x).contains("THSL"))
-					configurationValuesEvent->configurationData_.slowThreshold_ = allConfigurationValues.at(x).section('=', -1).toDouble();
-				else if(allConfigurationValues.at(x).contains("TPEA"))
-					configurationValuesEvent->configurationData_.peakingTime_ = allConfigurationValues.at(x).section('=', -1).toDouble();
-				else if(allConfigurationValues.at(x).contains("TPFA"))
-					configurationValuesEvent->configurationData_.fastChannelPeakingTime_ = allConfigurationValues.at(x).section('=', -1).toInt();
-			}
-
-			QCoreApplication::postEvent(spectrumReceiver_, configurationValuesEvent);
-		}
+		onConfigurationReadbackEventReceived((AmptekConfigurationReadbackEvent*)e);
 	}
+
 	return QObject::event(e);
 }
 
-void AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrumData, int numChannels){
+void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEvent* event)
+{
+	QByteArray spectrumByteArray = event->spectrumByteArray_;
+	int channelCount = event->channelCount_;
+	QByteArray statusDataArray = event->statusDataArray_;
+
+	AMDSFlatArray *spectrumArray = readSpectrumData(spectrumByteArray, channelCount);
+	readStatusData(statusDataArray);
+
+	if(spectrumReceiver_){
+		AmptekSpectrumEvent *spectrumEvent = new AmptekSpectrumEvent();
+		spectrumEvent->detectorSourceName_ = name();
+		spectrumEvent->spectrum_ = *spectrumArray;
+		AmptekStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), event->dwellStartTime_, event->dwellEndTime_, event->dwellReplyTime_);
+		spectrumEvent->statusData_ = statusData;
+
+		QCoreApplication::postEvent(spectrumReceiver_, spectrumEvent);
+	}
+}
+
+void AmptekSDD123Detector::onConfigurationReadbackEventReceived(AmptekConfigurationReadbackEvent* event)
+{
+	if (spectrumReceiver_) {
+		QStringList allConfigurations = event->configurationReadback_.split(';');
+
+		AmptekConfigurationValuesEvent *configurationValuesEvent = new AmptekConfigurationValuesEvent();
+		configurationValuesEvent->parseConfigurations(allConfigurations);
+
+		QCoreApplication::postEvent(spectrumReceiver_, configurationValuesEvent);
+	}
+}
+
+AMDSFlatArray *AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrumData, int numChannels){
+	if (numChannels != bufferSize()) {
+		AMErrorMon::alert(this, 0, QString("Spectrum channel number (%1) doesn't match with the expected buffer size (%2)").arg(numChannels).arg(bufferSize()));
+	}
+
+	AMDSFlatArray *spectrumArray = new AMDSFlatArray(dataType(), bufferSize());
+
 	QList<double> spectrum;
 	QByteArray tmpData;
 	bool ok;
 	//qDebug() << spectrumData.size();
 
-	lastSpectrumVector_->clear();
-	for(int x = 0; x < numChannels; x++){
-		backwardsMid(x*3, 3, spectrumData, tmpData);
+	for(int index = 0; index < numChannels; index++){
+		backwardsMid(index*3, 3, spectrumData, tmpData);
 		spectrum.append(tmpData.toHex().toInt(&ok, 16));
-//TODO read data
-//		lastSpectrumVector_->append(tmpData.toHex().toInt(&ok, 16));
+
+		spectrumArray->setValue(index, tmpData.toHex().toInt(&ok, 16));
 	}
 
 	//qDebug() << "Spectrum ready:\n " << spectrum;
 	emit spectrumChanged(spectrum);
+
+	return spectrumArray;
 }
 
 void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
+
+	//qDebug() << "Status hex: " << statusData.toHex();
+
+//	QString spacedStatus = statusData.toHex();
+//	int endVal = spacedStatus.size()-8;
+//	for(int x = endVal; x > 0; x-=8)
+//		spacedStatus.insert(x, " ");
+//	//qDebug() << spacedStatus;
+
 	bool ok;
 	QByteArray tmpData;
-	//qDebug() << "Status hex: " << statusData.toHex();
-	QString spacedStatus = statusData.toHex();
-
-	int endVal = spacedStatus.size()-8;
-	for(int x = endVal; x > 0; x-=8)
-		spacedStatus.insert(x, " ");
-	//qDebug() << spacedStatus;
-
 	backwardsMid(0, 4, statusData, tmpData);
 	internalSetFastCounts(tmpData.toHex().toInt(&ok, 16));
 	//qDebug() << "Fast: " << tmpData.toHex() << fastCounts_;
@@ -189,6 +164,7 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	backwardsMid(12, 1, statusData, tmpData);
 	int accTime = tmpData.toHex().toInt(&ok, 16);
 	//qDebug() << "accTime: " << tmpData.toHex() << accTime;
+
 	backwardsMid(13, 3, statusData, tmpData);
 	accTime += tmpData.toHex().toInt(&ok, 16)*100;
 	internalSetAccumulationTime( ((double)(accTime))/1000);
@@ -207,6 +183,7 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	tmpData[0] = tmpData[0] >> 4;
 	internalSetFirmwareMajorVersion(tmpData.toHex().toInt(&ok, 16));
 	//qDebug() << "firmwareMajorVersion: " << tmpData.toHex() << firmwareMajorVersion;
+
 	backwardsMid(24, 1, statusData, tmpData);
 	tmpData[0] = tmpData[0] & 0x0f;
 	internalSetFirmwareMinorVersion(tmpData.toHex().toInt(&ok, 16));
@@ -217,6 +194,7 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	tmpData[0] = tmpData[0] >> 4;
 	internalSetFpgaMajorVersion(tmpData.toHex().toInt(&ok, 16));
 	//qDebug() << "fpgaMajorVersion: " << tmpData.toHex() << fpgaMajorVersion;
+
 	backwardsMid(25, 1, statusData, tmpData);
 	tmpData[0] = tmpData[0] & 0x0f;
 	internalSetFpgaMinorVersion(tmpData.toHex().toInt(&ok, 16));
@@ -227,8 +205,7 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	 //qDebug() << "serialNumber: " << tmpData.toHex() << serialNumber;
 
 	tmpData = statusData.mid(30, 2);
-	signed short shortHV = tmpData.toHex().toUShort(&ok, 16);
-	internalSetHighVoltage((double)(shortHV) * 0.5);
+	internalSetHighVoltage((double)(tmpData.toHex().toUShort(&ok, 16)) * 0.5);
 	//qDebug() << "hv: " << tmpData.toHex() << shortHV << hv;
 
 	tmpData = statusData.mid(32, 2);
@@ -245,16 +222,19 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	tmpData[0] = tmpData[0] >> 7;
 	internalSetPresetRealTimeReached((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "presetRealTimeReached " << presetRealTimeReached_;
+
 	tmpData = statusData.mid(35, 1);
 	tmpData[0] = tmpData[0] & 0x40;
 	tmpData[0] = tmpData[0] >> 6;
 	internalSetAutoFastThresholdLocked((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "autoFastThresholdLocked " << autoFastThresholdLocked;
+
 	tmpData = statusData.mid(35, 1);
 	tmpData[0] = tmpData[0] & 0x20;
 	tmpData[0] = tmpData[0] >> 5;
 	internalSetMcaEnabled((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "mcaEnabled " << mcaEnabled_;
+
 	tmpData = statusData.mid(35, 1);
 	tmpData[0] = tmpData[0] & 0x10;
 	tmpData[0] = tmpData[0] >> 4;
@@ -267,6 +247,7 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	tmpData[0] = tmpData[0] >> 2;
 	internalSetOscilloscopeDataReady((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "oscilloscopeDataReady " << oscilloscopeDataReady;
+
 	tmpData = statusData.mid(35, 1);
 	tmpData[0] = tmpData[0] & 0x02;
 	tmpData[0] = tmpData[0] >> 1;
@@ -280,17 +261,20 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	tmpData[0] = tmpData[0] >> 7;
 	internalSetAutoInputOffsetSearching((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "autoInputOffsetSearching " << autoInputOffsetSearching;
+
 	tmpData = statusData.mid(36, 1);
 	tmpData[0] = tmpData[0] & 0x40;
 	tmpData[0] = tmpData[0] >> 6;
 	internalSetMcsFinished((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "mcsFinished " << mcsFinished;
+
 	tmpData = statusData.mid(36, 1);
 	tmpData[0] = tmpData[0] & 0x02;
 	tmpData[0] = tmpData[0] >> 1;
 	internalSetUsing20MHz(!(bool)(tmpData.toHex().toInt(&ok, 16)));
 	internalSetUsing80MHz((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "using20MHz " << using20MHz << " using80MHz " << using80MHz;
+
 	tmpData = statusData.mid(36, 1);
 	tmpData[0] = tmpData[0] & 0x01;
 	internalSetClockAutoSet((bool)(tmpData.toHex().toInt(&ok, 16)));
@@ -304,12 +288,14 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	tmpData[0] = tmpData[0] >> 7;
 	internalSetPc5DetectedAtPowerUp((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "pc5DetectedAtPowerUp " << pc5DetectedAtPowerUp;
+
 	tmpData = statusData.mid(36, 1);
 	tmpData[0] = tmpData[0] & 0x40;
 	tmpData[0] = tmpData[0] >> 6;
 	internalSetPc5HVNegative(!(bool)(tmpData.toHex().toInt(&ok, 16)));
 	internalSetPc5HVPositive((bool)(tmpData.toHex().toInt(&ok, 16)));
 	//qDebug() << "pc5HVNegative " << pc5HVNegative << " pc5HVPositive " << pc5HVPositive;
+
 	tmpData = statusData.mid(36, 1);
 	tmpData[0] = tmpData[0] & 0x20;
 	tmpData[0] = tmpData[0] >> 5;
@@ -343,10 +329,6 @@ void AmptekSDD123Detector::readTextConfigurationReadback(const QString &textConf
 			internalSetPresetTime(ASCIICommand.section('=', 1).toDouble());
 			//presetTime_->move(ASCIICommand.section('=', 1).toDouble());
 	}
-}
-
-void AmptekSDD123Detector::setSpectrumReceiver(QObject *spectrumReceiver){
-	spectrumReceiver_ = spectrumReceiver;
 }
 
 void AmptekSDD123Detector::backwardsMid(int start, int length, const QByteArray &inputData, QByteArray &outputData){

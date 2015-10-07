@@ -42,7 +42,7 @@ protected:
 	void initializeAndStartTCPServer();
 
 	/// pure virtual function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
-	virtual void initializeBufferGroup(quint64 maxCountSize = 1000*60*60*10) = 0;
+	virtual void initializeBufferGroup() = 0;
 	/// pure virtual function to initialize the data server to update the buffer groups
 	virtual void initializeAndStartDataServer() = 0;
 	/// pure virtual function to finalize the initialization
@@ -54,6 +54,8 @@ protected:
 	void processClientDataRequest(AMDSClientRequest *clientRequest);
 
 protected:
+	/// the max buffer size, default value: 1000*60*60*10 --- 10 hours data collection
+	quint64 maxBufferSize_;
 	/// the instance of threaded TCP data server
 	AMDSThreadedTCPDataServer *tcpDataServer_;
 	/// the list of bufferGroup managers

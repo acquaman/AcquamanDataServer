@@ -6,9 +6,9 @@
 #include <QVector>
 
 #include "DataElement/AMDSDataTypeDefinitions.h"
+#include "Detector/Amptek/AmptekEventDefinitions.h"
 
 class AMDSFlatArray;
-class AMDSBufferGroupInfo;
 
 class AmptekSDD123Detector : public QObject
 {
@@ -17,67 +17,23 @@ class AmptekSDD123Detector : public QObject
 public:
 	AmptekSDD123Detector(const QString &name, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, QObject *parent = 0);
 
-	AMDSDataTypeDefinitions::DataType dataType() { return dataType(); }
-	int bufferSize() { return bufferSize_; }
-
-	QString name() const { return name_;}
-	QString basePVName() const { return basePVName_;}
-	bool configurationParametersInitialized() const { return configurationParametersInitialized_;}
-
-	int fastCounts() const {return fastCounts_;}
-	int slowCounts() const {return slowCounts_;}
-	int generalPurposeCounter() const {return generalPurposeCounter_;}
-	double accumulationTime() const {return accumulationTime_;}
-	double liveTime() const {return liveTime_;}
-	double realTime() const {return realTime_;}
-	int firmwareMajorVersion() const {return firmwareMajorVersion_;}
-	int firmwareMinorVersion() const {return firmwareMinorVersion_;}
-	int fpgaMajorVersion() const {return fpgaMajorVersion_;}
-	int fpgaMinorVersion() const {return fpgaMinorVersion_;}
-	int serialNumber() const {return serialNumber_;}
-	double highVoltage() const {return highVoltage_;}
-	double detectorTemperature() const {return detectorTemperature_;}
-	int boardTemperature() const {return boardTemperature_;}
-	bool presetRealTimeReached() const {return presetRealTimeReached_;}
-	bool autoFastThresholdLocked() const {return autoFastThresholdLocked_;}
-	bool mcaEnabled() const {return mcaEnabled_;}
-	bool presetCountReached() const {return presetCountReached_;}
-	bool oscilloscopeDataReady() const {return oscilloscopeDataReady_;}
-	bool unitConfigured() const {return unitConfigured_;}
-	bool autoInputOffsetSearching() const {return autoInputOffsetSearching_;}
-	bool mcsFinished() const {return mcsFinished_;}
-	bool using20MHz() const {return using20MHz_;}
-	bool using80MHz() const {return using80MHz_;}
-	bool clockAutoSet() const {return clockAutoSet_;}
-	bool pc5DetectedAtPowerUp() const {return pc5DetectedAtPowerUp_;}
-	bool pc5HVNegative() const {return pc5HVNegative_;}
-	bool pc5HVPositive() const {return pc5HVPositive_;}
-	bool pc5Preamp5V() const {return pc5Preamp5V_;}
-	bool pc5Preamp8p5V() const {return pc5Preamp8p5V_;}
-	int deviceID() const {return deviceID_;}
-
-	/// Returns the preset time (PRET). Returns -1 if the value was set to "OFF".
-	double presetTime() const {return presetTime_;}
-	/// Returns the number of MCA Channels being used (MCAC)
-	int mcaChannels() const { return mcaChannels_;}
-
+	/// function to handle the system events
 	virtual bool event(QEvent *e);
 
-public slots:
-	void setName(const QString &name) { name_ = name;}
-	void setBasePVName(const QString &basePVName) { basePVName_ = basePVName; }
+	/// returns the dataType the detector will return
+	inline AMDSDataTypeDefinitions::DataType dataType() { return dataType(); }
+	/// returns the buffersize (spectrum size) the detector will return
+	inline int bufferSize() { return bufferSize_; }
 
-	void readSpectrumData(const QByteArray &spectrumData, int numChannels);
-	void readStatusData(const QByteArray &statusData);
-
-	void readTextConfigurationReadback(const QString &textConfiguration);
-
-	void setSpectrumReceiver(QObject *spectrumReceiver);
+	/// returns the name of the detector
+	inline QString name() const { return name_;}
+	/// returns the basePVName of the detector
+	inline QString basePVName() const { return basePVName_;}
 
 signals:
 	void spectrumChanged(QList<double> spectrum);
 	void statusDataRead();
-	void textConfigurationRead();
+//	void textConfigurationRead();
 
 	void fastCountsChanged(int fastCounts);
 	void slowCountsChanged(int slowCounts);
@@ -147,7 +103,22 @@ signals:
 	void mcaChannelsChanged(int mcaChannels);
 
 protected:
+
+	/// helper function to handle the SpectrumPacketEvent
+	void onSpectrumPacketEventReceived(AmptekSpectrumPacketEvent* event);
+	/// helper function to handle the ConfigurationReadbackEvent
+	void onConfigurationReadbackEventReceived(AmptekConfigurationReadbackEvent* event);
+
+	/// helper function to read the spectrum data
+	AMDSFlatArray *readSpectrumData(const QByteArray &spectrumData, int numChannels);
+	/// helper function to read the spectrum status data
+	void readStatusData(const QByteArray &statusData);
+	/// helper function to read the text configuration readback
+	void readTextConfigurationReadback(const QString &textConfiguration);
+
+	/// helper function to copy date backward from "start" till "start+length" of inputData to outputData
 	void backwardsMid(int start, int length, const QByteArray &inputData, QByteArray &outputData);
+	/// helper function to covert bool true/false to string "true"/"false"
 	QString stringFromBool(bool input) const;
 
 	void internalSetFastCounts(int fastCounts);
@@ -181,14 +152,71 @@ protected:
 	void internalSetPc5Preamp5V(bool pc5Preamp5V);
 	void internalSetPc5Preamp8p5V(bool pc5Preamp8p5V);
 	void internalSetDeviceID(int deviceID);
-
 	/// Set the preset time (for use by the configuration text readback system)
 	void internalSetPresetTime(double presetTime);
 	/// Set the number of MCA channels (for use by the configuration text readback system)
 	void internalSetMCAChannels(int mcaChannels);
 
+	/// returns the current fastCounts
+	inline int fastCounts() const {return fastCounts_;}
+	/// returns the current slowCounts
+	inline int slowCounts() const {return slowCounts_;}
+	/// returns the current generalPurposeCounter
+	inline int generalPurposeCounter() const {return generalPurposeCounter_;}
+	/// returns the current accumulationTime
+	inline double accumulationTime() const {return accumulationTime_;}
+	/// returns the current liveTime
+	inline double liveTime() const {return liveTime_;}
+	/// returns the current realTime
+	inline double realTime() const {return realTime_;}
+	/// returns the current detectorTemperature
+	inline double detectorTemperature() const {return detectorTemperature_;}
+
+	/// set the receiver of the new spectrum data
+	inline void setSpectrumReceiver(QObject *spectrumReceiver) { spectrumReceiver_ = spectrumReceiver; }
+
+	/// The following methods are NOT used
+	inline bool configurationParametersInitialized() const { return configurationParametersInitialized_;}
+	inline int firmwareMajorVersion() const {return firmwareMajorVersion_;}
+	inline int firmwareMinorVersion() const {return firmwareMinorVersion_;}
+	inline int fpgaMajorVersion() const {return fpgaMajorVersion_;}
+	inline int fpgaMinorVersion() const {return fpgaMinorVersion_;}
+	inline int serialNumber() const {return serialNumber_;}
+	inline double highVoltage() const {return highVoltage_;}
+	inline int boardTemperature() const {return boardTemperature_;}
+	inline bool presetRealTimeReached() const {return presetRealTimeReached_;}
+	inline bool autoFastThresholdLocked() const {return autoFastThresholdLocked_;}
+	inline bool mcaEnabled() const {return mcaEnabled_;}
+	inline bool presetCountReached() const {return presetCountReached_;}
+	inline bool oscilloscopeDataReady() const {return oscilloscopeDataReady_;}
+	inline bool unitConfigured() const {return unitConfigured_;}
+	inline bool autoInputOffsetSearching() const {return autoInputOffsetSearching_;}
+	inline bool mcsFinished() const {return mcsFinished_;}
+	inline bool using20MHz() const {return using20MHz_;}
+	inline bool using80MHz() const {return using80MHz_;}
+	inline bool clockAutoSet() const {return clockAutoSet_;}
+	inline bool pc5DetectedAtPowerUp() const {return pc5DetectedAtPowerUp_;}
+	inline bool pc5HVNegative() const {return pc5HVNegative_;}
+	inline bool pc5HVPositive() const {return pc5HVPositive_;}
+	inline bool pc5Preamp5V() const {return pc5Preamp5V_;}
+	inline bool pc5Preamp8p5V() const {return pc5Preamp8p5V_;}
+	inline int deviceID() const {return deviceID_;}
+	/// Returns the preset time (PRET). Returns -1 if the value was set to "OFF".
+	inline double presetTime() const {return presetTime_;}
+	/// Returns the number of MCA Channels being used (MCAC)
+	inline int mcaChannels() const { return mcaChannels_;}
+
 protected:
+	/// the event receiver for spectrum package
+	QObject *spectrumReceiver_;
+
+	/// the name of the detector
+	QString name_;
+	/// the basePVName of the detector
+	QString basePVName_;
+	///	the dataType of the data in the spectrum
 	AMDSDataTypeDefinitions::DataType dataType_;
+	///	the size of the spectrum
 	int bufferSize_;
 
 	//// START OF STATUS PACKET PARAMETERS ////
@@ -243,21 +271,15 @@ protected:
 	int deviceID_;
 	//// END OF STATUS PACKET PARAMETERS ////
 
+	/// Holds whether or not the text configuration has been fully readback at least once
+	bool configurationParametersInitialized_;
+
 	//// START OF CONFIGURATION READBACK PARAMETERS ////
 	/// Preset time for configuration (PRET). A value of -1 is associated with the "OFF" value.
 	double presetTime_;
 	/// Number of MCA Channels in use (MCAC)
 	int mcaChannels_;
 	//// END OF CONFIGURATION READBACK PARAMETERS ////
-
-	QString name_;
-	QString basePVName_;
-	/// Holds whether or not the text configuration has been fully readback at least once
-	bool configurationParametersInitialized_;
-
-	QObject *spectrumReceiver_;
-//	QVector<double> lastSpectrumVector_;
-	AMDSFlatArray *lastSpectrumVector_;
 };
 
 #endif // AMPTEKSDD123DETECTOR_H

@@ -17,6 +17,17 @@ public:
 	/// define the Division operation of AMDSFlatArray: the value of the given handler will be divided by the given divisior
 	virtual AMDSFlatArray operator /(quint32 divisor);
 
+	void setValue(int index, qint8   value) { vectorQint8_[index] = value; }
+	void setValue(int index, quint8  value) { vectorQuint8_[index] = value; }
+	void setValue(int index, qint16  value) { vectorQint16_[index] = value; }
+	void setValue(int index, quint16 value) { vectorQuint16_[index] = value; }
+	void setValue(int index, qint32  value) { vectorQint32_[index] = value; }
+	void setValue(int index, quint32 value) { vectorQuint32_[index] = value; }
+	void setValue(int index, qint64  value) { vectorQint64_[index] = value; }
+	void setValue(int index, quint64 value) { vectorQuint64_[index] = value; }
+	void setValue(int index, float   value) { vectorFloat_[index] = value; }
+	void setValue(int index, double  value) { vectorDouble_[index] = value; }
+
 	inline AMDSDataTypeDefinitions::DataType dataType() const { return dataType_; }
 	inline quint32 size() const;
 

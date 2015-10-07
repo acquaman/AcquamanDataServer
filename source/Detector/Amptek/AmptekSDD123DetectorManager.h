@@ -2,32 +2,16 @@
 #define AMPTEKSDD123DETECTORMANAGER_H
 
 #include <QObject>
-#include <QList>
-#include <QVector>
 
-#include "AmptekEventDefinitions.h"
+#include "Detector/Amptek/AmptekEventDefinitions.h"
 
-#include "DataElement/AMDSFlatArray.h"
-
-class AmptekSDD123ThreadedBufferGroupManager;
-
-
-class QSignalMapper;
-class AMDSClientRequest;
-class AMDSClientDataRequest;
-class AmptekSDD123Detector;
-//class AmptekSDD123Histogram;
-class AmptekSDD123DwellHistogramGroup;
-//class AmptekSDD123ThreadedHistogramGroup;
-class AMDSThreadedBufferGroup;
-class AMDSBufferGroup;
 class AMDSDataHolder;
-
+class AmptekSDD123Detector;
 class AmptekSDD123ConfigurationMap;
 
 class AmptekSDD123DetectorManager : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	enum DwellMode{
 		ContinuousDwell = 0,
@@ -46,26 +30,34 @@ public:
 		FastPeakingTime400 = 2
 	};
 
-	AmptekSDD123DetectorManager(AmptekSDD123Detector *detector, quint64 maxCountSize, bool enableCumulative = false, QObject *parent = 0);
+	AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent = 0);
 
-//	QString name() const;
-//	bool dwellActive() const;
+	/// helper function to return the name of the Amptek detector
+	QString detectorName() const;
+	/// helper function to return the detector of the current manager
+	AmptekSDD123Detector *detector();
 
+	/// helper function to return the current dwell time
 	double dwellTime() const;
-
+	/// helper function to return the current dwell mode
 	AmptekSDD123DetectorManager::DwellMode dwellMode() const;
 
 	/// function to handle QEvent
 	bool event(QEvent *e);
 
-	/// helper function to return the detector of the current manager
-	AmptekSDD123Detector *detector();
+
+
+
+signals:
+	void clearHistrogramData(QString detectorName);
+	void clearDwellHistrogramData(QString detectorName);
+	void newHistrogramReceived(QString detectorName, AMDSDataHolder *);
+	void newDwellHistrogramReceived(QString detectorName, AMDSDataHolder *);
 
 public slots:
 	/// function to set the event receiver to handle the request
 	void setRequestEventReceiver(QObject *requestEventReceiver);
 
-	void clearDwellData();
 	void startDwell();
 	void stopDwell();
 
@@ -88,10 +80,10 @@ public slots:
 	void setDetectorSlowThreshold(double slowThreshold);
 	void setDetectorPeakingTime(double peakingTime);
 	void setDetectorFastPeakingTime(AmptekSDD123DetectorManager::FastPeakingTimeValue fastPeakingTimeValue);
-	void forwardDataRequest(AMDSClientDataRequest*);
+//	void forwardDataRequest(AMDSClientDataRequest*);
 
 signals:
-	void requestData(AMDSClientRequest*);
+//	void requestData(AMDSClientRequest*);
 //	void requestData(AMDSClientDataRequest*);
 //	void continuousDataUpdate(AMDSFlatArray continuousSpectrum);
 	void continuousDataUpdate(AMDSDataHolder *continuousSpectrum);
@@ -108,7 +100,7 @@ signals:
 	void dwellFinishedTimeUpdate(double dwellTime);
 
 	void configurationValuesUpdate(AmptekConfigurationData configurationData);
-	void clientRequestProcessed(AMDSClientDataRequest*);
+//	void clientRequestProcessed(AMDSClientDataRequest*);
 
 
 protected:
@@ -132,10 +124,10 @@ protected:
 	QTime presetDwellLocalEndTime_;
 	AmptekSDD123DetectorManager::DwellMode dwellMode_;
 
-//	AmptekSDD123ThreadedHistogramGroup *allData_;
-	AMDSThreadedBufferGroup *allData_;
-//	AmptekSDD123DwellHistogramGroup *dwellData_;
-	AMDSBufferGroup *dwellData_;
+////	AmptekSDD123ThreadedHistogramGroup *allData_;
+//	AMDSThreadedBufferGroup *allData_;
+////	AmptekSDD123DwellHistogramGroup *dwellData_;
+//	AMDSBufferGroup *dwellData_;
 
 	int maxHistogramStackSize_;
 
