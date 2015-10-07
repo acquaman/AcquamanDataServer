@@ -30,6 +30,9 @@ public:
 	/// returns the basePVName of the detector
 	inline QString basePVName() const { return basePVName_;}
 
+	/// set the receiver of the new spectrum data
+	inline void setSpectrumReceiver(QObject *spectrumReceiver) { spectrumReceiver_ = spectrumReceiver; }
+
 signals:
 	void spectrumChanged(QList<double> spectrum);
 	void statusDataRead();
@@ -171,9 +174,6 @@ protected:
 	inline double realTime() const {return realTime_;}
 	/// returns the current detectorTemperature
 	inline double detectorTemperature() const {return detectorTemperature_;}
-
-	/// set the receiver of the new spectrum data
-	inline void setSpectrumReceiver(QObject *spectrumReceiver) { spectrumReceiver_ = spectrumReceiver; }
 
 	/// The following methods are NOT used
 	inline bool configurationParametersInitialized() const { return configurationParametersInitialized_;}

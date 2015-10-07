@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "Detector/Amptek/AmptekEventDefinitions.h"
+#include "Detector/Amptek/AmptekSDD123Detector.h"
 
 class AMDSDataHolder;
 class AmptekSDD123Detector;
@@ -33,9 +34,9 @@ public:
 	AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent = 0);
 
 	/// helper function to return the name of the Amptek detector
-	QString detectorName() const;
+	inline QString detectorName() const { return detector_->name(); }
 	/// helper function to return the detector of the current manager
-	AmptekSDD123Detector *detector();
+	inline AmptekSDD123Detector *detector() { return detector_; }
 
 	/// helper function to return the current dwell time
 	double dwellTime() const;

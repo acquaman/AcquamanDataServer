@@ -8,7 +8,6 @@
 #include "Detector/Amptek/AmptekSDD123Application.h"
 
 #include "ClientRequest/AMDSClientDataRequest.h"
-#include "Detector/Amptek/AmptekSDD123Detector.h"
 #include "Detector/Amptek/AmptekSDD123Histogram.h"
 
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
@@ -37,15 +36,6 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	presetDwellActive_ = false;
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
-}
-
-QString AmptekSDD123DetectorManager::detectorName() const
-{
-	return detector_->name();
-}
-
-AmptekSDD123Detector* AmptekSDD123DetectorManager::detector(){
-	return detector_;
 }
 
 double AmptekSDD123DetectorManager::dwellTime() const{
@@ -339,7 +329,7 @@ void AmptekSDD123DetectorManager::spectrumEventHelper(QEvent *e){
 }
 
 void AmptekSDD123DetectorManager::configurationValuesEventHelper(QEvent *e){
-	configurationData_ = ((AmptekConfigurationValuesEvent*)e)->configurationData_;
+	configurationData_ = ((AmptekConfigurationValuesEvent*)e)->configurationData();
 	emit configurationValuesUpdate(configurationData_);
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;

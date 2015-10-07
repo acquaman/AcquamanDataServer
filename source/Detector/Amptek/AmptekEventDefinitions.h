@@ -53,7 +53,7 @@ public:
 //	inline void setSpectrum(QVector<double> spectrums) { spectrum_.clear(); spectrum_ = spectrums; }
 //	inline void setStatusData(AmptekStatusData statusData) { statusData_ = statusData; }
 
-protected:
+//protected:
 	QString detectorSourceName_;
 //	QVector<double> spectrum_;
 	AMDSFlatArray spectrum_;
@@ -122,6 +122,9 @@ public:
 
 	/// helper function to pase the list of configurations in the event
 	void parseConfigurations(QStringList configurationList);
+
+	/// returns the configurationData
+	inline AmptekConfigurationData configurationData() { return configurationData_; }
 
 protected:
 	/// the configuraiton data
