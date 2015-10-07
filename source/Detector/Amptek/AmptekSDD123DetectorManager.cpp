@@ -38,14 +38,6 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
 }
 
-double AmptekSDD123DetectorManager::dwellTime() const{
-	return dwellTime_;
-}
-
-AmptekSDD123DetectorManager::DwellMode AmptekSDD123DetectorManager::dwellMode() const{
-	return dwellMode_;
-}
-
 bool AmptekSDD123DetectorManager::event(QEvent *e){
 	if(e->type() == (QEvent::Type)AmptekEventDefinitions::SpectrumEvent){
 		spectrumEventHelper(e);

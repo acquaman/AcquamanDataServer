@@ -33,21 +33,17 @@ public:
 
 	AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent = 0);
 
+	/// function to handle QEvent
+	bool event(QEvent *e);
+
 	/// helper function to return the name of the Amptek detector
 	inline QString detectorName() const { return detector_->name(); }
 	/// helper function to return the detector of the current manager
 	inline AmptekSDD123Detector *detector() { return detector_; }
-
 	/// helper function to return the current dwell time
-	double dwellTime() const;
+	inline double dwellTime() const { return dwellTime_; }
 	/// helper function to return the current dwell mode
-	AmptekSDD123DetectorManager::DwellMode dwellMode() const;
-
-	/// function to handle QEvent
-	bool event(QEvent *e);
-
-
-
+	inline AmptekSDD123DetectorManager::DwellMode dwellMode() const { return dwellMode_; }
 
 signals:
 	void clearHistrogramData(QString detectorName);
