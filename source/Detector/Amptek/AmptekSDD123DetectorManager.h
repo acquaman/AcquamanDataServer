@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "Detector/Amptek/AmptekEventDefinitions.h"
+//#include "Detector/Amptek/AmptekEventDefinitions.h"
 #include "Detector/Amptek/AmptekSDD123Detector.h"
 
 class AMDSDataHolder;
@@ -84,18 +84,31 @@ public slots:
 	/// function to request AmptekDetector configuration values
 	void requestDetectorConfigurationValues();
 
+	/// slot to request set detector configuration
 	void setDetectorConfigurationValues();
+	/// slot to request set detector analog gain index
 	void setDetectorAnalogGainIndex(int analogGainIndex);
+	/// slot to request set detector fine gain
 	void setDetectorFineGain(double fineGain);
+	/// slot to request set detector total gain
 	void setDetectorTotalGain(double totalGain);
+	/// slot to request turn on/off detector HV
 	void setDetectorHV(bool on);
+	/// slot to request enable/disable detector MCA
 	void setDetectorMCAEnabled(bool enabled);
+	/// slot to request enable/disable detector pile up rejection
 	void setDetectorPileUpRejection(bool enabled);
+	/// slot to request set detector coolerSetting
 	void setDetectorCoolerSetting(int coolerSetting);
+	/// slot to request set detector single channel analyzer
 	void setDetectorSingleChannelAnalyzer(int singleChannelAnalyzerIndex, int lowChannelIndex, int highChannelIndex);
+	/// slot to request set detector fast threshold
 	void setDetectorFastThreshold(int fastThreshold);
+	/// slot to request set detector slow threshold
 	void setDetectorSlowThreshold(double slowThreshold);
+	/// slot to request set detector pearking time
 	void setDetectorPeakingTime(double peakingTime);
+	/// slot to request set detector fast pearking time
 	void setDetectorFastPeakingTime(AmptekSDD123DetectorManager::FastPeakingTimeValue fastPeakingTimeValue);
 
 protected slots:
@@ -122,29 +135,33 @@ protected:
 	void postConfigurationSetEvent();
 
 protected:
+	/// the instance of the Amptek detector
 	AmptekSDD123Detector *detector_;
-	AmptekConfigurationData configurationData_;
-
+	/// the QEvent receiver
 	QObject *requestEventReceiver_;
 
-	int dwellTime_;
-	bool dwellActive_;
-	bool setPresetDwellEndTimeOnNextEvent_;
-
-	QTime lastestDwellEndTime_;
-
-	QTime presetDwellEndTime_;
-	QTime presetDwellLocalStartTime_;
-	QTime presetDwellLocalEndTime_;
-	AmptekSDD123DetectorManager::DwellMode dwellMode_;
-
-	int maxHistogramStackSize_;
-
-	bool presetDwellActive_;
-
+	/// flag to indicate whether the data is initialized or not (whether the coming package is the first package)
 	bool initialized_;
+	/// the default dwell time
+	int dwellTime_;
+	/// the current dwell mode
+	AmptekSDD123DetectorManager::DwellMode dwellMode_;
+	/// flag to indicate whether dwell is actived or not
+	bool dwellActive_;
+	/// flag to indicate whether to end preset dwell on next event
+	bool setPresetDwellEndTimeOnNextEvent_;
+	/// the expected preset dwell end time
+	QTime presetDwellEndTime_;
+	/// the start time of presetdwell
+	QTime presetDwellLocalStartTime_;
+	/// the preset dwell end time of the latest event
+	QTime presetDwellLocalEndTime_;
 
+	/// the configuration data received via configuration value event
+	AmptekConfigurationData configurationData_;
+	/// the current reason of configuration
 	AmptekSDD123DetectorManager::ConfigurationModeReason configurationRequestReason_;
+	/// the current command of setting configuration
 	QString configurationSetCommand_;
 };
 

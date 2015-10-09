@@ -21,10 +21,10 @@ protected slots:
 	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime) ;
 	/// slot to handle dwell finish data update
 	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime);
+	/// slot to handle configuration value update signal
+	void onConfigurationValuesUpdate(AmptekConfigurationData configurationData);
 
 	void onSpectrumControlValueChanged();
-
-	void onConfigurationValuesUpdate(AmptekConfigurationData configurationData);
 
 	void onStartDwellControlValueChange(double newValue);
 	void onStopDwellControlValueChange(double newValue);
@@ -65,6 +65,13 @@ protected:
 	void dataHelper(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime);
 
 protected:
+	QTime lastEPICSSpectrumUpdateTime_;
+	int EPICSSpectrumUpdateMSecs_;
+	bool connected_;
+	bool receivedConfigurationDataOnce_;
+
+	AMControlSet *allControls_;
+
 	AMSinglePVControl *startDwellControl_;
 	AMSinglePVControl *stopDwellControl_;
 	AMSinglePVControl *clearSpectrumControl_;
@@ -73,8 +80,6 @@ protected:
 	AMSinglePVControl *dwellStateControl_;
 	AMSinglePVControl *isAvailableControl_;
 
-	QTime lastEPICSSpectrumUpdateTime_;
-	int EPICSSpectrumUpdateMSecs_;
 	AMWaveformBinningSinglePVControl *spectrumControl_;
 
 	AMSinglePVControl *fastCountsControl_;
@@ -122,9 +127,6 @@ protected:
 	QList<AMSinglePVControl*> roiLowIndexControls_;
 	QList<AMSinglePVControl*> roiHighIndexControls_;
 
-	AMControlSet *allControls_;
-	bool connected_;
-	bool receivedConfigurationDataOnce_;
 };
 
 #endif // AMPTEKSDD123EPICSDETECTORMANAGER_H

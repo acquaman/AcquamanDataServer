@@ -24,12 +24,10 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	detector_ = new AmptekSDD123Detector(amptekConfiguration->detectorName(), amptekConfiguration->detectorBasePVName(), amptekConfiguration->dataType(), amptekConfiguration->spectrumCountSize());
 	detector_->setSpectrumReceiver(this);
 
+	dwellMode_ = AmptekSDD123DetectorManager::PresetDwell;
 	dwellActive_ = false;
 	dwellTime_ = 2;
-	dwellMode_ = AmptekSDD123DetectorManager::PresetDwell;
 	setPresetDwellEndTimeOnNextEvent_ = false;
-
-	presetDwellActive_ = false;
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
 }

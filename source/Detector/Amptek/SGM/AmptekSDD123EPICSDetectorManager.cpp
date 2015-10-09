@@ -140,7 +140,6 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 
 	connect(this, SIGNAL(continuousAllDataUpdate(QVector<int>,AMDSStatusData,int,double)), this, SLOT(onContinuousAllDataUpdate(QVector<int>,AMDSStatusData,int,double)));
 	connect(this, SIGNAL(dwellFinishedAllDataUpdate(QVector<int>,AMDSStatusData,int,double)), this, SLOT(onDwellFinishedAllDataUpdate(QVector<int>,AMDSStatusData,int,double)));
-
 	connect(this, SIGNAL(configurationValuesUpdate(AmptekConfigurationData)), this, SLOT(onConfigurationValuesUpdate(AmptekConfigurationData)));
 
 	connect(allControls_, SIGNAL(connected(bool)), this, SLOT(onAllControlsConnected(bool)));
