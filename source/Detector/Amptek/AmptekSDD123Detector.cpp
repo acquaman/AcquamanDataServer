@@ -141,10 +141,10 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 
 	//qDebug() << "Status hex: " << statusData.toHex();
 
-//	QString spacedStatus = statusData.toHex();
-//	int endVal = spacedStatus.size()-8;
-//	for(int x = endVal; x > 0; x-=8)
-//		spacedStatus.insert(x, " ");
+	QString spacedStatus = statusData.toHex();
+	int endVal = spacedStatus.size()-8;
+	for(int x = endVal; x > 0; x-=8)
+		spacedStatus.insert(x, " ");
 //	//qDebug() << spacedStatus;
 
 	bool ok;
@@ -323,7 +323,7 @@ void AmptekSDD123Detector::readTextConfigurationReadback(const QString &textConf
 		if(ASCIICommand.section('=', 0, 0) == "MCAC"){
 			//qDebug() << "I think MCAC is " << ASCIICommand.section('=', 1).toDouble();
 			//mcaChannels_->move(ASCIICommand.section('=', 1).toDouble());
-			internalSetMCAChannels(ASCIICommand.section('=', 1).toDouble());
+			internalSetMCAChannels(ASCIICommand.section('=', 1).toInt());
 		}
 		else if(ASCIICommand.section('=', 0, 0) == "PRET")
 			internalSetPresetTime(ASCIICommand.section('=', 1).toDouble());

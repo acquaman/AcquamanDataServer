@@ -135,7 +135,7 @@ void AmptekConfigurationValuesEvent::parseConfigurations(QStringList configurati
 		else if(configuration.contains("PURE"))
 			configurationData_.pileUpRejection_ = configurationValue;
 		else if(configuration.contains("SCAI")){
-			AMErrorMon::information(this, 0, QString("==== SCAI: High Indices (%1) Low Indices (%2)").arg(configurationList.at(x+1)).arg(configurationList.at(x+2)));
+			AMErrorMon::information(0, 0, QString("==== SCAI: High Indices (%1) Low Indices (%2)").arg(configurationList.at(x+1)).arg(configurationList.at(x+2)));
 
 			QString configurationValueHightIndices = configurationList.at(x+1).section('=', -1);
 			QString configurationValueLowIndices = configurationList.at(x+2).section('=', -1);
