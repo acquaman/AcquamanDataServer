@@ -4,7 +4,10 @@
 #
 #-------------------------------------------------
 
+PATH_TO_SOURCE = /home/liux0/beamline/programming/AcquamanDataServer/source
 PATH_TO_ACQUAMAN = /home/liux0/beamline/programming/acquaman/source
+
+INCLUDEPATH += $$PATH_TO_SOURCE
 INCLUDEPATH += $$PATH_TO_ACQUAMAN
 
 include ( compositCommon/AMDSClientCommon.pri )

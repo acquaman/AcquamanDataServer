@@ -2,18 +2,18 @@
 
 #include <QtNetwork>
 
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
-#include "source/ClientRequest/AMDSClientRequestSupport.h"
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
-#include "source/ClientRequest/AMDSClientStatisticsRequest.h"
-#include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
-#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
-#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
-#include "source/Connection/AMDSClientTCPSocket.h"
-#include "source/Connection/AMDSServer.h"
+#include "ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "ClientRequest/AMDSClientRequestSupport.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "ClientRequest/AMDSClientStatisticsRequest.h"
+#include "ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "Connection/AMDSClientTCPSocket.h"
+#include "Connection/AMDSServer.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSClientAppController::AMDSClientAppController(QObject *parent) :

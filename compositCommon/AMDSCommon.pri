@@ -4,7 +4,6 @@
 #
 #-------------------------------------------------
 
-
 QT       += core network gui sql
 
 CONFIG   += console
