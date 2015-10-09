@@ -3,7 +3,6 @@
 
 #include <QObject>
 
-//#include "Detector/Amptek/AmptekEventDefinitions.h"
 #include "Detector/Amptek/AmptekSDD123Detector.h"
 
 class AMDSDataHolder;
