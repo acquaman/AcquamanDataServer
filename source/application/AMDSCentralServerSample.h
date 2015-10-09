@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMap>
 
-#include "source/application/AMDSCentralServer.h"
+#include "application/AMDSCentralServer.h"
 
 class AMDSCentralServerSample : public AMDSCentralServer
 {

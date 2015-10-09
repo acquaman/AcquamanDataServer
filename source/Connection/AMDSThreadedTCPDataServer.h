@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QThread>
 
-#include "source/Connection/AMDSTCPDataServer.h"
+#include "Connection/AMDSTCPDataServer.h"
 
 class AMDSClientRequest;
 

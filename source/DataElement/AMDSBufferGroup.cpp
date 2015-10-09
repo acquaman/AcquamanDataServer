@@ -1,10 +1,10 @@
 #include "AMDSBufferGroup.h"
 
-#include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
-#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
-#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, bool enableCumulative, QObject *parent) :

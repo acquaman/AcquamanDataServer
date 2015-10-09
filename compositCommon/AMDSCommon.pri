@@ -46,6 +46,7 @@ HEADERS *= \
 	source/DataElement/AMDSBufferGroup.h \
 	source/DataElement/AMDSBufferGroupInfo.h \
 	source/DataElement/AMDSThreadedBufferGroup.h \
+	source/DataElement/AMDSDwellStatusData.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
@@ -53,8 +54,7 @@ HEADERS *= \
 	source/DataHolder/AMDSSpectralDataHolder.h \
 	source/DataHolder/AMDSDwellSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h  \
-	source/util/AMDSMetaObjectSupport.h \
-    source/DataElement/AMDSDwellStatusData.h
+	source/util/AMDSMetaObjectSupport.h
 
 SOURCES *= \
 	source/ClientRequest/AMDSClientRequest.cpp \
@@ -79,6 +79,7 @@ SOURCES *= \
 	source/DataElement/AMDSBufferGroupInfo.cpp \
 	source/DataElement/AMDSBufferGroup.cpp \
 	source/DataElement/AMDSThreadedBufferGroup.cpp \
+	source/DataElement/AMDSDwellStatusData.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
@@ -86,9 +87,4 @@ SOURCES *= \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSDwellSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
-	source/util/AMDSMetaObjectSupport.cpp \
-    source/DataElement/AMDSDwellStatusData.cpp
-
-
-
-
+	source/util/AMDSMetaObjectSupport.cpp

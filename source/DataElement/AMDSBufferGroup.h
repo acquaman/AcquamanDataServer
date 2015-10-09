@@ -3,10 +3,10 @@
 
 #include <QObject>
 
-#include "source/DataElement/AMDSDwellStatusData.h"
-#include "source/DataElement/AMDSBuffer.h"
-#include "source/DataElement/AMDSBufferGroupInfo.h"
-#include "source/DataHolder/AMDSDataHolder.h"
+#include "DataElement/AMDSDwellStatusData.h"
+#include "DataElement/AMDSBuffer.h"
+#include "DataElement/AMDSBufferGroupInfo.h"
+#include "DataHolder/AMDSDataHolder.h"
 
 
 class AMDSClientRequest;
