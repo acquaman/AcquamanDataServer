@@ -23,41 +23,12 @@ namespace AmptekEventDefinitions{
 	};
 }
 
-//class AmptekStatusData
-//{
-//public:
-//	AmptekStatusData(int fastCounts = -1, int slowCounts = -1, double detectorTemperature = -1, double accumulationTime = -1, double liveTime = -1, double realTime = -1, int generalPurposeCounter = -1, const QTime &dwellStartTime = QTime(), const QTime &dwellEndTime = QTime(), const QTime &dwellReplyTime = QTime());
-//	AmptekStatusData(const AmptekStatusData &other);
-//	AmptekStatusData& operator =(const AmptekStatusData &other);
-
-//	int fastCounts_;
-//	int slowCounts_;
-//	double detectorTemperature_;
-//	double accumulationTime_;
-//	double liveTime_;
-//	double realTime_;
-//	int generalPurposeCounter_;
-//	QTime dwellStartTime_;
-//	QTime dwellEndTime_;
-//	QTime dwellReplyTime_;
-//};
-
 class AmptekSpectrumEvent : public QEvent
 {
 public:
 	AmptekSpectrumEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumEvent) {}
 
-//	inline QString detectorSourceName() const { return detectorSourceName_; }
-//	inline QVector<double> spectrum() { return spectrum_; }
-//	inline AmptekStatusData statusData() { return statusData_; }
-
-//	inline void setDetectorSourceName(const QString &detectorSourceName) { detectorSourceName_ = detectorSourceName; }
-//	inline void setSpectrum(QVector<double> spectrums) { spectrum_.clear(); spectrum_ = spectrums; }
-//	inline void setStatusData(AmptekStatusData statusData) { statusData_ = statusData; }
-
-//protected:
 	QString detectorSourceName_;
-//	QVector<double> spectrum_;
 	AMDSFlatArray spectrum_;
 	AMDSDwellStatusData statusData_;
 };
@@ -96,7 +67,6 @@ public:
 	/// helper function to pase the configurations
 	void parseConfiguration(QString configuration);
 
-//protected:
 	int analogGainIndex_; //GAIA
 	double fineGain_; //GAIF
 	double totalGain_; //GAIN
