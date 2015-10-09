@@ -96,7 +96,7 @@ void AMDSCentralServerSGM::wrappingUpInitialization()
 
 		amptekDetectorManager->setRequestEventReceiver(amptekServer);
 
-		connect(threadedBufferGroup, SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSStatusData,int,double)), amptekDetectorManager, SLOT(continuousAllDataUpdate(AMDSDataHolder*,AMDSStatusData,int,double)));
+		connect(threadedBufferGroup, SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)));
 	}
 }
 

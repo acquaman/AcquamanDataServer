@@ -4,7 +4,7 @@
 #include <QCoreApplication>
 
 #include "DataElement/AMDSFlatArray.h"
-#include "DataElement/AMDSStatusData.h"
+#include "DataElement/AMDSDwellStatusData.h"
 #include "DataHolder/AMDSDwellSpectralDataHolder.h"
 
 #include "Detector/Amptek/AmptekSDD123Application.h"
@@ -209,7 +209,7 @@ void AmptekSDD123DetectorManager::setDetectorFastPeakingTime(AmptekSDD123Detecto
 
 void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent){
 	AMDSFlatArray spectrumData = spectrumEvent->spectrum_;
-	AMDSStatusData statusData = spectrumEvent->statusData_;
+	AMDSDwellStatusData statusData = spectrumEvent->statusData_;
 
 	if(setPresetDwellEndTimeOnNextEvent_){
 		setPresetDwellEndTimeOnNextEvent_ = false;

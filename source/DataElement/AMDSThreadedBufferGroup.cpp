@@ -46,7 +46,7 @@ void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, bool elapsedDwellTim
 
 	if (bufferGroup_->cumulativeEnabled()) {
 		AMDSDwellSpectralDataHolder *cumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(bufferGroup_->cumulativeDataHolder());
-		AMDSStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
+		AMDSDwellStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
 
 		emit continuousDataUpdate(cumulativeDataHolder);
 		emit continuousStatusDataUpdate(cumulativeStatusData, bufferGroup_->count());
@@ -65,7 +65,7 @@ void AMDSThreadedBufferGroup::finishDwellDataUpdate(double elapsedTime)
 
 	if (bufferGroup_->cumulativeEnabled()) {
 		AMDSDwellSpectralDataHolder *cumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(bufferGroup_->cumulativeDataHolder());
-		AMDSStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
+		AMDSDwellStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
 
 		emit dwellFinishedTimeUpdate(elapsedTime);
 		emit dwellFinishedDataUpdate(cumulativeDataHolder);

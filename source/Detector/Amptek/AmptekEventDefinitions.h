@@ -7,7 +7,7 @@
 #include <QStringList>
 
 #include "DataElement/AMDSFlatArray.h"
-#include "DataElement/AMDSStatusData.h"
+#include "DataElement/AMDSDwellStatusData.h"
 
 namespace AmptekEventDefinitions{
 	enum EventType{
@@ -59,7 +59,7 @@ public:
 	QString detectorSourceName_;
 //	QVector<double> spectrum_;
 	AMDSFlatArray spectrum_;
-	AMDSStatusData statusData_;
+	AMDSDwellStatusData statusData_;
 };
 
 class AmptekSpectrumPacketEvent : public QEvent

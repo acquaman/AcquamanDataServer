@@ -6,9 +6,8 @@
 #include <QVector>
 
 #include "DataElement/AMDSDataTypeDefinitions.h"
-//#include "Detector/Amptek/AmptekEventDefinitions.h"
-
-class AMDSFlatArray;
+#include "DataElement/AMDSFlatArray.h"
+#include "Detector/Amptek/AmptekEventDefinitions.h"
 
 class AmptekSDD123Detector : public QObject
 {

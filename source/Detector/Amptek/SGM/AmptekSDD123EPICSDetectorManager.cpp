@@ -3,7 +3,7 @@
 #include "beamline/AMPVControl.h"
 #include "beamline/AMControlSet.h"
 
-#include "DataElement/AMDSStatusData.h"
+#include "DataElement/AMDSDwellStatusData.h"
 #include "DataHolder/AMDSDataHolder.h"
 
 AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent)
@@ -138,8 +138,8 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	allControls_->addControl(roi8HighIndexControl_);
 	/**/
 
-	connect(this, SIGNAL(continuousAllDataUpdate(QVector<int>,AMDSStatusData,int,double)), this, SLOT(onContinuousAllDataUpdate(QVector<int>,AMDSStatusData,int,double)));
-	connect(this, SIGNAL(dwellFinishedAllDataUpdate(QVector<int>,AMDSStatusData,int,double)), this, SLOT(onDwellFinishedAllDataUpdate(QVector<int>,AMDSStatusData,int,double)));
+	connect(this, SIGNAL(continuousAllDataUpdate(QVector<int>,AMDSDwellStatusData,int,double)), this, SLOT(onContinuousAllDataUpdate(QVector<int>,AMDSDwellStatusData,int,double)));
+	connect(this, SIGNAL(dwellFinishedAllDataUpdate(QVector<int>,AMDSDwellStatusData,int,double)), this, SLOT(onDwellFinishedAllDataUpdate(QVector<int>,AMDSDwellStatusData,int,double)));
 	connect(this, SIGNAL(configurationValuesUpdate(AmptekConfigurationData)), this, SLOT(onConfigurationValuesUpdate(AmptekConfigurationData)));
 
 	connect(allControls_, SIGNAL(connected(bool)), this, SLOT(onAllControlsConnected(bool)));
@@ -179,7 +179,7 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime)
+void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime)
 {
 	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){
 		lastEPICSSpectrumUpdateTime_ = QTime::currentTime();
@@ -187,7 +187,7 @@ void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder 
 	}
 }
 
-void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime)
+void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime)
 {
 	dataHelper(spectrum, statusData, count, elapsedTime);
 
@@ -256,7 +256,7 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(AmptekConfigu
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime){
 	if(!connected_)
 		return;
 

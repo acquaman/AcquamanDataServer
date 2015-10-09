@@ -30,25 +30,13 @@ void AMDSDwellSpectralDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 
 AMDSDataHolder* AMDSDwellSpectralDataHolder::operator +(AMDSDataHolder &dataHolder)
 {
-//	AMDSAmptekSDD123SpectralDataHolder *addInputDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(&dataHolder);
-//	if (!addInputDataHolder) {
-//		AMErrorMon::alert(this, AMDS_SERVER_ERR_UNMATCH_DATA_HOLDER_FOR_PLUS, QString("Invalid class type (%1) to do the PLUS operation").arg(dataHolder.metaObject()->className()));
-//		return 0;
-//	}
-
-//	AMDSFlatArray data = dataArray() + addInputDataHolder->dataArray();
-
-//	AMDSDataHolder* targetDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(metaObject()->className());
-//	targetDataHolder->setData(&data);
-//	return targetDataHolder;
-
 	AMDSDataHolder* targetDataHolder = AMDSLightWeightSpectralDataHolder::operator +(dataHolder);
 
 	AMDSDwellSpectralDataHolder *addInputDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(&dataHolder);
 	AMDSDwellSpectralDataHolder *addTargetDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(targetDataHolder);
 	if (addInputDataHolder && addTargetDataHolder) {
-		AMDSStatusData addInputStatusData = addInputDataHolder->dwellStatusData();
-		AMDSStatusData newStatusData;
+		AMDSDwellStatusData addInputStatusData = addInputDataHolder->dwellStatusData();
+		AMDSDwellStatusData newStatusData;
 
 		newStatusData.fastCounts_ = addInputStatusData.fastCounts_ + dwellStatusData().fastCounts_;
 		newStatusData.slowCounts_ = addInputStatusData.slowCounts_ + dwellStatusData().slowCounts_;
@@ -77,7 +65,7 @@ AMDSDataHolder* AMDSDwellSpectralDataHolder::operator /(quint32 divisor)
 	AMDSDwellSpectralDataHolder *divisionTargetDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(targetDataHolder);
 
 	if (divisionTargetDataHolder) {
-		AMDSStatusData newStatusData(dwellStatusData());
+		AMDSDwellStatusData newStatusData(dwellStatusData());
 
 		newStatusData.fastCounts_ = dwellStatusData().fastCounts_ / divisor;
 		newStatusData.slowCounts_ = dwellStatusData().slowCounts_ / divisor;
@@ -93,11 +81,11 @@ AMDSDataHolder* AMDSDwellSpectralDataHolder::operator /(quint32 divisor)
 	return divisionTargetDataHolder;
 }
 
-AMDSStatusData AMDSDwellSpectralDataHolder::dwellStatusData() const{
+AMDSDwellStatusData AMDSDwellSpectralDataHolder::dwellStatusData() const{
 	return dwellStatusData_;
 }
 
-void AMDSDwellSpectralDataHolder::setDwellStatusData(const AMDSStatusData &statusData){
+void AMDSDwellSpectralDataHolder::setDwellStatusData(const AMDSDwellStatusData &statusData){
 	dwellStatusData_ = statusData;
 }
 

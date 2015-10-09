@@ -1,7 +1,7 @@
 #ifndef AMDSDWELLSPECTRALDATAHOLDER_H
 #define AMDSDWELLSPECTRALDATAHOLDER_H
 
-#include "DataElement/AMDSStatusData.h"
+#include "DataElement/AMDSDwellStatusData.h"
 #include "DataHolder/AMDSSpectralDataHolder.h"
 
 class AMDSDwellSpectralDataHolder: public AMDSLightWeightSpectralDataHolder
@@ -19,15 +19,15 @@ public:
 	/// Implement the Division operation of AMDSLightWeightDataHolder: the value of the given handler will be divided by the given divisior
 	virtual AMDSDataHolder* operator /(quint32 divisor);
 	/// The status data relating to the detector response
-	AMDSStatusData dwellStatusData() const;
+	AMDSDwellStatusData dwellStatusData() const;
 
 public slots:
 	/// Sets the status data for the histogram
-	void setDwellStatusData(const AMDSStatusData &dwellStatusData);
+	void setDwellStatusData(const AMDSDwellStatusData &dwellStatusData);
 
 protected:
 	/// the dwell status
-	AMDSStatusData dwellStatusData_;
+	AMDSDwellStatusData dwellStatusData_;
 };
 
 #endif // AMDSDWELLSPECTRALDATAHOLDER_H

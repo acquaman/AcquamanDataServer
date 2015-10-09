@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QThread>
 
-#include "DataElement/AMDSStatusData.h"
+#include "DataElement/AMDSDwellStatusData.h"
 #include "DataElement/AMDSBufferGroup.h"
 
 class AMDSClientRequest;
@@ -34,18 +34,18 @@ signals:
 	/// signal to indicate that the new data added for conitunous monitor
 	void continuousDataUpdate(AMDSDataHolder *continuousDataHolder);
 	/// signal to indicate that the new status update for conitunous monitor
-	void continuousStatusDataUpdate(AMDSStatusData statusData, int count);
+	void continuousStatusDataUpdate(AMDSDwellStatusData statusData, int count);
 	/// signal to indicate that the new update for conitunous monitor
-	void continuousAllDataUpdate(AMDSDataHolder *continuousDataHolder, AMDSStatusData statusData, int count, double elapsedTime);
+	void continuousAllDataUpdate(AMDSDataHolder *continuousDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
 
 	/// signal to indicate that dwell update is finished, with the elapsedTime
 	void dwellFinishedTimeUpdate(double elapsedTime);
 	/// signal to indicate that dwell update is finished, with the dataHolder
 	void dwellFinishedDataUpdate(AMDSDataHolder *accumulateDataHolder);
 	/// signal to indicate that dwell update is finished, with the statusData
-	void dwellFinishedStatusDataUpdate(AMDSStatusData statusData, int count);
+	void dwellFinishedStatusDataUpdate(AMDSDwellStatusData statusData, int count);
 	/// signal to indicate that dwell update is finished, with all data
-	void dwellFinishedAllDataUpdate(AMDSDataHolder *accumlatedDataHolder, AMDSStatusData statusData, int count, double elapsedTime);
+	void dwellFinishedAllDataUpdate(AMDSDataHolder *accumlatedDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
 
 public slots:
 	/// slot to finish dwell data update

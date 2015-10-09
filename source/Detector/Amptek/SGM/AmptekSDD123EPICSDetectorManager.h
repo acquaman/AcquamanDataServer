@@ -7,7 +7,7 @@ class AMWaveformBinningSinglePVControl;
 class AMSinglePVControl;
 class AMControlSet;
 
-class AMDSStatusData;
+class AMDSDwellStatusData;
 class AMDSDataHolder;
 
 class AmptekSDD123EPICSDetectorManager : public AmptekSDD123DetectorManager
@@ -18,9 +18,9 @@ public:
 
 protected slots:
 	/// slot to handle continuous data update
-	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime) ;
+	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime) ;
 	/// slot to handle dwell finish data update
-	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime);
+	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime);
 	/// slot to handle configuration value update signal
 	void onConfigurationValuesUpdate(AmptekConfigurationData configurationData);
 
@@ -62,7 +62,7 @@ protected slots:
 
 protected:
 	/// helper function to handle continuous spectrum data update
-	void dataHelper(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime);
+	void dataHelper(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime);
 
 protected:
 	QTime lastEPICSSpectrumUpdateTime_;

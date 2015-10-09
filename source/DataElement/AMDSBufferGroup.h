@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "source/DataElement/AMDSStatusData.h"
+#include "source/DataElement/AMDSDwellStatusData.h"
 #include "source/DataElement/AMDSBuffer.h"
 #include "source/DataElement/AMDSBufferGroupInfo.h"
 #include "source/DataHolder/AMDSDataHolder.h"

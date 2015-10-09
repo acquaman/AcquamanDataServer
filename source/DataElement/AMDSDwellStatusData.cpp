@@ -1,7 +1,7 @@
-#include "AMDSStatusData.h"
+#include "AMDSDwellStatusData.h"
 
 /// =============== implementation of AMDSStatusData ================
-AMDSStatusData::AMDSStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime) :
+AMDSDwellStatusData::AMDSDwellStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime) :
 	fastCounts_(fastCounts), slowCounts_(slowCounts), detectorTemperature_(detectorTemperature), accumulationTime_(accumulationTime), liveTime_(liveTime), realTime_(realTime), generalPurposeCounter_(generalPurposeCounter)
 {
 	dwellStartTime_.setHMS(dwellStartTime.hour(), dwellStartTime.minute(), dwellStartTime.second(), dwellStartTime.msec());
@@ -9,12 +9,12 @@ AMDSStatusData::AMDSStatusData(int fastCounts, int slowCounts, double detectorTe
 	dwellReplyTime_.setHMS(dwellReplyTime.hour(), dwellReplyTime.minute(), dwellReplyTime.second(), dwellReplyTime.msec());
 }
 
-AMDSStatusData::AMDSStatusData(const AMDSStatusData &other)
+AMDSDwellStatusData::AMDSDwellStatusData(const AMDSDwellStatusData &other)
 {
 	this->operator =(other);
 }
 
-AMDSStatusData& AMDSStatusData::operator =(const AMDSStatusData &other)
+AMDSDwellStatusData& AMDSDwellStatusData::operator =(const AMDSDwellStatusData &other)
 {
 	if(this != &other){
 		fastCounts_ = other.fastCounts_;
