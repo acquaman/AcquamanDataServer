@@ -6,7 +6,7 @@
 #include <QVector>
 
 #include "DataElement/AMDSDataTypeDefinitions.h"
-#include "Detector/Amptek/AmptekEventDefinitions.h"
+//#include "Detector/Amptek/AmptekEventDefinitions.h"
 
 class AMDSFlatArray;
 

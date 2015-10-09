@@ -1,20 +1,14 @@
 #include "AmptekSDD123DetectorManager.h"
 
 #include <QDebug>
-#include <QSignalMapper>
 #include <QCoreApplication>
 
 #include "DataElement/AMDSFlatArray.h"
 #include "DataElement/AMDSStatusData.h"
-#include "Detector/Amptek/AmptekSDD123Application.h"
-
-#include "ClientRequest/AMDSClientDataRequest.h"
-
-#include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
-#include "beamline/AMPVControl.h"
 #include "DataHolder/AMDSDwellSpectralDataHolder.h"
-#include "DataElement/AMDSBufferGroupInfo.h"
-#include "DataElement/AMDSThreadedBufferGroup.h"
+
+#include "Detector/Amptek/AmptekSDD123Application.h"
+#include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 
 AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent) :
 	QObject(parent)
