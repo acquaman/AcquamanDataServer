@@ -43,17 +43,19 @@ HEADERS *= \
 	source/DataElement/AMDSnDIndex.h \
 	source/DataElement/AMDSEventData.h \
 	source/DataElement/AMDSEventDataSupport.h \
+	source/DataElement/AMDSStatusData.h \
 	source/DataElement/AMDSFlatArray.h \
 	source/DataElement/AMDSBufferGroup.h \
 	source/DataElement/AMDSBufferGroupInfo.h \
+	source/DataElement/AMDSThreadedBufferGroup.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
+	source/DataHolder/AMDSDwellSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h  \
-	source/util/AMDSMetaObjectSupport.h \
-    source/DataElement/AMDSThreadedBufferGroup.h
+	source/util/AMDSMetaObjectSupport.h
 
 SOURCES *= \
 	source/ClientRequest/AMDSClientRequest.cpp \
@@ -74,23 +76,16 @@ SOURCES *= \
 	source/DataElement/AMDSnDIndex.cpp \
 	source/DataElement/AMDSEventData.cpp \
 	source/DataElement/AMDSEventDataSupport.cpp \
+	source/DataElement/AMDSStatusData.cpp \
 	source/DataElement/AMDSFlatArray.cpp \
-	source/DataElement/AMDSBufferGroup.cpp \
 	source/DataElement/AMDSBufferGroupInfo.cpp \
+	source/DataElement/AMDSBufferGroup.cpp \
+	source/DataElement/AMDSThreadedBufferGroup.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
+	source/DataHolder/AMDSDwellSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
-	source/util/AMDSMetaObjectSupport.cpp \
-    source/DataElement/AMDSThreadedBufferGroup.cpp
-
-
-
-
-
-
-
-
-
+	source/util/AMDSMetaObjectSupport.cpp

@@ -55,21 +55,22 @@ void AMDSCentralServerSGM::initializeBufferGroup()
 		amptekBufferGroupAxes << AMDSAxisInfo("Energy", amptekConfiguration->spectrumCountSize(), "Energy Axis", "eV");
 
 		AMDSBufferGroupInfo amptekBufferGroupInfo(amptekConfiguration->detectorName(), amptekConfiguration->localAddress().toString(), "Counts", amptekConfiguration->dataType(), amptekConfiguration->spectrumCountSize(), AMDSBufferGroupInfo::NoFlatten, amptekBufferGroupAxes);
-		AMDSThreadedBufferGroup *amptekThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_);
+		AMDSThreadedBufferGroup *amptekThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_, false);
 		connect(amptekThreadedBufferGroup, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_, SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
-		AMDSThreadedBufferGroup *amptekDwellThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_);
+		AMDSThreadedBufferGroup *amptekDwellThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_, true);
 
 		bufferGroupManagers_.insert(amptekThreadedBufferGroup->bufferGroupName(), amptekThreadedBufferGroup);
 		dwellBufferGroupManagers_.insert(amptekDwellThreadedBufferGroup->bufferGroupName(), amptekDwellThreadedBufferGroup);
 	}
 
 
-	detectorGroup_ = new AmptekSDD123DetectorGroupSGM(configurationMaps_);
-	connect(detectorGroup_, SIGNAL(clearHistrogramData(QString)), this, SLOT(onClearHistrogramData(QString)));
-	connect(detectorGroup_, SIGNAL(clearDwellHistrogramData(QString)), this, SLOT(onClearDwellHistrogramData(QString)));
-	connect(detectorGroup_, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder*)), this, SLOT(onNewHistrogramReceived(QString, AMDSDataHolder*)));
-	connect(detectorGroup_, SIGNAL(newDwellHistrogramReceived(QString, AMDSDataHolder*)), this, SLOT(onNewDwellHistrogramReceived(QString, AMDSDataHolder*)));
+	amptekDetectorGroup_ = new AmptekSDD123DetectorGroupSGM(configurationMaps_);
+	connect(amptekDetectorGroup_, SIGNAL(clearHistrogramData(QString)), this, SLOT(onClearHistrogramData(QString)));
+	connect(amptekDetectorGroup_, SIGNAL(clearDwellHistrogramData(QString)), this, SLOT(onClearDwellHistrogramData(QString)));
+	connect(amptekDetectorGroup_, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder*)), this, SLOT(onNewHistrogramReceived(QString, AMDSDataHolder*)));
+	connect(amptekDetectorGroup_, SIGNAL(newDwellHistrogramReceived(QString, AMDSDataHolder*, double)), this, SLOT(onNewDwellHistrogramReceived(QString, AMDSDataHolder*, double)));
+	connect(amptekDetectorGroup_, SIGNAL(dwellFinishedUpdate(QString,double)), this, SLOT(onDwellFinishedDataUpdate(QString,double)));
 }
 
 void AMDSCentralServerSGM::initializeAndStartDataServer()
@@ -83,8 +84,8 @@ void AMDSCentralServerSGM::initializeAndStartDataServer()
 void AMDSCentralServerSGM::wrappingUpInitialization()
 {
 	// connect the event among the amptek data servers and the detectors
-	for(int x = 0, size = detectorGroup_->detectorManagers().count(); x < size; x++){
-		AmptekSDD123DetectorManager *amptekDetectorManager = detectorGroup_->detectorManagers().at(x);
+	for(int x = 0, size = amptekDetectorGroup_->detectorManagers().count(); x < size; x++){
+		AmptekSDD123DetectorManager *amptekDetectorManager = amptekDetectorGroup_->detectorManagers().at(x);
 		AmptekSDD123Server *amptekServer = amptekThreadedDataServerGroup_->serverAt(x);
 
 		amptekServer->setSpectrumPacketReceiver((QObject *)amptekDetectorManager->detector());
@@ -126,8 +127,14 @@ void AMDSCentralServerSGM::onNewHistrogramReceived(QString detectorName, AMDSDat
 	bufferGroup->append(dataHolder);
 }
 
-void AMDSCentralServerSGM::onNewDwellHistrogramReceived(QString detectorName, AMDSDataHolder *dataHolder)
+void AMDSCentralServerSGM::onNewDwellHistrogramReceived(QString detectorName, AMDSDataHolder *dataHolder, double elapsedTime)
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
-	bufferGroup->append(dataHolder);
+	bufferGroup->append(dataHolder, elapsedTime);
+}
+
+void AMDSCentralServerSGM::onDwellFinishedDataUpdate(QString detectorName, double elapsedTime)
+{
+	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
+	bufferGroup->finishDwellDataUpdate(elapsedTime);
 }

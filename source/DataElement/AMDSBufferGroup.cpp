@@ -31,20 +31,54 @@ AMDSBufferGroup::~AMDSBufferGroup()
 }
 
 
-void AMDSBufferGroup::append(AMDSDataHolder *value)
+AMDSDataHolder * AMDSBufferGroup::cumulativeDataHolder() const
+{
+	QReadLocker readLock(&lock_);
+	return cumulativeDataHolder_;
+}
+
+int AMDSBufferGroup::count() const
+{
+	QReadLocker readLock(&lock_);
+	return dataHolders_.count();
+}
+
+void AMDSBufferGroup::clear()
+{
+	QWriteLocker writeLock(&lock_);
+	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++)
+		delete dataHolders_[iElement];
+
+	dataHolders_.clear();
+
+	if (enableCumulative_)
+		cumulativeDataHolder_->clear();
+}
+
+AMDSDataHolder* AMDSBufferGroup::at(int index)
+{
+	QReadLocker readLock(&lock_);
+
+	return dataHolders_[index];
+}
+
+void AMDSBufferGroup::append(AMDSDataHolder *newData)
 {
 	QWriteLocker writeLock(&lock_);
 
-	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(value);
+	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(newData);
 	if(dataHolderRemoved)
 		delete dataHolderRemoved;
 
 	if (enableCumulative_) {
 		if (cumulativeDataHolder_) {
-			cumulativeDataHolder_ = (*cumulativeDataHolder_) + (*value);
+			AMDSDataHolder *tempDataHolder = cumulativeDataHolder_;
+
+			cumulativeDataHolder_ = (*cumulativeDataHolder_) + (*newData);
+			tempDataHolder->deleteLater();
 		} else {
-			cumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromClassName(value->metaObject()->className());
-			cumulativeDataHolder_->cloneData(value);
+			cumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromClassName(newData->metaObject()->className());
+			cumulativeDataHolder_->cloneData(newData);
 		}
 	}
 }

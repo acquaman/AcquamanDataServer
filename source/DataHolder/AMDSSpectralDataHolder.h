@@ -11,6 +11,11 @@ public:
 	Q_INVOKABLE AMDSLightWeightSpectralDataHolder(AMDSLightWeightSpectralDataHolder *sourceDataHolder, QObject *parent = 0);
 	virtual ~AMDSLightWeightSpectralDataHolder();
 
+	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
+	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
+
 	/// implement the function to return axes information
 	virtual inline QList<AMDSAxisInfo> axes() const;
 	/// implement the function to return the rank information (size of Axes)
@@ -19,11 +24,6 @@ public:
 	virtual inline quint32 size(int axisId) const;
 	/// implement the function to return the lenght of axes
 	virtual inline AMDSnDIndex size() const;
-
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
 class AMDSFullSpectralDataHolder : public AMDSFullGenericFlatArrayDataHolder

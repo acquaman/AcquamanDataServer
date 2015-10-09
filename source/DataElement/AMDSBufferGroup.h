@@ -3,9 +3,11 @@
 
 #include <QObject>
 
+#include "source/DataElement/AMDSStatusData.h"
 #include "source/DataElement/AMDSBuffer.h"
 #include "source/DataElement/AMDSBufferGroupInfo.h"
 #include "source/DataHolder/AMDSDataHolder.h"
+
 
 class AMDSClientRequest;
 class AMDSClientDataRequest;
@@ -33,23 +35,20 @@ public:
 	/// Returns the data dimension and other information included in the bufferGroupInfo
 	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
 
-	AMDSDataHolder* at(int index) { return dataHolders_[index]; }
-	/// Subscript operator for use in lhs assignment (ie b[i] = 5)
-	/// Returns the pointer at provided index
-//	inline AMDSDataHolder* operator[](int index);
-	/// Subscript operator for use in rhs assignment (ie x = b[i])
-	/// Returns the pointer at provided index
-//	inline const AMDSDataHolder* operator[](int index) const;
-	inline AMDSDataHolder *cumulativeDataHolder() {return cumulativeDataHolder_; }
-	/// The total capacity of the buffer
-	inline quint64 maxSize() const;
+	/// returns whether Cumulative is enabled or not
+	inline bool cumulativeEnabled() { return enableCumulative_; }
+	/// returns the current dataholder of cumulative data
+	AMDSDataHolder *cumulativeDataHolder() const;
+
+	/// returns the dataHolder at given index
+	AMDSDataHolder* at(int index);
+	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will always return maxSize)
+	int count() const;
+	/// Clears the buffer of all its members, and frees their resources
+	void clear();
 	/// Adds a new AMDSDataHolder pointer to the end of the buffer. The buffer group takes ownership
 	/// of the passed AMDSDataHolder, becoming responsible for its destruction
 	void append(AMDSDataHolder* value);
-	/// Clears the buffer of all its members, and frees their resources
-	inline void clear();
-	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will always return maxSize)
-	inline int count() const;
 
 public slots:
 	/// Slot which handles a request for data. The buffer group will attempt to populate the request
@@ -81,42 +80,17 @@ protected:
 	int getDataIndexByDateTime(const QDateTime& dwellTime);
 
 protected:
-	/// the flag to indicate whether we enabled the cumultive feature
-	bool enableCumulative_;
-
 	mutable QReadWriteLock lock_;
 	/// the buffergroup information about this buffer group
 	AMDSBufferGroupInfo bufferGroupInfo_;
 
+	/// the flag to indicate whether we enabled the cumultive feature
+	bool enableCumulative_;
 	/// the Dataholder to holder the cumulative data
 	AMDSDataHolder *cumulativeDataHolder_;
 
 	/// A buffer which contains histogram data collection, sorted by the startDwellTime
 	AMDSBuffer<AMDSDataHolder*> dataHolders_;
 };
-
-quint64 AMDSBufferGroup::maxSize() const
-{
-	QReadLocker readLock(&lock_);
-	return dataHolders_.maxSize();
-}
-
-void AMDSBufferGroup::clear()
-{
-	QWriteLocker writeLock(&lock_);
-	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++)
-		delete dataHolders_[iElement];
-
-	dataHolders_.clear();
-
-//	if (enableCumulative_)
-//		cumulativeDataHolder_->clear();
-}
-
-int AMDSBufferGroup::count() const
-{
-	QReadLocker readLock(&lock_);
-	return dataHolders_.count();
-}
 
 #endif // AMDSBUFFERGROUP_H

@@ -56,6 +56,8 @@ public:
 	/// Returns the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const  = 0;
 
+	/// pure virtual function to clear the data of the instance
+	virtual void clear() = 0;
 	/// pure virtual function to copy the data of the instance to outputArray
 	virtual bool data(AMDSFlatArray *outputArray) const = 0;
 	/// pure virtual function to copy the data of inputArray to local instance
@@ -158,6 +160,8 @@ public:
 	/// implement the spanSize() function to return the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const;
 
+	/// implement the clear function to clear the data of the instance
+	virtual void clear() { lightWeightDataHolder_->clear(); }
 	/// implement the data() function to copy the data of the instance to outputArray
 	virtual bool data(AMDSFlatArray *outputValues) const { return lightWeightDataHolder_->data(outputValues); }
 	/// implement the setData() function to copy the data of inputArray to local instance

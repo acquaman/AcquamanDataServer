@@ -7,6 +7,8 @@ class AMWaveformBinningSinglePVControl;
 class AMSinglePVControl;
 class AMControlSet;
 
+class AMDSStatusData;
+
 class AmptekSDD123EPICSDetectorManager : public AmptekSDD123DetectorManager
 {
 Q_OBJECT
@@ -14,8 +16,8 @@ public:
 	AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent = 0);
 
 protected slots:
-	void onContinuousAllDataUpdate(QVector<int> spectrum, AmptekStatusData statusData, int count, double elapsedTime);
-	void onDwellFinishedAllDataUpdate(QVector<int> spectrum, AmptekStatusData statusData, int count, double elapsedTime);
+	void onContinuousAllDataUpdate(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime);
+	void onDwellFinishedAllDataUpdate(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime);
 
 	void onSpectrumControlValueChanged();
 
@@ -56,7 +58,7 @@ protected slots:
 	void onAllControlsTimedOut();
 
 protected:
-	void dataHelper(QVector<int> spectrum, AmptekStatusData statusData, int count, double elapsedTime);
+	void dataHelper(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime);
 
 protected:
 	AMSinglePVControl *startDwellControl_;

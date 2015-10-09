@@ -1,16 +1,16 @@
-#ifndef AMDSAMPTEKSDD123SPECTRALDATAHOLDER_H
-#define AMDSAMPTEKSDD123SPECTRALDATAHOLDER_H
+#ifndef AMDSDWELLSPECTRALDATAHOLDER_H
+#define AMDSDWELLSPECTRALDATAHOLDER_H
 
+#include "DataElement/AMDSStatusData.h"
 #include "DataHolder/AMDSSpectralDataHolder.h"
-#include "Detector/Amptek/AmptekEventDefinitions.h"
 
-class AMDSAmptekSDD123SpectralDataHolder: public AMDSLightWeightSpectralDataHolder
+class AMDSDwellSpectralDataHolder: public AMDSLightWeightSpectralDataHolder
 {
 	Q_OBJECT
 public:
-	Q_INVOKABLE AMDSAmptekSDD123SpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, QObject *parent = 0);
-	Q_INVOKABLE AMDSAmptekSDD123SpectralDataHolder(AMDSAmptekSDD123SpectralDataHolder *sourceDataHolder, QObject *parent = 0);
-	virtual ~AMDSAmptekSDD123SpectralDataHolder();
+	Q_INVOKABLE AMDSDwellSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, QObject *parent = 0);
+	Q_INVOKABLE AMDSDwellSpectralDataHolder(AMDSDwellSpectralDataHolder *sourceDataHolder, QObject *parent = 0);
+	virtual ~AMDSDwellSpectralDataHolder();
 
 	/// function to copy the value of source instance to the current instance
 	virtual void cloneData(AMDSDataHolder *dataHolder);
@@ -19,14 +19,15 @@ public:
 	/// Implement the Division operation of AMDSLightWeightDataHolder: the value of the given handler will be divided by the given divisior
 	virtual AMDSDataHolder* operator /(quint32 divisor);
 	/// The status data relating to the detector response
-	AmptekStatusData statusData() const;
+	AMDSStatusData dwellStatusData() const;
 
 public slots:
 	/// Sets the status data for the histogram
-	void setStatusData(const AmptekStatusData &statusData);
+	void setDwellStatusData(const AMDSStatusData &dwellStatusData);
 
 protected:
-	AmptekStatusData statusData_;
+	/// the dwell status
+	AMDSStatusData dwellStatusData_;
 };
 
-#endif // AMDSAMPTEKSDD123SPECTRALDATAHOLDER_H
+#endif // AMDSDWELLSPECTRALDATAHOLDER_H

@@ -5,15 +5,14 @@
 #include <QCoreApplication>
 
 #include "DataElement/AMDSFlatArray.h"
+#include "DataElement/AMDSStatusData.h"
 #include "Detector/Amptek/AmptekSDD123Application.h"
 
 #include "ClientRequest/AMDSClientDataRequest.h"
-#include "Detector/Amptek/AmptekSDD123Histogram.h"
 
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
-#include "Detector/Amptek/AmptekSDD123ThreadedHistogramGroup.h"
 #include "beamline/AMPVControl.h"
-#include "DataHolder/Amptek/AMDSAmptekSDD123SpectralDataHolder.h"
+#include "DataHolder/AMDSDwellSpectralDataHolder.h"
 #include "DataElement/AMDSBufferGroupInfo.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
 
@@ -25,12 +24,9 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	detector_ = new AmptekSDD123Detector(amptekConfiguration->detectorName(), amptekConfiguration->detectorBasePVName(), amptekConfiguration->dataType(), amptekConfiguration->spectrumCountSize());
 	detector_->setSpectrumReceiver(this);
 
+	dwellActive_ = false;
 	dwellTime_ = 2.0;
 	dwellMode_ = AmptekSDD123DetectorManager::PresetDwell;
-
-
-
-	dwellActive_ = false;
 	setPresetDwellEndTimeOnNextEvent_ = false;
 
 	presetDwellActive_ = false;
@@ -40,21 +36,21 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 
 bool AmptekSDD123DetectorManager::event(QEvent *e){
 	if(e->type() == (QEvent::Type)AmptekEventDefinitions::SpectrumEvent){
-		spectrumEventHelper(e);
+		onSpectrumEventReceived((AmptekSpectrumEvent *)e);
 		e->accept();
 		return true;
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationValuesEvent){
 		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
 			qDebug() << "It was a configurationValuesEvent";
-		configurationValuesEventHelper(e);
+		onConfigurationValuesEventReceived((AmptekConfigurationValuesEvent *)e);
 		e->accept();
 		return true;
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationModeConfirmationEvent){
 		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
 			qDebug() << "It was a configurationModeConfirmationEvent";
-		configurationModeConfirmationEventHelper(e);
+		onConfigurationModeConfirmationEventReceived((AmptekConfigurationModeConfirmationEvent *)e);
 		e->accept();
 		return true;
 	}
@@ -66,7 +62,8 @@ void AmptekSDD123DetectorManager::setRequestEventReceiver(QObject *requestEventR
 }
 
 void AmptekSDD123DetectorManager::startDwell(){
-	dwellActive_ = true;
+	setDwellActive(true);
+
 	if(dwellMode_ == AmptekSDD123DetectorManager::PresetDwell){
 		emit clearDwellHistrogramData(detectorName());
 		setPresetDwellEndTimeOnNextEvent_ = true;
@@ -74,7 +71,7 @@ void AmptekSDD123DetectorManager::startDwell(){
 }
 
 void AmptekSDD123DetectorManager::stopDwell(){
-	dwellActive_ = false;
+	setDwellActive(false);
 }
 
 void AmptekSDD123DetectorManager::setDwellActive(bool dwellActive){
@@ -91,26 +88,27 @@ void AmptekSDD123DetectorManager::setDwellMode(AmptekSDD123DetectorManager::Dwel
 
 void AmptekSDD123DetectorManager::requestDetectorConfigurationValues(){
 	configurationRequestReason_ = AmptekSDD123DetectorManager::RequestConfigurationReason;
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorConfigurationValues(){
 	configurationRequestReason_ = AmptekSDD123DetectorManager::SetConfigurationReason;
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorAnalogGainIndex(int analogGainIndex){
 	if(analogGainIndex < 1 || analogGainIndex > 16)
 		return;
+
 	configurationRequestReason_ = AmptekSDD123DetectorManager::SetConfigurationReason;
 	configurationSetCommand_ = QString("GAIA=%1;").arg(analogGainIndex);
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorFineGain(double fineGain){
 	configurationRequestReason_ = AmptekSDD123DetectorManager::SetConfigurationReason;
 	configurationSetCommand_ = QString("GAIF=%1;").arg(fineGain, 0, 'e', 3);
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorTotalGain(double totalGain){
@@ -118,7 +116,7 @@ void AmptekSDD123DetectorManager::setDetectorTotalGain(double totalGain){
 		return;
 	configurationRequestReason_ = AmptekSDD123DetectorManager::SetConfigurationReason;
 	configurationSetCommand_ = QString("GAIN=%1;").arg(totalGain, 0, 'e', 3);
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorHV(bool on){
@@ -127,7 +125,7 @@ void AmptekSDD123DetectorManager::setDetectorHV(bool on){
 		configurationSetCommand_ = QString("HVSE=ON;");
 	else
 		configurationSetCommand_ = QString("HVSE=OFF;");
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorMCAEnabled(bool enabled){
@@ -136,7 +134,7 @@ void AmptekSDD123DetectorManager::setDetectorMCAEnabled(bool enabled){
 		configurationSetCommand_ = QString("MCAE=ON;");
 	else
 		configurationSetCommand_ = QString("MCAE=OFF;");
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorPileUpRejection(bool enabled){
@@ -145,7 +143,7 @@ void AmptekSDD123DetectorManager::setDetectorPileUpRejection(bool enabled){
 		configurationSetCommand_ = QString("PURE=ON;");
 	else
 		configurationSetCommand_ = QString("PURE=OFF;");
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorCoolerSetting(int coolerSetting){
@@ -158,7 +156,7 @@ void AmptekSDD123DetectorManager::setDetectorCoolerSetting(int coolerSetting){
 		configurationSetCommand_ = QString("TECS=%1;").arg(coolerSetting);
 		qDebug() << "Set TECS to " << coolerSetting;
 	}
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorSingleChannelAnalyzer(int singleChannelAnalyzerIndex, int lowChannelIndex, int highChannelIndex){
@@ -172,7 +170,7 @@ void AmptekSDD123DetectorManager::setDetectorSingleChannelAnalyzer(int singleCha
 	if(lowChannelIndex >= highChannelIndex)
 		return;
 	configurationSetCommand_ = QString("SCAI=%1;SCAH=%2;SCAL=%3;SCAO=HI;").arg(singleChannelAnalyzerIndex).arg(highChannelIndex).arg(lowChannelIndex);
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorFastThreshold(int fastThreshold){
@@ -181,7 +179,7 @@ void AmptekSDD123DetectorManager::setDetectorFastThreshold(int fastThreshold){
 		return;
 	else
 		configurationSetCommand_ = QString("THFA=%1;").arg(fastThreshold);
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorSlowThreshold(double slowThreshold){
@@ -189,7 +187,7 @@ void AmptekSDD123DetectorManager::setDetectorSlowThreshold(double slowThreshold)
 		return;
 	configurationRequestReason_ = AmptekSDD123DetectorManager::SetConfigurationReason;
 	configurationSetCommand_ = QString("THSL=%1;").arg(slowThreshold, 0, 'e', 3);
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorPeakingTime(double peakingTime){
@@ -197,7 +195,7 @@ void AmptekSDD123DetectorManager::setDetectorPeakingTime(double peakingTime){
 		return;
 	configurationRequestReason_ = AmptekSDD123DetectorManager::SetConfigurationReason;
 	configurationSetCommand_ = QString("TPEA=%1;").arg(peakingTime, 0, 'e', 3);
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
 void AmptekSDD123DetectorManager::setDetectorFastPeakingTime(AmptekSDD123DetectorManager::FastPeakingTimeValue fastPeakingTimeValue){
@@ -214,127 +212,62 @@ void AmptekSDD123DetectorManager::setDetectorFastPeakingTime(AmptekSDD123Detecto
 		break;
 	}
 
-	initiateRequestConfigurationModeHelper();
+	postConfigurationInitiateRequestEvent();
 }
 
-void AmptekSDD123DetectorManager::initiateRequestConfigurationModeHelper(){
-	if(requestEventReceiver_){
-		AmptekConfigurationInitiateRequestEvent *configurationInitiateRequestEvent = new AmptekConfigurationInitiateRequestEvent();
-		configurationInitiateRequestEvent->configurationMode_ = true;
-		QCoreApplication::postEvent(requestEventReceiver_, configurationInitiateRequestEvent);
-	}
-}
-
-void AmptekSDD123DetectorManager::spectrumEventHelper(QEvent *e){
-//	QVector<double> spectrumVector = ((AmptekSpectrumEvent*)e)->spectrum_;
-	AMDSFlatArray spectrumVector = ((AmptekSpectrumEvent*)e)->spectrum_;
-	AmptekStatusData statusData = ((AmptekSpectrumEvent*)e)->statusData_;
-
-	int totalCounts = 0;
-	QVector<int> spectrumIntVector;
-	for(int x = 0; x < spectrumVector.size(); x++){
-//		spectrumIntVector.append(spectrumVector.at(x));
-//TODO: caculate the total count
-//		totalCounts += spectrumVector.at(x);
-	}
+void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent){
+	AMDSFlatArray spectrumData = spectrumEvent->spectrum_;
+	AMDSStatusData statusData = spectrumEvent->statusData_;
 
 	if(setPresetDwellEndTimeOnNextEvent_){
 		setPresetDwellEndTimeOnNextEvent_ = false;
 		presetDwellLocalStartTime_ = statusData.dwellStartTime_;
 		presetDwellEndTime_ = statusData.dwellStartTime_.addMSecs(dwellTime_*1000);
-
-		//qDebug() << "Local start time was " << presetDwellLocalStartTime_.toString("hh:mm:ss.zzz") << "I want to end after " << presetDwellEndTime_.toString("hh:mm:ss.zzz");
 	}
-	else {
-//// TODO the usage of dwelldata
-////		AMDSAmptekSDD123SpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_[dwellData_->count()-1]);
-//		AMDSAmptekSDD123SpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_->at(dwellData_->count()-1));
-//		if((dwellMode_ == AmptekSDD123DetectorManager::PresetDwell) && dwellActive_ && spectrumDataHolder && (spectrumDataHolder->statusData().dwellEndTime_ >= presetDwellEndTime_)){
-//			dwellActive_ = false;
+	else if (dwellActive_ && isPresetDwell() && presetDwellLocalEndTime_.isValid()) {
+		if ( presetDwellLocalEndTime_ >= presetDwellEndTime_ ) { //dwellToBeDeactived
+			dwellActive_ = false;
 
-//			presetDwellLocalEndTime_ = spectrumDataHolder->statusData().dwellEndTime_;
-
-//			//qDebug() << "I actually stopped dwelling at " << presetDwellLocalEndTime_.toString("hh:mm:ss.zzz") << " for a difference of " << ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
-
-//			AMDSAmptekSDD123SpectralDataHolder * cumulativeSpectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_->cumulativeDataHolder());
-////			emit dwellFinishedDataUpdate(dwellData_->cumulativeSpectrum());
-////			emit dwellFinishedStatusDataUpdate(dwellData_->cumulativeStatusData(), dwellData_->count());
-//			emit dwellFinishedDataUpdate(cumulativeSpectrumDataHolder);
-//			emit dwellFinishedStatusDataUpdate(cumulativeSpectrumDataHolder->statusData(), dwellData_->count());
-
-//			double elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
-////			emit dwellFinishedAllDataUpdate(dwellData_->cumulativeSpectrum(), dwellData_->cumulativeStatusData(), dwellData_->count(), elapsedTime);
-//			emit dwellFinishedAllDataUpdate(cumulativeSpectrumDataHolder, cumulativeSpectrumDataHolder->statusData(), dwellData_->count(), elapsedTime);
-
-//			emit dwellFinishedTimeUpdate(elapsedTime);
-//		}
-//		//else if((dwellMode_ == AmptekSDD123DetectorManager::PresetDwell) && dwellActive_ && (dwellData_->at(dwellData_->count()-1)->statusData().dwellEndTime_ < presetDwellEndTime_))
-//		//	qDebug() << "Couldn't stop dwelling because current time is " << QTime::currentTime().toString("hh:mm:ss.zzz") << "(" << QTime::currentTime().addMSecs(-statusData.dwellEndTime_.msecsTo(statusData.dwellReplyTime_)).toString("hh:mm:ss.zzz") << ")";
+			double elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
+			emit dwellFinishedUpdate(detectorName(), elapsedTime);
+		}
 	}
 
-	AMDSAmptekSDD123SpectralDataHolder *oneHistogram = new AMDSAmptekSDD123SpectralDataHolder(detector_->dataType(), detector_->bufferSize(), this);
-	oneHistogram->setData(&spectrumVector);
-	oneHistogram->setStatusData(statusData);
-
-//	allData_->append(oneHistogram);
-	emit newHistrogramReceived(detectorName(), oneHistogram);
-	if(!initialized_ || dwellActive_)
-		emit newDwellHistrogramReceived(detectorName(), oneHistogram);
-//		dwellData_->append(oneHistogram);
-
-	if(!initialized_){
+	if (!initialized_) {
 		emit clearHistrogramData(detectorName());
 		emit clearDwellHistrogramData(detectorName());
-//		allData_->clear();
-//		dwellData_->clear();
 		initialized_ = true;
+	} else {
+
+		// generate the spectrum data holder and notice the bufferGroup new data is ready
+		AMDSDwellSpectralDataHolder *oneHistogram = new AMDSDwellSpectralDataHolder(detector_->dataType(), detector_->bufferSize(), this);
+		oneHistogram->setData(&spectrumData);
+		oneHistogram->setDwellStatusData(statusData);
+
+		emit newHistrogramReceived(detectorName(), oneHistogram);
+		if (dwellActive_) {
+			presetDwellLocalEndTime_ = statusData.dwellEndTime_;
+
+			double elapsedTime = 0;
+			if (presetDwellLocalStartTime_.isValid())
+				elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
+
+			emit newDwellHistrogramReceived(detectorName(), oneHistogram, elapsedTime);
+		}
 	}
-	else if(dwellActive_){
-////TODO the usage of dwell data
-//		AMDSAmptekSDD123SpectralDataHolder * cumulativeSpectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_->cumulativeDataHolder());
-
-//		//emit continuousDataUpdate(allData_->cumulativeSpectrum());
-//		//emit cumulativeStatusDataUpdate(allData_->cumulativeStatusData(), allData_->count());
-////		emit continuousDataUpdate(dwellData_->cumulativeSpectrum());
-////		emit cumulativeStatusDataUpdate(dwellData_->cumulativeStatusData(), dwellData_->count());
-//		emit continuousDataUpdate(cumulativeSpectrumDataHolder);
-//		emit cumulativeStatusDataUpdate(cumulativeSpectrumDataHolder->statusData(), dwellData_->count());
-
-////		AMDSAmptekSDD123SpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_[dwellData_->count()-1]);
-//		AMDSAmptekSDD123SpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSAmptekSDD123SpectralDataHolder *>(dwellData_->at(dwellData_->count()-1));
-//		QTime elapsedEndTime_ = spectrumDataHolder->statusData().dwellEndTime_;
-//		double elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(elapsedEndTime_))/1000;
-//		emit continuousAllDataUpdate(cumulativeSpectrumDataHolder, cumulativeSpectrumDataHolder->statusData(), dwellData_->count(), elapsedTime);
-	}
-
-	/*
-	qDebug() << "Heard " << detectorSourceName
-		 << "t: " << totalCounts
-		 << "f: " << oneHistogram->statusData().fastCounts_
-		 << "ti: " << oneHistogram->statusData().dwellStartTime_.toString("hh:mm:ss.zzz")
-		 << "tf: " << oneHistogram->statusData().dwellEndTime_.toString("hh:mm:ss.zzz")
-		 << "tr: " << oneHistogram->statusData().dwellReplyTime_.toString("hh:mm:ss.zzz")
-		 << "a: " << oneHistogram->statusData().accumulationTime_ << " " << (oneHistogram->statusData().accumulationTime_/0.05)*100
-		 << "r: " << oneHistogram->statusData().realTime_
-		 << "l: " << oneHistogram->statusData().liveTime_;
-	*/
 }
 
-void AmptekSDD123DetectorManager::configurationValuesEventHelper(QEvent *e){
-	configurationData_ = ((AmptekConfigurationValuesEvent*)e)->configurationData();
+void AmptekSDD123DetectorManager::onConfigurationValuesEventReceived(AmptekConfigurationValuesEvent *configurationValueEvent){
+	configurationData_ = configurationValueEvent->configurationData();
 	emit configurationValuesUpdate(configurationData_);
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
 
-	if(requestEventReceiver_){
-		AmptekDwellRequestEvent *dwellRequestEvent = new AmptekDwellRequestEvent();
-		dwellRequestEvent->dwellMode_ = true;
-		QCoreApplication::postEvent(requestEventReceiver_, dwellRequestEvent);
-	}
+	postDwellRequestEvent();
 }
 
-void AmptekSDD123DetectorManager::configurationModeConfirmationEventHelper(QEvent *e){
-	if(((AmptekConfigurationModeConfirmationEvent*)e)->confirmConfigurationMode_){
+void AmptekSDD123DetectorManager::onConfigurationModeConfirmationEventReceived(AmptekConfigurationModeConfirmationEvent *configurationModeConfirmationEvent){
+	if(configurationModeConfirmationEvent->confirmConfigurationMode_){
 		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
 			qDebug() << "In setConfigurationModeInitiated";
 
@@ -344,28 +277,49 @@ void AmptekSDD123DetectorManager::configurationModeConfirmationEventHelper(QEven
 		if(configurationRequestReason_ == AmptekSDD123DetectorManager::RequestConfigurationReason){
 			if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
 				qDebug() << "Heard detectorManger is now in configuration mode, request the configuration values";
-			if(requestEventReceiver_){
-				AmptekConfigurationRequestEvent *configurationRequestEvent = new AmptekConfigurationRequestEvent();
-				configurationRequestEvent->allParametersRequest_ = true;
-				QCoreApplication::postEvent(requestEventReceiver_, configurationRequestEvent);
-			}
+			postConfigurationRequestEvent();
 		}
 
 		if(configurationRequestReason_ == AmptekSDD123DetectorManager::SetConfigurationReason){
-			if(requestEventReceiver_){
-				AmptekConfigurationSetEvent *configurationSetEvent = new AmptekConfigurationSetEvent();
-				QStringList configurationCommands;
-				configurationCommands << configurationSetCommand_;
-				configurationSetEvent->configurationCommands_ = configurationCommands;
-				QCoreApplication::postEvent(requestEventReceiver_, configurationSetEvent);
-			}
+			postConfigurationSetEvent();
 		}
-		}
+	}
 }
 
-//void AmptekSDD123DetectorManager::forwardDataRequest(AMDSClientDataRequest *data)
-//{
-//	emit requestData(data);
-//}
+void AmptekSDD123DetectorManager::postDwellRequestEvent()
+{
+	if(requestEventReceiver_){
+		AmptekDwellRequestEvent *dwellRequestEvent = new AmptekDwellRequestEvent();
+		dwellRequestEvent->dwellMode_ = true;
+		QCoreApplication::postEvent(requestEventReceiver_, dwellRequestEvent);
+	}
+}
+
+void AmptekSDD123DetectorManager::postConfigurationInitiateRequestEvent(){
+	if(requestEventReceiver_){
+		AmptekConfigurationInitiateRequestEvent *configurationInitiateRequestEvent = new AmptekConfigurationInitiateRequestEvent();
+		configurationInitiateRequestEvent->configurationMode_ = true;
+		QCoreApplication::postEvent(requestEventReceiver_, configurationInitiateRequestEvent);
+	}
+}
+void AmptekSDD123DetectorManager::postConfigurationRequestEvent()
+{
+	if(requestEventReceiver_){
+		AmptekConfigurationRequestEvent *configurationRequestEvent = new AmptekConfigurationRequestEvent();
+		configurationRequestEvent->allParametersRequest_ = true;
+		QCoreApplication::postEvent(requestEventReceiver_, configurationRequestEvent);
+	}
+}
+
+void AmptekSDD123DetectorManager::postConfigurationSetEvent()
+{
+	if(requestEventReceiver_){
+		AmptekConfigurationSetEvent *configurationSetEvent = new AmptekConfigurationSetEvent();
+		QStringList configurationCommands;
+		configurationCommands << configurationSetCommand_;
+		configurationSetEvent->configurationCommands_ = configurationCommands;
+		QCoreApplication::postEvent(requestEventReceiver_, configurationSetEvent);
+	}
+}
 
 

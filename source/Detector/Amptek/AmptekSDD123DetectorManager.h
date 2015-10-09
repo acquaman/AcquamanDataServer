@@ -42,6 +42,11 @@ public:
 	inline AmptekSDD123Detector *detector() { return detector_; }
 	/// helper function to return the current dwell time
 	inline double dwellTime() const { return dwellTime_; }
+	/// helper function to return whether it is presetDwell now
+	inline bool isPresetDwell() { return dwellMode_ == AmptekSDD123DetectorManager::PresetDwell; }
+	/// helper function to return whether it is continuousDwell now
+	inline bool isContinuousDwell() { return dwellMode_ == AmptekSDD123DetectorManager::ContinuousDwell; }
+
 	/// helper function to return the current dwell mode
 	inline AmptekSDD123DetectorManager::DwellMode dwellMode() const { return dwellMode_; }
 
@@ -49,19 +54,26 @@ signals:
 	void clearHistrogramData(QString detectorName);
 	void clearDwellHistrogramData(QString detectorName);
 	void newHistrogramReceived(QString detectorName, AMDSDataHolder *);
-	void newDwellHistrogramReceived(QString detectorName, AMDSDataHolder *);
+	void newDwellHistrogramReceived(QString detectorName, AMDSDataHolder * dataHolder, double elapsedDwellTime);
+	void dwellFinishedUpdate(QString detectorName, double elapsedTime);
 
 public slots:
 	/// function to set the event receiver to handle the request
 	void setRequestEventReceiver(QObject *requestEventReceiver);
 
+	/// function to start dwell
 	void startDwell();
+	/// function to stop dwell
 	void stopDwell();
 
+	/// function to active dwell
 	void setDwellActive(bool dwellActive);
+	/// function to set Dwell Time
 	void setDwellTime(double dwellTime);
+	/// function to set dwell mode
 	void setDwellMode(AmptekSDD123DetectorManager::DwellMode dwellMode);
 
+	/// function to request AmptekDetector configuration values
 	void requestDetectorConfigurationValues();
 
 	void setDetectorConfigurationValues();
@@ -77,35 +89,27 @@ public slots:
 	void setDetectorSlowThreshold(double slowThreshold);
 	void setDetectorPeakingTime(double peakingTime);
 	void setDetectorFastPeakingTime(AmptekSDD123DetectorManager::FastPeakingTimeValue fastPeakingTimeValue);
-//	void forwardDataRequest(AMDSClientDataRequest*);
 
 signals:
-//	void requestData(AMDSClientRequest*);
-//	void requestData(AMDSClientDataRequest*);
-//	void continuousDataUpdate(AMDSFlatArray continuousSpectrum);
-	void continuousDataUpdate(AMDSDataHolder *continuousSpectrum);
-	void cumulativeStatusDataUpdate(AmptekStatusData statusData, int count);
-//	void continuousAllDataUpdate(AMDSFlatArray spectrum, AmptekStatusData statusData, int count, double elapsedTime);
-	void continuousAllDataUpdate(AMDSDataHolder *spectrum, AmptekStatusData statusData, int count, double elapsedTime);
-
-//	void dwellFinishedDataUpdate(AMDSFlatArray continuousSpectrum);
-	void dwellFinishedDataUpdate(AMDSDataHolder *continuousSpectrum);
-	void dwellFinishedStatusDataUpdate(AmptekStatusData statusData, int count);
-//	void dwellFinishedAllDataUpdate(AMDSFlatArray spectrum, AmptekStatusData statusData, int count, double elapsedTime);
-	void dwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AmptekStatusData statusData, int count, double elapsedTime);
-
-	void dwellFinishedTimeUpdate(double dwellTime);
-
+	/// signal to indicate that configuration value is updated
 	void configurationValuesUpdate(AmptekConfigurationData configurationData);
-//	void clientRequestProcessed(AMDSClientDataRequest*);
-
 
 protected:
-	void initiateRequestConfigurationModeHelper();
+	/// helper function to handle the incoming SpectrumEvent
+	void onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent);
+	/// helper function to handle the incoming ConfigurationValuesEvent
+	void onConfigurationValuesEventReceived(AmptekConfigurationValuesEvent *configurationValueEvent);
+	/// helper function to handle the incoming ConfigurationModeConfirmationEvent
+	void onConfigurationModeConfirmationEventReceived(AmptekConfigurationModeConfirmationEvent *configurationModeConfirmationEvent);
 
-	void spectrumEventHelper(QEvent *e);
-	void configurationValuesEventHelper(QEvent *e);
-	void configurationModeConfirmationEventHelper(QEvent *e);
+	/// helper function to post the DwellRequestEvent
+	void postDwellRequestEvent();
+	/// helper function to post the ConfigurationInitiateRequestEvent
+	void postConfigurationInitiateRequestEvent();
+	/// helper function to post the ConfigurationRequestEvent
+	void postConfigurationRequestEvent();
+	/// helper function to post the ConfigurationSetEvent
+	void postConfigurationSetEvent();
 
 protected:
 	AmptekSDD123Detector *detector_;
@@ -116,6 +120,9 @@ protected:
 	bool dwellActive_;
 	double dwellTime_;
 	bool setPresetDwellEndTimeOnNextEvent_;
+
+	QTime lastestDwellEndTime_;
+
 	QTime presetDwellEndTime_;
 	QTime presetDwellLocalStartTime_;
 	QTime presetDwellLocalEndTime_;

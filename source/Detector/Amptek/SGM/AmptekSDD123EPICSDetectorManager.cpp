@@ -1,6 +1,7 @@
 #include "AmptekSDD123EPICSDetectorManager.h"
 
 #include "DataElement/AMDSBufferGroup.h"
+#include "DataElement/AMDSStatusData.h"
 #include "beamline/AMPVControl.h"
 #include "beamline/AMControlSet.h"
 #include "Detector/Amptek/AmptekSDD123Detector.h"
@@ -137,8 +138,8 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	allControls_->addControl(roi8HighIndexControl_);
 	/**/
 
-	connect(this, SIGNAL(continuousAllDataUpdate(QVector<int>,AmptekStatusData,int,double)), this, SLOT(onContinuousAllDataUpdate(QVector<int>,AmptekStatusData,int,double)));
-	connect(this, SIGNAL(dwellFinishedAllDataUpdate(QVector<int>,AmptekStatusData,int,double)), this, SLOT(onDwellFinishedAllDataUpdate(QVector<int>,AmptekStatusData,int,double)));
+	connect(this, SIGNAL(continuousAllDataUpdate(QVector<int>,AMDSStatusData,int,double)), this, SLOT(onContinuousAllDataUpdate(QVector<int>,AMDSStatusData,int,double)));
+	connect(this, SIGNAL(dwellFinishedAllDataUpdate(QVector<int>,AMDSStatusData,int,double)), this, SLOT(onDwellFinishedAllDataUpdate(QVector<int>,AMDSStatusData,int,double)));
 
 	connect(this, SIGNAL(configurationValuesUpdate(AmptekConfigurationData)), this, SLOT(onConfigurationValuesUpdate(AmptekConfigurationData)));
 
@@ -179,14 +180,14 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(QVector<int> spectrum, AmptekStatusData statusData, int count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime){
 	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){
 		lastEPICSSpectrumUpdateTime_ = QTime::currentTime();
 		dataHelper(spectrum, statusData, count, elapsedTime);
 	}
 }
 
-void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(QVector<int> spectrum, AmptekStatusData statusData, int count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime){
 	dataHelper(spectrum, statusData, count, elapsedTime);
 
 	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
@@ -254,7 +255,7 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(AmptekConfigu
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::dataHelper(QVector<int> spectrum, AmptekStatusData statusData, int count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::dataHelper(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime){
 	if(!connected_)
 		return;
 

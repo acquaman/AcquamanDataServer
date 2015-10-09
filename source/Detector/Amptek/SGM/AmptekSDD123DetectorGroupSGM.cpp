@@ -13,8 +13,9 @@ AmptekSDD123DetectorGroupSGM::AmptekSDD123DetectorGroupSGM(QList<AmptekSDD123Con
 
 		connect(amptekDetectorManager, SIGNAL(clearHistrogramData(QString)), this, SIGNAL(clearHistrogramData(QString)));
 		connect(amptekDetectorManager, SIGNAL(clearDwellHistrogramData(QString)), this, SIGNAL(clearDwellHistrogramData(QString)));
-		connect(amptekDetectorManager, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder *)), this, SIGNAL(onNewHistrogramData(QString, AMDSDataHolder*)));
-		connect(amptekDetectorManager, SIGNAL(newDwellHistrogramReceived(QString, AMDSDataHolder *)), this, SIGNAL(onNewDwellHistrogramData(QString, AMDSDataHolder*)));
+		connect(amptekDetectorManager, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder *)), this, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder*)));
+		connect(amptekDetectorManager, SIGNAL(newDwellHistrogramReceived(QString, AMDSDataHolder *, double)), this, SIGNAL(newDwellHistrogramReceived(QString, AMDSDataHolder*, double)));
+		connect(amptekDetectorManager, SIGNAL(dwellFinishedDataUpdate(QString)), this, SIGNAL(dwellFinishedDataUpdate(QString)));
 
 		detectorManagers_.insert(amptekDetectorManager->detectorName(), amptekDetectorManager);
 	}

@@ -30,10 +30,17 @@ protected slots:
 	/// slot to handle the signal that server switch to dwell state
 	void onServerChangedToDwellState(int index);
 
+	/// slot to handle clear histrogramData request for a given buffer (detector)
 	void onClearHistrogramData(QString detectorName);
+	/// slot to handle clear dwell histrogramData request  for a given buffer (detector)
 	void onClearDwellHistrogramData(QString detectorName);
+	/// slot to handle new histrogramData request  for a given buffer (detector)
 	void onNewHistrogramReceived(QString detectorName, AMDSDataHolder *);
-	void onNewDwellHistrogramReceived(QString detectorName, AMDSDataHolder *);
+	/// slot to handle new dwell histrogramData request  for a given buffer (detector)
+	void onNewDwellHistrogramReceived(QString detectorName, AMDSDataHolder *, double elapsedTime);
+
+	/// slot to handle dwell data update finished request  for a given buffer (detector)
+	void onDwellFinishedDataUpdate(QString detectorName, double elapsedTime);
 
 protected:
 	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
@@ -47,6 +54,7 @@ protected:
 	/// the list of configuration map of SGM amptek
 	QList<AmptekSDD123ConfigurationMap*> configurationMaps_;
 
+	/// the list of bufferGroupManagers for dwell data buffers
 	QMap<QString, AMDSThreadedBufferGroup*> dwellBufferGroupManagers_;
 
 
@@ -54,7 +62,7 @@ protected:
 	AmptekSDD123ThreadedDataServerGroup *amptekThreadedDataServerGroup_;
 
 	/// the AmptekDetector group, which will manange and hold the Amptek data and manage the communications with the PVs
-	AmptekSDD123DetectorGroupSGM *detectorGroup_;
+	AmptekSDD123DetectorGroupSGM *amptekDetectorGroup_;
 };
 
 #endif // AMDSCENTRALSERVERSGM_H

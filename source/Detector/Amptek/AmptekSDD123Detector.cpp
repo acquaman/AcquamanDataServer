@@ -90,10 +90,11 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 	readStatusData(statusDataArray);
 
 	if(spectrumReceiver_){
+		AMDSStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), event->dwellStartTime_, event->dwellEndTime_, event->dwellReplyTime_);
+
 		AmptekSpectrumEvent *spectrumEvent = new AmptekSpectrumEvent();
 		spectrumEvent->detectorSourceName_ = name();
 		spectrumEvent->spectrum_ = *spectrumArray;
-		AmptekStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), event->dwellStartTime_, event->dwellEndTime_, event->dwellReplyTime_);
 		spectrumEvent->statusData_ = statusData;
 
 		QCoreApplication::postEvent(spectrumReceiver_, spectrumEvent);
