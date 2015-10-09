@@ -51,11 +51,19 @@ public:
 	inline AmptekSDD123DetectorManager::DwellMode dwellMode() const { return dwellMode_; }
 
 signals:
+	/// signal to request clear histrogram data
 	void clearHistrogramData(QString detectorName);
+	/// signal to request clear dwell histrogram data
 	void clearDwellHistrogramData(QString detectorName);
+	/// signal to indicate new histrogram data
 	void newHistrogramReceived(QString detectorName, AMDSDataHolder *);
+	/// signal to indicate new dwell histrogram data
 	void newDwellHistrogramReceived(QString detectorName, AMDSDataHolder * dataHolder, double elapsedDwellTime);
+	/// signal to indicate dwell finished updating data
 	void dwellFinishedUpdate(QString detectorName, double elapsedTime);
+
+	/// signal to indicate that configuration value is updated
+	void configurationValuesUpdate(AmptekConfigurationData configurationData);
 
 public slots:
 	/// function to set the event receiver to handle the request
@@ -69,7 +77,7 @@ public slots:
 	/// function to active dwell
 	void setDwellActive(bool dwellActive);
 	/// function to set Dwell Time
-	void setDwellTime(double dwellTime);
+	void setDwellTime(int dwellTime);
 	/// function to set dwell mode
 	void setDwellMode(AmptekSDD123DetectorManager::DwellMode dwellMode);
 
@@ -90,9 +98,11 @@ public slots:
 	void setDetectorPeakingTime(double peakingTime);
 	void setDetectorFastPeakingTime(AmptekSDD123DetectorManager::FastPeakingTimeValue fastPeakingTimeValue);
 
-signals:
-	/// signal to indicate that configuration value is updated
-	void configurationValuesUpdate(AmptekConfigurationData configurationData);
+protected slots:
+	/// slot to handle continuous data update
+	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime) = 0;
+	/// slot to handle dwell data update
+	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime) = 0;
 
 protected:
 	/// helper function to handle the incoming SpectrumEvent
@@ -117,8 +127,8 @@ protected:
 
 	QObject *requestEventReceiver_;
 
+	int dwellTime_;
 	bool dwellActive_;
-	double dwellTime_;
 	bool setPresetDwellEndTimeOnNextEvent_;
 
 	QTime lastestDwellEndTime_;
@@ -127,11 +137,6 @@ protected:
 	QTime presetDwellLocalStartTime_;
 	QTime presetDwellLocalEndTime_;
 	AmptekSDD123DetectorManager::DwellMode dwellMode_;
-
-////	AmptekSDD123ThreadedHistogramGroup *allData_;
-//	AMDSThreadedBufferGroup *allData_;
-////	AmptekSDD123DwellHistogramGroup *dwellData_;
-//	AMDSBufferGroup *dwellData_;
 
 	int maxHistogramStackSize_;
 

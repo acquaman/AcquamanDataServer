@@ -8,6 +8,7 @@ class AMSinglePVControl;
 class AMControlSet;
 
 class AMDSStatusData;
+class AMDSDataHolder;
 
 class AmptekSDD123EPICSDetectorManager : public AmptekSDD123DetectorManager
 {
@@ -16,8 +17,10 @@ public:
 	AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent = 0);
 
 protected slots:
-	void onContinuousAllDataUpdate(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime);
-	void onDwellFinishedAllDataUpdate(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime);
+	/// slot to handle continuous data update
+	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime) ;
+	/// slot to handle dwell finish data update
+	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime);
 
 	void onSpectrumControlValueChanged();
 
@@ -58,7 +61,8 @@ protected slots:
 	void onAllControlsTimedOut();
 
 protected:
-	void dataHelper(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime);
+	/// helper function to handle continuous spectrum data update
+	void dataHelper(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime);
 
 protected:
 	AMSinglePVControl *startDwellControl_;

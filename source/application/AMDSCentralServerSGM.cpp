@@ -19,8 +19,8 @@ AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 {
 	maxBufferSize_ = 20 * 60 * 1000; // 20 minuntes
 
-	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 239", "amptek:iain:sdd1", QHostAddress("192.168.0.239"), QHostAddress("192.168.0.100"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 240", "amptek:iain:sdd2", QHostAddress("192.168.0.240"), QHostAddress("192.168.0.101"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 239", "amptek:iain:sdd1", QHostAddress("192.168.0.239"), QHostAddress("192.168.0.100"), 12004, QHostAddress("192.168.10.104"), 1024, this));
+	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 240", "amptek:iain:sdd2", QHostAddress("192.168.0.240"), QHostAddress("192.168.0.101"), 12004, QHostAddress("192.168.10.104"), 1024, this));
 
 	/* Commented out PV and IP details for actual beamline ampteks, so can test on some detectors without interfering with beamline operations
 	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 239", "amptek:sdd1", QHostAddress("192.168.0.239"), QHostAddress("192.168.0.139"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
@@ -83,15 +83,20 @@ void AMDSCentralServerSGM::initializeAndStartDataServer()
 
 void AMDSCentralServerSGM::wrappingUpInitialization()
 {
+	QList<AmptekSDD123DetectorManager*> amptekDetectorManagerList = amptekDetectorGroup_->detectorManagers();
+
 	// connect the event among the amptek data servers and the detectors
-	for(int x = 0, size = amptekDetectorGroup_->detectorManagers().count(); x < size; x++){
-		AmptekSDD123DetectorManager *amptekDetectorManager = amptekDetectorGroup_->detectorManagers().at(x);
+	for(int x = 0, size = amptekDetectorManagerList.count(); x < size; x++){
+		AmptekSDD123DetectorManager *amptekDetectorManager = amptekDetectorManagerList.at(x);
 		AmptekSDD123Server *amptekServer = amptekThreadedDataServerGroup_->serverAt(x);
+		AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroupManagers_.value(amptekDetectorManager->detectorName());
 
 		amptekServer->setSpectrumPacketReceiver((QObject *)amptekDetectorManager->detector());
 		amptekServer->setConfirmationPacketReceiver(amptekDetectorManager);
 
 		amptekDetectorManager->setRequestEventReceiver(amptekServer);
+
+		connect(threadedBufferGroup, SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSStatusData,int,double)), amptekDetectorManager, SLOT(continuousAllDataUpdate(AMDSDataHolder*,AMDSStatusData,int,double)));
 	}
 }
 

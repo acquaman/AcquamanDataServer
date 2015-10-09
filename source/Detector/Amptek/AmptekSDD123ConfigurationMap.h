@@ -14,7 +14,8 @@ class AmptekSDD123ConfigurationMap : public QObject
 	Q_OBJECT
 public:
 	/// Creates a detector connection configuration from the provided arguments
-	AmptekSDD123ConfigurationMap(const QString &detectorName, const QString &detectorBasePVName, QHostAddress detectorAddress, QHostAddress localAddress, int port, QHostAddress windowsAddress, AMDSDataTypeDefinitions::DataType dataType, quint64 spectrumCountSize, QObject *parent = 0);
+//	AmptekSDD123ConfigurationMap(const QString &detectorName, const QString &detectorBasePVName, QHostAddress detectorAddress, QHostAddress localAddress, int port, QHostAddress windowsAddress, AMDSDataTypeDefinitions::DataType dataType, quint64 spectrumCountSize, QObject *parent = 0);
+	AmptekSDD123ConfigurationMap(const QString &detectorName, const QString &detectorBasePVName, QHostAddress detectorAddress, QHostAddress localAddress, int port, QHostAddress windowsAddress, quint64 spectrumCountSize, QObject *parent = 0);
 
 	/// The host address on the network of the detector
 	inline QHostAddress detectorAddress() const { return detectorAddress_; }

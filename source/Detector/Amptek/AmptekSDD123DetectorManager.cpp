@@ -25,7 +25,7 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	detector_->setSpectrumReceiver(this);
 
 	dwellActive_ = false;
-	dwellTime_ = 2.0;
+	dwellTime_ = 2;
 	dwellMode_ = AmptekSDD123DetectorManager::PresetDwell;
 	setPresetDwellEndTimeOnNextEvent_ = false;
 
@@ -78,7 +78,7 @@ void AmptekSDD123DetectorManager::setDwellActive(bool dwellActive){
 	dwellActive_ = dwellActive;
 }
 
-void AmptekSDD123DetectorManager::setDwellTime(double dwellTime){
+void AmptekSDD123DetectorManager::setDwellTime(int dwellTime){
 	dwellTime_ = dwellTime;
 }
 

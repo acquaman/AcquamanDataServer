@@ -1,10 +1,10 @@
 #include "AmptekSDD123EPICSDetectorManager.h"
 
-#include "DataElement/AMDSBufferGroup.h"
-#include "DataElement/AMDSStatusData.h"
 #include "beamline/AMPVControl.h"
 #include "beamline/AMControlSet.h"
-#include "Detector/Amptek/AmptekSDD123Detector.h"
+
+#include "DataElement/AMDSStatusData.h"
+#include "DataHolder/AMDSDataHolder.h"
 
 AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent)
 	:AmptekSDD123DetectorManager(amptekConfiguration, parent)
@@ -180,14 +180,16 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime)
+{
 	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){
 		lastEPICSSpectrumUpdateTime_ = QTime::currentTime();
 		dataHelper(spectrum, statusData, count, elapsedTime);
 	}
 }
 
-void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime)
+{
 	dataHelper(spectrum, statusData, count, elapsedTime);
 
 	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
@@ -255,12 +257,14 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(AmptekConfigu
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::dataHelper(QVector<int> spectrum, AMDSStatusData statusData, int count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDSStatusData statusData, int count, double elapsedTime){
 	if(!connected_)
 		return;
 
-	qDebug() << "Going to put " << spectrum;
-	spectrumControl_->setValues(spectrum);
+//	qDebug() << "Going to put " << spectrum;
+	AMDSFlatArray spectrumData;
+	spectrum->data(&spectrumData);
+	spectrumControl_->setValues(spectrumData.constVectorDouble()); // TODO: I need to know the type for a general usage ... How??
 
 	/**/
 	if(!fastCountsControl_->withinTolerance(statusData.fastCounts_))
@@ -331,7 +335,7 @@ void AmptekSDD123EPICSDetectorManager::onClearSpectrumControlValueChange(double 
 
 void AmptekSDD123EPICSDetectorManager::onDwellTimeControlValueChange(double newValue){
 	if(!dwellTimeControl_->withinTolerance(dwellTime()))
-		setDwellTime(newValue);
+		setDwellTime((int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onDwellModeControlValueChange(double newValue){
@@ -340,7 +344,7 @@ void AmptekSDD123EPICSDetectorManager::onDwellModeControlValueChange(double newV
 	else if(dwellModeControl_->withinTolerance(1) && dwellMode() == AmptekSDD123DetectorManager::ContinuousDwell)
 		return;
 	else{
-		int newMode = newValue;
+		int newMode = (int)newValue;
 		switch(newMode){
 		case 0:
 			setDwellMode(AmptekSDD123DetectorManager::PresetDwell);
@@ -355,6 +359,8 @@ void AmptekSDD123EPICSDetectorManager::onDwellModeControlValueChange(double newV
 }
 
 void AmptekSDD123EPICSDetectorManager::onHighVoltageControlValueChanged(double newValue){
+	Q_UNUSED(newValue)
+
 	if(!connected_ || !receivedConfigurationDataOnce_)
 		return;
 	/*
@@ -400,7 +406,7 @@ void AmptekSDD123EPICSDetectorManager::onThermoelectricCoolerControlValueChanged
 	double coolerSetting = configurationData_.coolerSetting_.toDouble();
 	if(thermoelectricCoolerControl_->withinTolerance(coolerSetting))
 		return;
-	setDetectorCoolerSetting(newValue);
+	setDetectorCoolerSetting((int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onFastThresholdControlValueChanged(double newValue){
@@ -408,7 +414,7 @@ void AmptekSDD123EPICSDetectorManager::onFastThresholdControlValueChanged(double
 		return;
 	if(fastThresholdControl_->withinTolerance(configurationData_.fastThreshold_))
 		return;
-	setDetectorFastThreshold(newValue);
+	setDetectorFastThreshold((int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onSlowThresholdControlValueChanged(double newValue){
@@ -437,7 +443,7 @@ void AmptekSDD123EPICSDetectorManager::onFastChannelPeakingTimeControlValueChang
 	else if(newValue == 2 && configurationData_.fastChannelPeakingTime_ == 400)
 		return;
 	else{
-		int enumValue = newValue;
+		int enumValue = (int)newValue;
 		switch(enumValue){
 		case 0:
 			setDetectorFastPeakingTime(AmptekSDD123DetectorManager::FastPeakingTime50);
@@ -459,7 +465,7 @@ void AmptekSDD123EPICSDetectorManager::onROI1LowIndexControlValueChanged(double 
 		return;
 	if(roi1LowIndexControl_->withinTolerance(configurationData_.scaLowIndices_.at(0)))
 		return;
-	setDetectorSingleChannelAnalyzer(1, newValue, configurationData_.scaHighIndices_.at(0));
+	setDetectorSingleChannelAnalyzer(1, (int)newValue, configurationData_.scaHighIndices_.at(0));
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI1HighIndexControlValueChanged(double newValue){
@@ -467,7 +473,7 @@ void AmptekSDD123EPICSDetectorManager::onROI1HighIndexControlValueChanged(double
 		return;
 	if(roi1HighIndexControl_->withinTolerance(configurationData_.scaHighIndices_.at(0)))
 		return;
-	setDetectorSingleChannelAnalyzer(1, configurationData_.scaLowIndices_.at(0), newValue);
+	setDetectorSingleChannelAnalyzer(1, configurationData_.scaLowIndices_.at(0), (int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI2LowIndexControlValueChanged(double newValue){
@@ -475,7 +481,7 @@ void AmptekSDD123EPICSDetectorManager::onROI2LowIndexControlValueChanged(double 
 		return;
 	if(roi2LowIndexControl_->withinTolerance(configurationData_.scaLowIndices_.at(1)))
 		return;
-	setDetectorSingleChannelAnalyzer(2, newValue, configurationData_.scaHighIndices_.at(1));
+	setDetectorSingleChannelAnalyzer(2, (int)newValue, configurationData_.scaHighIndices_.at(1));
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI2HighIndexControlValueChanged(double newValue){
@@ -483,7 +489,7 @@ void AmptekSDD123EPICSDetectorManager::onROI2HighIndexControlValueChanged(double
 		return;
 	if(roi2HighIndexControl_->withinTolerance(configurationData_.scaHighIndices_.at(1)))
 		return;
-	setDetectorSingleChannelAnalyzer(2, configurationData_.scaLowIndices_.at(1), newValue);
+	setDetectorSingleChannelAnalyzer(2, configurationData_.scaLowIndices_.at(1), (int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI3LowIndexControlValueChanged(double newValue){
@@ -491,7 +497,7 @@ void AmptekSDD123EPICSDetectorManager::onROI3LowIndexControlValueChanged(double 
 		return;
 	if(roi3LowIndexControl_->withinTolerance(configurationData_.scaLowIndices_.at(2)))
 		return;
-	setDetectorSingleChannelAnalyzer(3, newValue, configurationData_.scaHighIndices_.at(2));
+	setDetectorSingleChannelAnalyzer(3, (int)newValue, configurationData_.scaHighIndices_.at(2));
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI3HighIndexControlValueChanged(double newValue){
@@ -499,7 +505,7 @@ void AmptekSDD123EPICSDetectorManager::onROI3HighIndexControlValueChanged(double
 		return;
 	if(roi3HighIndexControl_->withinTolerance(configurationData_.scaHighIndices_.at(2)))
 		return;
-	setDetectorSingleChannelAnalyzer(3, configurationData_.scaLowIndices_.at(2), newValue);
+	setDetectorSingleChannelAnalyzer(3, configurationData_.scaLowIndices_.at(2), (int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI4LowIndexControlValueChanged(double newValue){
@@ -507,7 +513,7 @@ void AmptekSDD123EPICSDetectorManager::onROI4LowIndexControlValueChanged(double 
 		return;
 	if(roi4LowIndexControl_->withinTolerance(configurationData_.scaLowIndices_.at(3)))
 		return;
-	setDetectorSingleChannelAnalyzer(4, newValue, configurationData_.scaHighIndices_.at(3));
+	setDetectorSingleChannelAnalyzer(4, (int)newValue, configurationData_.scaHighIndices_.at(3));
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI4HighIndexControlValueChanged(double newValue){
@@ -515,7 +521,7 @@ void AmptekSDD123EPICSDetectorManager::onROI4HighIndexControlValueChanged(double
 		return;
 	if(roi4HighIndexControl_->withinTolerance(configurationData_.scaHighIndices_.at(3)))
 		return;
-	setDetectorSingleChannelAnalyzer(4, configurationData_.scaLowIndices_.at(3), newValue);
+	setDetectorSingleChannelAnalyzer(4, configurationData_.scaLowIndices_.at(3), (int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI5LowIndexControlValueChanged(double newValue){
@@ -523,7 +529,7 @@ void AmptekSDD123EPICSDetectorManager::onROI5LowIndexControlValueChanged(double 
 		return;
 	if(roi5LowIndexControl_->withinTolerance(configurationData_.scaLowIndices_.at(4)))
 		return;
-	setDetectorSingleChannelAnalyzer(5, newValue, configurationData_.scaHighIndices_.at(4));
+	setDetectorSingleChannelAnalyzer(5, (int)newValue, configurationData_.scaHighIndices_.at(4));
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI5HighIndexControlValueChanged(double newValue){
@@ -531,7 +537,7 @@ void AmptekSDD123EPICSDetectorManager::onROI5HighIndexControlValueChanged(double
 		return;
 	if(roi5HighIndexControl_->withinTolerance(configurationData_.scaHighIndices_.at(4)))
 		return;
-	setDetectorSingleChannelAnalyzer(5, configurationData_.scaLowIndices_.at(4), newValue);
+	setDetectorSingleChannelAnalyzer(5, configurationData_.scaLowIndices_.at(4), (int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI6LowIndexControlValueChanged(double newValue){
@@ -539,7 +545,7 @@ void AmptekSDD123EPICSDetectorManager::onROI6LowIndexControlValueChanged(double 
 		return;
 	if(roi6LowIndexControl_->withinTolerance(configurationData_.scaLowIndices_.at(5)))
 		return;
-	setDetectorSingleChannelAnalyzer(6, newValue, configurationData_.scaHighIndices_.at(5));
+	setDetectorSingleChannelAnalyzer(6, (int)newValue, configurationData_.scaHighIndices_.at(5));
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI6HighIndexControlValueChanged(double newValue){
@@ -547,7 +553,7 @@ void AmptekSDD123EPICSDetectorManager::onROI6HighIndexControlValueChanged(double
 		return;
 	if(roi6HighIndexControl_->withinTolerance(configurationData_.scaHighIndices_.at(5)))
 		return;
-	setDetectorSingleChannelAnalyzer(6, configurationData_.scaLowIndices_.at(5), newValue);
+	setDetectorSingleChannelAnalyzer(6, configurationData_.scaLowIndices_.at(5), (int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI7LowIndexControlValueChanged(double newValue){
@@ -555,7 +561,7 @@ void AmptekSDD123EPICSDetectorManager::onROI7LowIndexControlValueChanged(double 
 		return;
 	if(roi7LowIndexControl_->withinTolerance(configurationData_.scaLowIndices_.at(6)))
 		return;
-	setDetectorSingleChannelAnalyzer(7, newValue, configurationData_.scaHighIndices_.at(6));
+	setDetectorSingleChannelAnalyzer(7, (int)newValue, configurationData_.scaHighIndices_.at(6));
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI7HighIndexControlValueChanged(double newValue){
@@ -563,7 +569,7 @@ void AmptekSDD123EPICSDetectorManager::onROI7HighIndexControlValueChanged(double
 		return;
 	if(roi7HighIndexControl_->withinTolerance(configurationData_.scaHighIndices_.at(6)))
 		return;
-	setDetectorSingleChannelAnalyzer(7, configurationData_.scaLowIndices_.at(6), newValue);
+	setDetectorSingleChannelAnalyzer(7, configurationData_.scaLowIndices_.at(6), (int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI8LowIndexControlValueChanged(double newValue){
@@ -571,7 +577,7 @@ void AmptekSDD123EPICSDetectorManager::onROI8LowIndexControlValueChanged(double 
 		return;
 	if(roi8LowIndexControl_->withinTolerance(configurationData_.scaLowIndices_.at(7)))
 		return;
-	setDetectorSingleChannelAnalyzer(8, newValue, configurationData_.scaHighIndices_.at(7));
+	setDetectorSingleChannelAnalyzer(8, (int)newValue, configurationData_.scaHighIndices_.at(7));
 }
 
 void AmptekSDD123EPICSDetectorManager::onROI8HighIndexControlValueChanged(double newValue){
@@ -579,7 +585,7 @@ void AmptekSDD123EPICSDetectorManager::onROI8HighIndexControlValueChanged(double
 		return;
 	if(roi8HighIndexControl_->withinTolerance(configurationData_.scaHighIndices_.at(7)))
 		return;
-	setDetectorSingleChannelAnalyzer(8, configurationData_.scaLowIndices_.at(7), newValue);
+	setDetectorSingleChannelAnalyzer(8, configurationData_.scaLowIndices_.at(7), (int)newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onAllControlsConnected(bool connected){
