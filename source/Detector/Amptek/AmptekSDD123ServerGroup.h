@@ -69,6 +69,9 @@ signals:
 	void serverChangedToDwellState(int index);
 
 protected slots:
+	/// slot to initialize the timer to request all spectral
+	void initiateAllRequestSpectrum();
+
 	/// slot to request all the spectrual in the given request interval (masterRequestInterval_)
 	void onRequestAllSpectra();
 
@@ -80,8 +83,6 @@ protected slots:
 	void onServerChangedToDwellState(int index);
 
 private:
-	/// helper function to initialize the timer to request all spectral
-	void initiateAllRequestSpectrum();
 	/// helper function to release the spectural timer if it is allocated
 	void releaseRequestSpectrualTimer();
 

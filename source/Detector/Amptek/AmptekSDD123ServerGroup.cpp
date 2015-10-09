@@ -6,6 +6,7 @@
 #include "AmptekSDD123Server.h"
 
 AmptekSDD123ThreadedDataServerGroup::AmptekSDD123ThreadedDataServerGroup(QList<AmptekSDD123ConfigurationMap*> configurationMaps, QObject *parent)
+	:QObject(parent)
 {
 	amptekServerGroup_ = new AmptekSDD123ServerGroup(configurationMaps);
 

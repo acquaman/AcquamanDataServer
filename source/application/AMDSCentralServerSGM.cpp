@@ -70,7 +70,7 @@ void AMDSCentralServerSGM::initializeBufferGroup()
 	connect(amptekDetectorGroup_, SIGNAL(clearDwellHistrogramData(QString)), this, SLOT(onClearDwellHistrogramData(QString)));
 	connect(amptekDetectorGroup_, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder*)), this, SLOT(onNewHistrogramReceived(QString, AMDSDataHolder*)));
 	connect(amptekDetectorGroup_, SIGNAL(newDwellHistrogramReceived(QString, AMDSDataHolder*, double)), this, SLOT(onNewDwellHistrogramReceived(QString, AMDSDataHolder*, double)));
-	connect(amptekDetectorGroup_, SIGNAL(dwellFinishedUpdate(QString,double)), this, SLOT(onDwellFinishedDataUpdate(QString,double)));
+	connect(amptekDetectorGroup_, SIGNAL(dwellFinishedUpdate(QString,double)), this, SLOT(onDwellFinishedUpdate(QString,double)));
 }
 
 void AMDSCentralServerSGM::initializeAndStartDataServer()
@@ -96,7 +96,8 @@ void AMDSCentralServerSGM::wrappingUpInitialization()
 
 		amptekDetectorManager->setRequestEventReceiver(amptekServer);
 
-		connect(threadedBufferGroup, SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)));
+		connect(threadedBufferGroup, SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onContinuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)));
+		connect(threadedBufferGroup, SIGNAL(dwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onDwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)));
 	}
 }
 
@@ -138,7 +139,7 @@ void AMDSCentralServerSGM::onNewDwellHistrogramReceived(QString detectorName, AM
 	bufferGroup->append(dataHolder, elapsedTime);
 }
 
-void AMDSCentralServerSGM::onDwellFinishedDataUpdate(QString detectorName, double elapsedTime)
+void AMDSCentralServerSGM::onDwellFinishedUpdate(QString detectorName, double elapsedTime)
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
 	bufferGroup->finishDwellDataUpdate(elapsedTime);

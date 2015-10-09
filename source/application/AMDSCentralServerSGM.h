@@ -40,7 +40,7 @@ protected slots:
 	void onNewDwellHistrogramReceived(QString detectorName, AMDSDataHolder *, double elapsedTime);
 
 	/// slot to handle dwell data update finished request  for a given buffer (detector)
-	void onDwellFinishedDataUpdate(QString detectorName, double elapsedTime);
+	void onDwellFinishedUpdate(QString detectorName, double elapsedTime);
 
 protected:
 	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal

@@ -26,7 +26,8 @@ signals:
 	void newHistrogramReceived(QString detectorName, AMDSDataHolder *);
 	/// the signal to announce the new dwell histrogramData
 	void newDwellHistrogramReceived(QString detectorName, AMDSDataHolder * dataHolder, double elapsedDwellTime);
-	void dwellFinishedDataUpdate(QString detectorName);
+	/// signal to indicate dwell finished updating data
+	void dwellFinishedUpdate(QString detectorName, double elapsedTime);
 
 protected:
 	/// the mapping of detector names with detector managers
