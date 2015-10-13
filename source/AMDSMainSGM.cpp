@@ -2,7 +2,7 @@
 
 #include <QStringList>
 
-#include "AMDSMain_common.h"
+#include "AMDSMainCommon.h"
 #include "application/AMDSCentralServerSGM.h"
 
 int main(int argc, char *argv[])

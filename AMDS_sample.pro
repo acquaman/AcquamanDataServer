@@ -17,6 +17,6 @@ HEADERS *= \
 	source/application/AMDSCentralServerSample.h
 	
 SOURCES *= \
-	source/AMDSMain_Sample.cpp \
+	source/AMDSMainSample.cpp \
 	source/application/AMDSCentralServer.cpp \
 	source/application/AMDSCentralServerSample.cpp

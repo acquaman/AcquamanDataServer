@@ -29,7 +29,7 @@ HEADERS *= \
 	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.h
 
 SOURCES *= \
-	source/AMDSMain_SGM.cpp \
+	source/AMDSMainSGM.cpp \
 	source/application/AMDSCentralServer.cpp \
 	source/application/AMDSCentralServerSGM.cpp \
 	source/Detector/Amptek/AmptekEventDefinitions.cpp \
@@ -44,3 +44,5 @@ SOURCES *= \
 	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.cpp \
 	source/Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.cpp \
 	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.cpp
+
+

@@ -20,7 +20,7 @@ RCC_DIR=build_files
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
-	source/AMDSMain_common.h \
+	source/AMDSMainCommon.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
@@ -89,3 +89,5 @@ SOURCES *= \
 	source/DataHolder/AMDSDwellSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp
+
+
