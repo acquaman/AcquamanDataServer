@@ -12,9 +12,9 @@ int main(int argc, char *argv[])
 
 	QString interfaceType = "";
 	quint16 port = 28044;
-	bool result = AMDSMain_Common::parseArgument("AcquamanDataServerSGM", args, &interfaceType, &port);
 
-	if (result) {
+	bool startServer = AMDSMain_Common::parseArgument("AcquamanDataServerSGM", args, &interfaceType, &port);
+	if (startServer) {
 		AMDSMain_Common::initializeAppSettings(interfaceType, port);
 		AMDSMain_Common::initializeRegisteredClasses();
 

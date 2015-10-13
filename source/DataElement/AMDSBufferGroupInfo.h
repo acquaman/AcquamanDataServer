@@ -17,7 +17,7 @@ public:
 		NoFlatten = 2
 	};
 
-	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), AMDSDataTypeDefinitions::DataType dataType=AMDSDataTypeDefinitions::Double, int bufferSize=2, const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
+	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), AMDSDataTypeDefinitions::DataType dataType=AMDSDataTypeDefinitions::Double, const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
 	/// Copy constructor
 	AMDSBufferGroupInfo(const AMDSBufferGroupInfo& other);
 	/// Assignment operator
@@ -29,8 +29,8 @@ public:
 	inline QString description() const { return description_; }
 	/// returns the units of the bufferGroupInfo
 	inline QString units() const { return units_; }
+	/// returns the dataType of the bufferGroup
 	inline AMDSDataTypeDefinitions::DataType dataType() { return dataType_; }
-	inline int bufferSize() { return bufferSize_; }
 	/// returns whether the bufferGroup is enabled flatten
 	inline bool isFlattenEnabled() const { return flattenMethod_ != NoFlatten; }
 	/// returns the flatten method of the bufferGroup
@@ -77,8 +77,6 @@ protected:
 	QString units_;
 	/// the type of the data
 	AMDSDataTypeDefinitions::DataType dataType_;
-	/// the size of the data
-	int bufferSize_;
 	/// the definition on how the data should be flattened
 	DataFlattenMethod flattenMethod_;
 

@@ -30,9 +30,9 @@ namespace AMDSMain_Common {
 		QRegExp argPortType("--port=([0-9]{1,})");
 		QRegExp argHelp("--help");
 
-		bool result = true;
+		*port = 28040;
 
-		*port = 28044;
+		bool startServer = true;
 		for (int i = 1; i < args.size(); ++i) {
 			if (argInterfaceType.indexIn(args.at(i)) != -1) {
 				*interfaceType = argInterfaceType.cap(1);
@@ -40,19 +40,19 @@ namespace AMDSMain_Common {
 				QString value = argPortType.cap(1);
 				*port = value.toUInt();
 			} else if (argHelp.indexIn(args.at(i)) != -1) {
-				result = false;
+				startServer = false;
 			}
 		}
 
 		if ((*interfaceType).length() == 0)
-			result = false;
+			startServer = false;
 
-		if (!result)  {
+		if (!startServer)  {
 			qDebug() << "\nERROR: Missing or invalid interface argument. \n";
 			printUsage(appName);
 		}
 
-		return result;
+		return startServer;
 	}
 
 	/*

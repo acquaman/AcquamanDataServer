@@ -226,42 +226,7 @@ void AMDSDataStream::encodeDataType(AMDSDataTypeDefinitions::DataType dataType){
 
 void AMDSDataStream::write(const AMDSFlatArray &flatArray){
 	QDataStream::operator <<(flatArray.size());
-	switch(flatArray.dataType()){
-	case AMDSDataTypeDefinitions::Signed8:
-		*this << flatArray.constVectorQint8();
-		break;
-	case AMDSDataTypeDefinitions::Unsigned8:
-		*this << flatArray.constVectorQuint8();
-		break;
-	case AMDSDataTypeDefinitions::Signed16:
-		*this << flatArray.constVectorQint16();
-		break;
-	case AMDSDataTypeDefinitions::Unsigned16:
-		*this << flatArray.constVectorQuint16();
-		break;
-	case AMDSDataTypeDefinitions::Signed32:
-		*this << flatArray.constVectorQint32();
-		break;
-	case AMDSDataTypeDefinitions::Unsigned32:
-		*this << flatArray.constVectorQuint32();
-		break;
-	case AMDSDataTypeDefinitions::Signed64:
-		*this << flatArray.constVectorQint64();
-		break;
-	case AMDSDataTypeDefinitions::Unsigned64:
-		*this << flatArray.constVectorQuint64();
-		break;
-	case AMDSDataTypeDefinitions::Float:
-		*this << flatArray.constVectorFloat();
-		break;
-	case AMDSDataTypeDefinitions::Double:
-		*this << flatArray.constVectorDouble();
-		break;
-	case AMDSDataTypeDefinitions::InvalidType:
-		break;
-	default:
-		break;
-	}
+	flatArray.write(this);
 }
 
 AMDSDataTypeDefinitions::DataType AMDSDataStream::decodeDataType(){
@@ -281,45 +246,8 @@ void AMDSDataStream::read(AMDSFlatArray &flatArray){
 	if(status() != QDataStream::Ok)
 		return;
 
-	AMDSDataTypeDefinitions::DataType assumedDataType = flatArray.dataType();
-	flatArray.clearAndReset(assumedDataType, size);
-
-	switch(flatArray.dataType()){
-	case AMDSDataTypeDefinitions::Signed8:
-		*this >> flatArray.vectorQint8();
-		break;
-	case AMDSDataTypeDefinitions::Unsigned8:
-		*this >> flatArray.vectorQuint8();
-		break;
-	case AMDSDataTypeDefinitions::Signed16:
-		*this >> flatArray.vectorQint16();
-		break;
-	case AMDSDataTypeDefinitions::Unsigned16:
-		*this >> flatArray.vectorQuint16();
-		break;
-	case AMDSDataTypeDefinitions::Signed32:
-		*this >> flatArray.vectorQint32();
-		break;
-	case AMDSDataTypeDefinitions::Unsigned32:
-		*this >> flatArray.vectorQuint32();
-		break;
-	case AMDSDataTypeDefinitions::Signed64:
-		*this >> flatArray.vectorQint64();
-		break;
-	case AMDSDataTypeDefinitions::Unsigned64:
-		*this >> flatArray.vectorQuint64();
-		break;
-	case AMDSDataTypeDefinitions::Float:
-		*this >> flatArray.vectorFloat();
-		break;
-	case AMDSDataTypeDefinitions::Double:
-		*this >> flatArray.vectorDouble();
-		break;
-	case AMDSDataTypeDefinitions::InvalidType:
-		break;
-	default:
-		break;
-	}
+	flatArray.clearAndReset(flatArray.dataType(), size);
+	flatArray.read(this);
 }
 
 void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequest){

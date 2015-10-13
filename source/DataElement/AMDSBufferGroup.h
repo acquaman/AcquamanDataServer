@@ -27,6 +27,7 @@ class AMDSBufferGroup : public QObject
 	Q_OBJECT
 public:
 	/// Creates a new buffer group with a maximum capacity maxSize and data dimensions based on the bufferGroupInfo
+	/// If enableCumulative, a cumulativeDataHolder will be created automatically and cumulative operation will be applied when a new data holder is appended
 	AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, bool enableCumulative = false, QObject *parent = 0);
 	/// Copy constructor
 	AMDSBufferGroup(const AMDSBufferGroup& other);

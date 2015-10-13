@@ -46,18 +46,24 @@ int AMDSBufferGroup::count() const
 void AMDSBufferGroup::clear()
 {
 	QWriteLocker writeLock(&lock_);
-	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++)
-		delete dataHolders_[iElement];
 
+	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++) {
+		dataHolders_[iElement]->deleteLater();
+	}
 	dataHolders_.clear();
 
-	if (enableCumulative_)
-		cumulativeDataHolder_->clear();
+	if (enableCumulative_) {
+		cumulativeDataHolder_->deleteLater();
+		cumulativeDataHolder_ = 0;
+	}
 }
 
 AMDSDataHolder* AMDSBufferGroup::at(int index)
 {
 	QReadLocker readLock(&lock_);
+
+	if (index < 0 || index >= dataHolders_.count())
+		return 0;
 
 	return dataHolders_[index];
 }

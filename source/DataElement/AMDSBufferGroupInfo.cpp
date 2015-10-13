@@ -1,6 +1,6 @@
 #include "AMDSBufferGroupInfo.h"
 
-AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &description, const QString &units, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, const DataFlattenMethod flattenMethod, const QList<AMDSAxisInfo> &axes)
+AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &description, const QString &units, AMDSDataTypeDefinitions::DataType dataType, const DataFlattenMethod flattenMethod, const QList<AMDSAxisInfo> &axes)
 {
 	setName(name);
 	setDescription(description);
@@ -9,7 +9,6 @@ AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &des
 	setAxes(axes);
 
 	dataType_ = dataType;
-	bufferSize_ = bufferSize;
 }
 
 AMDSBufferGroupInfo::AMDSBufferGroupInfo(const AMDSBufferGroupInfo &other) {
@@ -25,7 +24,6 @@ AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& o
 	setAxes(other.axes());
 
 	dataType_ = other.dataType_;
-	bufferSize_ = other.bufferSize_;
 
 	return *this;
 }
