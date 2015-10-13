@@ -20,6 +20,7 @@ RCC_DIR=build_files
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
+	source/AMDSMain_common.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
