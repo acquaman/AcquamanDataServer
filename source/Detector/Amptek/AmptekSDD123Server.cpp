@@ -3,8 +3,6 @@
 #include <QtNetwork>
 #include <QCoreApplication>
 
-#include "AmptekSDD123Application.h"
-
 #include "AmptekEventDefinitions.h"
 
 /* Notes on how to convert back and forth
@@ -48,9 +46,7 @@ AmptekSDD123Server::AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurati
 		replySpectrumTime_->start();
 
 		udpDetectorSocket_ = new QUdpSocket(this);
-		bool boundUDP = udpDetectorSocket_->bind(configurationMap_->localAddress(), 10001, QUdpSocket::ShareAddress);
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "BoundUDP is " << boundUDP;
+
 		connect(udpDetectorSocket_, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 		connect(this, SIGNAL(responsePacketReady()), this, SLOT(onResponsePacketReady()));
 	}
@@ -76,8 +72,6 @@ QList<double> AmptekSDD123Server::unrequestedPacketStatistics() const{
 
 bool AmptekSDD123Server::event(QEvent *e){
 	if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationInitiateRequestEvent){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "It was a configurationInitiateRequestEvent";
 		if(((AmptekConfigurationInitiateRequestEvent*)e)->configurationMode_){
 			emit serverAboutToChangeToConfigurationState();
 			QTimer::singleShot(requestIntervalTimer_+5, this, SLOT(disableMCAMCS()));
@@ -86,16 +80,12 @@ bool AmptekSDD123Server::event(QEvent *e){
 		return true;
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationRequestEvent){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "It was a configurationRequestEvent";
 		if(((AmptekConfigurationRequestEvent*)e)->allParametersRequest_)
 			requestAllTextConfigurationParameters();
 		e->accept();
 		return true;
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::DwellRequestEvent){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "It was a dwellRequestEvent";
 		if(((AmptekDwellRequestEvent*)e)->dwellMode_)
 //			enableMCAMCS();
 			requestDataPacket(AmptekCommandManagerSGM::RequestEnableMCAMCS);
@@ -103,8 +93,6 @@ bool AmptekSDD123Server::event(QEvent *e){
 		return true;
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationSetEvent){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "It was a configurationSetEvent";
 		QStringList configurationCommands = ((AmptekConfigurationSetEvent*)e)->configurationCommands_;
 		textConfigurationSet(configurationCommands.at(0));
 		e->accept();
@@ -147,8 +135,6 @@ void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekComman
 
 //void AmptekSDD123Server::requestSpectrum(){
 //	AmptekSDD123Packet requestSpectrumPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->requestSpectrumHex());
-//	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-//		qDebug() << "Sending request for spectrum";
 //	sendRequestDatagram(requestSpectrumPacket);
 //}
 
@@ -184,9 +170,9 @@ void AmptekSDD123Server::mcaChannelsCount(){
 void AmptekSDD123Server::presetTime(){
 //	requestStatus();
 	requestDataPacket(AmptekCommandManagerSGM::ReqeustStatusPacket);
-	//fakeRequestStatus();
-	//requestSpectrum();
-	//requestCommTestAckPacket("f104");
+//	fakeRequestStatus();
+//	requestSpectrum();
+//	requestCommTestAckPacket("f104");
 }
 
 void AmptekSDD123Server::requestAllTextConfigurationParameters(){
@@ -309,8 +295,6 @@ void AmptekSDD123Server::sendSyncDatagram(AmptekSDD123Packet packet, int overrid
 		socketLocallyBusy_ = true;
 		currentSyncPacket_ = packet;
 		udpDetectorSocket_->writeDatagram(packet.datagram(), packet.datagram().size(), configurationMap_->detectorAddress(), 10001);
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "About to write a sync packet to " << configurationMap_->detectorAddress();
 		connect(syncPacketTimer_, SIGNAL(timeout()), this, SLOT(syncDatagramTimeout()));
 		if(overrideTimeout == -1)
 			syncPacketTimer_->start(currentSyncPacket_.timeout());
@@ -489,37 +473,27 @@ void AmptekSDD123Server::onResponsePacketReady(){
 		}
 	}
 	if(lastRequestPacket.commandText() == "Text Configuration"){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "Heard that the text configuration was accepted, check the new value";
 		requestAllTextConfigurationParameters();
 	}
 	if(responsePacket.commandText() == "Configuration Readback"){
 		QString allASCIICommands = QString(QByteArray::fromHex(responsePacket.dataString().toAscii()));
 		if(allASCIICommands.contains("ALLP")){
 			emit allParametersTextConfiguration(allASCIICommands);
+
 			if(spectrumPacketReceiver_){
-				if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-					qDebug() << "Going to post this configurationReadbackEvent " << allASCIICommands;
 				AmptekConfigurationReadbackEvent *configurationReadbackEvent = new AmptekConfigurationReadbackEvent();
 				configurationReadbackEvent->configurationReadback_ = allASCIICommands;
 				QCoreApplication::postEvent(spectrumPacketReceiver_, configurationReadbackEvent);
-				if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-					qDebug() << "Just posted that event";
 			}
 		}
 	}
 	if(lastRequestPacket.commandText() == "Enable MCA/MCS"){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "Heard enable MCA/MCS, so now we're in dwell state";
 		emit serverChangedToDwellState();
 	}
 	if(lastRequestPacket.commandText() == "Disable MCA/MCS"){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "Heard disable MCA/MCS, so now we're in configuration state";
 		emit serverChangedToConfigurationState();
+
 		if(confirmationPacketReceiver_){
-			if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-				qDebug() << "Going to post this configurationConfirmationEvent";
 			AmptekConfigurationModeConfirmationEvent *configurationConfirmationEvent = new AmptekConfigurationModeConfirmationEvent();
 			configurationConfirmationEvent->confirmConfigurationMode_ = true;
 			QCoreApplication::postEvent(confirmationPacketReceiver_, configurationConfirmationEvent);

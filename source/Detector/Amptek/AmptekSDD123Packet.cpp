@@ -3,8 +3,6 @@
 #include <QStringBuilder>
 #include <QDebug>
 
-#include "AmptekSDD123Application.h"
-
 AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const QString &commandString, const QString &dataString, bool isForwarded, QObject *parent) :
 		QObject(parent)
 {
@@ -176,8 +174,6 @@ void AmptekSDD123Packet::calculatePacket(){
 
 QString AmptekSDD123Packet::calculateLengthString(const QString &dataString){
 	if(dataString.size()%2 != 0){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "Error, bad hex data string, uneven length.";
 		return "";
 	}
 	QString retVal = QString("%1").arg(dataString.size()/2, 4, 16, QChar('0'));

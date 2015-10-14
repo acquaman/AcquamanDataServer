@@ -2,7 +2,6 @@
 
 #include <QSignalMapper>
 
-#include "AmptekSDD123Application.h"
 #include "AmptekSDD123Server.h"
 
 AmptekSDD123ThreadedDataServerGroup::AmptekSDD123ThreadedDataServerGroup(QList<AmptekSDD123ConfigurationMap*> configurationMaps, QObject *parent)
@@ -124,25 +123,16 @@ void AmptekSDD123ServerGroup::onRequestAllSpectra(){
 }
 
 void AmptekSDD123ServerGroup::onServerAboutToChangeToConfigurationState(int index){
-	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-		qDebug() << "Heard server at " << index << " is about to change to configuration mode";
-
 	AmptekSDD123Server *amptekServer = serverAt(index);
 	if(serversInDwellMode_.contains(amptekServer))
 		serversInDwellMode_.removeAll(amptekServer);
 }
 
 void AmptekSDD123ServerGroup::onServerChangedToConfigurationState(int index){
-	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-		qDebug() << "Heard server at " << index << " changed to configuration state";
-
 	emit serverChangedToConfigurationState(index);
 }
 
 void AmptekSDD123ServerGroup::onServerChangedToDwellState(int index){
-	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-		qDebug() << "Heard server at " << index << " changed to dwell state";
-
 
 	AmptekSDD123Server *amptekServer = serverAt(index);
 	if(!serversInDwellMode_.contains(amptekServer))

@@ -7,7 +7,6 @@
 #include "DataElement/AMDSDwellStatusData.h"
 #include "DataHolder/AMDSSpectralDataHolder.h"
 
-#include "Detector/Amptek/AmptekSDD123Application.h"
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 
 AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent) :
@@ -33,15 +32,11 @@ bool AmptekSDD123DetectorManager::event(QEvent *e){
 		return true;
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationValuesEvent){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "It was a configurationValuesEvent";
 		onConfigurationValuesEventReceived((AmptekConfigurationValuesEvent *)e);
 		e->accept();
 		return true;
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationModeConfirmationEvent){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "It was a configurationModeConfirmationEvent";
 		onConfigurationModeConfirmationEventReceived((AmptekConfigurationModeConfirmationEvent *)e);
 		e->accept();
 		return true;
@@ -260,15 +255,10 @@ void AmptekSDD123DetectorManager::onConfigurationValuesEventReceived(AmptekConfi
 
 void AmptekSDD123DetectorManager::onConfigurationModeConfirmationEventReceived(AmptekConfigurationModeConfirmationEvent *configurationModeConfirmationEvent){
 	if(configurationModeConfirmationEvent->confirmConfigurationMode_){
-		if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-			qDebug() << "In setConfigurationModeInitiated";
-
 		if(configurationRequestReason_ == AmptekSDD123DetectorManager::InvalidReason)
 			return;
 
 		if(configurationRequestReason_ == AmptekSDD123DetectorManager::RequestConfigurationReason){
-			if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-				qDebug() << "Heard detectorManger is now in configuration mode, request the configuration values";
 			postConfigurationRequestEvent();
 		}
 

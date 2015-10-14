@@ -6,7 +6,6 @@
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
-#include "Detector/Amptek/AmptekSDD123Application.h"
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 #include "Detector/Amptek/AmptekSDD123DetectorManager.h"
 #include "Detector/Amptek/AmptekSDD123ServerGroup.h"
@@ -102,16 +101,10 @@ void AMDSCentralServerSGM::wrappingUpInitialization()
 }
 
 void AMDSCentralServerSGM::onServerChangedToConfigurationState(int index){
-	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-		qDebug() << "Heard that the server " << index << " is now in the configuration state";
-
 	emit serverChangedToConfigurationState(index);
 }
 
 void AMDSCentralServerSGM::onServerChangedToDwellState(int index){
-	if(AmptekSDD123Application::amptekApp()->debuggingEnabled())
-		qDebug() << "Heard that the server " << index << " group is now in the dwell state";
-
 	emit serverChangedToDwellState(index);
 }
 

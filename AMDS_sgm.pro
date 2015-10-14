@@ -16,7 +16,6 @@ HEADERS *= \
 	source/application/AMDSCentralServer.h \
 	source/application/AMDSCentralServerSGM.h \
 	source/Detector/Amptek/AmptekEventDefinitions.h \
-	source/Detector/Amptek/AmptekSDD123Application.h \
 	source/Detector/Amptek/AmptekSDD123ConfigurationMap.h \
 	source/Detector/Amptek/AmptekCommandManager.h \
 	source/Detector/Amptek/AmptekSDD123Packet.h \
@@ -33,7 +32,6 @@ SOURCES *= \
 	source/application/AMDSCentralServer.cpp \
 	source/application/AMDSCentralServerSGM.cpp \
 	source/Detector/Amptek/AmptekEventDefinitions.cpp \
-	source/Detector/Amptek/AmptekSDD123Application.cpp \
 	source/Detector/Amptek/AmptekSDD123ConfigurationMap.cpp \
 	source/Detector/Amptek/AmptekCommandManager.cpp \
 	source/Detector/Amptek/AmptekSDD123Packet.cpp \
