@@ -2,6 +2,7 @@
 #define AMPTEKSDD123PACKET_H
 
 #include <QObject>
+#include <QDateTime>
 
 #include "Detector/Amptek/SGM/AmptekCommandManagerSGM.h"
 
@@ -72,7 +73,6 @@ protected:
 	QByteArray datagram_;
 };
 
-#include <QDateTime>
 
 class AmptekSDD123PacketMonitor : public QObject{
 Q_OBJECT

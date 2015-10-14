@@ -168,11 +168,11 @@ void AmptekSDD123Server::mcaChannelsCount(){
 }
 
 void AmptekSDD123Server::presetTime(){
-//	requestStatus();
 	requestDataPacket(AmptekCommandManagerSGM::ReqeustStatusPacket);
-//	fakeRequestStatus();
-//	requestSpectrum();
-//	requestCommTestAckPacket("f104");
+//	requestStatus();
+////	fakeRequestStatus();
+////	requestSpectrum();
+////	requestCommTestAckPacket("f104");
 }
 
 void AmptekSDD123Server::requestAllTextConfigurationParameters(){

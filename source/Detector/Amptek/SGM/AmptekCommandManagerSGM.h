@@ -62,7 +62,7 @@ public:
 
 	virtual ~AmptekCommandManagerSGM();
 
-//	QString requestStatusPacketHex() const;
+	QString requestStatusPacketHex() const;
 //	QString requestSpectrumHex() const;
 //	QString requestSpectrumAndClearHex() const;
 //	QString clearSpectrumHex() const;

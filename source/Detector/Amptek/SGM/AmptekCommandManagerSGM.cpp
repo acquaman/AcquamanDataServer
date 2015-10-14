@@ -21,68 +21,68 @@ AmptekCommandManagerSGM::~AmptekCommandManagerSGM()
 {
 }
 
-//QString AmptekCommandManagerSGM::requestStatusPacketHex() const{
-//	return amptekCommandFromCommandId(ReqeustStatusPacket).hex();
-//}
+QString AmptekCommandManagerSGM::requestStatusPacketHex() const{
+	return amptekCommand(ReqeustStatusPacket).hex();
+}
 
 //QString AmptekCommandManagerSGM::requestSpectrumHex() const{
-//	return amptekCommandFromCommandId(RequestSpecturmPlusStatus).hex();
+//	return amptekCommand(RequestSpecturmPlusStatus).hex();
 //}
 
 //QString AmptekCommandManagerSGM::requestSpectrumAndClearHex() const{
-//	return amptekCommandFromCommandId(RequestAndClearSpecturmPlusStatus).hex();
+//	return amptekCommand(RequestAndClearSpecturmPlusStatus).hex();
 //}
 
 //QString AmptekCommandManagerSGM::clearSpectrumHex() const{
-//	return amptekCommandFromCommandId(RequestClearSpecturm).hex();
+//	return amptekCommand(RequestClearSpecturm).hex();
 //}
 
 //QString AmptekCommandManagerSGM::enableMCAMCSHex() const{
-//	return amptekCommandFromCommandId(RequestEnableMCAMCS).hex();
+//	return amptekCommand(RequestEnableMCAMCS).hex();
 //}
 
 //QString AmptekCommandManagerSGM::disableMCAMCSHex() const{
-//	return amptekCommandFromCommandId(RequestDisableMCAMCS).hex();
+//	return amptekCommand(RequestDisableMCAMCS).hex();
 //}
 
 //QString AmptekCommandManagerSGM::textConfigurationReadbackHex() const{
-//	return amptekCommandFromCommandId(RequestTextConfigurationReadback).hex();
+//	return amptekCommand(RequestTextConfigurationReadback).hex();
 //}
 
 //QString AmptekCommandManagerSGM::textConfigurationHex() const{
-//	return amptekCommandFromCommandId(RequestTextConfiguration).hex();
+//	return amptekCommand(RequestTextConfiguration).hex();
 //}
 
 //QString AmptekCommandManagerSGM::commTestRequestAckOKPacketHex() const{
-//	return amptekCommandFromCommandId(RequestCommTestACKOKPacket).hex();
+//	return amptekCommand(RequestCommTestACKOKPacket).hex();
 //}
 
 //QString AmptekCommandManagerSGM::commTestRequestAckOKwithSharingPacketHex() const{
-//	return amptekCommandFromCommandId(RequestCommTestACKOKWithSharingPacket).hex();
+//	return amptekCommand(RequestCommTestACKOKWithSharingPacket).hex();
 //}
 
 //QString AmptekCommandManagerSGM::commTestRequestAckSyncErrorPacketHex() const{
-//	return amptekCommandFromCommandId(RequestCommTestACKSyncErrorPacket).hex();
+//	return amptekCommand(RequestCommTestACKSyncErrorPacket).hex();
 //}
 
 //QString AmptekCommandManagerSGM::commTestRequestAckPIDErrorPacketHex() const{
-//	return amptekCommandFromCommandId(RequestCommTestACKPIDErrorPacket).hex();
+//	return amptekCommand(RequestCommTestACKPIDErrorPacket).hex();
 //}
 
 //QString AmptekCommandManagerSGM::commTestRequestAckLENErrorPacketHex() const{
-//	return amptekCommandFromCommandId(RequestCommTestACKLENErrorPacket).hex();
+//	return amptekCommand(RequestCommTestACKLENErrorPacket).hex();
 //}
 
 //QString AmptekCommandManagerSGM::commTestRequestAckChecksumErrorPacketHex() const{
-//	return amptekCommandFromCommandId(RequestCommTestACKChecksumErrorPacket).hex();
+//	return amptekCommand(RequestCommTestACKChecksumErrorPacket).hex();
 //}
 
 //QString AmptekCommandManagerSGM::commTestRequestAckBadParameterPacketHex() const{
-//	return amptekCommandFromCommandId(RequestCommTestACKBadParameterPacket).hex();
+//	return amptekCommand(RequestCommTestACKBadParameterPacket).hex();
 //}
 
 //QString AmptekCommandManagerSGM::commTestRequestEchoPacketHex() const{
-//	return amptekCommandFromCommandId(RequestCommTestEchoPacket).hex();
+//	return amptekCommand(RequestCommTestEchoPacket).hex();
 //}
 
 QString AmptekCommandManagerSGM::textFromHex(const QString &hexString) const{

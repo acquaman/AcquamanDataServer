@@ -9,6 +9,8 @@
 #include "DataElement/AMDSFlatArray.h"
 #include "Detector/Amptek/AmptekEventDefinitions.h"
 
+#define AMPTEK_ALERT_CHANNEL_NUMBER_UNMATCH 40101
+
 class AmptekSDD123Detector : public QObject
 {
 	Q_OBJECT

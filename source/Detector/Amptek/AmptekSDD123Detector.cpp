@@ -114,7 +114,7 @@ void AmptekSDD123Detector::onConfigurationReadbackEventReceived(AmptekConfigurat
 
 AMDSFlatArray *AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrumData, int numChannels){
 	if (numChannels != bufferSize()) {
-		AMErrorMon::alert(this, 0, QString("Spectrum channel number (%1) doesn't match with the expected buffer size (%2)").arg(numChannels).arg(bufferSize()));
+		AMErrorMon::alert(this, AMPTEK_ALERT_CHANNEL_NUMBER_UNMATCH, QString("Spectrum channel number (%1) doesn't match with the expected buffer size (%2)").arg(numChannels).arg(bufferSize()));
 	}
 
 	AMDSFlatArray *spectrumArray = new AMDSFlatArray(dataType(), bufferSize());
@@ -338,9 +338,7 @@ void AmptekSDD123Detector::backwardsMid(int start, int length, const QByteArray 
 }
 
 QString AmptekSDD123Detector::stringFromBool(bool input) const{
-	if(input)
-		return "true";
-	return "false";
+	return input ? "true" : "false" ;
 }
 
 
