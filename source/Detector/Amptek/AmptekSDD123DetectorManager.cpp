@@ -5,7 +5,7 @@
 
 #include "DataElement/AMDSFlatArray.h"
 #include "DataElement/AMDSDwellStatusData.h"
-#include "DataHolder/AMDSDwellSpectralDataHolder.h"
+#include "DataHolder/AMDSSpectralDataHolder.h"
 
 #include "Detector/Amptek/AmptekSDD123Application.h"
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"

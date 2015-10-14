@@ -19,7 +19,7 @@ public:
 	/// Implement the Division operation of AMDSLightWeightDataHolder: the value of the given handler will be divided by the given divisior
 	virtual AMDSDataHolder* operator /(quint32 divisor);
 
-	/// pure virtual function to clear the data of the instance
+	/// Implement the function to clear the data of the instance
 	virtual void clear() { valueFlatArray_.clear(); }
 	/// implement the data function to read data from valueFlatArray_ and write data to the given outputArray
 	virtual bool data(AMDSFlatArray *outputArray) const { return valueFlatArray_.resetTargetArrayAndReplaceData(outputArray); }

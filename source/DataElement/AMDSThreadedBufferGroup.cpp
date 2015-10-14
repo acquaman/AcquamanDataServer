@@ -1,7 +1,7 @@
 #include "AMDSThreadedBufferGroup.h"
 
 #include "DataElement/AMDSBufferGroup.h"
-#include "DataHolder/AMDSDwellSpectralDataHolder.h"
+#include "DataHolder/AMDSSpectralDataHolder.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
 #include "util/AMErrorMonitor.h"
 

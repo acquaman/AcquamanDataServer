@@ -53,7 +53,6 @@ HEADERS *= \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
-	source/DataHolder/AMDSDwellSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h  \
 	source/util/AMDSMetaObjectSupport.h
 
@@ -86,7 +85,6 @@ SOURCES *= \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
-	source/DataHolder/AMDSDwellSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp
 
