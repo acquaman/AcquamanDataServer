@@ -5,6 +5,7 @@
 
 #include "DataElement/AMDSDwellStatusData.h"
 #include "DataHolder/AMDSDataHolder.h"
+#include "util/AMErrorMonitor.h"
 
 AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent)
 	:AmptekSDD123DetectorManager(amptekConfiguration, parent)
@@ -261,7 +262,10 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDS
 //	qDebug() << "Going to put " << spectrum;
 	AMDSFlatArray spectrumData;
 	spectrum->data(&spectrumData);
-	spectrumControl_->setValues(spectrumData.constVectorDouble()); // TODO: I need to know the type for a general usage ... How??
+	if (spectrumData.dataType() == AMDSDataTypeDefinitions::Double)
+		spectrumControl_->setValues(spectrumData.constVectorDouble());
+	else
+		AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The dataType of the data array (%1) is NOT expected Double type.").arg(spectrumData.dataType()));
 
 	/**/
 	if(!fastCountsControl_->withinTolerance(statusData.fastCounts_))

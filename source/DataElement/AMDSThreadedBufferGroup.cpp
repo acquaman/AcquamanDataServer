@@ -3,6 +3,7 @@
 #include "DataElement/AMDSBufferGroup.h"
 #include "DataHolder/AMDSDwellSpectralDataHolder.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
+#include "util/AMErrorMonitor.h"
 
 AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
 	QObject(parent)
@@ -46,11 +47,15 @@ void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, bool elapsedDwellTim
 
 	if (bufferGroup_->cumulativeEnabled()) {
 		AMDSDwellSpectralDataHolder *cumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(bufferGroup_->cumulativeDataHolder());
-		AMDSDwellStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
+		if (cumulativeDataHolder) {
+			AMDSDwellStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
 
-		emit continuousDataUpdate(cumulativeDataHolder);
-		emit continuousStatusDataUpdate(cumulativeStatusData, bufferGroup_->count());
-		emit continuousAllDataUpdate(cumulativeDataHolder, cumulativeStatusData, bufferGroup_->count(), elapsedDwellTime);
+			emit continuousDataUpdate(cumulativeDataHolder);
+			emit continuousStatusDataUpdate(cumulativeStatusData, bufferGroup_->count());
+			emit continuousAllDataUpdate(cumulativeDataHolder, cumulativeStatusData, bufferGroup_->count(), elapsedDwellTime);
+		} else {
+			AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(bufferGroup_->cumulativeDataHolder()->metaObject()->className()));
+		}
 	}
 }
 
@@ -65,12 +70,16 @@ void AMDSThreadedBufferGroup::finishDwellDataUpdate(double elapsedTime)
 
 	if (bufferGroup_->cumulativeEnabled()) {
 		AMDSDwellSpectralDataHolder *cumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(bufferGroup_->cumulativeDataHolder());
-		AMDSDwellStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
+		if (cumulativeDataHolder) {
+			AMDSDwellStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
 
-		emit dwellFinishedTimeUpdate(elapsedTime);
-		emit dwellFinishedDataUpdate(cumulativeDataHolder);
-		emit dwellFinishedStatusDataUpdate(cumulativeStatusData, bufferGroup_->count());
-		emit dwellFinishedAllDataUpdate(cumulativeDataHolder, cumulativeStatusData, bufferGroup_->count(), elapsedTime);
+			emit dwellFinishedTimeUpdate(elapsedTime);
+			emit dwellFinishedDataUpdate(cumulativeDataHolder);
+			emit dwellFinishedStatusDataUpdate(cumulativeStatusData, bufferGroup_->count());
+			emit dwellFinishedAllDataUpdate(cumulativeDataHolder, cumulativeStatusData, bufferGroup_->count(), elapsedTime);
+		} else {
+			AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(bufferGroup_->cumulativeDataHolder()->metaObject()->className()));
+		}
 	}
 }
 

@@ -29,6 +29,18 @@ public:
 	bool setValue(int index, float   value) ;
 	bool setValue(int index, double  value) ;
 
+	/// returns the data Array in const
+	inline const QVector<qint8>& constVectorQint8() const { return vectorQint8_; }
+	inline const QVector<quint8>& constVectorQuint8() const { return vectorQuint8_; }
+	inline const QVector<qint16>& constVectorQint16() const { return vectorQint16_; }
+	inline const QVector<quint16>& constVectorQuint16() const { return vectorQuint16_; }
+	inline const QVector<qint32>& constVectorQint32() const { return vectorQint32_; }
+	inline const QVector<quint32>& constVectorQuint32() const { return vectorQuint32_; }
+	inline const QVector<qint64>& constVectorQint64() const { return vectorQint64_; }
+	inline const QVector<quint64>& constVectorQuint64() const { return vectorQuint64_; }
+	inline const QVector<float>& constVectorFloat() const { return vectorFloat_; }
+	inline const QVector<double>& constVectorDouble() const { return vectorDouble_; }
+
 	/// returns the size of the DataArray
 	quint32 size() const;
 	/// clear the dataArray and reset the size to 0
@@ -54,18 +66,6 @@ public:
 protected:
 	/// helper function to resize the dataArray with given type and size
 	void resizeType(AMDSDataTypeDefinitions::DataType dataType, quint32 size);
-
-	/// returns the data Array in const
-	inline const QVector<qint8>& constVectorQint8() const { return vectorQint8_; }
-	inline const QVector<quint8>& constVectorQuint8() const { return vectorQuint8_; }
-	inline const QVector<qint16>& constVectorQint16() const { return vectorQint16_; }
-	inline const QVector<quint16>& constVectorQuint16() const { return vectorQuint16_; }
-	inline const QVector<qint32>& constVectorQint32() const { return vectorQint32_; }
-	inline const QVector<quint32>& constVectorQuint32() const { return vectorQuint32_; }
-	inline const QVector<qint64>& constVectorQint64() const { return vectorQint64_; }
-	inline const QVector<quint64>& constVectorQuint64() const { return vectorQuint64_; }
-	inline const QVector<float>& constVectorFloat() const { return vectorFloat_; }
-	inline const QVector<double>& constVectorDouble() const { return vectorDouble_; }
 
 	/// returns the data Array
 	inline QVector<qint8>& vectorQint8() { return vectorQint8_; }

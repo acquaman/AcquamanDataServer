@@ -7,8 +7,7 @@ AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &des
 	setUnits(units);
 	setFlattenMethod(flattenMethod);
 	setAxes(axes);
-
-	dataType_ = dataType;
+	setDataType(dataType);
 }
 
 AMDSBufferGroupInfo::AMDSBufferGroupInfo(const AMDSBufferGroupInfo &other) {
@@ -22,8 +21,7 @@ AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& o
 	setUnits(other.units());
 	setFlattenMethod(other.flattenMethod());
 	setAxes(other.axes());
-
-	dataType_ = other.dataType_;
+	setDataType(other.dataType());
 
 	return *this;
 }
