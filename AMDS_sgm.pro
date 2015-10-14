@@ -1,7 +1,14 @@
 
-PATH_TO_SOURCE = /home/liux0/beamline/programming/AcquamanDataServer/source
-PATH_TO_ACQUAMAN = /home/liux0/beamline/programming/acquaman/source
-PATH_TO_MPLOT = /home/liux0/beamline/programming/MPlot/src
+HOME_FOLDER = $$system(echo $HOME)
+
+USERNAME = $$system(whoami)
+contains(USERNAME, liux0) {
+	HOME_FOLDER = "/home/liux0"
+}
+
+PATH_TO_SOURCE = $$HOME_FOLDER/beamline/programming/AcquamanDataServer/source
+PATH_TO_ACQUAMAN = $$HOME_FOLDER/beamline/programming/acquaman/source
+PATH_TO_MPLOT = $$HOME_FOLDER/beamline/programming/MPlot/src
 
 INCLUDEPATH += $$PATH_TO_SOURCE
 INCLUDEPATH += $$PATH_TO_ACQUAMAN

@@ -44,7 +44,7 @@ void AMDSCentralServerSample::onHundredMillisecondTimerUpdate(){
 	qint64 oneValue;
 	for(int x = 0; x < oneSpectralFlatArray.constVectorQint64().size(); x++){
 		oneValue = (spectralCounter_+x)*2;
-		oneSpectralFlatArray.vectorQint64()[x] = oneValue;
+		oneSpectralFlatArray.setValue(x, oneValue);
 	}
 	oneSpectralDataHolder->setData(&oneSpectralFlatArray);
 
