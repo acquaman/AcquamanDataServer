@@ -45,6 +45,7 @@ HEADERS  += \
 	source/DataElement/AMDSEventDataSupport.h \
 	source/DataElement/AMDSFlatArray.h \
 	source/DataElement/AMDSBufferGroupInfo.h \
+	source/DataElement/AMDSDwellStatusData.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
@@ -76,6 +77,7 @@ SOURCES += \
 	source/DataElement/AMDSEventDataSupport.cpp \
 	source/DataElement/AMDSFlatArray.cpp \
 	source/DataElement/AMDSBufferGroupInfo.cpp \
+	source/DataElement/AMDSDwellStatusData.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \

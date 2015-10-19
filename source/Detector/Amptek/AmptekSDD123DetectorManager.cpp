@@ -1,6 +1,5 @@
 #include "AmptekSDD123DetectorManager.h"
 
-#include <QDebug>
 #include <QCoreApplication>
 
 #include "DataElement/AMDSFlatArray.h"
@@ -141,7 +140,6 @@ void AmptekSDD123DetectorManager::setDetectorCoolerSetting(int coolerSetting){
 		return;
 	else{
 		configurationSetCommand_ = QString("TECS=%1;").arg(coolerSetting);
-		qDebug() << "Set TECS to " << coolerSetting;
 	}
 	postConfigurationInitiateRequestEvent();
 }

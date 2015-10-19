@@ -6,9 +6,11 @@ contains(USERNAME, liux0) {
 	HOME_FOLDER = "/home/liux0"
 }
 
-PATH_TO_SOURCE = $$HOME_FOLDER/beamline/programming/AcquamanDataServer/source
-PATH_TO_ACQUAMAN = $$HOME_FOLDER/beamline/programming/acquaman/source
-PATH_TO_MPLOT = $$HOME_FOLDER/beamline/programming/MPlot/src
+PATH_TO_WORKSPACE = beamline/programming
+
+PATH_TO_SOURCE = $$HOME_FOLDER/$$PATH_TO_WORKSPACE/AcquamanDataServer/source
+PATH_TO_ACQUAMAN = $$HOME_FOLDER/$$PATH_TO_WORKSPACE/acquaman/source
+PATH_TO_MPLOT = $$HOME_FOLDER/$$PATH_TO_WORKSPACE/MPlot/src
 
 INCLUDEPATH += $$PATH_TO_SOURCE
 INCLUDEPATH += $$PATH_TO_ACQUAMAN

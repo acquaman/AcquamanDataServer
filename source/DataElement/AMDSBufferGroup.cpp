@@ -74,7 +74,7 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData)
 
 	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(newData);
 	if(dataHolderRemoved)
-		delete dataHolderRemoved;
+		dataHolderRemoved->deleteLater();
 
 	if (enableCumulative_) {
 		if (cumulativeDataHolder_) {

@@ -1,7 +1,6 @@
 #include "AmptekSDD123Packet.h"
 
 #include <QStringBuilder>
-#include <QDebug>
 
 AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const QString &commandString, const QString &dataString, bool isForwarded, QObject *parent) :
 		QObject(parent)

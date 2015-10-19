@@ -87,7 +87,6 @@ bool AmptekSDD123Server::event(QEvent *e){
 	}
 	else if(e->type() == (QEvent::Type)AmptekEventDefinitions::DwellRequestEvent){
 		if(((AmptekDwellRequestEvent*)e)->dwellMode_)
-//			enableMCAMCS();
 			requestDataPacket(AmptekCommandManagerSGM::RequestEnableMCAMCS);
 		e->accept();
 		return true;
@@ -112,7 +111,9 @@ int AmptekSDD123Server::forwardDatagram(const QByteArray &datagram){
 
 void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekCommandDefSGM command, const QString &dataStringHex, bool sendFakeRequest, bool sendSyncRequest, int overrideTimeout)
 {
-	AmptekSDD123Packet requestStatusPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->amptekCommand(command).hex(), dataStringHex);
+	AmptekSDD123Packet requestStatusPacket(packetIDCounter_, AmptekCommandManagerSGM::sddCommands()->amptekCommand(command).hex(), dataStringHex);
+	packetIDCounter_++;
+
 	if (sendFakeRequest) {
 		fakeSendDatagram(requestStatusPacket, overrideTimeout);
 	} else if (sendSyncRequest) {
@@ -123,42 +124,7 @@ void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekComman
 	}
 }
 
-//void AmptekSDD123Server::requestStatus(){
-//	AmptekSDD123Packet requestStatusPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->requestStatusPacketHex());
-//	sendRequestDatagram(requestStatusPacket);
-//}
-
-//void AmptekSDD123Server::fakeRequestStatus(){
-//	AmptekSDD123Packet requestStatusPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->requestStatusPacketHex());
-//	fakeSendDatagram(requestStatusPacket);
-//}
-
-//void AmptekSDD123Server::requestSpectrum(){
-//	AmptekSDD123Packet requestSpectrumPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->requestSpectrumHex());
-//	sendRequestDatagram(requestSpectrumPacket);
-//}
-
-//void AmptekSDD123Server::requestSpectrumAndClear(){
-//	lastRequestSpectrumTime_->setHMS(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
-//	requestSpectrumTime_->restart();
-
-//	AmptekSDD123Packet requestSpectrumAndClearPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->requestSpectrumAndClearHex());
-//	sendRequestDatagram(requestSpectrumAndClearPacket);
-//}
-
-//void AmptekSDD123Server::clearSpectrum(){
-//	AmptekSDD123Packet clearSpectrumPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->clearSpectrumHex());
-//	sendRequestDatagram(clearSpectrumPacket);
-//}
-
-//void AmptekSDD123Server::enableMCAMCS(){
-//	AmptekSDD123Packet enableMCAMCSPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->enableMCAMCSHex());
-//	sendRequestDatagram(enableMCAMCSPacket);
-//}
-
 void AmptekSDD123Server::disableMCAMCS(){
-//	AmptekSDD123Packet disableMCAMCSPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->disableMCAMCSHex());
-//	sendRequestDatagram(disableMCAMCSPacket);
 	requestDataPacket(AmptekCommandManagerSGM::RequestDisableMCAMCS);
 }
 
@@ -169,10 +135,6 @@ void AmptekSDD123Server::mcaChannelsCount(){
 
 void AmptekSDD123Server::presetTime(){
 	requestDataPacket(AmptekCommandManagerSGM::ReqeustStatusPacket);
-//	requestStatus();
-////	fakeRequestStatus();
-////	requestSpectrum();
-////	requestCommTestAckPacket("f104");
 }
 
 void AmptekSDD123Server::requestAllTextConfigurationParameters(){
@@ -193,8 +155,6 @@ void AmptekSDD123Server::requestAllTextConfigurationParameters(){
 void AmptekSDD123Server::textConfigurationReadback(QString singleCommandRequest){
 	QString dataString = singleCommandRequest+"=?;";
 	requestDataPacket(AmptekCommandManagerSGM::RequestTextConfigurationReadback, dataString.toAscii().toHex());
-//	AmptekSDD123Packet textConfigurationReadbackPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->textConfigurationReadbackHex(), dataString.toAscii().toHex());
-//	sendRequestDatagram(textConfigurationReadbackPacket);
 }
 
 void AmptekSDD123Server::textConfigurationReadback(QStringList multiCommandRequest){
@@ -203,47 +163,11 @@ void AmptekSDD123Server::textConfigurationReadback(QStringList multiCommandReque
 	foreach(singleCommand, multiCommandRequest)
 		fullCommandString.append(singleCommand+";");
 	requestDataPacket(AmptekCommandManagerSGM::RequestTextConfigurationReadback, fullCommandString.toAscii().toHex());
-//	AmptekSDD123Packet textConfigurationReadbackPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->textConfigurationReadbackHex(), fullCommandString.toAscii().toHex());
-//	sendRequestDatagram(textConfigurationReadbackPacket);
 }
 
 void AmptekSDD123Server::textConfigurationSet(QString singleCommandRequest){
 	requestDataPacket(AmptekCommandManagerSGM::RequestTextConfiguration, singleCommandRequest.toAscii().toHex());
-	//QString dataString = singleCommandRequest+"=?;";
-//	AmptekSDD123Packet textConfigurationSetPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->textConfigurationHex(), singleCommandRequest.toAscii().toHex());
-//	sendRequestDatagram(textConfigurationSetPacket);
 }
-
-//void AmptekSDD123Server::requestCommTestAckPacket(const QString &hexCommand){
-//	AmptekSDD123Packet requestCommTestPacket(packetIDCounter_++, hexCommand);
-//	sendRequestDatagram(requestCommTestPacket);
-//}
-
-//void AmptekSDD123Server::requestCommTestEchoPacket(const QString &hashTag){
-//	if(hashTag.isEmpty()){
-//		requestDataPacket(AmptekCommandManagerSGM::RequestCommTestEchoPacket);
-////		AmptekSDD123Packet requestCommTestEchoPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->commTestRequestEchoPacketHex());
-////		sendRequestDatagram(requestCommTestEchoPacket);
-//	}
-//	else{
-//		requestDataPacket(AmptekCommandManagerSGM::RequestCommTestEchoPacket, hashTag);
-////		AmptekSDD123Packet requestCommTestEchoPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->commTestRequestEchoPacketHex(), hashTag);
-////		sendRequestDatagram(requestCommTestEchoPacket);
-//	}
-//}
-
-//void AmptekSDD123Server::fakeRequestCommTestEchoPacket(const QString &hashTag){
-//	if(hashTag.isEmpty()){
-//		requestDataPacket(AmptekCommandManagerSGM::RequestCommTestEchoPacket);
-////		AmptekSDD123Packet requestCommTestEchoPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->commTestRequestEchoPacketHex());
-////		sendRequestDatagram(requestCommTestEchoPacket);
-//	}
-//	else{
-//		requestDataPacket(AmptekCommandManagerSGM::RequestCommTestEchoPacket, hashTag);
-////		AmptekSDD123Packet requestCommTestEchoPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->commTestRequestEchoPacketHex(), hashTag);
-////		fakeSendDatagram(requestCommTestEchoPacket);
-//	}
-//}
 
 bool AmptekSDD123Server::readReplyDatagram(int &id, QByteArray &datagram){
 	if(hasReplyReady_){
@@ -514,23 +438,12 @@ void AmptekSDD123Server::onResponsePacketReady(){
 
 void AmptekSDD123Server::syncRequest(int timeout){
 	QString hashTag = QString("%1").arg(--timeOutIDCounter_);
-//	AmptekSDD123Packet requestCommTestEchoPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->commTestRequestEchoPacketHex(), hashTag.toAscii().toHex());
-//	currentRequestPacket_.appendRelatedSyncRequestID(timeOutIDCounter_);
-//	if(timeout == -1)
-//		sendSyncDatagram(requestCommTestEchoPacket);
-//	else
-//		sendSyncDatagram(requestCommTestEchoPacket, timeout);
 	requestDataPacket(AmptekCommandManagerSGM::RequestCommTestEchoPacket, hashTag.toAscii().toHex(), false, true, timeout);
 }
 
 void AmptekSDD123Server::fakeSyncRequest(int timeout){
 	QString hashTag = QString("%1").arg(timeOutIDCounter_--);
 	requestDataPacket(AmptekCommandManagerSGM::RequestCommTestEchoPacket, hashTag.toAscii().toHex(), true, timeout);
-//	AmptekSDD123Packet requestCommTestEchoPacket(packetIDCounter_++, AmptekCommandManagerSGM::sddCommands()->commTestRequestEchoPacketHex(), hashTag.toAscii().toHex());
-//	if(timeout == -1)
-//		fakeSendDatagram(requestCommTestEchoPacket);
-//	else
-//		fakeSendDatagram(requestCommTestEchoPacket, timeout);
 }
 
 void AmptekSDD123Server::requestDatagramTimeout(){
