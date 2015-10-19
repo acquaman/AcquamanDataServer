@@ -206,8 +206,8 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 
 	if(setPresetDwellEndTimeOnNextEvent_){
 		setPresetDwellEndTimeOnNextEvent_ = false;
-		presetDwellLocalStartTime_ = statusData.dwellStartTime_;
-		presetDwellEndTime_ = statusData.dwellStartTime_.addMSecs(dwellTime_*1000);
+		presetDwellLocalStartTime_ = statusData.dwellStartTime();
+		presetDwellEndTime_ = statusData.dwellStartTime().addMSecs(dwellTime_*1000);
 	}
 	else if (dwellActive_ && isPresetDwell() && presetDwellLocalEndTime_.isValid()) {
 		if ( presetDwellLocalEndTime_ >= presetDwellEndTime_ ) { //dwellToBeDeactived
@@ -231,7 +231,7 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 
 		emit newHistrogramReceived(detectorName(), oneHistogram);
 		if (dwellActive_) {
-			presetDwellLocalEndTime_ = statusData.dwellEndTime_;
+			presetDwellLocalEndTime_ = statusData.dwellEndTime();
 
 			double elapsedTime = 0;
 			if (presetDwellLocalStartTime_.isValid())

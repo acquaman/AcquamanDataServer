@@ -268,43 +268,43 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDS
 		AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The dataType of the data array (%1) is NOT expected Double type.").arg(spectrumData.dataType()));
 
 	/**/
-	if(!fastCountsControl_->withinTolerance(statusData.fastCounts_))
-		fastCountsControl_->move(statusData.fastCounts_);
-	if(!fastCountsAverageControl_->withinTolerance(statusData.fastCounts_/count))
-		fastCountsAverageControl_->move(statusData.fastCounts_/count);
-	if(!slowCountsControl_->withinTolerance(statusData.slowCounts_))
-		slowCountsControl_->move(statusData.slowCounts_);
-	if(!slowCountsAverageControl_->withinTolerance(statusData.slowCounts_/count))
-		slowCountsAverageControl_->move(statusData.slowCounts_/count);
-	if(!accumulationTimeControl_->withinTolerance(statusData.accumulationTime_))
-		accumulationTimeControl_->move(statusData.accumulationTime_);
-	if(!accumulationTimeAverageControl_->withinTolerance(statusData.accumulationTime_/count))
-		accumulationTimeAverageControl_->move(statusData.accumulationTime_/count);
-	if(!liveTimeControl_->withinTolerance(statusData.liveTime_))
-		liveTimeControl_->move(statusData.liveTime_);
-	if(!liveTimeAverageControl_->withinTolerance(statusData.liveTime_/count))
-		liveTimeAverageControl_->move(statusData.liveTime_/count);
-	if(!realTimeControl_->withinTolerance(statusData.realTime_))
-		realTimeControl_->move(statusData.realTime_);
-	if(!realTimeAverageControl_->withinTolerance(statusData.realTime_/count))
-		realTimeAverageControl_->move(statusData.realTime_/count);
+	if(!fastCountsControl_->withinTolerance(statusData.fastCounts()))
+		fastCountsControl_->move(statusData.fastCounts());
+	if(!fastCountsAverageControl_->withinTolerance(statusData.fastCounts()/count))
+		fastCountsAverageControl_->move(statusData.fastCounts()/count);
+	if(!slowCountsControl_->withinTolerance(statusData.slowCounts()))
+		slowCountsControl_->move(statusData.slowCounts());
+	if(!slowCountsAverageControl_->withinTolerance(statusData.slowCounts()/count))
+		slowCountsAverageControl_->move(statusData.slowCounts()/count);
+	if(!accumulationTimeControl_->withinTolerance(statusData.accumulationTime()))
+		accumulationTimeControl_->move(statusData.accumulationTime());
+	if(!accumulationTimeAverageControl_->withinTolerance(statusData.accumulationTime()/count))
+		accumulationTimeAverageControl_->move(statusData.accumulationTime()/count);
+	if(!liveTimeControl_->withinTolerance(statusData.liveTime()))
+		liveTimeControl_->move(statusData.liveTime());
+	if(!liveTimeAverageControl_->withinTolerance(statusData.liveTime()/count))
+		liveTimeAverageControl_->move(statusData.liveTime()/count);
+	if(!realTimeControl_->withinTolerance(statusData.realTime()))
+		realTimeControl_->move(statusData.realTime());
+	if(!realTimeAverageControl_->withinTolerance(statusData.realTime()/count))
+		realTimeAverageControl_->move(statusData.realTime()/count);
 	if(!elapsedTimeControl_->withinTolerance(elapsedTime))
 		elapsedTimeControl_->move(elapsedTime);
-	if(startTimeControl_->readPV()->getString() != statusData.dwellStartTime_.toString("hh:mm:ss.zzz"))
-		startTimeControl_->move(statusData.dwellStartTime_.toString("hh:mm:ss.zzz"));
-	if(endTimeControl_->readPV()->getString() != statusData.dwellEndTime_.toString("hh:mm:ss.zzz"))
-		endTimeControl_->move(statusData.dwellEndTime_.toString("hh:mm:ss.zzz"));
+	if(startTimeControl_->readPV()->getString() != statusData.dwellStartTime().toString("hh:mm:ss.zzz"))
+		startTimeControl_->move(statusData.dwellStartTime().toString("hh:mm:ss.zzz"));
+	if(endTimeControl_->readPV()->getString() != statusData.dwellEndTime().toString("hh:mm:ss.zzz"))
+		endTimeControl_->move(statusData.dwellEndTime().toString("hh:mm:ss.zzz"));
 
-	int dwellReplyHours = statusData.dwellReplyTime_.hour();
-	int dwellReplyMinutes = statusData.dwellReplyTime_.minute();
-	int dwellReplySeconds = statusData.dwellReplyTime_.second();
-	int dwellReplyMSecs = statusData.dwellReplyTime_.msec();
+	int dwellReplyHours = statusData.dwellReplyTime().hour();
+	int dwellReplyMinutes = statusData.dwellReplyTime().minute();
+	int dwellReplySeconds = statusData.dwellReplyTime().second();
+	int dwellReplyMSecs = statusData.dwellReplyTime().msec();
 	int totalMSecs = dwellReplyMSecs + dwellReplySeconds*1000 + dwellReplyMinutes*1000*60 + dwellReplyHours*1000*60*60;
 	qDebug() << "totalMSecs is " << totalMSecs << " so average is " << totalMSecs/count;
 	if(!replyTimeAverageControl_->withinTolerance(totalMSecs/count))
 		replyTimeAverageControl_->move(totalMSecs/count);
-	if(!temperatureControl_->withinTolerance(statusData.detectorTemperature_/count))
-		temperatureControl_->move(statusData.detectorTemperature_/count);
+	if(!temperatureControl_->withinTolerance(statusData.detectorTemperature()/count))
+		temperatureControl_->move(statusData.detectorTemperature()/count);
 	/**/
 }
 
