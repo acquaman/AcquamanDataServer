@@ -52,10 +52,6 @@ AmptekSDD123Server::AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurati
 	}
 }
 
-bool AmptekSDD123Server::detectorUnavailable() const{
-	return detectorUnavailable_;
-}
-
 QList<double> AmptekSDD123Server::droppedPacketStatistics() const{
 	QDateTime last30Seconds = QDateTime::currentDateTime().addSecs(-30);
 	QList<double> retVal;

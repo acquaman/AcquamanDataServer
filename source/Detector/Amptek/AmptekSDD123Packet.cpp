@@ -42,8 +42,24 @@ AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const AmptekSDD123Packet &o
 	packetID_ = packetID;
 }
 
-QString AmptekSDD123Packet::commandString() const{
-	return commandString_;
+
+AmptekSDD123Packet& AmptekSDD123Packet::operator =(const AmptekSDD123Packet &other){
+	if(this != &other){
+		lastError_ = other.lastError();
+		isForwarded_ = other.isForwarded();
+		isValid_ = false;
+		retries_ = other.currentRetries();
+		relatedSyncRequestIDs_ = other.relatedSyncRequestIDs();
+		packetID_ = other.packetID();
+		if(!other.isValid())
+			datagram_ = QByteArray::fromHex(QString("0000").toAscii());
+		else{
+			datagram_ = other.datagram();
+			commandString_ = datagram_.mid(2,2).toHex();
+			isValid_ = true;
+		}
+	}
+	return *this;
 }
 
 QString AmptekSDD123Packet::commandText() const{
@@ -94,49 +110,6 @@ int AmptekSDD123Packet::dataLength() const{
 		return lengthString().toInt(&ok, 16);
 	}
 	return -1;
-}
-
-QByteArray AmptekSDD123Packet::datagram() const{
-	return datagram_;
-}
-
-bool AmptekSDD123Packet::isValid() const{
-	return isValid_;
-}
-
-bool AmptekSDD123Packet::isForwarded() const{
-	return isForwarded_;
-}
-
-int AmptekSDD123Packet::packetID() const{
-	return packetID_;
-}
-
-AmptekSDD123Packet::amptekSDD123PacketError AmptekSDD123Packet::lastError() const{
-	return lastError_;
-}
-
-AmptekSDD123Packet& AmptekSDD123Packet::operator =(const AmptekSDD123Packet &other){
-	if(this != &other){
-		lastError_ = other.lastError();
-		isForwarded_ = other.isForwarded();
-		isValid_ = false;
-		retries_ = other.currentRetries();
-		relatedSyncRequestIDs_ = other.relatedSyncRequestIDs();
-		packetID_ = other.packetID();
-		if(!other.isValid())
-			datagram_ = QByteArray::fromHex(QString("0000").toAscii());
-		else{
-			datagram_ = other.datagram();
-			commandString_ = datagram_.mid(2,2).toHex();
-			isValid_ = true;
-		}
-	}
-	return *this;
-}
-
-const QList<int>& AmptekSDD123Packet::relatedSyncRequestIDs() const{
-	return relatedSyncRequestIDs_;
 }
 
 void AmptekSDD123Packet::setPacketStrings(const QString &commandString, const QString &dataString){
