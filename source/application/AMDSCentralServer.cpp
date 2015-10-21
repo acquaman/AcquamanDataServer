@@ -41,6 +41,9 @@ void AMDSCentralServer::initializeAndStartServices()
 
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the Data server...");
 	initializeAndStartDataServer();
+
+	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... wrap up initialization...");
+	wrappingUpInitialization();
 }
 
 void AMDSCentralServer::initializeAndStartTCPServer()

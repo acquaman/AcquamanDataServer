@@ -2,8 +2,10 @@
 
 #include <QtNetwork>
 #include <QCoreApplication>
+#include <QDebug>
 
 #include "AmptekEventDefinitions.h"
+#include "util/AMErrorMonitor.h"
 
 /* Notes on how to convert back and forth
 QString dataString = "4d4341433d3f3b";
@@ -46,13 +48,17 @@ AmptekSDD123Server::AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurati
 		replySpectrumTime_->start();
 
 		udpDetectorSocket_ = new QUdpSocket(this);
+		bool boundUDP = udpDetectorSocket_->bind(configurationMap_->localAddress(), 10001, QUdpSocket::ShareAddress);
+		if (!boundUDP)
+			AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_FAILED_TO_BOUND_UDP, QString("Amptek Server failed to bound to the detector via %1:%2").arg(configurationMap_->localAddress().toString()).arg(10001));
 
 		connect(udpDetectorSocket_, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 		connect(this, SIGNAL(responsePacketReady()), this, SLOT(onResponsePacketReady()));
 	}
 }
 
-QList<double> AmptekSDD123Server::droppedPacketStatistics() const{
+QList<double> AmptekSDD123Server::droppedPacketStatistics() const
+{
 	QDateTime last30Seconds = QDateTime::currentDateTime().addSecs(-30);
 	QList<double> retVal;
 	retVal << droppedPackets_.totalOccurances() << droppedPackets_.totalRate() << droppedPackets_.occurancesSince(last30Seconds) << droppedPackets_.rateSince(last30Seconds);
@@ -66,7 +72,9 @@ QList<double> AmptekSDD123Server::unrequestedPacketStatistics() const{
 	return retVal;
 }
 
-bool AmptekSDD123Server::event(QEvent *e){
+bool AmptekSDD123Server::event(QEvent *e)
+{
+
 	if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationInitiateRequestEvent){
 		if(((AmptekConfigurationInitiateRequestEvent*)e)->configurationMode_){
 			emit serverAboutToChangeToConfigurationState();
@@ -96,7 +104,8 @@ bool AmptekSDD123Server::event(QEvent *e){
 	return QObject::event(e);
 }
 
-int AmptekSDD123Server::forwardDatagram(const QByteArray &datagram){
+int AmptekSDD123Server::forwardDatagram(const QByteArray &datagram)
+{
 	AmptekSDD123Packet forwardingPacket(packetIDCounter_++, datagram, true);
 	if(forwardingPacket.isValid()){
 		sendRequestDatagram(forwardingPacket);
@@ -120,20 +129,24 @@ void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekComman
 	}
 }
 
-void AmptekSDD123Server::disableMCAMCS(){
+void AmptekSDD123Server::disableMCAMCS()
+{
 	requestDataPacket(AmptekCommandManagerSGM::RequestDisableMCAMCS);
 }
 
 
-void AmptekSDD123Server::mcaChannelsCount(){
+void AmptekSDD123Server::mcaChannelsCount()
+{
 	textConfigurationReadback("MCAC");
 }
 
-void AmptekSDD123Server::presetTime(){
+void AmptekSDD123Server::presetTime()
+{
 	requestDataPacket(AmptekCommandManagerSGM::ReqeustStatusPacket);
 }
 
-void AmptekSDD123Server::requestAllTextConfigurationParameters(){
+void AmptekSDD123Server::requestAllTextConfigurationParameters()
+{
 	QStringList manyCommands;
 	manyCommands << "ALLP" << "CLCK" << "GAIA" << "GAIF" << "GAIN" << "HVSE" << "MCAC" << "MCAE" << "MCAS" << "PAPS" << "PDMD" << "PRER" << "PURE"
 			<< "SCAI=1" << "SCAH" << "SCAL"
@@ -148,12 +161,14 @@ void AmptekSDD123Server::requestAllTextConfigurationParameters(){
 	textConfigurationReadback(manyCommands);
 }
 
-void AmptekSDD123Server::textConfigurationReadback(QString singleCommandRequest){
+void AmptekSDD123Server::textConfigurationReadback(QString singleCommandRequest)
+{
 	QString dataString = singleCommandRequest+"=?;";
 	requestDataPacket(AmptekCommandManagerSGM::RequestTextConfigurationReadback, dataString.toAscii().toHex());
 }
 
-void AmptekSDD123Server::textConfigurationReadback(QStringList multiCommandRequest){
+void AmptekSDD123Server::textConfigurationReadback(QStringList multiCommandRequest)
+{
 	QString singleCommand;
 	QString fullCommandString;
 	foreach(singleCommand, multiCommandRequest)
@@ -161,11 +176,13 @@ void AmptekSDD123Server::textConfigurationReadback(QStringList multiCommandReque
 	requestDataPacket(AmptekCommandManagerSGM::RequestTextConfigurationReadback, fullCommandString.toAscii().toHex());
 }
 
-void AmptekSDD123Server::textConfigurationSet(QString singleCommandRequest){
+void AmptekSDD123Server::textConfigurationSet(QString singleCommandRequest)
+{
 	requestDataPacket(AmptekCommandManagerSGM::RequestTextConfiguration, singleCommandRequest.toAscii().toHex());
 }
 
-bool AmptekSDD123Server::readReplyDatagram(int &id, QByteArray &datagram){
+bool AmptekSDD123Server::readReplyDatagram(int &id, QByteArray &datagram)
+{
 	if(hasReplyReady_){
 		id = currentRequestPacket_.packetID();
 		datagram = currentRequestPacket_.datagram();
@@ -175,25 +192,27 @@ bool AmptekSDD123Server::readReplyDatagram(int &id, QByteArray &datagram){
 	return false;
 }
 
-void AmptekSDD123Server::setRequestIntervalTimer(int mSec){
+void AmptekSDD123Server::setRequestIntervalTimer(int mSec)
+{
 	requestIntervalTimer_ = mSec;
 }
 
-void AmptekSDD123Server::setSpectrumPacketReceiver(QObject *spectrumPacketReceiver){
+void AmptekSDD123Server::setSpectrumPacketReceiver(QObject *spectrumPacketReceiver)
+{
 	spectrumPacketReceiver_ = spectrumPacketReceiver;
 }
 
-void AmptekSDD123Server::setConfirmationPacketReceiver(QObject *confirmationPacketReceiver){
+void AmptekSDD123Server::setConfirmationPacketReceiver(QObject *confirmationPacketReceiver)
+{
 	confirmationPacketReceiver_ = confirmationPacketReceiver;
 }
 
-void AmptekSDD123Server::sendRequestDatagram(AmptekSDD123Packet packet, int overrideTimeout){
+void AmptekSDD123Server::sendRequestDatagram(AmptekSDD123Packet packet, int overrideTimeout)
+{
 	if(socketLocallyBusy_){
-		qDebug() << "\nPACKET QUEUE IS BUSY\n";
+		qDebug() << "\nPACKET QUEUE IS BUSY (send request datagram)\n";
 		packetQueue_.append(packet);
-	}
-	else{
-		//qDebug() << "Sending request datagram";
+	} else {
 		socketLocallyBusy_ = true;
 		currentRequestPacket_ = packet;
 		currentRequestTime_.restart();
@@ -206,9 +225,10 @@ void AmptekSDD123Server::sendRequestDatagram(AmptekSDD123Packet packet, int over
 	}
 }
 
-void AmptekSDD123Server::sendSyncDatagram(AmptekSDD123Packet packet, int overrideTimeout){
+void AmptekSDD123Server::sendSyncDatagram(AmptekSDD123Packet packet, int overrideTimeout)
+{
 	if(socketLocallyBusy_){
-		qDebug() << "PACKET QUEUE IS BUSY";
+		qDebug() << "PACKET QUEUE IS BUSY (send sync datagram)";
 		packetQueue_.append(packet);
 	}
 	else{
@@ -223,9 +243,10 @@ void AmptekSDD123Server::sendSyncDatagram(AmptekSDD123Packet packet, int overrid
 	}
 }
 
-void AmptekSDD123Server::fakeSendDatagram(AmptekSDD123Packet packet, int overrideTimeout){
+void AmptekSDD123Server::fakeSendDatagram(AmptekSDD123Packet packet, int overrideTimeout)
+{
 	if(socketLocallyBusy_){
-		qDebug() << "PACKET QUEUE IS BUSY";
+		qDebug() << "PACKET QUEUE IS BUSY (fake send datagram)";
 		packetQueue_.append(packet);
 	}
 	else{
@@ -241,7 +262,8 @@ void AmptekSDD123Server::fakeSendDatagram(AmptekSDD123Packet packet, int overrid
 	}
 }
 
-void AmptekSDD123Server::processPendingDatagrams(){
+void AmptekSDD123Server::processPendingDatagrams()
+{
 	responsePacketReady_ = false;
 	while(udpDetectorSocket_->hasPendingDatagrams()){
 		QByteArray datagram;
@@ -278,8 +300,8 @@ void AmptekSDD123Server::processPendingDatagrams(){
 		emit responsePacketReady();
 }
 
-void AmptekSDD123Server::onResponsePacketReady(){
-	//qDebug() << "In onResonsePacketReady";
+void AmptekSDD123Server::onResponsePacketReady()
+{
 	requestPacketTimer_->stop();
 	syncPacketTimer_->stop();
 	AmptekSDD123Packet lastRequestPacket = currentRequestPacket_;
@@ -432,17 +454,20 @@ void AmptekSDD123Server::onResponsePacketReady(){
 	}
 }
 
-void AmptekSDD123Server::syncRequest(int timeout){
+void AmptekSDD123Server::syncRequest(int timeout)
+{
 	QString hashTag = QString("%1").arg(--timeOutIDCounter_);
 	requestDataPacket(AmptekCommandManagerSGM::RequestCommTestEchoPacket, hashTag.toAscii().toHex(), false, true, timeout);
 }
 
-void AmptekSDD123Server::fakeSyncRequest(int timeout){
+void AmptekSDD123Server::fakeSyncRequest(int timeout)
+{
 	QString hashTag = QString("%1").arg(timeOutIDCounter_--);
 	requestDataPacket(AmptekCommandManagerSGM::RequestCommTestEchoPacket, hashTag.toAscii().toHex(), true, timeout);
 }
 
-void AmptekSDD123Server::requestDatagramTimeout(){
+void AmptekSDD123Server::requestDatagramTimeout()
+{
 	socketLocallyBusy_ = false;
 	disconnect(requestPacketTimer_, SIGNAL(timeout()), this, SLOT(requestDatagramTimeout()));
 	requestPacketTimer_->stop();
@@ -460,7 +485,8 @@ void AmptekSDD123Server::requestDatagramTimeout(){
 	syncRequest();
 }
 
-void AmptekSDD123Server::syncDatagramTimeout(){
+void AmptekSDD123Server::syncDatagramTimeout()
+{
 	socketLocallyBusy_ = false;
 	disconnect(syncPacketTimer_, SIGNAL(timeout()), this, SLOT(syncDatagramTimeout()));
 	syncPacketTimer_->stop();

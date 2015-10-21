@@ -14,6 +14,8 @@
 
 class QUdpSocket;
 
+#define AMPTEK_SERVER_ALERT_FAILED_TO_BOUND_UDP 30200
+
 class AmptekSDD123Server : public QObject
 {
 Q_OBJECT

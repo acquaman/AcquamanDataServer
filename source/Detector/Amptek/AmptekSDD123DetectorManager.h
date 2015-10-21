@@ -9,6 +9,8 @@ class AMDSDataHolder;
 class AmptekSDD123Detector;
 class AmptekSDD123ConfigurationMap;
 
+#define DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED 30100
+
 class AmptekSDD123DetectorManager : public QObject
 {
 	Q_OBJECT

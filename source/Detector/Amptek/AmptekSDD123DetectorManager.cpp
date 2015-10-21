@@ -272,6 +272,8 @@ void AmptekSDD123DetectorManager::postDwellRequestEvent()
 		AmptekDwellRequestEvent *dwellRequestEvent = new AmptekDwellRequestEvent();
 		dwellRequestEvent->dwellMode_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, dwellRequestEvent);
+	} else {
+		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The equesetEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 
@@ -280,6 +282,8 @@ void AmptekSDD123DetectorManager::postConfigurationInitiateRequestEvent(){
 		AmptekConfigurationInitiateRequestEvent *configurationInitiateRequestEvent = new AmptekConfigurationInitiateRequestEvent();
 		configurationInitiateRequestEvent->configurationMode_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationInitiateRequestEvent);
+	} else {
+		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The equesetEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 void AmptekSDD123DetectorManager::postConfigurationRequestEvent()
@@ -288,6 +292,8 @@ void AmptekSDD123DetectorManager::postConfigurationRequestEvent()
 		AmptekConfigurationRequestEvent *configurationRequestEvent = new AmptekConfigurationRequestEvent();
 		configurationRequestEvent->allParametersRequest_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationRequestEvent);
+	} else {
+		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The equesetEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 
@@ -299,7 +305,8 @@ void AmptekSDD123DetectorManager::postConfigurationSetEvent()
 		configurationCommands << configurationSetCommand_;
 		configurationSetEvent->configurationCommands_ = configurationCommands;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationSetEvent);
+	} else {
+		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The equesetEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
+
 }
-
-
