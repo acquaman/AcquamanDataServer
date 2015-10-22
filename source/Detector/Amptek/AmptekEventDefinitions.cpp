@@ -81,12 +81,10 @@ void AmptekConfigurationData::parseConfiguration(QString configuration)
 		pileUpRejection_ = configurationValue;
 	else if(configuration.contains("SCAI"))
 		scaIndices_.append(configurationValue.toInt());
-	else if(configuration.contains("SCAH")){
+	else if(configuration.contains("SCAH"))
 		scaHighIndices_.append(configurationValue.toInt());
-	}
-	else if(configuration.contains("SCAL")){
+	else if(configuration.contains("SCAL"))
 		scaLowIndices_.append(configurationValue.toInt());
-	}
 	else if(configuration.contains("TECS"))
 		coolerSetting_ = configurationValue;
 	else if(configuration.contains("THFA"))
@@ -104,9 +102,7 @@ void AmptekConfigurationData::parseConfiguration(QString configuration)
 void AmptekConfigurationValuesEvent::parseConfigurations(QStringList configurationList)
 {
 	for(int x = 0, size = configurationList.count(); x < size; x++){
-		QString configuration = configurationList.at(x);
-
-		configurationData_.parseConfiguration(configuration.section('=', -1));
+		configurationData_.parseConfiguration(configurationList.at(x));
 	}
 
 }
