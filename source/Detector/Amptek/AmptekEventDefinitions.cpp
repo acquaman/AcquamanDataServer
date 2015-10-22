@@ -81,16 +81,11 @@ void AmptekConfigurationData::parseConfiguration(QString configuration)
 		pileUpRejection_ = configurationValue;
 	else if(configuration.contains("SCAI"))
 		scaIndices_.append(configurationValue.toInt());
-//TODO: figure out the definitions of these two configurations...
-//	else if (configuration.contains("HightIncides"))
-//		scaHighIndices_.append(configurationValue.toInt());
-//	else if (configuration.contains("LowIncides"))
-//		scaLowIndices_.append(configurationValue.toInt());
 	else if(configuration.contains("SCAH")){
-		//ignore this
+		scaHighIndices_.append(configurationValue.toInt());
 	}
 	else if(configuration.contains("SCAL")){
-		//ignore this
+		scaLowIndices_.append(configurationValue.toInt());
 	}
 	else if(configuration.contains("TECS"))
 		coolerSetting_ = configurationValue;
@@ -110,56 +105,8 @@ void AmptekConfigurationValuesEvent::parseConfigurations(QStringList configurati
 {
 	for(int x = 0, size = configurationList.count(); x < size; x++){
 		QString configuration = configurationList.at(x);
-		QString configurationValue = configuration.section('=', -1);
-// TODO: after figuring out the defintions of configurationValueHightIndices / configurationValueLowIndices, we can use this function
-//		configurationData_.parseConfiguration(configuration);
 
-		if(configuration.contains("GAIA"))
-			configurationData_.analogGainIndex_ = configurationValue.toInt();
-		else if(configuration.contains("GAIF"))
-			configurationData_.fineGain_ = configurationValue.toDouble();
-		else if(configuration.contains("GAIN"))
-			configurationData_.totalGain_ = configurationValue.toDouble();
-		else if(configuration.contains("HVSE"))
-			configurationData_.hvSet_ = configurationValue;
-		else if(configuration.contains("MCAC"))
-			configurationData_.mcaCount_ = configurationValue.toInt();
-		else if(configuration.contains("MCAE"))
-			configurationData_.mcaEnabled_ = configurationValue;
-		else if(configuration.contains("MCAS"))
-			configurationData_.mcaSource_ = configurationValue;
-		else if(configuration.contains("PAPS"))
-			configurationData_.preampState_ = configurationValue;
-		else if(configuration.contains("PDMD"))
-			configurationData_.peakDetectMode_ = configurationValue;
-		else if(configuration.contains("PURE"))
-			configurationData_.pileUpRejection_ = configurationValue;
-		else if(configuration.contains("SCAI")){
-			AMErrorMon::information(0, 0, QString("==== SCAI: High Indices (%1) Low Indices (%2)").arg(configurationList.at(x+1)).arg(configurationList.at(x+2)));
-
-			QString configurationValueHightIndices = configurationList.at(x+1).section('=', -1);
-			QString configurationValueLowIndices = configurationList.at(x+2).section('=', -1);
-
-			configurationData_.scaIndices_.append(configurationValue.toInt());
-			configurationData_.scaHighIndices_.append(configurationValueHightIndices.toInt());
-			configurationData_.scaLowIndices_.append(configurationValueLowIndices.toInt());
-		}
-		else if(configuration.contains("SCAH")){
-			//ignore this
-		}
-		else if(configuration.contains("SCAL")){
-			//ignore this
-		}
-		else if(configuration.contains("TECS"))
-			configurationData_.coolerSetting_ = configurationValue;
-		else if(configuration.contains("THFA"))
-			configurationData_.fastThreshold_ = configurationValue.toDouble();
-		else if(configuration.contains("THSL"))
-			configurationData_.slowThreshold_ = configurationValue.toDouble();
-		else if(configuration.contains("TPEA"))
-			configurationData_.peakingTime_ = configurationValue.toDouble();
-		else if(configuration.contains("TPFA"))
-			configurationData_.fastChannelPeakingTime_ = configurationValue.toInt();
+		configurationData_.parseConfiguration(configuration.section('=', -1));
 	}
 
 }
