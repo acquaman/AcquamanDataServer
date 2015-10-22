@@ -85,11 +85,6 @@ QString AmptekCommandManagerSGM::requestStatusPacketHex() const{
 //	return amptekCommand(RequestCommTestEchoPacket).hex();
 //}
 
-QString AmptekCommandManagerSGM::textFromHex(const QString &hexString) const{
-	AmptekCommand other(-1, hexString, "", -1);
-	return commandHexMapping_.valueR(other);
-}
-
 //bool AmptekCommandManagerSGM::isAcknowledgePacket(const QString &hexString) const{
 //	if(hexString.at(0) == 'f' && hexString.at(1) == 'f')
 //		return true;
@@ -129,7 +124,7 @@ void AmptekCommandManagerSGM::initiateAmptekCommands()
 	amptekCommands_.append( AmptekCommand(ResponseRequestStatusPacket,           "8001", "Request Status Packet Response"));
 	amptekCommands_.append( AmptekCommand(Response256ChannelSpectrumPlusStatus,  "8102", "256-channel spectrum plus Status"));
 	amptekCommands_.append( AmptekCommand(Response512ChannelSpectrumPlusStatus,  "8104", "512-channel spectrum plus Status"));
-	amptekCommands_.append( AmptekCommand(Response1024ChannelSpectrumPlusStatus, "8105", "1024-channel spectrum plus Status"));
+	amptekCommands_.append( AmptekCommand(Response1024ChannelSpectrumPlusStatus, "8106", "1024-channel spectrum plus Status"));
 	amptekCommands_.append( AmptekCommand(ResponseConfiguration,                 "8207", "Configuration Readback"));
 	amptekCommands_.append( AmptekCommand(ResponseCommTestEchoPacket,            "8f7f", "Comm test - Echo packet Response"));
 

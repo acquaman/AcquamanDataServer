@@ -18,7 +18,7 @@ class AmptekSDD123Packet : public QObject
 	};
 
 public:
-	AmptekSDD123Packet(int packetID, const QString &commandString, const QString &dataString = "", bool isForwarded = false, QObject *parent = 0);
+	AmptekSDD123Packet(int packetID, const QString &commandHex, const QString &dataString = "", bool isForwarded = false, QObject *parent = 0);
 	AmptekSDD123Packet(int packetID, const QByteArray &datagram, bool isForwarded = false, QObject *parent = 0);
 	AmptekSDD123Packet(const AmptekSDD123Packet &original);
 	AmptekSDD123Packet(int packetID, const AmptekSDD123Packet &original);
@@ -26,28 +26,34 @@ public:
 	/// the = operation
 	AmptekSDD123Packet& operator=(const AmptekSDD123Packet &other);
 
-	/// returns the command text
-	QString commandText() const;
 	/// returns the length of the datagram
 	QString lengthString() const;
 	/// returns the data string of the datagram in hex
 	QString dataString() const;
 	/// returns the datagram in hex
 	QString fullString() const;
-	/// returns the value of timeout
-	int timeout() const;
-	/// returns the value of maxRetries
-	int maxRetries() const;
-	/// returns the value of currentRetries
-	int currentRetries() const;
-	/// returns the possible responses
-	QStringList possibleResponses() const;
 
 	/// returns the legth of the data
 	int dataLength() const;
 
+	/// retuns the AmptekCommand
+	inline AmptekCommand amptekCommand() const { return amptekCommand_; }
+	/// returns the command Id
+	inline int commandId() const { return amptekCommand_.commandId(); }
+	/// returns the command hex codes
+	inline QString commandHex() const { return amptekCommand_.hex(); }
 	/// returns the command string
-	inline QString commandString() const { return commandString_; }
+	inline QString command() const { return amptekCommand_.command(); }
+	/// returns the value of timeout
+	inline int timeout() const { return amptekCommand_.timeout(); }
+	/// returns the value of maxRetries
+	inline int maxRetries() const { return amptekCommand_.retries(); }
+	/// returns the possible responses
+	inline QStringList possibleResponses() const { return amptekCommand_.responseHexes(); }
+
+	/// returns the value of currentRetries
+	inline int currentRetries() const { return retries_; }
+
 	/// returns the datagram in byte
 	inline QByteArray datagram() const { return datagram_; }
 	/// returns the value of isValid flag
@@ -63,7 +69,7 @@ public:
 
 public slots:
 	/// slot to set the packet strings
-	void setPacketStrings(const QString &commandString, const QString &dataString = "");
+	void setPacketStrings(const QString &dataString = "");
 	/// slot to increment the retries
 	void incrementRetries(int newPacketID);
 	/// slot to append a related sync request ID
@@ -72,6 +78,9 @@ public slots:
 	void removeRelatedSynchRequestID(int syncRequestID);
 
 protected:
+	/// set the AmptekCommand
+	void setAmptekCommand(const QString &commandHex);
+
 	/// helper function to calculate packet
 	void calculatePacket();
 	/// helper function to calculate the lenght of datastring
@@ -83,8 +92,9 @@ protected:
 	bool validatePacket(const QByteArray &datagram);
 
 protected:
-	/// the command string of the data packet
-	QString commandString_;
+	/// the amptekCommand definition
+	AmptekCommand amptekCommand_;
+
 	/// the data string of the data packet
 	QString dataString_;
 	/// the isValid flag of the data packet

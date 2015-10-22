@@ -2,7 +2,7 @@
 
 #include <QStringBuilder>
 
-AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const QString &commandString, const QString &dataString, bool isForwarded, QObject *parent) :
+AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const QString &commandHex, const QString &dataString, bool isForwarded, QObject *parent) :
 		QObject(parent)
 {
 	retries_ = 0;
@@ -10,7 +10,9 @@ AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const QString &commandStrin
 	lastError_ = AmptekSDD123Packet::noError;
 	isValid_ = false;
 	isForwarded_ = isForwarded;
-	setPacketStrings(commandString, dataString);
+
+	setAmptekCommand(commandHex);
+	setPacketStrings(dataString);
 }
 
 AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const QByteArray &datagram, bool isForwarded, QObject *parent) :
@@ -24,9 +26,10 @@ AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const QByteArray &datagram,
 	if(!validatePacket(datagram))
 		datagram_ = QByteArray::fromHex(QString("0000").toAscii());
 	else{
-		datagram_ = datagram;
-		commandString_ = datagram_.mid(2,2).toHex();
 		isValid_ = true;
+
+		datagram_ = datagram;
+		setAmptekCommand(datagram_.mid(2,2).toHex());
 	}
 }
 
@@ -54,16 +57,13 @@ AmptekSDD123Packet& AmptekSDD123Packet::operator =(const AmptekSDD123Packet &oth
 		if(!other.isValid())
 			datagram_ = QByteArray::fromHex(QString("0000").toAscii());
 		else{
-			datagram_ = other.datagram();
-			commandString_ = datagram_.mid(2,2).toHex();
 			isValid_ = true;
+
+			datagram_ = other.datagram();
+			setAmptekCommand(datagram_.mid(2,2).toHex());
 		}
 	}
 	return *this;
-}
-
-QString AmptekSDD123Packet::commandText() const{
-	return AmptekCommandManagerSGM::sddCommands()->textFromHex(commandString());
 }
 
 QString AmptekSDD123Packet::lengthString() const{
@@ -88,22 +88,6 @@ QString AmptekSDD123Packet::fullString() const{
 	return "";
 }
 
-int AmptekSDD123Packet::timeout() const{
-	return AmptekCommandManagerSGM::sddCommands()->amptekCommand(commandText()).timeout();
-}
-
-int AmptekSDD123Packet::maxRetries() const{
-	return AmptekCommandManagerSGM::sddCommands()->amptekCommand(commandText()).retries();
-}
-
-int AmptekSDD123Packet::currentRetries() const{
-	return retries_;
-}
-
-QStringList AmptekSDD123Packet::possibleResponses() const{
-	return AmptekCommandManagerSGM::sddCommands()->amptekCommand(commandText()).responseHexes();
-}
-
 int AmptekSDD123Packet::dataLength() const{
 	if(isValid_){
 		bool ok;
@@ -112,9 +96,10 @@ int AmptekSDD123Packet::dataLength() const{
 	return -1;
 }
 
-void AmptekSDD123Packet::setPacketStrings(const QString &commandString, const QString &dataString){
-	commandString_ = commandString;
+void AmptekSDD123Packet::setPacketStrings(const QString &dataString)
+{
 	dataString_ = dataString;
+
 	calculatePacket();
 }
 
@@ -131,15 +116,21 @@ void AmptekSDD123Packet::removeRelatedSynchRequestID(int syncRequestID){
 	relatedSyncRequestIDs_.removeOne(syncRequestID);
 }
 
+/// set the AmptekCommand
+void AmptekSDD123Packet::setAmptekCommand(const QString &commandHex)
+{
+	amptekCommand_ = AmptekCommandManagerSGM::sddCommands()->amptekCommandFromHex(commandHex);
+}
+
 void AmptekSDD123Packet::calculatePacket(){
 	QString headerString = "f5fa";
 	QString lengthString = calculateLengthString(dataString_);
 
 	QString hexString;
 	if(dataLength() == 0)
-		hexString = headerString%commandString_%lengthString;
+		hexString = headerString%amptekCommand_.hex()%lengthString;
 	else
-		hexString = headerString%commandString_%lengthString%dataString_;
+		hexString = headerString%amptekCommand_.hex()%lengthString%dataString_;
 	appendChecksum(QByteArray::fromHex(hexString.toAscii()), datagram_);
 	isValid_ = true;
 }

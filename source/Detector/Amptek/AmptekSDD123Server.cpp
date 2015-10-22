@@ -217,6 +217,7 @@ void AmptekSDD123Server::sendRequestDatagram(AmptekSDD123Packet packet, int over
 		currentRequestPacket_ = packet;
 		currentRequestTime_.restart();
 		udpDetectorSocket_->writeDatagram(packet.datagram(), packet.datagram().size(), configurationMap_->detectorAddress(), 10001);
+
 		connect(requestPacketTimer_, SIGNAL(timeout()), this, SLOT(requestDatagramTimeout()));
 		if(overrideTimeout == -1)
 			requestPacketTimer_->start(currentRequestPacket_.timeout());
@@ -311,21 +312,24 @@ void AmptekSDD123Server::onResponsePacketReady()
 	bool rerequestRequired = false;
 	if(timedOutPackets_.count() > 0){
 		for(int x = 0; x < timedOutPackets_.count(); x++){
-			qDebug() << timedOutPackets_.at(x).commandText() << QString(QByteArray::fromHex(timedOutPackets_.at(x).dataString().toAscii()));
+			qDebug() << timedOutPackets_.at(x).command() << QString(QByteArray::fromHex(timedOutPackets_.at(x).dataString().toAscii()));
 		}
 
 		AmptekSDD123Packet headPacket(-1, QString("NONE"));
 		while(!foundTimedOutPacket && timedOutPackets_.count() > 0){
 			headPacket = timedOutPackets_.dequeue();
-			if(responsePacket.commandText() == "Comm test - Echo packet Response" && headPacket.commandText() == "Comm test - Echo packet" && responsePacket.dataString() == headPacket.dataString())
+
+//			if(responsePacket.command() == "Comm test - Echo packet Response" && headPacket.command() == "Comm test - Echo packet" && responsePacket.dataString() == headPacket.dataString())
+			if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseCommTestEchoPacket && headPacket.commandId() == AmptekCommandManagerSGM::RequestCommTestEchoPacket && responsePacket.dataString() == headPacket.dataString())
 				foundTimedOutPacket = true;
-			else if(responsePacket.commandText() != "Comm test - Echo packet Response" && headPacket.possibleResponses().contains(responsePacket.commandString())){
+//			else if(responsePacket.command() != "Comm test - Echo packet Response" && headPacket.possibleResponses().contains(responsePacket.commandHex())){
+			else if(responsePacket.commandId() != AmptekCommandManagerSGM::ResponseCommTestEchoPacket && headPacket.possibleResponses().contains(responsePacket.commandHex())){
 				foundTimedOutPacket = true;
 				AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
 				currentRequestPacket_ = emptyPacket;
 			}
 			else{
-				if(headPacket.commandText() == currentRequestPacket_.commandText() && responsePacket.dataString() == currentSyncPacket_.dataString())
+				if(headPacket.command() == currentRequestPacket_.command() && responsePacket.dataString() == currentSyncPacket_.dataString())
 					rerequestRequired = true;
 				droppedPackets_.appendPacket(QDateTime::currentDateTime(), headPacket);
 				emit dropPacketDetected();
@@ -335,7 +339,7 @@ void AmptekSDD123Server::onResponsePacketReady()
 
 	AmptekSDD123Packet localRequestPacket(currentRequestPacket_.packetID(), currentRequestPacket_);
 
-	if(!foundTimedOutPacket && currentRequestPacket_.possibleResponses().contains(responsePacket.commandString())){
+	if(!foundTimedOutPacket && currentRequestPacket_.possibleResponses().contains(responsePacket.commandHex())){
 		AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
 		currentRequestPacket_ = emptyPacket;
 	}
@@ -364,10 +368,11 @@ void AmptekSDD123Server::onResponsePacketReady()
 		hasReplyReady_ = true;
 		emit replyDatagram(responsePacket.packetID(), responsePacket.datagram());
 	}
-	if(responsePacket.commandText() == "Request Status Packet Response"){
+//	if(responsePacket.command() == "Request Status Packet Response"){
+	if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseRequestStatusPacket){
 		emit statusDataReady(responsePacket.datagram().mid(6, 64));
-	}
-	if(responsePacket.commandText() == "256-channel spectrum plus Status"){
+//	} else if(responsePacket.command() == "256-channel spectrum plus Status"){
+	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response256ChannelSpectrumPlusStatus){
 		replySpectrumTime_->restart();
 		//qDebug() << "Heard a 256-channel response";
 		emit spectrumDataReady(responsePacket.datagram().mid(6, 768), 256);
@@ -382,8 +387,8 @@ void AmptekSDD123Server::onResponsePacketReady()
 			spectrumPacketEvent->dwellReplyTime_.setHMS(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec());
 			QCoreApplication::postEvent(spectrumPacketReceiver_, spectrumPacketEvent);
 		}
-	}
-	if(responsePacket.commandText() == "512-channel spectrum plus Status"){
+//	} else if(responsePacket.command() == "512-channel spectrum plus Status"){
+	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response512ChannelSpectrumPlusStatus){
 		replySpectrumTime_->restart();
 		//qDebug() << "Heard a 512-channel response";
 		emit spectrumDataReady(responsePacket.datagram().mid(6, 1536), 512);
@@ -398,8 +403,8 @@ void AmptekSDD123Server::onResponsePacketReady()
 			spectrumPacketEvent->dwellReplyTime_.setHMS(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec());
 			QCoreApplication::postEvent(spectrumPacketReceiver_, spectrumPacketEvent);
 		}
-	}
-	if(responsePacket.commandText() == "1024-channel spectrum plus Status"){
+//	} else if(responsePacket.command() == "1024-channel spectrum plus Status"){
+	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response1024ChannelSpectrumPlusStatus){
 		replySpectrumTime_->restart();
 		emit spectrumDataReady(responsePacket.datagram().mid(6, 3072), 1024);
 		emit statusDataReady(responsePacket.datagram().mid(3078, 64));
@@ -414,10 +419,12 @@ void AmptekSDD123Server::onResponsePacketReady()
 			QCoreApplication::postEvent(spectrumPacketReceiver_, spectrumPacketEvent);
 		}
 	}
-	if(lastRequestPacket.commandText() == "Text Configuration"){
+//	if(lastRequestPacket.command() == "Text Configuration"){
+	if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestTextConfiguration){
 		requestAllTextConfigurationParameters();
 	}
-	if(responsePacket.commandText() == "Configuration Readback"){
+//	if(responsePacket.command() == "Configuration Readback"){
+	if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseConfiguration){
 		QString allASCIICommands = QString(QByteArray::fromHex(responsePacket.dataString().toAscii()));
 		if(allASCIICommands.contains("ALLP")){
 			emit allParametersTextConfiguration(allASCIICommands);
@@ -429,10 +436,11 @@ void AmptekSDD123Server::onResponsePacketReady()
 			}
 		}
 	}
-	if(lastRequestPacket.commandText() == "Enable MCA/MCS"){
+//	if(lastRequestPacket.command() == "Enable MCA/MCS"){
+	if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestEnableMCAMCS){
 		emit serverChangedToDwellState();
-	}
-	if(lastRequestPacket.commandText() == "Disable MCA/MCS"){
+//	} else if(lastRequestPacket.command() == "Disable MCA/MCS"){
+	} else if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestDisableMCAMCS){
 		emit serverChangedToConfigurationState();
 
 		if(confirmationPacketReceiver_){
@@ -441,13 +449,15 @@ void AmptekSDD123Server::onResponsePacketReady()
 			QCoreApplication::postEvent(confirmationPacketReceiver_, configurationConfirmationEvent);
 		}
 	}
-	if(responsePacket.commandText() == "OK"){
+//	if(responsePacket.command() == "OK"){
+	if(responsePacket.commandId() == AmptekCommandManagerSGM::AcknowledgeOk){
 		emit acknowledgeOK();
 	}
 
 	if(!packetQueue_.isEmpty()){
 		AmptekSDD123Packet resendPacket(packetQueue_.takeFirst());
-		if(resendPacket.commandText() == "Comm test - Echo packet")
+//		if(resendPacket.command() == "Comm test - Echo packet")
+		if(resendPacket.commandId() == AmptekCommandManagerSGM::RequestCommTestEchoPacket)
 			sendSyncDatagram(resendPacket);
 		else
 			sendRequestDatagram(resendPacket);
@@ -476,7 +486,8 @@ void AmptekSDD123Server::requestDatagramTimeout()
 		requestPacketTimer_->start(currentRequestPacket_.timeout());
 		return;
 	}
-	if(currentRequestPacket_.commandText() == "Comm test - Echo packet" && QString(QByteArray::fromHex(currentRequestPacket_.dataString().toAscii())) == "a7xi272727;idhai"){
+//	if(currentRequestPacket_.command() == "Comm test - Echo packet" && QString(QByteArray::fromHex(currentRequestPacket_.dataString().toAscii())) == "a7xi272727;idhai"){
+	if(currentRequestPacket_.commandId() == AmptekCommandManagerSGM::RequestCommTestEchoPacket && QString(QByteArray::fromHex(currentRequestPacket_.dataString().toAscii())) == "a7xi272727;idhai"){
 		detectorUnavailable_ = true;
 		emit detectorUnavailableChanged(detectorUnavailable_);
 		return;

@@ -14,10 +14,17 @@ class AmptekCommandManager: public QObject
 public:
 	virtual ~AmptekCommandManager() {}
 
-	/// returns the AmptekCommand with given command text
-	AmptekCommand amptekCommand(const QString &commandText) const;
 	/// returns the AmptekCommand with given command ID
 	AmptekCommand amptekCommand(int commandID) const;
+	/// returns the AmptekCommand with given command text
+	AmptekCommand amptekCommand(const QString &commandText) const;
+	/// returns the AmptekCommand with given command hex
+	AmptekCommand amptekCommandFromHex(const QString &hex) const;
+
+	/// returns the commandId with a given command
+	int commandId(const QString &command);
+	/// returns the command string from the command hex code
+	QString commandFromHex(const QString &hex) const;
 
 protected:
 	/// constructor of AmptekCommandManager class, which is protected since AmptekCommandManager should be used as singleton
@@ -44,18 +51,21 @@ public:
 	/// the definition of an Amptek command
 	AmptekCommand(const int commandId=-1, const QString &hex = "", const QString &command = "", int timeout = -1, int retries = 0, QStringList responseHexes = QStringList());
 
+	/// returns a string of the command
+	QString toString() const;
+
 	/// the commandId value of the amptek command
-	int commandId() const;
+	inline int commandId() const { return commandId_; }
 	/// the hex value of the amptek command
-	QString hex() const;
+	inline QString hex() const { return hex_; }
 	/// the string (command) of the amptek command
-	QString command() const;
+	inline QString command() const { return command_; }
 	/// the predefined timeout of the amptek command
-	int timeout() const;
+	inline int timeout() const { return timeout_; }
 	/// the predefined retries of the amptek command
-	int retries() const;
+	inline int retries() const  { return retries_; }
 	/// the predefined response of the amptek command
-	QStringList responseHexes() const;
+	inline QStringList responseHexes() const { return responseHexes_; }
 
 protected:
 	/// the ID of the AmptekCommand

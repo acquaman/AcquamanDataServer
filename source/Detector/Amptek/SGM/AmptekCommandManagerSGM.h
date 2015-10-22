@@ -79,8 +79,6 @@ public:
 //	QString commTestRequestAckBadParameterPacketHex() const;
 //	QString commTestRequestEchoPacketHex() const;
 
-	QString textFromHex(const QString &hexString) const;
-
 /// TODO: legacy codes, there is no usage for this yet...
 //	bool isAcknowledgePacket(const QString &hexString) const;
 //	bool isAcknowledgeErrorPacket(const QString &hexString) const;
