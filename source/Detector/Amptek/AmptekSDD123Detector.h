@@ -10,6 +10,7 @@
 #include "Detector/Amptek/AmptekEventDefinitions.h"
 
 #define AMPTEK_ALERT_CHANNEL_NUMBER_UNMATCH 40101
+#define AMPTEK_ALERT_NO_SPECTRUM_EVENT_RECEIVER 40102
 
 class AmptekSDD123Detector : public QObject
 {
@@ -22,7 +23,7 @@ public:
 	virtual bool event(QEvent *e);
 
 	/// returns the dataType the detector will return
-	inline AMDSDataTypeDefinitions::DataType dataType() { return dataType(); }
+	inline AMDSDataTypeDefinitions::DataType dataType() { return dataType_; }
 	/// returns the buffersize (spectrum size) the detector will return
 	inline int bufferSize() { return bufferSize_; }
 
