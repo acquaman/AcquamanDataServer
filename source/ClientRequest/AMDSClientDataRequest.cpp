@@ -58,9 +58,13 @@ AMDSClientDataRequest& AMDSClientDataRequest::operator =(const AMDSClientDataReq
 void AMDSClientDataRequest::copyAndAppendData(AMDSDataHolder *dataHolder)
 {
 	AMDSDataHolder *cloneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dataHolder);
-	(*cloneDataHolder) = (*dataHolder);
+	if (cloneDataHolder) {
+		(*cloneDataHolder) = (*dataHolder);
 
-	data_.append(cloneDataHolder);
+		data_.append(cloneDataHolder);
+	} else {
+		AMErrorMon::error(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("This type (%1) of dataHolder might NOT be registered. Please contact Acquaman Developers.").arg(dataHolder->metaObject()->className()));
+	}
 }
 
 void AMDSClientDataRequest::clearData()

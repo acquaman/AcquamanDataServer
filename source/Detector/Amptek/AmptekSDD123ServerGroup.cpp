@@ -7,10 +7,12 @@
 AmptekSDD123ThreadedDataServerGroup::AmptekSDD123ThreadedDataServerGroup(QList<AmptekSDD123ConfigurationMap*> configurationMaps, QObject *parent)
 	:QObject(parent)
 {
-	amptekServerGroup_ = new AmptekSDD123ServerGroup(configurationMaps);
-
 	amptekServerGroupThread_ = new QThread();
+
+	amptekServerGroup_ = new AmptekSDD123ServerGroup(configurationMaps);
 	amptekServerGroup_->moveToThread(amptekServerGroupThread_);
+
+	connect(amptekServerGroupThread_, SIGNAL(finished()), amptekServerGroup_, SLOT(deleteLater()));
 
 	connect(amptekServerGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SIGNAL(serverChangedToConfigurationState(int)));
 	connect(amptekServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SIGNAL(serverChangedToDwellState(int)));
@@ -24,7 +26,6 @@ AmptekSDD123ThreadedDataServerGroup::~AmptekSDD123ThreadedDataServerGroup()
 		amptekServerGroupThread_->quit();
 	}
 
-	amptekServerGroup_->deleteLater();
 	amptekServerGroupThread_->deleteLater();
 }
 

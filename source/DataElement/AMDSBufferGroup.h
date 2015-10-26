@@ -8,7 +8,6 @@
 #include "DataElement/AMDSBufferGroupInfo.h"
 #include "DataHolder/AMDSDataHolder.h"
 
-
 class AMDSClientRequest;
 class AMDSClientDataRequest;
 class AMDSClientStartTimePlusCountDataRequest;
@@ -49,7 +48,9 @@ public:
 	void clear();
 	/// Adds a new AMDSDataHolder pointer to the end of the buffer. The buffer group takes ownership
 	/// of the passed AMDSDataHolder, becoming responsible for its destruction
-	void append(AMDSDataHolder* value);
+	void append(AMDSDataHolder* value, bool elapsedDwellTime=0);
+	/// finish dwell data update
+	void finishDwellDataUpdate(double elapsedTime=0);
 
 public slots:
 	/// Slot which handles a request for data. The buffer group will attempt to populate the request
@@ -59,6 +60,22 @@ public slots:
 signals:
 	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
 	void clientRequestProcessed(AMDSClientRequest *clientRequest);
+
+	/// signal to indicate that the new data added for conitunous monitor
+	void continuousDataUpdate(AMDSDataHolder *continuousDataHolder);
+	/// signal to indicate that the new status update for conitunous monitor
+	void continuousStatusDataUpdate(AMDSDwellStatusData statusData, int count);
+	/// signal to indicate that the new update for conitunous monitor
+	void continuousAllDataUpdate(AMDSDataHolder *continuousDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
+
+	/// signal to indicate that dwell update is finished, with the elapsedTime
+	void dwellFinishedTimeUpdate(double elapsedTime);
+	/// signal to indicate that dwell update is finished, with the dataHolder
+	void dwellFinishedDataUpdate(AMDSDataHolder *accumulateDataHolder);
+	/// signal to indicate that dwell update is finished, with the statusData
+	void dwellFinishedStatusDataUpdate(AMDSDwellStatusData statusData, int count);
+	/// signal to indicate that dwell update is finished, with all data
+	void dwellFinishedAllDataUpdate(AMDSDataHolder *accumlatedDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
 
 protected:
 	/// Flatten the data based on the given flatten method, return True if no error happened

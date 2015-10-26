@@ -9,15 +9,15 @@ AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QObject *parent) :
 	QObject(parent)
 {
 	thread_ = new QThread;
+
 	server_ = new AMDSTCPDataServer;
+	server_->moveToThread(thread_);
 
 	connect(thread_, SIGNAL(started()), this, SLOT(onThreadStarted()));
+	connect(thread_, SIGNAL(finished()), server_, SLOT(deleteLater()));
 
 	connect(this, SIGNAL(startServer(QString,quint16)), server_, SLOT(start(QString,quint16)));
-	connect(server_, SIGNAL(error(quint8,quint16,QString)), this, SIGNAL(error(quint8,quint16,QString)));
-	connect(server_, SIGNAL(clientRequestRead(AMDSClientRequest*)), this, SIGNAL(clientRequestRead(AMDSClientRequest*)));
 
-	server_->moveToThread(thread_);
 	thread_->start(QThread::LowPriority);
 }
 
@@ -26,16 +26,8 @@ AMDSThreadedTCPDataServer::~AMDSThreadedTCPDataServer()
 	if (thread_->isRunning())
 		thread_->quit();
 
-	server_->deleteLater();
-	server_ = 0;
-
 	thread_->deleteLater();
 	thread_ = 0;
-}
-
-void AMDSThreadedTCPDataServer::onClientRequestProcessed(AMDSClientRequest* clientRequest)
-{
-	server_->onClientRequestProcessed(clientRequest);
 }
 
 void AMDSThreadedTCPDataServer::onThreadStarted()

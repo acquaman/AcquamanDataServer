@@ -25,27 +25,12 @@ public:
 	/// to clear the data of the buffer group
 	void clear();
 
+	/// returns the buffergroup
+	inline AMDSBufferGroup *bufferGroup() { return bufferGroup_; }
+
 signals:
 	/// signal to indicate the bufferGroupManager is ready to use
 	void bufferGroupReady();
-	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
-	void clientRequestProcessed(AMDSClientRequest *clientRequest);
-
-	/// signal to indicate that the new data added for conitunous monitor
-	void continuousDataUpdate(AMDSDataHolder *continuousDataHolder);
-	/// signal to indicate that the new status update for conitunous monitor
-	void continuousStatusDataUpdate(AMDSDwellStatusData statusData, int count);
-	/// signal to indicate that the new update for conitunous monitor
-	void continuousAllDataUpdate(AMDSDataHolder *continuousDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
-
-	/// signal to indicate that dwell update is finished, with the elapsedTime
-	void dwellFinishedTimeUpdate(double elapsedTime);
-	/// signal to indicate that dwell update is finished, with the dataHolder
-	void dwellFinishedDataUpdate(AMDSDataHolder *accumulateDataHolder);
-	/// signal to indicate that dwell update is finished, with the statusData
-	void dwellFinishedStatusDataUpdate(AMDSDwellStatusData statusData, int count);
-	/// signal to indicate that dwell update is finished, with all data
-	void dwellFinishedAllDataUpdate(AMDSDataHolder *accumlatedDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
 
 public slots:
 	/// slot to finish dwell data update

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QThread>
 
 class AmptekSDD123ConfigurationMap;
 class AmptekSDD123DetectorManager;
@@ -13,25 +14,17 @@ class AmptekSDD123DetectorGroupSGM : public QObject
 	Q_OBJECT
 public:
 	AmptekSDD123DetectorGroupSGM(QList<AmptekSDD123ConfigurationMap*> configurationMaps, QObject *parent = 0);
+	~AmptekSDD123DetectorGroupSGM();
 
 	/// returns the list of AmptekDetectorManager
 	QList<AmptekSDD123DetectorManager*> detectorManagers();
 
-signals:
-	/// the signal to request clear the histrogramData
-	void clearHistrogramData(QString detectorName);
-	/// the signal to request clear the dwell histrogramData
-	void clearDwellHistrogramData(QString detectorName);
-	/// the signal to announce the new histrogramData
-	void newHistrogramReceived(QString detectorName, AMDSDataHolder *);
-	/// the signal to announce the new dwell histrogramData
-	void newDwellHistrogramReceived(QString detectorName, AMDSDataHolder * dataHolder, double elapsedDwellTime);
-	/// signal to indicate dwell finished updating data
-	void dwellFinishedUpdate(QString detectorName, double elapsedTime);
-
 protected:
 	/// the mapping of detector names with detector managers
 	QMap<QString, AmptekSDD123DetectorManager*> detectorManagers_;
+
+	/// the mapping of detector names with detector manager threads
+	QMap<QString, QThread*> detectorManagerThreads_;
 };
 
 #endif // AMPTEKSDD123DETECTORGROUPSGM_H

@@ -13,20 +13,17 @@ AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroup
 	bufferGroup_ = new AMDSBufferGroup(bufferGroupInfo, maxCountSize, enableCumulative);
 	bufferGroup_->moveToThread(bufferGroupThread_);
 
-	connect(bufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)));
 	connect(bufferGroupThread_, SIGNAL(started()), this, SLOT(onBufferGroupThreadStarted()));
+	connect(bufferGroupThread_, SIGNAL(finished()), bufferGroup_, SLOT(deleteLater()));
 
 	bufferGroupThread_->start();
 }
 
 AMDSThreadedBufferGroup::~AMDSThreadedBufferGroup()
 {
-	QWriteLocker writeLock(&lock_);
-
 	if (bufferGroupThread_->isRunning())
 		bufferGroupThread_->quit();
 
-	bufferGroup_->deleteLater();
 	bufferGroupThread_->deleteLater();
 }
 
@@ -43,20 +40,7 @@ QString AMDSThreadedBufferGroup::bufferGroupName() const
 void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, bool elapsedDwellTime)
 {
 	QWriteLocker writeLock(&lock_);
-	bufferGroup_->append(value);
-
-	if (bufferGroup_->cumulativeEnabled()) {
-		AMDSDwellSpectralDataHolder *cumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(bufferGroup_->cumulativeDataHolder());
-		if (cumulativeDataHolder) {
-			AMDSDwellStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
-
-			emit continuousDataUpdate(cumulativeDataHolder);
-			emit continuousStatusDataUpdate(cumulativeStatusData, bufferGroup_->count());
-			emit continuousAllDataUpdate(cumulativeDataHolder, cumulativeStatusData, bufferGroup_->count(), elapsedDwellTime);
-		} else {
-			AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(bufferGroup_->cumulativeDataHolder()->metaObject()->className()));
-		}
-	}
+	bufferGroup_->append(value, elapsedDwellTime);
 }
 
 void AMDSThreadedBufferGroup::clear() {
@@ -67,20 +51,7 @@ void AMDSThreadedBufferGroup::clear() {
 void AMDSThreadedBufferGroup::finishDwellDataUpdate(double elapsedTime)
 {
 	QReadLocker readLock(&lock_);
-
-	if (bufferGroup_->cumulativeEnabled()) {
-		AMDSDwellSpectralDataHolder *cumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(bufferGroup_->cumulativeDataHolder());
-		if (cumulativeDataHolder) {
-			AMDSDwellStatusData cumulativeStatusData = cumulativeDataHolder->dwellStatusData();
-
-			emit dwellFinishedTimeUpdate(elapsedTime);
-			emit dwellFinishedDataUpdate(cumulativeDataHolder);
-			emit dwellFinishedStatusDataUpdate(cumulativeStatusData, bufferGroup_->count());
-			emit dwellFinishedAllDataUpdate(cumulativeDataHolder, cumulativeStatusData, bufferGroup_->count(), elapsedTime);
-		} else {
-			AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(bufferGroup_->cumulativeDataHolder()->metaObject()->className()));
-		}
-	}
+	bufferGroup_->finishDwellDataUpdate(elapsedTime);
 }
 
 void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){
@@ -89,10 +60,6 @@ void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){
 
 void AMDSThreadedBufferGroup::forwardClientRequest(AMDSClientRequest *clientRequest)
 {
-	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest *>(clientRequest);
-	if (clientDataRequest)
-		clientDataRequest->setBufferGroupInfo(bufferGroupInfo());
-
 	bufferGroup_->processClientRequest(clientRequest);
 }
 

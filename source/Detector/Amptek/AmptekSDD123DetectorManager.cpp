@@ -8,6 +8,7 @@
 
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 
+
 AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent) :
 	QObject(parent)
 {
