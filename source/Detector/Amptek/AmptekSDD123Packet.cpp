@@ -96,6 +96,45 @@ int AmptekSDD123Packet::dataLength() const{
 	return -1;
 }
 
+QByteArray AmptekSDD123Packet::spectrumByteArray()
+{
+	QByteArray spectrum;
+	switch (commandId()) {
+	case AmptekCommandManagerSGM::Response256ChannelSpectrumPlusStatus:
+		spectrum = datagram_.mid(6, 768);
+		break;
+	case AmptekCommandManagerSGM::Response512ChannelSpectrumPlusStatus:
+		spectrum = datagram_.mid(6, 1536);
+		break;
+	case AmptekCommandManagerSGM::Response1024ChannelSpectrumPlusStatus:
+		spectrum = datagram_.mid(6, 3072);
+		break;
+	}
+
+	return spectrum;
+}
+
+QByteArray AmptekSDD123Packet::statusByteArray()
+{
+	QByteArray status;
+	switch (commandId()) {
+	case AmptekCommandManagerSGM::ResponseRequestStatusPacket:
+		status = datagram_.mid(6, 64);
+		break;
+	case AmptekCommandManagerSGM::Response256ChannelSpectrumPlusStatus:
+		status = datagram_.mid(774, 64);
+		break;
+	case AmptekCommandManagerSGM::Response512ChannelSpectrumPlusStatus:
+		status = datagram_.mid(1542, 64);
+		break;
+	case AmptekCommandManagerSGM::Response1024ChannelSpectrumPlusStatus:
+		status = datagram_.mid(3078, 64);
+		break;
+	}
+
+	return status;
+}
+
 void AmptekSDD123Packet::setPacketStrings(const QString &dataString)
 {
 	dataString_ = dataString;

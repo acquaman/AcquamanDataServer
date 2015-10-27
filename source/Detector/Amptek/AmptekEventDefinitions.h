@@ -36,8 +36,17 @@ public:
 class AmptekSpectrumPacketEvent : public QEvent
 {
 public:
-	AmptekSpectrumPacketEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent)
-	{}
+	AmptekSpectrumPacketEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent) {}
+	AmptekSpectrumPacketEvent(QByteArray spectrumArray, QByteArray statusArray, int channelCount, QTime dwellStartTime, QTime dwellEndTime, QTime dwellReplyTime) : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent)
+	{
+		spectrumByteArray_ = spectrumArray;
+		statusDataArray_ = statusArray;
+
+		channelCount_ = channelCount;
+		dwellStartTime_ = dwellStartTime;
+		dwellEndTime_ = dwellEndTime;
+		dwellReplyTime_ = dwellReplyTime;
+	}
 
 	QByteArray spectrumByteArray_;
 	QByteArray statusDataArray_;

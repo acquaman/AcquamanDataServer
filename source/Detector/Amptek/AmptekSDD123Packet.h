@@ -36,6 +36,11 @@ public:
 	/// returns the legth of the data
 	int dataLength() const;
 
+	/// parses and returns the spectrum byte array from the package datagram
+	QByteArray spectrumByteArray();
+	/// parses and returns the status byte array from the package datagram
+	QByteArray statusByteArray();
+
 	/// retuns the AmptekCommand
 	inline AmptekCommand amptekCommand() const { return amptekCommand_; }
 	/// returns the command Id

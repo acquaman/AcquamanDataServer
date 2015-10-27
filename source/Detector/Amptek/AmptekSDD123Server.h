@@ -15,6 +15,9 @@
 class QUdpSocket;
 
 #define AMPTEK_SERVER_ALERT_FAILED_TO_BOUND_UDP 30200
+#define AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY 30201
+#define AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED 30202
+#define AMPTEK_SERVER_INFO_PACKET_QUEUE_BUSY 30210
 
 class AmptekSDD123Server : public QObject
 {
@@ -119,6 +122,22 @@ protected slots:
 	void syncDatagramTimeout();
 
 protected:
+	/// helper function to handle the local timedout message queue for the responsePacket
+	void processLocalStoredPacket(AmptekSDD123Packet responsePacket);
+
+	/// helper function to send the response packet
+	void processResponseFeedback(AmptekSDD123Packet responsePacket);
+	/// helper function to post the spectrumPlusStatusReady response
+	void postSpectrumPlusStatusReadyResponse(QByteArray spectrumByteArray, QByteArray statusByteArray, int channelCount);
+	/// helper function to post the configuration readback response
+	void postConfigurationReadbackResponse(const QString &ASCIICommands);
+
+	/// helper funtion to check the last request packet
+	void processLastRequestPacket(AmptekSDD123Packet lastRequestPacket);
+	/// helper function to send the first packet in queue
+	void sendPacketInQueue();
+
+protected:
 	/// the udp detector socket
 	QUdpSocket *udpDetectorSocket_;
 
@@ -133,8 +152,8 @@ protected:
 	int totalResponseDatagramSize_;
 	/// flag to indicate whether the total response datagram is still on the way (more packets are expecting)
 	bool stillReceivingResponseDatagram_;
-	/// flag to indicate that the response packet is ready
-	bool responsePacketReady_;
+//	/// flag to indicate that the response packet is ready
+//	bool responsePacketReady_;
 
 	/// flag to indicate the socket is busy
 	bool socketLocallyBusy_;

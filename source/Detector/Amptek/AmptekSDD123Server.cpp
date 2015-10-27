@@ -21,11 +21,11 @@ AmptekSDD123Server::AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurati
 	configurationMap_ = configurationMap;
 	serverName_ = serverName;
 	spectrumPacketReceiver_ = 0;
+	confirmationPacketReceiver_ = 0;
 	requestIntervalTimer_ = -1;
 
 	if(configurationMap_){
 		stillReceivingResponseDatagram_ = false;
-		responsePacketReady_ = false;
 		socketLocallyBusy_ = false;
 		detectorUnavailable_ = false;
 
@@ -210,7 +210,7 @@ void AmptekSDD123Server::setConfirmationPacketReceiver(QObject *confirmationPack
 void AmptekSDD123Server::sendRequestDatagram(AmptekSDD123Packet packet, int overrideTimeout)
 {
 	if(socketLocallyBusy_){
-		qDebug() << "\nPACKET QUEUE IS BUSY (send request datagram)\n";
+		AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "\nPACKET QUEUE IS BUSY (send request datagram)");
 		packetQueue_.append(packet);
 	} else {
 		socketLocallyBusy_ = true;
@@ -229,7 +229,7 @@ void AmptekSDD123Server::sendRequestDatagram(AmptekSDD123Packet packet, int over
 void AmptekSDD123Server::sendSyncDatagram(AmptekSDD123Packet packet, int overrideTimeout)
 {
 	if(socketLocallyBusy_){
-		qDebug() << "PACKET QUEUE IS BUSY (send sync datagram)";
+		AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "PACKET QUEUE IS BUSY (send sync datagram)");
 		packetQueue_.append(packet);
 	}
 	else{
@@ -247,7 +247,7 @@ void AmptekSDD123Server::sendSyncDatagram(AmptekSDD123Packet packet, int overrid
 void AmptekSDD123Server::fakeSendDatagram(AmptekSDD123Packet packet, int overrideTimeout)
 {
 	if(socketLocallyBusy_){
-		qDebug() << "PACKET QUEUE IS BUSY (fake send datagram)";
+		AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "PACKET QUEUE IS BUSY (fake send datagram)");
 		packetQueue_.append(packet);
 	}
 	else{
@@ -265,7 +265,8 @@ void AmptekSDD123Server::fakeSendDatagram(AmptekSDD123Packet packet, int overrid
 
 void AmptekSDD123Server::processPendingDatagrams()
 {
-	responsePacketReady_ = false;
+	bool emitResponsePacketReady = false;
+
 	while(udpDetectorSocket_->hasPendingDatagrams()){
 		QByteArray datagram;
 		bool ok;
@@ -274,17 +275,18 @@ void AmptekSDD123Server::processPendingDatagrams()
 		udpDetectorSocket_->readDatagram(datagram.data(), datagram.size(), sourceAddress);
 
 		if(datagram.size() < 520 && datagram.mid(0,2) == QByteArray::fromHex("f5fa")){
+			emitResponsePacketReady = true;
+
 			totalResponseDatagramSize_ = datagram.size();
 			totalResponseDatagram_.clear();
 			totalResponseDatagram_.append(datagram);
-			responsePacketReady_ = true;
 			stillReceivingResponseDatagram_ = false;
 		}
 		else if(stillReceivingResponseDatagram_){
 			totalResponseDatagram_.append(datagram);
 			if(totalResponseDatagram_.size() == totalResponseDatagramSize_){
+				emitResponsePacketReady = true;
 				stillReceivingResponseDatagram_ = false;
-				responsePacketReady_ = true;
 			}
 		}
 		else if(datagram.size() == 520){
@@ -297,7 +299,8 @@ void AmptekSDD123Server::processPendingDatagrams()
 		}
 		delete sourceAddress;
 	}
-	if(responsePacketReady_)
+
+	if(emitResponsePacketReady)
 		emit responsePacketReady();
 }
 
@@ -305,163 +308,14 @@ void AmptekSDD123Server::onResponsePacketReady()
 {
 	requestPacketTimer_->stop();
 	syncPacketTimer_->stop();
+
 	AmptekSDD123Packet lastRequestPacket = currentRequestPacket_;
 	AmptekSDD123Packet responsePacket(currentRequestPacket_.packetID(), totalResponseDatagram_);
 
-	bool foundTimedOutPacket = false;
-	bool rerequestRequired = false;
-	if(timedOutPackets_.count() > 0){
-		for(int x = 0; x < timedOutPackets_.count(); x++){
-			qDebug() << timedOutPackets_.at(x).command() << QString(QByteArray::fromHex(timedOutPackets_.at(x).dataString().toAscii()));
-		}
-
-		AmptekSDD123Packet headPacket(-1, QString("NONE"));
-		while(!foundTimedOutPacket && timedOutPackets_.count() > 0){
-			headPacket = timedOutPackets_.dequeue();
-
-//			if(responsePacket.command() == "Comm test - Echo packet Response" && headPacket.command() == "Comm test - Echo packet" && responsePacket.dataString() == headPacket.dataString())
-			if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseCommTestEchoPacket && headPacket.commandId() == AmptekCommandManagerSGM::RequestCommTestEchoPacket && responsePacket.dataString() == headPacket.dataString())
-				foundTimedOutPacket = true;
-//			else if(responsePacket.command() != "Comm test - Echo packet Response" && headPacket.possibleResponses().contains(responsePacket.commandHex())){
-			else if(responsePacket.commandId() != AmptekCommandManagerSGM::ResponseCommTestEchoPacket && headPacket.possibleResponses().contains(responsePacket.commandHex())){
-				foundTimedOutPacket = true;
-				AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
-				currentRequestPacket_ = emptyPacket;
-			}
-			else{
-				if(headPacket.command() == currentRequestPacket_.command() && responsePacket.dataString() == currentSyncPacket_.dataString())
-					rerequestRequired = true;
-				droppedPackets_.appendPacket(QDateTime::currentDateTime(), headPacket);
-				emit dropPacketDetected();
-			}
-		}
-	}
-
-	AmptekSDD123Packet localRequestPacket(currentRequestPacket_.packetID(), currentRequestPacket_);
-
-	if(!foundTimedOutPacket && currentRequestPacket_.possibleResponses().contains(responsePacket.commandHex())){
-		AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
-		currentRequestPacket_ = emptyPacket;
-	}
-	else if(!foundTimedOutPacket && currentSyncPacket_.dataString() == responsePacket.dataString()){
-		AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
-		currentSyncPacket_ = emptyPacket;
-	}
-	else if(!foundTimedOutPacket){
-		unrequestedPackets_.appendPacket(QDateTime::currentDateTime(), responsePacket);
-		emit unrequestedPacketDetected();
-	}
-
-	socketLocallyBusy_ = false;
-
-	if(rerequestRequired){
-		if(localRequestPacket.currentRetries() < localRequestPacket.maxRetries()){
-			localRequestPacket.incrementRetries(packetIDCounter_++);
-			sendRequestDatagram(localRequestPacket);
-		}
-		else
-			emit fatalTimeout();
-	}
-
-
-	if(localRequestPacket.isForwarded()){
-		hasReplyReady_ = true;
-		emit replyDatagram(responsePacket.packetID(), responsePacket.datagram());
-	}
-//	if(responsePacket.command() == "Request Status Packet Response"){
-	if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseRequestStatusPacket){
-		emit statusDataReady(responsePacket.datagram().mid(6, 64));
-//	} else if(responsePacket.command() == "256-channel spectrum plus Status"){
-	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response256ChannelSpectrumPlusStatus){
-		replySpectrumTime_->restart();
-		//qDebug() << "Heard a 256-channel response";
-		emit spectrumDataReady(responsePacket.datagram().mid(6, 768), 256);
-		emit statusDataReady(responsePacket.datagram().mid(774, 64));
-		if(spectrumPacketReceiver_){
-			AmptekSpectrumPacketEvent *spectrumPacketEvent = new AmptekSpectrumPacketEvent();
-			spectrumPacketEvent->spectrumByteArray_ = responsePacket.datagram().mid(6, 768);
-			spectrumPacketEvent->channelCount_ = 256;
-			spectrumPacketEvent->statusDataArray_ = responsePacket.datagram().mid(774, 64);
-			spectrumPacketEvent->dwellStartTime_.setHMS(lastRequestSpectrumTime_->hour(), lastRequestSpectrumTime_->minute(), lastRequestSpectrumTime_->second(), lastRequestSpectrumTime_->msec());
-			spectrumPacketEvent->dwellEndTime_.setHMS(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
-			spectrumPacketEvent->dwellReplyTime_.setHMS(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec());
-			QCoreApplication::postEvent(spectrumPacketReceiver_, spectrumPacketEvent);
-		}
-//	} else if(responsePacket.command() == "512-channel spectrum plus Status"){
-	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response512ChannelSpectrumPlusStatus){
-		replySpectrumTime_->restart();
-		//qDebug() << "Heard a 512-channel response";
-		emit spectrumDataReady(responsePacket.datagram().mid(6, 1536), 512);
-		emit statusDataReady(responsePacket.datagram().mid(1542, 64));
-		if(spectrumPacketReceiver_){
-			AmptekSpectrumPacketEvent *spectrumPacketEvent = new AmptekSpectrumPacketEvent();
-			spectrumPacketEvent->spectrumByteArray_ = responsePacket.datagram().mid(6, 1536);
-			spectrumPacketEvent->channelCount_ = 512;
-			spectrumPacketEvent->statusDataArray_ = responsePacket.datagram().mid(1542, 64);
-			spectrumPacketEvent->dwellStartTime_.setHMS(lastRequestSpectrumTime_->hour(), lastRequestSpectrumTime_->minute(), lastRequestSpectrumTime_->second(), lastRequestSpectrumTime_->msec());
-			spectrumPacketEvent->dwellEndTime_.setHMS(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
-			spectrumPacketEvent->dwellReplyTime_.setHMS(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec());
-			QCoreApplication::postEvent(spectrumPacketReceiver_, spectrumPacketEvent);
-		}
-//	} else if(responsePacket.command() == "1024-channel spectrum plus Status"){
-	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response1024ChannelSpectrumPlusStatus){
-		replySpectrumTime_->restart();
-		emit spectrumDataReady(responsePacket.datagram().mid(6, 3072), 1024);
-		emit statusDataReady(responsePacket.datagram().mid(3078, 64));
-		if(spectrumPacketReceiver_){
-			AmptekSpectrumPacketEvent *spectrumPacketEvent = new AmptekSpectrumPacketEvent();
-			spectrumPacketEvent->spectrumByteArray_ = responsePacket.datagram().mid(6, 3072);
-			spectrumPacketEvent->channelCount_ = 1024;
-			spectrumPacketEvent->statusDataArray_ = responsePacket.datagram().mid(3078, 64);
-			spectrumPacketEvent->dwellStartTime_.setHMS(lastRequestSpectrumTime_->hour(), lastRequestSpectrumTime_->minute(), lastRequestSpectrumTime_->second(), lastRequestSpectrumTime_->msec());
-			spectrumPacketEvent->dwellEndTime_.setHMS(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
-			spectrumPacketEvent->dwellReplyTime_.setHMS(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec());
-			QCoreApplication::postEvent(spectrumPacketReceiver_, spectrumPacketEvent);
-		}
-	}
-//	if(lastRequestPacket.command() == "Text Configuration"){
-	if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestTextConfiguration){
-		requestAllTextConfigurationParameters();
-	}
-//	if(responsePacket.command() == "Configuration Readback"){
-	if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseConfiguration){
-		QString allASCIICommands = QString(QByteArray::fromHex(responsePacket.dataString().toAscii()));
-		if(allASCIICommands.contains("ALLP")){
-			emit allParametersTextConfiguration(allASCIICommands);
-
-			if(spectrumPacketReceiver_){
-				AmptekConfigurationReadbackEvent *configurationReadbackEvent = new AmptekConfigurationReadbackEvent();
-				configurationReadbackEvent->configurationReadback_ = allASCIICommands;
-				QCoreApplication::postEvent(spectrumPacketReceiver_, configurationReadbackEvent);
-			}
-		}
-	}
-//	if(lastRequestPacket.command() == "Enable MCA/MCS"){
-	if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestEnableMCAMCS){
-		emit serverChangedToDwellState();
-//	} else if(lastRequestPacket.command() == "Disable MCA/MCS"){
-	} else if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestDisableMCAMCS){
-		emit serverChangedToConfigurationState();
-
-		if(confirmationPacketReceiver_){
-			AmptekConfigurationModeConfirmationEvent *configurationConfirmationEvent = new AmptekConfigurationModeConfirmationEvent();
-			configurationConfirmationEvent->confirmConfigurationMode_ = true;
-			QCoreApplication::postEvent(confirmationPacketReceiver_, configurationConfirmationEvent);
-		}
-	}
-//	if(responsePacket.command() == "OK"){
-	if(responsePacket.commandId() == AmptekCommandManagerSGM::AcknowledgeOk){
-		emit acknowledgeOK();
-	}
-
-	if(!packetQueue_.isEmpty()){
-		AmptekSDD123Packet resendPacket(packetQueue_.takeFirst());
-//		if(resendPacket.command() == "Comm test - Echo packet")
-		if(resendPacket.commandId() == AmptekCommandManagerSGM::RequestCommTestEchoPacket)
-			sendSyncDatagram(resendPacket);
-		else
-			sendRequestDatagram(resendPacket);
-	}
+	processLocalStoredPacket(responsePacket);
+	processResponseFeedback(responsePacket);
+	processLastRequestPacket(lastRequestPacket);
+	sendPacketInQueue();
 }
 
 void AmptekSDD123Server::syncRequest(int timeout)
@@ -486,7 +340,7 @@ void AmptekSDD123Server::requestDatagramTimeout()
 		requestPacketTimer_->start(currentRequestPacket_.timeout());
 		return;
 	}
-//	if(currentRequestPacket_.command() == "Comm test - Echo packet" && QString(QByteArray::fromHex(currentRequestPacket_.dataString().toAscii())) == "a7xi272727;idhai"){
+
 	if(currentRequestPacket_.commandId() == AmptekCommandManagerSGM::RequestCommTestEchoPacket && QString(QByteArray::fromHex(currentRequestPacket_.dataString().toAscii())) == "a7xi272727;idhai"){
 		detectorUnavailable_ = true;
 		emit detectorUnavailableChanged(detectorUnavailable_);
@@ -514,3 +368,155 @@ void AmptekSDD123Server::syncDatagramTimeout()
 		qDebug() << "Could not complete sync request" << " Been " << currentRequestTime_.elapsed() << " since original request";
 	}
 }
+
+void AmptekSDD123Server::processLocalStoredPacket(AmptekSDD123Packet responsePacket)
+{
+	bool foundTimedOutPacket = false;
+	bool rerequestRequired = false;
+
+	if(timedOutPackets_.count() > 0){
+		for(int x = 0; x < timedOutPackets_.count(); x++){
+			AMErrorMon::information(this, AMPTEK_SERVER_INFO_PACKET_QUEUE_BUSY, QString("Timed Out Packet: %1 %2").arg(timedOutPackets_.at(x).command()).arg(QString(QByteArray::fromHex(timedOutPackets_.at(x).dataString().toAscii()))));
+		}
+
+		AmptekSDD123Packet headPacket(-1, QString("NONE"));
+		while(!foundTimedOutPacket && timedOutPackets_.count() > 0){
+			headPacket = timedOutPackets_.dequeue();
+
+			if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseCommTestEchoPacket && headPacket.commandId() == AmptekCommandManagerSGM::RequestCommTestEchoPacket && responsePacket.dataString() == headPacket.dataString()) {
+				foundTimedOutPacket = true;
+
+			} else if(responsePacket.commandId() != AmptekCommandManagerSGM::ResponseCommTestEchoPacket && headPacket.possibleResponses().contains(responsePacket.commandHex())){
+				foundTimedOutPacket = true;
+				AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
+				currentRequestPacket_ = emptyPacket;
+
+			} else {
+				if(headPacket.command() == currentRequestPacket_.command() && responsePacket.dataString() == currentSyncPacket_.dataString())
+					rerequestRequired = true;
+
+				droppedPackets_.appendPacket(QDateTime::currentDateTime(), headPacket);
+				emit dropPacketDetected();
+			}
+		}
+	}
+
+	AmptekSDD123Packet localRequestPacket(currentRequestPacket_.packetID(), currentRequestPacket_);
+
+	if (!foundTimedOutPacket) {
+		if (currentRequestPacket_.possibleResponses().contains(responsePacket.commandHex())) {
+			AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
+			currentRequestPacket_ = emptyPacket;
+		} else if (currentSyncPacket_.dataString() == responsePacket.dataString()) {
+			AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
+			currentSyncPacket_ = emptyPacket;
+		} else {
+			unrequestedPackets_.appendPacket(QDateTime::currentDateTime(), responsePacket);
+			emit unrequestedPacketDetected();
+		}
+	}
+
+	socketLocallyBusy_ = false;
+
+	if(rerequestRequired){
+		if(localRequestPacket.currentRetries() < localRequestPacket.maxRetries()){
+			localRequestPacket.incrementRetries(packetIDCounter_++);
+			sendRequestDatagram(localRequestPacket);
+		} else {
+			emit fatalTimeout();
+		}
+	}
+
+	if(localRequestPacket.isForwarded()){
+		hasReplyReady_ = true;
+		emit replyDatagram(responsePacket.packetID(), responsePacket.datagram());
+	}
+}
+
+void AmptekSDD123Server::processResponseFeedback(AmptekSDD123Packet responsePacket)
+{
+	QByteArray spectrumByteArray = responsePacket.spectrumByteArray();
+	QByteArray statusByteArray = responsePacket.statusByteArray();
+
+	if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseRequestStatusPacket){
+		emit statusDataReady(statusByteArray);
+	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::AcknowledgeOk){
+		emit acknowledgeOK();
+	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response256ChannelSpectrumPlusStatus){
+		postSpectrumPlusStatusReadyResponse(spectrumByteArray, statusByteArray, 256);
+	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response512ChannelSpectrumPlusStatus){
+		postSpectrumPlusStatusReadyResponse(spectrumByteArray, statusByteArray, 512);
+	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::Response1024ChannelSpectrumPlusStatus){
+		postSpectrumPlusStatusReadyResponse(spectrumByteArray, statusByteArray, 1024);
+	} else if(responsePacket.commandId() == AmptekCommandManagerSGM::ResponseConfiguration){
+		postConfigurationReadbackResponse(QString(QByteArray::fromHex(responsePacket.dataString().toAscii())));
+	}
+}
+
+void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(QByteArray spectrumByteArray, QByteArray statusByteArray, int channelCount)
+{
+	replySpectrumTime_->restart();
+
+	emit spectrumDataReady(spectrumByteArray, channelCount);
+	emit statusDataReady(statusByteArray);
+
+	if(spectrumPacketReceiver_) {
+		QTime dwellStartTime(lastRequestSpectrumTime_->hour(), lastRequestSpectrumTime_->minute(), lastRequestSpectrumTime_->second(), lastRequestSpectrumTime_->msec());
+		QTime dwellEndTime(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
+		QTime dwellReplyTime(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec());
+
+		QEvent *responseEvent = new AmptekSpectrumPacketEvent(spectrumByteArray, statusByteArray, channelCount, dwellStartTime, dwellEndTime, dwellReplyTime);
+
+		QCoreApplication::postEvent(spectrumPacketReceiver_, responseEvent);
+	} else {
+		AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum packet receiver"));
+	}
+}
+
+void AmptekSDD123Server::postConfigurationReadbackResponse(const QString &ASCIICommands)
+{
+	if(ASCIICommands.contains("ALLP")){
+		emit allParametersTextConfiguration(ASCIICommands);
+
+		if(spectrumPacketReceiver_){
+			AmptekConfigurationReadbackEvent *configurationReadbackEvent = new AmptekConfigurationReadbackEvent();
+			configurationReadbackEvent->configurationReadback_ = ASCIICommands;
+
+			QCoreApplication::postEvent(spectrumPacketReceiver_, configurationReadbackEvent);
+		} else {
+			AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum packet receiver"));
+		}
+	}
+
+}
+
+void AmptekSDD123Server::processLastRequestPacket(AmptekSDD123Packet lastRequestPacket)
+{
+	if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestTextConfiguration){
+		requestAllTextConfigurationParameters();
+	} else if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestEnableMCAMCS){
+		emit serverChangedToDwellState();
+	} else if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestDisableMCAMCS){
+		emit serverChangedToConfigurationState();
+
+		if(confirmationPacketReceiver_){
+			AmptekConfigurationModeConfirmationEvent *configurationConfirmationEvent = new AmptekConfigurationModeConfirmationEvent();
+			configurationConfirmationEvent->confirmConfigurationMode_ = true;
+			QCoreApplication::postEvent(confirmationPacketReceiver_, configurationConfirmationEvent);
+		} else {
+			AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum confirmation packet receiver"));
+		}
+	}
+}
+
+void AmptekSDD123Server::sendPacketInQueue()
+{
+	if(!packetQueue_.isEmpty()){
+		AmptekSDD123Packet resendPacket(packetQueue_.takeFirst());
+		if(resendPacket.commandId() == AmptekCommandManagerSGM::RequestCommTestEchoPacket)
+			sendSyncDatagram(resendPacket);
+		else
+			sendRequestDatagram(resendPacket);
+	}
+}
+
