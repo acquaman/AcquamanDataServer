@@ -56,17 +56,6 @@ AMDSDwellStatusData& AMDSDwellStatusData::operator =(const AMDSDwellStatusData &
 	return *this;
 }
 
-int AMDSDwellStatusData::replyMSecs() {
-	QTime replyTime = dwellReplyDateTime().time();
-
-	int dwellReplyHours = replyTime.hour();
-	int dwellReplyMinutes = replyTime.minute();
-	int dwellReplySeconds = replyTime.second();
-	int dwellReplyMSecs = replyTime.msec();
-
-	return dwellReplyMSecs + dwellReplySeconds*1000 + dwellReplyMinutes*1000*60 + dwellReplyHours*1000*60*60;
-}
-
 void AMDSDwellStatusData::setStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QDateTime &dwellStartDateTime, const QDateTime &dwellEndDateTime, const QDateTime &dwellReplyDateTime)
 {
 	fastCounts_ = fastCounts ;

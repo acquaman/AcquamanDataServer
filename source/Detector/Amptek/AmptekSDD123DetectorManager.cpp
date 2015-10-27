@@ -207,14 +207,14 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 
 	if(setPresetDwellEndTimeOnNextEvent_){
 		setPresetDwellEndTimeOnNextEvent_ = false;
-		presetDwellLocalStartDateTime_ = statusData.dwellStartDateTime();
-		presetDwellEndDateTime_ = statusData.dwellStartDateTime().addMSecs(dwellTime_*1000);
+		presetDwellLocalStartTime_ = statusData.dwellStartTime();
+		presetDwellEndTime_ = statusData.dwellStartTime().addMSecs(dwellTime_*1000);
 	}
-	else if (dwellActive_ && isPresetDwell() && presetDwellLocalEndDateTime_.isValid()) {
-		if ( presetDwellLocalEndDateTime_ >= presetDwellEndDateTime_ ) { //dwellToBeDeactived
+	else if (dwellActive_ && isPresetDwell() && presetDwellLocalEndTime_.isValid()) {
+		if ( presetDwellLocalEndTime_ >= presetDwellEndTime_ ) { //dwellToBeDeactived
 			dwellActive_ = false;
 
-			double elapsedTime = ((double)presetDwellLocalStartDateTime_.msecsTo(presetDwellLocalEndDateTime_))/1000;
+			double elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
 			emit dwellFinishedUpdate(detectorName(), elapsedTime);
 		}
 	}
@@ -232,11 +232,11 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 
 		emit newHistrogramReceived(detectorName(), oneHistogram);
 		if (dwellActive_) {
-			presetDwellLocalEndDateTime_ = statusData.dwellEndDateTime();
+			presetDwellLocalEndTime_ = statusData.dwellEndTime();
 
 			double elapsedTime = 0;
-			if (presetDwellLocalStartDateTime_.isValid())
-				elapsedTime = ((double)presetDwellLocalStartDateTime_.msecsTo(presetDwellLocalEndDateTime_))/1000;
+			if (presetDwellLocalStartTime_.isValid())
+				elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
 
 			emit newDwellHistrogramReceived(detectorName(), oneHistogram, elapsedTime);
 		}

@@ -290,12 +290,16 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDS
 		realTimeAverageControl_->move(statusData.realTime()/count);
 	if(!elapsedTimeControl_->withinTolerance(elapsedTime))
 		elapsedTimeControl_->move(elapsedTime);
-	if(startTimeControl_->readPV()->getString() != statusData.dwellStartTime())
-		startTimeControl_->move(statusData.dwellStartTime());
-	if(endTimeControl_->readPV()->getString() != statusData.dwellEndTime())
-		endTimeControl_->move(statusData.dwellEndTime());
+	if(startTimeControl_->readPV()->getString() != statusData.dwellStartTime().toString("hh:mm:ss.zzz"))
+		startTimeControl_->move(statusData.dwellStartTime().toString("hh:mm:ss.zzz"));
+	if(endTimeControl_->readPV()->getString() != statusData.dwellEndTime().toString("hh:mm:ss.zzz"))
+		endTimeControl_->move(statusData.dwellEndTime().toString("hh:mm:ss.zzz"));
 
-	int totalMSecs = statusData.replyMSecs();
+	int dwellReplyHours = statusData.dwellReplyTime().hour();
+	int dwellReplyMinutes = statusData.dwellReplyTime().minute();
+	int dwellReplySeconds = statusData.dwellReplyTime().second();
+	int dwellReplyMSecs = statusData.dwellReplyTime().msec();
+	int totalMSecs = dwellReplyMSecs + dwellReplySeconds*1000 + dwellReplyMinutes*1000*60 + dwellReplyHours*1000*60*60;
 	qDebug() << "totalMSecs is " << totalMSecs << " so average is " << totalMSecs/count;
 	if(!replyTimeAverageControl_->withinTolerance(totalMSecs/count))
 		replyTimeAverageControl_->move(totalMSecs/count);
