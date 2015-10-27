@@ -17,6 +17,9 @@ public:
 	/// the assign ( = ) operation of ADMSDwellStatusData
 	AMDSDwellStatusData& operator =(const AMDSDwellStatusData &other);
 
+	/// returns the total MSecs to reply the message
+	int replyMSecs();
+
 	/// returns the vlaue of fastCounts
 	inline int fastCounts() const { return fastCounts_; }
 	/// returns the value of slowCounts
@@ -37,6 +40,13 @@ public:
 	inline QDateTime dwellEndDateTime() const { return dwellEndDateTime_; }
 	/// returns the value of dwellReplyDateTime
 	inline QDateTime dwellReplyDateTime() const { return dwellReplyDateTime_; }
+
+	/// returns the string value of dwellStartTime
+	inline QString dwellStartTime(const QString &format="hh:mm:ss.zzz") const { return dwellStartDateTime_.time().toString(format); }
+	/// returns the string value of dwellEndTime
+	inline QString dwellEndTime(const QString &format="hh:mm:ss.zzz") const { return dwellEndDateTime_.time().toString(format); }
+	/// returns the string value of dwellReplyTime
+	inline QString dwellReplyTime(const QString &format="hh:mm:ss.zzz") const { return dwellReplyDateTime_.time().toString(format); }
 
 protected:
 	/// helper function to update all the properties

@@ -153,11 +153,11 @@ protected:
 	/// flag to indicate whether to end preset dwell on next event
 	bool setPresetDwellEndTimeOnNextEvent_;
 	/// the expected preset dwell end time
-	QTime presetDwellEndTime_;
+	QDateTime presetDwellEndDateTime_;
 	/// the start time of presetdwell
-	QTime presetDwellLocalStartTime_;
+	QDateTime presetDwellLocalStartDateTime_;
 	/// the preset dwell end time of the latest event
-	QTime presetDwellLocalEndTime_;
+	QDateTime presetDwellLocalEndDateTime_;
 
 	/// the configuration data received via configuration value event
 	AmptekConfigurationData configurationData_;
