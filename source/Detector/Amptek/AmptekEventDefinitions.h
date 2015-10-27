@@ -37,24 +37,23 @@ class AmptekSpectrumPacketEvent : public QEvent
 {
 public:
 	AmptekSpectrumPacketEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent) {}
-
-	AmptekSpectrumPacketEvent(QByteArray spectrumArray, QByteArray statusArray, int channelCount, QDateTime dwellStartDateTime, QDateTime dwellEndDateTime, QDateTime dwellReplyDateTime) : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent)
+	AmptekSpectrumPacketEvent(QByteArray spectrumArray, QByteArray statusArray, int channelCount, QTime dwellStartTime, QTime dwellEndTime, QTime dwellReplyTime) : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent)
 	{
 		spectrumByteArray_ = spectrumArray;
 		statusDataArray_ = statusArray;
 
 		channelCount_ = channelCount;
-		dwellStartDateTime_ = dwellStartDateTime;
-		dwellEndDateTime_ = dwellEndDateTime;
-		dwellReplyDateTime_ = dwellReplyDateTime;
+		dwellStartTime_ = dwellStartTime;
+		dwellEndTime_ = dwellEndTime;
+		dwellReplyTime_ = dwellReplyTime;
 	}
 
 	QByteArray spectrumByteArray_;
 	QByteArray statusDataArray_;
 	int channelCount_;
-	QDateTime dwellStartDateTime_;
-	QDateTime dwellEndDateTime_;
-	QDateTime dwellReplyDateTime_;
+	QTime dwellStartTime_;
+	QTime dwellEndTime_;
+	QTime dwellReplyTime_;
 };
 
 class AmptekConfigurationReadbackEvent : public QEvent

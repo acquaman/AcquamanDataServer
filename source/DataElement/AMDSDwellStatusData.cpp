@@ -1,9 +1,9 @@
 #include "AMDSDwellStatusData.h"
 
 /// =============== implementation of AMDSStatusData ================
-AMDSDwellStatusData::AMDSDwellStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QDateTime &dwellStartDateTime, const QDateTime &dwellEndDateTime, const QDateTime &dwellReplyDateTime)
+AMDSDwellStatusData::AMDSDwellStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime)
 {
-	setStatusData(fastCounts, slowCounts, detectorTemperature, accumulationTime, liveTime, realTime, generalPurposeCounter, dwellStartDateTime, dwellEndDateTime, dwellReplyDateTime);
+	setStatusData(fastCounts, slowCounts, detectorTemperature, accumulationTime, liveTime, realTime, generalPurposeCounter, dwellStartTime, dwellEndTime, dwellReplyTime);
 }
 
 AMDSDwellStatusData::AMDSDwellStatusData(const AMDSDwellStatusData &other)
@@ -21,16 +21,16 @@ AMDSDwellStatusData& AMDSDwellStatusData::operator +(const AMDSDwellStatusData &
 	double realTimePlus = realTime() + other.realTime();
 	int generalPurposeCounterPlus = generalPurposeCounter() + other.generalPurposeCounter();
 
-	QDateTime dwellStartDateTimePlus =  dwellStartDateTime();
-	QDateTime dwellEndDateTimePlus =  dwellEndDateTime();
-	if(dwellEndDateTime() < other.dwellEndDateTime())
-		dwellEndDateTimePlus = other.dwellEndDateTime();
-	else if(dwellStartDateTime() < other.dwellStartDateTime())
-		dwellStartDateTimePlus = other.dwellStartDateTime();
+	QTime dwellStartTimePlus =  dwellStartTime();
+	QTime dwellEndTimePlus =  dwellEndTime();
+	if(dwellEndTime() < other.dwellEndTime())
+		dwellEndTimePlus.setHMS(other.dwellEndTime().hour(), other.dwellEndTime().minute(), other.dwellEndTime().second(), other.dwellEndTime().msec());
+	else if(dwellStartTime() < other.dwellStartTime())
+		dwellStartTimePlus.setHMS(other.dwellStartTime().hour(), other.dwellStartTime().minute(), other.dwellStartTime().second(), other.dwellStartTime().msec());
 
-	QDateTime dwellReplyDateTimePlus = dwellReplyDateTime().addMSecs(other.dwellEndDateTime().msecsTo(other.dwellReplyDateTime()));
+	QTime dwellReplyTimePlus = dwellReplyTime().addMSecs(other.dwellEndTime().msecsTo(other.dwellReplyTime()));
 
-	setStatusData(fastCountsPlus, slowCountsPlus, detectorTemperaturePlus, accumulationTimePlus, liveTimePlus, realTimePlus, generalPurposeCounterPlus, dwellStartDateTimePlus, dwellEndDateTimePlus, dwellReplyDateTimePlus);
+	setStatusData(fastCountsPlus, slowCountsPlus, detectorTemperaturePlus, accumulationTimePlus, liveTimePlus, realTimePlus, generalPurposeCounterPlus, dwellStartTimePlus, dwellEndTimePlus, dwellReplyTimePlus);
 	return *this;
 }
 
@@ -44,19 +44,19 @@ AMDSDwellStatusData& AMDSDwellStatusData::operator /(quint32 divisor)
 	double realTimeDiv = realTime() / divisor;
 	int generalPurposeCounterDiv = generalPurposeCounter() / divisor;
 
-	setStatusData(fastCountsDiv, slowCountsDiv, detectorTemperatureDiv, accumulationTimeDiv, liveTimeDiv, realTimeDiv, generalPurposeCounterDiv, dwellStartDateTime(), dwellEndDateTime(), dwellReplyDateTime());
+	setStatusData(fastCountsDiv, slowCountsDiv, detectorTemperatureDiv, accumulationTimeDiv, liveTimeDiv, realTimeDiv, generalPurposeCounterDiv, dwellStartTime(), dwellEndTime(), dwellReplyTime());
 	return *this;
 }
 
 AMDSDwellStatusData& AMDSDwellStatusData::operator =(const AMDSDwellStatusData &other)
 {
 	if(this != &other){
-		setStatusData( other.fastCounts(), other.slowCounts(), other.detectorTemperature(), other.accumulationTime(), other.liveTime(), other.realTime(), other.generalPurposeCounter(), other.dwellStartDateTime(), other.dwellEndDateTime(), other.dwellReplyDateTime());
+		setStatusData( other.fastCounts(), other.slowCounts(), other.detectorTemperature(), other.accumulationTime(), other.liveTime(), other.realTime(), other.generalPurposeCounter(), other.dwellStartTime(), other.dwellEndTime(), other.dwellReplyTime());
 	}
 	return *this;
 }
 
-void AMDSDwellStatusData::setStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QDateTime &dwellStartDateTime, const QDateTime &dwellEndDateTime, const QDateTime &dwellReplyDateTime)
+void AMDSDwellStatusData::setStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime)
 {
 	fastCounts_ = fastCounts ;
 	slowCounts_ = slowCounts ;
@@ -66,7 +66,7 @@ void AMDSDwellStatusData::setStatusData(int fastCounts, int slowCounts, double d
 	realTime_ = realTime ;
 	generalPurposeCounter_ = generalPurposeCounter ;
 
-	dwellStartDateTime_ = dwellStartDateTime;
-	dwellEndDateTime_ = dwellEndDateTime;
-	dwellReplyDateTime_ = dwellReplyDateTime;
+	dwellStartTime_.setHMS(dwellStartTime.hour(), dwellStartTime.minute(), dwellStartTime.second(), dwellStartTime.msec());
+	dwellEndTime_.setHMS(dwellEndTime.hour(), dwellEndTime.minute(), dwellEndTime.second(), dwellEndTime.msec());
+	dwellReplyTime_.setHMS(dwellReplyTime.hour(), dwellReplyTime.minute(), dwellReplyTime.second(), dwellReplyTime.msec());
 }

@@ -134,6 +134,4 @@ AMDSDwellStatusData AMDSDwellSpectralDataHolder::dwellStatusData() const{
 
 void AMDSDwellSpectralDataHolder::setDwellStatusData(const AMDSDwellStatusData &statusData){
 	dwellStatusData_ = statusData;
-
-	eventData_->setEventTime(dwellStatusData_.dwellStartDateTime());
 }
