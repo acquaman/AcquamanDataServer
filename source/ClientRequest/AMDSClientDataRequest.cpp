@@ -247,9 +247,7 @@ QString AMDSClientDataRequest::toString() const
 		messageData = QString("%1\n\tNo data for this message yet").arg(messageData);
 	else {
 		for(int x = 0, size = data().count(); x < size; x++){
-			AMDSFlatArray oneFlatArray = AMDSFlatArray(uniformDataType(), bufferGroupInfo().spanSize());
-			data().at(x)->data(&oneFlatArray);
-			messageData = QString("%1\n\tData at %2 - %3").arg(messageData).arg(x).arg(oneFlatArray.printData());
+			messageData = QString("%1\n\tData at %2 - %3").arg(messageData).arg(x).arg(data().at(x)->printData());
 		}
 	}
 
