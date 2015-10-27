@@ -152,8 +152,6 @@ protected:
 	int totalResponseDatagramSize_;
 	/// flag to indicate whether the total response datagram is still on the way (more packets are expecting)
 	bool stillReceivingResponseDatagram_;
-//	/// flag to indicate that the response packet is ready
-//	bool responsePacketReady_;
 
 	/// flag to indicate the socket is busy
 	bool socketLocallyBusy_;

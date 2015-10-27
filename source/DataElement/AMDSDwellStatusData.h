@@ -6,7 +6,7 @@
 class AMDSDwellStatusData
 {
 public:
-	AMDSDwellStatusData(int fastCounts = -1, int slowCounts = -1, double detectorTemperature = -1, double accumulationTime = -1, double liveTime = -1, double realTime = -1, int generalPurposeCounter = -1, const QTime &dwellStartTime = QTime(), const QTime &dwellEndTime = QTime(), const QTime &dwellReplyTime = QTime());
+	AMDSDwellStatusData(int fastCounts = -1, int slowCounts = -1, double detectorTemperature = -1, double accumulationTime = -1, double liveTime = -1, double realTime = -1, int generalPurposeCounter = -1, const QDateTime &dwellStartDateTime = QDateTime(), const QDateTime &dwellEndDateTime = QDateTime(), const QDateTime &dwellReplyDateTime = QDateTime());
 	AMDSDwellStatusData(const AMDSDwellStatusData &other);
 
 	/// the + operation of ADMSDwellStatusData
@@ -31,16 +31,16 @@ public:
 	inline double realTime() const { return realTime_; }
 	/// returns the value of generalPurposeCounter
 	inline int generalPurposeCounter() const { return generalPurposeCounter_; }
-	/// returns the value of dwellStartTime
-	inline QTime dwellStartTime() const { return dwellStartTime_; }
-	/// returns the value of dwellEndTime
-	inline QTime dwellEndTime() const { return dwellEndTime_; }
-	/// returns the value of dwellReplyTime
-	inline QTime dwellReplyTime() const { return dwellReplyTime_; }
+	/// returns the value of dwellStartDateTime
+	inline QDateTime dwellStartDateTime() const { return dwellStartDateTime_; }
+	/// returns the value of dwellEndDateTime
+	inline QDateTime dwellEndDateTime() const { return dwellEndDateTime_; }
+	/// returns the value of dwellReplyDateTime
+	inline QDateTime dwellReplyDateTime() const { return dwellReplyDateTime_; }
 
 protected:
 	/// helper function to update all the properties
-	void setStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime);
+	void setStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QDateTime &dwellStartDateTime, const QDateTime &dwellEndDateTime, const QDateTime &dwellReplyDateTime);
 
 protected:
 	/// the value of fastCounts
@@ -58,11 +58,11 @@ protected:
 	/// the value of generalPurposeCounter
 	int generalPurposeCounter_;
 	/// the value of dwellStartTime
-	QTime dwellStartTime_;
-	/// the value of dwellEndTime
-	QTime dwellEndTime_;
-	/// the value of dwellReplyTime
-	QTime dwellReplyTime_;
+	QDateTime dwellStartDateTime_;
+	/// the value of dwellEndDateTime
+	QDateTime dwellEndDateTime_;
+	/// the value of dwellReplyDateTime
+	QDateTime dwellReplyDateTime_;
 };
 
 #endif // AMDSDWELLSTATUSDATA_H

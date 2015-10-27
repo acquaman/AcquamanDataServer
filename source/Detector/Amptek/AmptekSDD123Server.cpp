@@ -461,11 +461,15 @@ void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(QByteArray spectrum
 	emit statusDataReady(statusByteArray);
 
 	if(spectrumPacketReceiver_) {
-		QTime dwellStartTime(lastRequestSpectrumTime_->hour(), lastRequestSpectrumTime_->minute(), lastRequestSpectrumTime_->second(), lastRequestSpectrumTime_->msec());
-		QTime dwellEndTime(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
-		QTime dwellReplyTime(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec());
+		QDateTime dwellStartDateTime = QDateTime::currentDateTimeUtc();
+		QDateTime dwellEndDateTime = QDateTime::currentDateTimeUtc();
+		QDateTime dwellReplyDateTime = QDateTime::currentDateTimeUtc();
 
-		QEvent *responseEvent = new AmptekSpectrumPacketEvent(spectrumByteArray, statusByteArray, channelCount, dwellStartTime, dwellEndTime, dwellReplyTime);
+		dwellStartDateTime.setTime(QTime(lastRequestSpectrumTime_->hour(), lastRequestSpectrumTime_->minute(), lastRequestSpectrumTime_->second(), lastRequestSpectrumTime_->msec()));
+		dwellEndDateTime.setTime(QTime(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec()));
+		dwellReplyDateTime.setTime(QTime(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec()));
+
+		QEvent *responseEvent = new AmptekSpectrumPacketEvent(spectrumByteArray, statusByteArray, channelCount, dwellStartDateTime, dwellEndDateTime, dwellReplyDateTime);
 
 		QCoreApplication::postEvent(spectrumPacketReceiver_, responseEvent);
 	} else {

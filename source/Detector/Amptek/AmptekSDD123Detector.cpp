@@ -93,7 +93,7 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 
 	if(spectrumReceiver_){
 
-		AMDSDwellStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), event->dwellStartTime_, event->dwellEndTime_, event->dwellReplyTime_);
+		AMDSDwellStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), event->dwellStartDateTime_, event->dwellEndDateTime_, event->dwellReplyDateTime_);
 
 		AmptekSpectrumEvent *spectrumEvent = new AmptekSpectrumEvent();
 		spectrumEvent->detectorSourceName_ = name();
