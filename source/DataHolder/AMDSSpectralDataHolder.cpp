@@ -139,7 +139,7 @@ bool AMDSDwellSpectralDataHolder::writeToDataStream(AMDSDataStream *dataStream, 
 	if (!AMDSLightWeightSpectralDataHolder::writeToDataStream(dataStream, encodeDataType))
 		return false;
 
-	dwellStatusData_.write(dataStream);
+	dwellStatusData_.writeToDataStream(dataStream);
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
@@ -151,7 +151,7 @@ bool AMDSDwellSpectralDataHolder::readFromDataStream(AMDSDataStream *dataStream,
 	if (!AMDSLightWeightSpectralDataHolder::readFromDataStream(dataStream, decodeAsDataType))
 		return false;
 
-	dwellStatusData_.read(dataStream);
+	dwellStatusData_.readFromDataStream(dataStream);
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 

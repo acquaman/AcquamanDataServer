@@ -19,9 +19,9 @@ public:
 	AMDSDwellStatusData& operator =(const AMDSDwellStatusData &other);
 
 	/// read data from dataStream and write to the dwellStatusData
-	void read(QDataStream *dataStream);
+	bool readFromDataStream(QDataStream *dataStream);
 	/// write status data of the dataArray to dataStream
-	void write(QDataStream *dataStream) const;
+	bool writeToDataStream(QDataStream *dataStream) const;
 
 	/// print the result of DwellStatusData to a string
 	QString toString();

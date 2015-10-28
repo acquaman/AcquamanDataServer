@@ -56,34 +56,94 @@ AMDSDwellStatusData& AMDSDwellStatusData::operator =(const AMDSDwellStatusData &
 	return *this;
 }
 
-void AMDSDwellStatusData::read(QDataStream *dataStream)
+bool AMDSDwellStatusData::readFromDataStream(QDataStream *dataStream)
 {
 	*dataStream >> fastCounts_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream >> slowCounts_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream >> detectorTemperature_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream >> accumulationTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream >> liveTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream >> realTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream >> generalPurposeCounter_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
 
 	*dataStream >> dwellStartTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream >> dwellEndTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream >> dwellReplyTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
+	return true;
 }
 
-void AMDSDwellStatusData::write(QDataStream *dataStream) const
+bool AMDSDwellStatusData::writeToDataStream(QDataStream *dataStream) const
 {
 	*dataStream << fastCounts_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << slowCounts_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << detectorTemperature_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << accumulationTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << liveTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << realTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << generalPurposeCounter_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
 
 	*dataStream << dwellStartTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << dwellEndTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << dwellReplyTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
+	return true;
 }
 
 QString AMDSDwellStatusData::toString()
