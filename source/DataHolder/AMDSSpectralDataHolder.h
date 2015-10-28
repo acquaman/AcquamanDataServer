@@ -49,17 +49,26 @@ public:
 	Q_INVOKABLE AMDSDwellSpectralDataHolder(AMDSDwellSpectralDataHolder *sourceDataHolder, QObject *parent = 0);
 	virtual ~AMDSDwellSpectralDataHolder();
 
-	/// reimplement the function to clear the data of the instance
-	virtual void clear();
-
-	/// function to copy the value of source instance to the current instance
-	virtual void cloneData(AMDSDataHolder *dataHolder);
 	/// Implement the PLUS operation of AMDSLightWeightDataHolder, which will plus the value of the two instances of AMDSLightWeightDataHolder and return the new instance
 	virtual AMDSDataHolder* operator +(AMDSDataHolder &dataHolder);
 	/// Implement the Division operation of AMDSLightWeightDataHolder: the value of the given handler will be divided by the given divisior
 	virtual AMDSDataHolder* operator /(quint32 divisor);
+
+	/// reimplement the function to clear the data of the instance
+	virtual void clear();
+	/// implement the function to return the data string
+	virtual QString printData();
+
+	/// function to copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder);
+
+	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
+	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
+
 	/// The status data relating to the detector response
-	AMDSDwellStatusData dwellStatusData() const;
+	inline AMDSDwellStatusData dwellStatusData() const { return dwellStatusData_; }
 
 public slots:
 	/// Sets the status data for the histogram

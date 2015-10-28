@@ -383,8 +383,10 @@ void AMDSFlatArray::clearAndReset(AMDSDataTypeDefinitions::DataType dataType, qu
 	resizeType(dataType, size);
 }
 
-void AMDSFlatArray::read(QDataStream *dataStream)
+void AMDSFlatArray::read(QDataStream *dataStream, quint32 size)
 {
+	clearAndReset(dataType_, size);
+
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:
 		*dataStream >> vectorQint8();

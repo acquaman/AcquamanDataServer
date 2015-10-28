@@ -246,8 +246,7 @@ void AMDSDataStream::read(AMDSFlatArray &flatArray){
 	if(status() != QDataStream::Ok)
 		return;
 
-	flatArray.clearAndReset(flatArray.dataType(), size);
-	flatArray.read(this);
+	flatArray.read(this, size);
 }
 
 void AMDSDataStream::encodeClientRequestType(const AMDSClientRequest &clientRequest){
@@ -291,4 +290,14 @@ void AMDSDataStream::read(AMDSClientRequest &clientRequest){
 		QString errMessage = AMDSClientRequestDefinitions::errorMessage(errorCode, AMDSClientRequestDefinitions::Read, clientRequest.requestType());
 		AMErrorMon::alert(0, errorCode, errMessage);
 	}
+}
+
+void AMDSDataStream::write(const AMDSDwellStatusData &dwellStatusData)
+{
+	dwellStatusData.write(this);
+}
+
+void AMDSDataStream::read(AMDSDwellStatusData &dwellStatusData)
+{
+	dwellStatusData.read(this);
 }

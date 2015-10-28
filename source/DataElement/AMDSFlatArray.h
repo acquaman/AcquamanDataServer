@@ -49,7 +49,7 @@ public:
 	void clearAndReset(AMDSDataTypeDefinitions::DataType dataType, quint32 size);
 
 	/// read data from dataStream and write to the dataArray
-	void read(QDataStream *dataStream);
+	void read(QDataStream *dataStream, quint32 size);
 	/// write data of the dataArray to dataStream
 	void write(QDataStream *dataStream) const;
 

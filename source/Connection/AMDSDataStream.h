@@ -7,6 +7,7 @@
 #include "source/DataElement/AMDSAxisInfo.h"
 #include "source/DataElement/AMDSFlatArray.h"
 #include "source/DataElement/AMDSBufferGroup.h"
+#include "source/DataElement/AMDSDwellStatusData.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 
 #define AMDS_SERVER_ERR_DATA_STREAM 20500
@@ -53,6 +54,9 @@ public:
 	AMDSClientRequestDefinitions::RequestType decodeRequestType();
 	AMDSClientRequest* decodeAndInstantiateClientRequestType();
 	void read(AMDSClientRequest &clientRequest);
+
+	void write(const AMDSDwellStatusData &dwellStatusData);
+	void read(AMDSDwellStatusData &dwellStatusData);
 };
 
 #endif // AMDSDATASTREAM_H
