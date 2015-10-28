@@ -312,6 +312,10 @@ void AmptekSDD123Server::onResponsePacketReady()
 	AmptekSDD123Packet lastRequestPacket = currentRequestPacket_;
 	AmptekSDD123Packet responsePacket(currentRequestPacket_.packetID(), totalResponseDatagram_);
 
+	if (!responsePacket.isValid()) {
+		AMErrorMon::error(this, AMPTEK_SERVER_ERR_INVALID_PACKET_DATA, QString("The datagram of reponse packet is invalid (error %1)").arg(responsePacket.lastError()));
+	}
+
 	processLocalStoredPacket(responsePacket);
 	processResponseFeedback(responsePacket);
 	processLastRequestPacket(lastRequestPacket);
