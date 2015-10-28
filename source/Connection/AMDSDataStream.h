@@ -4,7 +4,6 @@
 #include <QDataStream>
 
 #include "source/Connection/AMDSPacketStats.h"
-#include "source/DataElement/AMDSAxisInfo.h"
 #include "source/DataElement/AMDSFlatArray.h"
 #include "source/DataElement/AMDSBufferGroup.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
@@ -20,11 +19,6 @@ public:
 	explicit AMDSDataStream(QByteArray *array, QIODevice::OpenMode openMode = QIODevice::ReadWrite);
 	explicit AMDSDataStream(const QByteArray &array);
 	virtual ~AMDSDataStream();
-
-	/// write the axis info to the datastream
-	void write(const AMDSAxisInfo &axisInfo);
-	/// If the axis info was not readable, then the passed in reference is left unchanged.
-	void read(AMDSAxisInfo &axisInfo);
 
 	/// write the bufferGroup info to the datastream
 	void write(const AMDSBufferGroupInfo &bufferGroupInfo);

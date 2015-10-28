@@ -160,8 +160,7 @@ bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool enco
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 	for(int x = 0, size = axes_.count(); x < size; x++){
-		dataStream->write(axes_.at(x));
-		if(dataStream->status() != QDataStream::Ok)
+		if (!axes_.at(x).writeToDataStream(dataStream))
 			return false;
 	}
 
@@ -197,7 +196,7 @@ bool AMDSFullDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSData
 		return false;
 	for(int x = 0, size = readAxesCount; x < size; x++){
 		AMDSAxisInfo oneAxisInfo("Invalid", 0);
-		dataStream->read(oneAxisInfo);
+		oneAxisInfo.readFromDataStream(dataStream);
 		if(oneAxisInfo.name() == "Invalid")
 			return false;
 		readAxes.append(oneAxisInfo);

@@ -29,55 +29,6 @@ AMDSDataStream::~AMDSDataStream()
 {
 }
 
-void AMDSDataStream::read(AMDSAxisInfo &axisInfo){
-	QString name;
-	QString description;
-	QString units;
-	quint32 size;
-	bool isUniform;
-	qint16 start;
-	quint16 increment;
-
-	*this >> name;
-	if(status() != QDataStream::Ok)
-		return;
-	*this >> description;
-	if(status() != QDataStream::Ok)
-		return;
-	*this >> units;
-	if(status() != QDataStream::Ok)
-		return;
-	QDataStream::operator >>(size);
-	if(status() != QDataStream::Ok)
-		return;
-	QDataStream::operator >>(isUniform);
-	if(status() != QDataStream::Ok)
-		return;
-	QDataStream::operator >>(start);
-	if(status() != QDataStream::Ok)
-		return;
-	QDataStream::operator >>(increment);
-	if(status() != QDataStream::Ok)
-		return;
-
-	axisInfo.setName(name);
-	axisInfo.setDescription(description);
-	axisInfo.setUnits(units);
-	axisInfo.setSize(size);
-	axisInfo.setIsUniform(isUniform);
-	axisInfo.setStart(start);
-	axisInfo.setIncrement(increment);
-}
-
-void AMDSDataStream::write(const AMDSAxisInfo &axisInfo){
-	*this << axisInfo.name();
-	*this << axisInfo.description();
-	*this << axisInfo.units();
-	QDataStream::operator <<(axisInfo.size());
-	QDataStream::operator <<(axisInfo.isUniform());
-	QDataStream::operator <<(axisInfo.start());
-	QDataStream::operator <<(axisInfo.increment());
-}
 
 void AMDSDataStream::read(AMDSBufferGroupInfo &bufferGroupInfo){
 	QString name;
@@ -101,7 +52,8 @@ void AMDSDataStream::read(AMDSBufferGroupInfo &bufferGroupInfo){
 
 	for(int x = 0, size = axesCount; x < size; x++){
 		AMDSAxisInfo oneAxisInfo("Invalid", 0);
-		read(oneAxisInfo);
+		oneAxisInfo.readFromDataStream(this);
+
 		if(oneAxisInfo.name() == "Invalid")
 			return;
 		axes.append(oneAxisInfo);
@@ -118,8 +70,9 @@ void AMDSDataStream::write(const AMDSBufferGroupInfo &bufferGroupInfo){
 	*this << bufferGroupInfo.description();
 	*this << bufferGroupInfo.units();
 	QDataStream::operator <<((quint8)(bufferGroupInfo.axes().count()));
-	for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++)
-		write(bufferGroupInfo.axes().at(x));
+	for(int x = 0, size = bufferGroupInfo.axes().count(); x < size; x++) {
+		bufferGroupInfo.axes().at(x).writeToDataStream(this);
+	}
 }
 
 void AMDSDataStream::read(AMDSPacketStats &packetStat){
