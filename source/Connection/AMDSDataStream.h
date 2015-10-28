@@ -7,7 +7,6 @@
 #include "source/DataElement/AMDSAxisInfo.h"
 #include "source/DataElement/AMDSFlatArray.h"
 #include "source/DataElement/AMDSBufferGroup.h"
-#include "source/DataElement/AMDSDwellStatusData.h"
 #include "source/ClientRequest/AMDSClientRequest.h"
 
 #define AMDS_SERVER_ERR_DATA_STREAM 20500
@@ -22,11 +21,14 @@ public:
 	explicit AMDSDataStream(const QByteArray &array);
 	virtual ~AMDSDataStream();
 
+	/// write the axis info to the datastream
 	void write(const AMDSAxisInfo &axisInfo);
 	/// If the axis info was not readable, then the passed in reference is left unchanged.
 	void read(AMDSAxisInfo &axisInfo);
 
+	/// write the bufferGroup info to the datastream
 	void write(const AMDSBufferGroupInfo &bufferGroupInfo);
+	/// read the bufferGroup info from the datastream
 	void read(AMDSBufferGroupInfo &bufferGroupInfo);
 
 	void write(const AMDSPacketStats &packetStat);
@@ -54,9 +56,6 @@ public:
 	AMDSClientRequestDefinitions::RequestType decodeRequestType();
 	AMDSClientRequest* decodeAndInstantiateClientRequestType();
 	void read(AMDSClientRequest &clientRequest);
-
-	void write(const AMDSDwellStatusData &dwellStatusData);
-	void read(AMDSDwellStatusData &dwellStatusData);
 };
 
 #endif // AMDSDATASTREAM_H

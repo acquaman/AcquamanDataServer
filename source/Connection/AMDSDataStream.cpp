@@ -291,13 +291,3 @@ void AMDSDataStream::read(AMDSClientRequest &clientRequest){
 		AMErrorMon::alert(0, errorCode, errMessage);
 	}
 }
-
-void AMDSDataStream::write(const AMDSDwellStatusData &dwellStatusData)
-{
-	dwellStatusData.write(this);
-}
-
-void AMDSDataStream::read(AMDSDwellStatusData &dwellStatusData)
-{
-	dwellStatusData.read(this);
-}
