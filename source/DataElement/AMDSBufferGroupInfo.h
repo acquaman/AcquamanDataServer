@@ -1,6 +1,8 @@
 #ifndef AMDSBUFFERGROUPINFO_H
 #define AMDSBUFFERGROUPINFO_H
 
+#include <QDataStream>
+
 #include "DataElement/AMDSAxisInfo.h"
 #include "DataElement/AMDSnDIndex.h"
 #include "DataElement/AMDSDataTypeDefinitions.h"
@@ -20,8 +22,14 @@ public:
 	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), AMDSDataTypeDefinitions::DataType dataType=AMDSDataTypeDefinitions::Double, const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
 	/// Copy constructor
 	AMDSBufferGroupInfo(const AMDSBufferGroupInfo& other);
+
 	/// Assignment operator
 	AMDSBufferGroupInfo& operator=(const AMDSBufferGroupInfo& other);
+
+	/// Writes this AMDSBufferGroupInfo to a DataStream, returns true if no errors are encountered
+	bool writeToDataStream(QDataStream *dataStream) const;
+	/// Reads this AMDSBufferGroupInfo from the DataStream, returns true if no errors are encountered
+	bool readFromDataStream(QDataStream *dataStream);
 
 	/// returns the name of the bufferGroupInfo
 	inline QString name() const { return name_; }

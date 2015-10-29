@@ -3,10 +3,17 @@
 
 #include <QObject>
 
+class AMDSDataStream;
+
 class AMDSPacketStats
 {
 public:
 	AMDSPacketStats(const QString &name = QString(), quint64 inboundBytes = 0, quint64 outboundBytes = 0, quint64 maxInboundBytes = 0, quint64 maxOutboundBytes = 0, quint64 maxTotalBytes = 0);
+
+	/// Writes this AMDSPacketStats to an AMDSDataStream, returns true if no errors are encountered
+	bool writeToDataStream(AMDSDataStream *dataStream) const;
+	/// Reads this AMDSPacketStats from the AMDSDataStream, returns true if no errors are encountered
+	bool readFromDataStream(AMDSDataStream *dataStream);
 
 	inline QString name() const { return name_; }
 

@@ -20,19 +20,6 @@ public:
 	explicit AMDSDataStream(const QByteArray &array);
 	virtual ~AMDSDataStream();
 
-	/// write the bufferGroup info to the datastream
-	void write(const AMDSBufferGroupInfo &bufferGroupInfo);
-	/// read the bufferGroup info from the datastream
-	void read(AMDSBufferGroupInfo &bufferGroupInfo);
-
-	void write(const AMDSPacketStats &packetStat);
-	void read(AMDSPacketStats &packetStat);
-
-	void encodeEventDataType(const AMDSEventData &eventData);
-	void write(const AMDSEventData &eventData);
-	QString decodeEventDataType();
-	AMDSEventData* decodeAndInstantiateEventData();
-	void read(AMDSEventData &eventData);
 
 	void encodeDataHolderType(const AMDSDataHolder &dataHolder);
 	void write(const AMDSDataHolder &dataHolder, bool encodeDataType = true);

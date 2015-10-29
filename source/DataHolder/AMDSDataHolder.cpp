@@ -68,7 +68,7 @@ void AMDSLightWeightDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 
 bool AMDSLightWeightDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
 	Q_UNUSED(encodeDataType)
-	dataStream->encodeEventDataType(*eventData_);
+//	dataStream->encodeEventDataType(*eventData_);
 	if(!eventData_->writeToDataStream(dataStream))
 		return false;
 
@@ -79,8 +79,9 @@ bool AMDSLightWeightDataHolder::readFromDataStream(AMDSDataStream *dataStream, A
 	Q_UNUSED(decodeAsDataType)
 	if(eventData_)
 		eventData_->deleteLater();
-	eventData_ = dataStream->decodeAndInstantiateEventData();
-	if(!eventData_->readFromDataStream(dataStream))
+
+	eventData_ = AMDSEventData::decodeAndInstantiateEventData(dataStream);
+	if((eventData_ == 0) || !eventData_->readFromDataStream(dataStream))
 		return false;
 
 	return true;

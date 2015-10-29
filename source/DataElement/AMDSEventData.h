@@ -28,6 +28,8 @@ public:
 		InvalidScale = 7
 	};
 
+	static AMDSEventData *decodeAndInstantiateEventData(AMDSDataStream *dataStream);
+
 	AMDSEventData(QObject *parent = 0);
 	virtual ~AMDSEventData();
 

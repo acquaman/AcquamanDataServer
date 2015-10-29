@@ -46,7 +46,7 @@ int AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) c
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_PACKET_STATS_COUNT;
 
 	for(int x = 0, size = packetStats().count(); x < size; x++)
-		dataStream->write(packetStats().at(x));
+		packetStats().at(x).writeToDataStream(dataStream);
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
@@ -66,7 +66,7 @@ int AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	for(int x = 0, size = readPacketStatsCount; x < size; x++){
 		AMDSPacketStats onePacketStat("Invalid");
-		dataStream->read(onePacketStat);
+		onePacketStat.readFromDataStream(dataStream);
 		if(onePacketStat.name() == "Invalid")
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_PACKET_STATS;
 		readPacketStats.append(onePacketStat);

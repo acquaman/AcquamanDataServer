@@ -99,7 +99,7 @@ int AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 	// write data to the data stream
 	if(includeData){
 
-		dataStream->write(bufferGroupInfo_);
+		bufferGroupInfo_.writeToDataStream(dataStream);
 
 		quint8 uniformDataType = (quint8)uniformDataType_;
 		*dataStream << uniformDataType;
@@ -173,7 +173,9 @@ int AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INCLUDE_DATA;
 
 	if(readIncludeData){
-		dataStream->read(readBufferGroupInfo);
+		if (! readBufferGroupInfo.readFromDataStream(dataStream))
+			return false;
+
 		*dataStream >> readUniformDataType;
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_UNIFORM_DATA_TYPE;

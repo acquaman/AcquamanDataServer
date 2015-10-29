@@ -68,7 +68,7 @@ int AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_GROUP_INFO_COUNT;
 
 	for(int x = 0, size = bufferGroupInfos_.count(); x < size; x++)
-		dataStream->write(bufferGroupInfos_.at(x));
+		bufferGroupInfos_.at(x).writeToDataStream(dataStream);
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
@@ -92,7 +92,7 @@ int AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStrea
 
 	for(int x = 0, size = readBufferGroupInfosCount; x < size; x++){
 		AMDSBufferGroupInfo oneBufferGroupInfo("Invalid");
-		dataStream->read(oneBufferGroupInfo);
+		oneBufferGroupInfo.readFromDataStream(dataStream);
 		if(oneBufferGroupInfo.name() == "Invalid")
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_GROUP_INFO;
 		readBufferGroupInfos.append(oneBufferGroupInfo);

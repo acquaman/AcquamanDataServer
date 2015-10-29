@@ -4,6 +4,17 @@
 #include "source/DataElement/AMDSEventDataSupport.h"
 
 // ======== implementation of AMDSEventData  ===========
+AMDSEventData *AMDSEventData::decodeAndInstantiateEventData(AMDSDataStream *dataStream)
+{
+	QString eventDataClassName;
+	*dataStream >> eventDataClassName;
+
+	if(dataStream->status() != QDataStream::Ok)
+		return 0;
+
+	return AMDSEventDataSupport::instantiateEventDataFromClassName(eventDataClassName);
+}
+
 AMDSEventData::AMDSEventData(QObject *parent) :
 	QObject(parent)
 {
@@ -45,6 +56,12 @@ void AMDSLightWeightEventData::cloneData(AMDSEventData *sourceEventData)
 }
 
 bool AMDSLightWeightEventData::writeToDataStream(AMDSDataStream *dataStream) const{
+	//encodeEventDataType
+	QString eventDataClassNameAsString(metaObject()->className());
+	*dataStream << eventDataClassNameAsString;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << eventTime_;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
