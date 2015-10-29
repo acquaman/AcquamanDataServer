@@ -13,11 +13,11 @@ class AmptekSDD123DetectorGroupSGM : public QObject
 {
 	Q_OBJECT
 public:
-	AmptekSDD123DetectorGroupSGM(QList<AmptekSDD123ConfigurationMap*> configurationMaps, QObject *parent = 0);
+	AmptekSDD123DetectorGroupSGM(const QList<AmptekSDD123ConfigurationMap*> &configurationMaps, QObject *parent = 0);
 	~AmptekSDD123DetectorGroupSGM();
 
 	/// returns the list of AmptekDetectorManager
-	QList<AmptekSDD123DetectorManager*> detectorManagers();
+	QList<AmptekSDD123DetectorManager*> detectorManagers() const;
 
 protected:
 	/// the mapping of detector names with detector managers

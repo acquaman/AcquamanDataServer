@@ -32,16 +32,11 @@ public:
 	AMDSBufferGroup(const AMDSBufferGroup& other);
 	~AMDSBufferGroup();
 
-	/// Returns the data dimension and other information included in the bufferGroupInfo
-	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
-
-	/// returns whether Cumulative is enabled or not
-	inline bool cumulativeEnabled() { return enableCumulative_; }
 	/// returns the current dataholder of cumulative data
 	AMDSDataHolder *cumulativeDataHolder() const;
 
 	/// returns the dataHolder at given index
-	AMDSDataHolder* at(int index);
+	AMDSDataHolder* at(int index) const;
 	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will always return maxSize)
 	int count() const;
 	/// Clears the buffer of all its members, and frees their resources
@@ -51,6 +46,11 @@ public:
 	void append(AMDSDataHolder* value, bool elapsedDwellTime=0);
 	/// finish dwell data update
 	void finishDwellDataUpdate(double elapsedTime=0);
+
+	/// Returns the data dimension and other information included in the bufferGroupInfo
+	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
+	/// returns whether Cumulative is enabled or not
+	inline bool cumulativeEnabled() const { return enableCumulative_; }
 
 public slots:
 	/// Slot which handles a request for data. The buffer group will attempt to populate the request

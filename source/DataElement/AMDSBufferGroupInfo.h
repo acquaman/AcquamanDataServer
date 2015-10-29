@@ -66,7 +66,7 @@ public:
 	/// Set the units of the bufferGroupInfo
 	inline void setUnits(const QString &units) { units_ = units; }
 	/// Set the dataType of the bufferGroupInfo
-	inline void setDataType(const AMDSDataTypeDefinitions::DataType dataType) { dataType_ = dataType; }
+	inline void setDataType(AMDSDataTypeDefinitions::DataType dataType) { dataType_ = dataType; }
 	/// Set the axes of the bufferGroupInfo
 	inline void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
 	/// Set how the bufferGroup should be flattened

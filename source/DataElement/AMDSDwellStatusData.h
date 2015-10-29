@@ -9,6 +9,7 @@ class AMDSDwellStatusData
 public:
 	AMDSDwellStatusData(quint32 fastCounts = -1, quint32 slowCounts = -1, quint64 detectorTemperature = -1, quint64 accumulationTime = -1, quint64 liveTime = -1, quint64 realTime = -1, quint32 generalPurposeCounter = -1, const QTime &dwellStartTime = QTime(), const QTime &dwellEndTime = QTime(), const QTime &dwellReplyTime = QTime());
 	AMDSDwellStatusData(const AMDSDwellStatusData &other);
+	~AMDSDwellStatusData();
 
 	/// the + operation of ADMSDwellStatusData
 	AMDSDwellStatusData& operator +(const AMDSDwellStatusData &other);
@@ -24,7 +25,7 @@ public:
 	bool writeToDataStream(QDataStream *dataStream) const;
 
 	/// print the result of DwellStatusData to a string
-	QString toString();
+	QString toString() const;
 
 	/// returns the vlaue of fastCounts
 	inline quint32 fastCounts() const { return fastCounts_; }

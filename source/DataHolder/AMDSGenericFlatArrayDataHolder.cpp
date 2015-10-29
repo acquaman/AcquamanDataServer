@@ -43,6 +43,11 @@ AMDSDataHolder* AMDSLightWeightGenericFlatArrayDataHolder::operator /(const quin
 	return targetDataHolder;
 }
 
+QString AMDSLightWeightGenericFlatArrayDataHolder::printData()
+{
+	return QString("%1 : %2").arg(eventTime().toString()).arg(valueFlatArray_.printData());
+}
+
 void AMDSLightWeightGenericFlatArrayDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 {
 	AMDSLightWeightDataHolder::cloneData(sourceDataHolder);

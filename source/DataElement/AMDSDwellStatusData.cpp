@@ -11,6 +11,11 @@ AMDSDwellStatusData::AMDSDwellStatusData(const AMDSDwellStatusData &other)
 	this->operator =(other);
 }
 
+AMDSDwellStatusData::~AMDSDwellStatusData()
+{
+
+}
+
 AMDSDwellStatusData& AMDSDwellStatusData::operator +(const AMDSDwellStatusData &other)
 {
 	quint32 fastCountsPlus = fastCounts() + other.fastCounts();
@@ -146,7 +151,7 @@ bool AMDSDwellStatusData::writeToDataStream(QDataStream *dataStream) const
 	return true;
 }
 
-QString AMDSDwellStatusData::toString()
+QString AMDSDwellStatusData::toString() const
 {
 	return QString("Status: %1 %2 %3 %4").arg(dwellStartTime_.toString()).arg(dwellEndTime_.toString()).arg(dwellReplyTime_.toString()).arg(liveTime_);
 }

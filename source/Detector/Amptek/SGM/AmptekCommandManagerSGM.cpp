@@ -129,69 +129,52 @@ void AmptekCommandManagerSGM::initiateAmptekCommands()
 	amptekCommands_.append( AmptekCommand(ResponseCommTestEchoPacket,            "8f7f", "Comm test - Echo packet Response"));
 
 	//Request types
-	QStringList tempResponses;
-	tempResponses.clear();
-	tempResponses << "Request Status Packet Response" << "NormalErrors";
+	QStringList tempResponses = QStringList() << "Request Status Packet Response" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(ReqeustStatusPacket, "0101", "Request Status Packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "OK" << "NormalErrors";
+	tempResponses = QStringList() << "OK" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestClearSpecturm, "f001", "Clear Spectrum", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "1024-channel spectrum plus Status" << "NormalErrors" << "FPGA Error";
+	tempResponses = QStringList() << "1024-channel spectrum plus Status" << "NormalErrors" << "FPGA Error";
 	amptekCommands_.append( AmptekCommand(RequestSpecturmPlusStatus, "0203", "Request Spectrum plus Status", 50, 1, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "1024-channel spectrum plus Status" << "NormalErrors" << "FPGA Error";
+	tempResponses = QStringList() << "1024-channel spectrum plus Status" << "NormalErrors" << "FPGA Error";
 	amptekCommands_.append( AmptekCommand(RequestAndClearSpecturmPlusStatus, "0204", "Request and clear Spectrum plus Status", 50, 1, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "OK" << "NormalErrors";
+	tempResponses = QStringList() << "OK" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestEnableMCAMCS, "f002", "Enable MCA/MCS", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "OK" << "NormalErrors";
+	tempResponses = QStringList() << "OK" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestDisableMCAMCS, "f003", "Disable MCA/MCS", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "Configuration Readback" << "NormalErrors";
+	tempResponses = QStringList() << "Configuration Readback" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestTextConfigurationReadback, "2003", "Text Configuration Readback", 100, 1, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "OK" << "NormalErrors";
+	tempResponses = QStringList() << "OK" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestTextConfiguration, "2002", "Text Configuration", 25, 1, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "OK" << "NormalErrors";
+	tempResponses = QStringList() << "OK" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestCommTestACKOKPacket, "f100", "Comm test - Request ACK OK packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "OK,with Interface Sharing Request" << "NormalErrors";
+	tempResponses = QStringList() << "OK,with Interface Sharing Request" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestCommTestACKOKWithSharingPacket, "f10c", "Comm test - Request ACK OK with Sharing packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "Sync Error" << "NormalErrors";
+	tempResponses = QStringList() << "Sync Error" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestCommTestACKSyncErrorPacket, "f101", "Comm test - Request ACK Sync Error packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "PID Error" << "NormalErrors";
+	tempResponses = QStringList() << "PID Error" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestCommTestACKPIDErrorPacket, "f102", "Comm test - Request ACK PID Error packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "LEN Error" << "NormalErrors";
+	tempResponses = QStringList() << "LEN Error" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestCommTestACKLENErrorPacket, "f103", "Comm test - Request ACK LEN Error packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "Checksum Error" << "NormalErrors";
+	tempResponses = QStringList() << "Checksum Error" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestCommTestACKChecksumErrorPacket, "f104", "Comm test - Request ACK Checksum Error packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "Bad Parameter" << "NormalErrors";
+	tempResponses = QStringList() << "Bad Parameter" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestCommTestACKBadParameterPacket, "f105", "Comm test - Request ACK Bad Parameter packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
 
-	tempResponses.clear();
-	tempResponses << "Comm test - Echo packet Response" << "NormalErrors";
+	tempResponses = QStringList() << "Comm test - Echo packet Response" << "NormalErrors";
 	amptekCommands_.append( AmptekCommand(RequestCommTestEchoPacket, "f17f", "Comm test - Echo packet", 7, 1, internalCreateResponsesFromText(tempResponses)));
 
 
@@ -201,7 +184,7 @@ void AmptekCommandManagerSGM::initiateAmptekCommands()
 	}
 }
 
-QStringList AmptekCommandManagerSGM::internalCreateResponsesFromText(QStringList texts){
+QStringList AmptekCommandManagerSGM::internalCreateResponsesFromText(const QStringList &texts){
 	QStringList retVal;
 	for(int x = 0; x < texts.count(); x++){
 		if(texts.at(x) == "NormalErrors")

@@ -31,16 +31,16 @@ protected slots:
 	void onServerChangedToDwellState(int index);
 
 	/// slot to handle clear histrogramData request for a given buffer (detector)
-	void onClearHistrogramData(QString detectorName);
+	void onClearHistrogramData(const QString &detectorName);
 	/// slot to handle clear dwell histrogramData request  for a given buffer (detector)
-	void onClearDwellHistrogramData(QString detectorName);
+	void onClearDwellHistrogramData(const QString &detectorName);
 	/// slot to handle new histrogramData request  for a given buffer (detector)
-	void onNewHistrogramReceived(QString detectorName, AMDSDataHolder *);
+	void onNewHistrogramReceived(const QString &detectorName, AMDSDataHolder *);
 	/// slot to handle new dwell histrogramData request  for a given buffer (detector)
-	void onNewDwellHistrogramReceived(QString detectorName, AMDSDataHolder *, double elapsedTime);
+	void onNewDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder *, double elapsedTime);
 
 	/// slot to handle dwell data update finished request  for a given buffer (detector)
-	void onDwellFinishedUpdate(QString detectorName, double elapsedTime);
+	void onDwellFinishedUpdate(const QString &detectorName, double elapsedTime);
 
 protected:
 	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal

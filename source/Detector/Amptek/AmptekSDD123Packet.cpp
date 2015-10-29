@@ -45,6 +45,11 @@ AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const AmptekSDD123Packet &o
 	packetID_ = packetID;
 }
 
+AmptekSDD123Packet::~AmptekSDD123Packet()
+{
+
+}
+
 
 AmptekSDD123Packet& AmptekSDD123Packet::operator =(const AmptekSDD123Packet &other){
 	if(this != &other){
@@ -96,7 +101,7 @@ int AmptekSDD123Packet::dataLength() const{
 	return -1;
 }
 
-QByteArray AmptekSDD123Packet::spectrumByteArray()
+QByteArray AmptekSDD123Packet::spectrumByteArray() const
 {
 	QByteArray spectrum;
 	switch (commandId()) {
@@ -114,7 +119,7 @@ QByteArray AmptekSDD123Packet::spectrumByteArray()
 	return spectrum;
 }
 
-QByteArray AmptekSDD123Packet::statusByteArray()
+QByteArray AmptekSDD123Packet::statusByteArray() const
 {
 	QByteArray status;
 	switch (commandId()) {

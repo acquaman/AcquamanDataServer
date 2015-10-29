@@ -345,16 +345,10 @@ void AmptekSDD123Detector::backwardsMid(int start, int length, const QByteArray 
 		outputData.append(inputData.at(x-1));
 }
 
-QString AmptekSDD123Detector::stringFromBool(bool input) const{
-	return input ? "true" : "false" ;
-}
-
-
 void AmptekSDD123Detector::internalSetFastCounts(int fastCounts){
 	if(fastCounts != fastCounts_){
 		fastCounts_ = fastCounts;
 		emit fastCountsChanged(fastCounts_);
-		emit fastCountsChanged(QString("%1").arg(fastCounts_));
 	}
 }
 
@@ -362,7 +356,6 @@ void AmptekSDD123Detector::internalSetSlowCounts(int slowCounts){
 	if(slowCounts != slowCounts_){
 		slowCounts_ = slowCounts;
 		emit slowCountsChanged(slowCounts_);
-		emit slowCountsChanged(QString("%1").arg(slowCounts_));
 	}
 }
 
@@ -370,7 +363,6 @@ void AmptekSDD123Detector::internalSetGeneralPurposeCounter(int generalPurposeCo
 	if(generalPurposeCounter != generalPurposeCounter_){
 		generalPurposeCounter_ = generalPurposeCounter;
 		emit generalPurposeCounterChanged(generalPurposeCounter_);
-		emit generalPurposeCounterChanged(QString("%1").arg(generalPurposeCounter_));
 	}
 }
 
@@ -378,7 +370,6 @@ void AmptekSDD123Detector::internalSetAccumulationTime(double accumulationTime){
 	if(accumulationTime != accumulationTime_){
 		accumulationTime_ = accumulationTime;
 		emit accumulationTimeChanged(accumulationTime_);
-		emit accumulationTimeChanged(QString("%1").arg(accumulationTime_));
 	}
 }
 
@@ -386,7 +377,6 @@ void AmptekSDD123Detector::internalSetLiveTime(double liveTime){
 	if(liveTime != liveTime_){
 		liveTime_ = liveTime;
 		emit liveTimeChanged(liveTime);
-		emit liveTimeChanged(QString("%1").arg(liveTime));
 	}
 }
 
@@ -394,7 +384,6 @@ void AmptekSDD123Detector::internalSetRealTime(double realTime){
 	if(realTime != realTime_){
 		realTime_ = realTime;
 		emit realTimeChanged(realTime_);
-		emit realTimeChanged(QString("%1").arg(realTime_));
 	}
 }
 
@@ -402,7 +391,6 @@ void AmptekSDD123Detector::internalSetFirmwareMajorVersion(int firmwareMajorVers
 	if(firmwareMajorVersion != firmwareMajorVersion_){
 		firmwareMajorVersion_ = firmwareMajorVersion;
 		emit firmwareMajorVersionChanged(firmwareMajorVersion_);
-		emit firmwareMajorVersionChanged(QString("%1").arg(firmwareMajorVersion_));
 	}
 }
 
@@ -410,7 +398,6 @@ void AmptekSDD123Detector::internalSetFirmwareMinorVersion(int firmwareMinorVers
 	if(firmwareMinorVersion != firmwareMinorVersion_){
 		firmwareMinorVersion_ = firmwareMinorVersion;
 		emit firmwareMinorVersionChanged(firmwareMinorVersion_);
-		emit firmwareMinorVersionChanged(QString("%1").arg(firmwareMinorVersion_));
 	}
 }
 
@@ -418,7 +405,6 @@ void AmptekSDD123Detector::internalSetFpgaMajorVersion(int fpgaMajorVersion){
 	if(fpgaMajorVersion != fpgaMajorVersion_){
 		fpgaMajorVersion_ = fpgaMajorVersion;
 		emit fpgaMajorVersionChanged(fpgaMajorVersion_);
-		emit fpgaMajorVersionChanged(QString("%1").arg(fpgaMajorVersion_));
 	}
 }
 
@@ -426,7 +412,6 @@ void AmptekSDD123Detector::internalSetFpgaMinorVersion(int fpgaMinorVersion){
 	if(fpgaMinorVersion != fpgaMinorVersion_){
 		fpgaMinorVersion_ = fpgaMinorVersion;
 		emit fpgaMinorVersionChanged(fpgaMinorVersion_);
-		emit fpgaMinorVersionChanged(QString("%1").arg(fpgaMinorVersion_));
 	}
 }
 
@@ -434,7 +419,6 @@ void AmptekSDD123Detector::internalSetSerialNumber(int serialNumber){
 	if(serialNumber != serialNumber_){
 		serialNumber_ = serialNumber;
 		emit serialNumberChanged(serialNumber_);
-		emit serialNumberChanged(QString("%1").arg(serialNumber_));
 	}
 }
 
@@ -442,7 +426,6 @@ void AmptekSDD123Detector::internalSetHighVoltage(double highVoltage){
 	if(highVoltage != highVoltage_){
 		highVoltage_ = highVoltage;
 		emit highVoltageChanged(highVoltage_);
-		emit highVoltageChanged(QString("%1").arg(highVoltage_));
 	}
 }
 
@@ -450,7 +433,6 @@ void AmptekSDD123Detector::internalSetDetectorTemperature(double detectorTempera
 	if(detectorTemperature != detectorTemperature_){
 		detectorTemperature_ = detectorTemperature;
 		emit detectorTemperatureChanged(detectorTemperature_);
-		emit detectorTemperatureChanged(QString("%1").arg(detectorTemperature_));
 	}
 }
 
@@ -458,7 +440,6 @@ void AmptekSDD123Detector::internalSetBoardTemperature(int boardTemperature){
 	if(boardTemperature != boardTemperature_){
 		boardTemperature_ = boardTemperature;
 		emit boardTemperatureChanged(boardTemperature_);
-		emit boardTemperatureChanged(QString("%1").arg(boardTemperature_));
 	}
 }
 
@@ -467,8 +448,6 @@ void AmptekSDD123Detector::internalSetPresetRealTimeReached(bool presetRealTimeR
 		presetRealTimeReachedInitialized_ = true;
 		presetRealTimeReached_ = presetRealTimeReached;
 		emit presetRealTimeReachedChanged(presetRealTimeReached_);
-		//emit presetRealTimeReachedChanged(QString("%1").arg(presetRealTimeReached_));
-		emit presetRealTimeReachedChanged(stringFromBool(presetRealTimeReached_));
 	}
 }
 
@@ -477,7 +456,6 @@ void AmptekSDD123Detector::internalSetAutoFastThresholdLocked(bool autoFastThres
 		autoFastThresholdLockedInitialized_ = true;
 		autoFastThresholdLocked_ = autoFastThresholdLocked;
 		emit autoFastThresholdLockedChanged(autoFastThresholdLocked_);
-		emit autoFastThresholdLockedChanged(stringFromBool(autoFastThresholdLocked_));
 	}
 }
 
@@ -486,7 +464,6 @@ void AmptekSDD123Detector::internalSetMcaEnabled(bool mcaEnabled){
 		mcaEnabledInitialized_ = true;
 		mcaEnabled_ = mcaEnabled;
 		emit mcaEnabledChanged(mcaEnabled_);
-		emit mcaEnabledChanged(stringFromBool(mcaEnabled_));
 	}
 }
 
@@ -495,7 +472,6 @@ void AmptekSDD123Detector::internalSetPresetCountReached(bool presetCountReached
 		presetCountReachedInitialized_ = true;
 		presetCountReached_ = presetCountReached;
 		emit presetCountReachedChanged(presetCountReached_);
-		emit presetCountReachedChanged(stringFromBool(presetCountReached_));
 	}
 }
 
@@ -504,7 +480,6 @@ void AmptekSDD123Detector::internalSetOscilloscopeDataReady(bool oscilloscopeDat
 		oscilloscopeDataReadyInitialized_ = true;
 		oscilloscopeDataReady_ = oscilloscopeDataReady;
 		emit oscilloscopeDataReadyChanged(oscilloscopeDataReady_);
-		emit oscilloscopeDataReadyChanged(stringFromBool(oscilloscopeDataReady_));
 	}
 }
 
@@ -513,7 +488,6 @@ void AmptekSDD123Detector::internalSetUnitConfigured(bool unitConfigured){
 		unitConfiguredInitialized_ = true;
 		unitConfigured_ = unitConfigured;
 		emit unitConfiguredChanged(unitConfigured_);
-		emit unitConfiguredChanged(stringFromBool(unitConfigured_));
 	}
 }
 
@@ -522,7 +496,6 @@ void AmptekSDD123Detector::internalSetAutoInputOffsetSearching(bool autoInputOff
 		autoInputOffsetSearchingInitialized_ = true;
 		autoInputOffsetSearching_ = autoInputOffsetSearching;
 		emit autoInputOffsetSearchingChanged(autoInputOffsetSearching_);
-		emit autoInputOffsetSearchingChanged(stringFromBool(autoInputOffsetSearching_));
 	}
 }
 
@@ -531,7 +504,6 @@ void AmptekSDD123Detector::internalSetMcsFinished(bool mcsFinished){
 		mcsFinishedInitialized_ = true;
 		mcsFinished_ = mcsFinished;
 		emit mcsFinishedChanged(mcsFinished_);
-		emit mcsFinishedChanged(stringFromBool(mcsFinished_));
 	}
 }
 
@@ -543,8 +515,6 @@ void AmptekSDD123Detector::internalSetUsing20MHz(bool using20MHz){
 		using80MHz_ = !using20MHz;
 		emit using20MHzChanged(using20MHz_);
 		emit using80MHzChanged(using80MHz_);
-		emit using20MHzChanged(stringFromBool(using20MHz_));
-		emit using80MHzChanged(stringFromBool(using80MHz_));
 	}
 }
 
@@ -556,8 +526,6 @@ void AmptekSDD123Detector::internalSetUsing80MHz(bool using80MHz){
 		using20MHz_ = !using80MHz;
 		emit using20MHzChanged(using20MHz_);
 		emit using80MHzChanged(using80MHz_);
-		emit using20MHzChanged(stringFromBool(using20MHz_));
-		emit using80MHzChanged(stringFromBool(using80MHz_));
 	}
 }
 
@@ -566,7 +534,6 @@ void AmptekSDD123Detector::internalSetClockAutoSet(bool clockAutoSet){
 		clockAutoSetInitialized_ = true;
 		clockAutoSet_ = clockAutoSet;
 		emit clockAutoSetChanged(clockAutoSet_);
-		emit clockAutoSetChanged(stringFromBool(clockAutoSet_));
 	}
 }
 
@@ -575,7 +542,6 @@ void AmptekSDD123Detector::internalSetPc5DetectedAtPowerUp(bool pc5DetectedAtPow
 		pc5DetectedAtPowerUpInitialized_ = true;
 		pc5DetectedAtPowerUp_ = pc5DetectedAtPowerUp;
 		emit pc5DetectedAtPowerUpChanged(pc5DetectedAtPowerUp_);
-		emit pc5DetectedAtPowerUpChanged(stringFromBool(pc5DetectedAtPowerUp_));
 	}
 }
 
@@ -587,8 +553,6 @@ void AmptekSDD123Detector::internalSetPc5HVNegative(bool pc5HVNegative){
 		pc5HVPositive_ = !pc5HVNegative;
 		emit pc5HVNegativeChanged(pc5HVNegative_);
 		emit pc5HVPositiveChanged(pc5HVPositive_);
-		emit pc5HVNegativeChanged(stringFromBool(pc5HVNegative_));
-		emit pc5HVPositiveChanged(stringFromBool(pc5HVPositive_));
 	}
 }
 
@@ -600,8 +564,6 @@ void AmptekSDD123Detector::internalSetPc5HVPositive(bool pc5HVPositive){
 		pc5HVNegative_ = !pc5HVPositive;
 		emit pc5HVNegativeChanged(pc5HVNegative_);
 		emit pc5HVPositiveChanged(pc5HVPositive_);
-		emit pc5HVNegativeChanged(stringFromBool(pc5HVNegative_));
-		emit pc5HVPositiveChanged(stringFromBool(pc5HVPositive_));
 	}
 }
 
@@ -613,8 +575,6 @@ void AmptekSDD123Detector::internalSetPc5Preamp5V(bool pc5Preamp5V){
 		pc5Preamp8p5V_ = !pc5Preamp5V;
 		emit pc5Preamp5VChanged(pc5Preamp5V_);
 		emit pc5Preamp8p5VChanged(pc5Preamp8p5V_);
-		emit pc5Preamp5VChanged(stringFromBool(pc5Preamp5V_));
-		emit pc5Preamp8p5VChanged(stringFromBool(pc5Preamp8p5V_));
 	}
 }
 
@@ -626,8 +586,6 @@ void AmptekSDD123Detector::internalSetPc5Preamp8p5V(bool pc5Preamp8p5V){
 		pc5Preamp5V_ = !pc5Preamp8p5V;
 		emit pc5Preamp5VChanged(pc5Preamp5V_);
 		emit pc5Preamp8p5VChanged(pc5Preamp8p5V_);
-		emit pc5Preamp5VChanged(stringFromBool(pc5Preamp5V_));
-		emit pc5Preamp8p5VChanged(stringFromBool(pc5Preamp8p5V_));
 	}
 }
 
@@ -635,7 +593,7 @@ void AmptekSDD123Detector::internalSetDeviceID(int deviceID){
 	if(deviceID != deviceID_){
 		deviceID_ = deviceID;
 		emit deviceIDChanged(deviceID_);
-		emit deviceIDChanged(stringFromBool(deviceID_));
+//		emit deviceIDChanged(stringFromBool(deviceID_));
 	}
 }
 
@@ -643,7 +601,7 @@ void AmptekSDD123Detector::internalSetPresetTime(double presetTime){
 	if(presetTime_ != presetTime){
 		presetTime_ = presetTime;
 		emit presetTimeChanged(presetTime_);
-		emit presetTimeChanged(QString("%1").arg(presetTime_));
+//		emit presetTimeChanged(QString("%1").arg(presetTime_));
 	}
 }
 
@@ -651,6 +609,6 @@ void AmptekSDD123Detector::internalSetMCAChannels(int mcaChannels){
 	if(mcaChannels_ != mcaChannels){
 		mcaChannels_ = mcaChannels;
 		emit mcaChannelsChanged(mcaChannels_);
-		emit mcaChannelsChanged(QString("%1").arg(mcaChannels_));
+//		emit mcaChannelsChanged(QString("%1").arg(mcaChannels_));
 	}
 }

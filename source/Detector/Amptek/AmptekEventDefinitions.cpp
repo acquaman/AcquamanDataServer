@@ -55,7 +55,7 @@ AmptekConfigurationData& AmptekConfigurationData::operator =(const AmptekConfigu
 	return *this;
 }
 
-void AmptekConfigurationData::parseConfiguration(QString configuration)
+void AmptekConfigurationData::parseConfiguration(const QString &configuration)
 {
 	QString configurationValue = configuration.section('=', -1);
 
@@ -99,7 +99,7 @@ void AmptekConfigurationData::parseConfiguration(QString configuration)
 
 
 /// =============== implementation of AmptekConfigurationValuesEvent ================
-void AmptekConfigurationValuesEvent::parseConfigurations(QStringList configurationList)
+void AmptekConfigurationValuesEvent::parseConfigurations(const QStringList &configurationList)
 {
 	for(int x = 0, size = configurationList.count(); x < size; x++){
 		configurationData_.parseConfiguration(configurationList.at(x));

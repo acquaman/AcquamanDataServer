@@ -22,6 +22,7 @@ public:
 	AmptekSDD123Packet(int packetID, const QByteArray &datagram, bool isForwarded = false, QObject *parent = 0);
 	AmptekSDD123Packet(const AmptekSDD123Packet &original);
 	AmptekSDD123Packet(int packetID, const AmptekSDD123Packet &original);
+	~AmptekSDD123Packet();
 
 	/// the = operation
 	AmptekSDD123Packet& operator=(const AmptekSDD123Packet &other);
@@ -37,9 +38,9 @@ public:
 	int dataLength() const;
 
 	/// parses and returns the spectrum byte array from the package datagram
-	QByteArray spectrumByteArray();
+	QByteArray spectrumByteArray() const;
 	/// parses and returns the status byte array from the package datagram
-	QByteArray statusByteArray();
+	QByteArray statusByteArray() const;
 
 	/// retuns the AmptekCommand
 	inline AmptekCommand amptekCommand() const { return amptekCommand_; }

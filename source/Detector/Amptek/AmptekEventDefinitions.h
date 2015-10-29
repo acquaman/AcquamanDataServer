@@ -74,7 +74,7 @@ public:
 	AmptekConfigurationData& operator =(const AmptekConfigurationData &other);
 
 	/// helper function to pase the configurations
-	void parseConfiguration(QString configuration);
+	void parseConfiguration(const QString &configuration);
 
 	int analogGainIndex_; //GAIA
 	double fineGain_; //GAIF
@@ -102,7 +102,7 @@ public:
 	AmptekConfigurationValuesEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::ConfigurationValuesEvent) {}
 
 	/// helper function to pase the list of configurations in the event
-	void parseConfigurations(QStringList configurationList);
+	void parseConfigurations(const QStringList &configurationList);
 
 	/// returns the configurationData
 	inline AmptekConfigurationData configurationData() { return configurationData_; }

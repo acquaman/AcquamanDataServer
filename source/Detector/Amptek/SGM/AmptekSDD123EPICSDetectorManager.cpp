@@ -178,7 +178,7 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime)
+void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime)
 {
 	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){
 		lastEPICSSpectrumUpdateTime_ = QTime::currentTime();
@@ -186,7 +186,7 @@ void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder 
 	}
 }
 
-void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime)
+void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime)
 {
 	dataHelper(spectrum, statusData, count, elapsedTime);
 
@@ -199,7 +199,7 @@ void AmptekSDD123EPICSDetectorManager::onSpectrumControlValueChanged(){
 	dwellStateControl_->move(0);
 }
 
-void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(AmptekConfigurationData configurationData){
+void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(const AmptekConfigurationData &configurationData){
 	if(!connected_)
 		return;
 

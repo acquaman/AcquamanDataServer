@@ -22,7 +22,7 @@ public:
 	AmptekCommand amptekCommandFromHex(const QString &hex) const;
 
 	/// returns the commandId with a given command
-	int commandId(const QString &command);
+	int commandId(const QString &command) const;
 	/// returns the command string from the command hex code
 	QString commandFromHex(const QString &hex) const;
 

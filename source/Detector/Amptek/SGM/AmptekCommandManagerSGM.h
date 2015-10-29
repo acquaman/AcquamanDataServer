@@ -90,7 +90,7 @@ protected:
 	/// implementation of the function to initialize the amptek commands and the hex mappling
 	virtual void initiateAmptekCommands();
 	/// helper function to create response from given texts
-	QStringList internalCreateResponsesFromText(QStringList texts);
+	QStringList internalCreateResponsesFromText(const QStringList &texts);
 
 protected:
 	/// static Instance variable

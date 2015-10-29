@@ -5,7 +5,7 @@
 #include "ClientRequest/AMDSClientDataRequest.h"
 #include "util/AMErrorMonitor.h"
 
-AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
+AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
 	QObject(parent)
 {
 	bufferGroupThread_= new QThread();

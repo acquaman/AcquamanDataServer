@@ -26,6 +26,7 @@ Q_OBJECT
 
 public:
 	AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurationMap, const QString &serverName, QObject *parent = 0);
+	~AmptekSDD123Server();
 
 	/// returns the statistics of dropped packets
 	QList<double> droppedPacketStatistics() const;
@@ -53,10 +54,10 @@ public slots:
 	/// request all text configuration parameters
 	void requestAllTextConfigurationParameters();
 	/// request text configuration readback with single/multi command request(s)
-	void textConfigurationReadback(QString singleCommandRequest);
-	void textConfigurationReadback(QStringList multiCommandRequest);
+	void textConfigurationReadback(const QString &singleCommandRequest);
+	void textConfigurationReadback(const QStringList &multiCommandRequest);
 	/// Sets a text configuration value. Must be the format of CMD=VALUE;
-	void textConfigurationSet(QString singleCommandRequest);
+	void textConfigurationSet(const QString &singleCommandRequest);
 
 	/// read the reply datagram
 	bool readReplyDatagram(int &id, QByteArray &datagram);
@@ -102,11 +103,11 @@ signals:
 
 protected slots:
 	/// helper function to send request datagram
-	void sendRequestDatagram(AmptekSDD123Packet packet, int overrideTimeout = -1);
+	void sendRequestDatagram(const AmptekSDD123Packet &packet, int overrideTimeout = -1);
 	/// helper function to send request datagram synchronizedly
-	void sendSyncDatagram(AmptekSDD123Packet packet, int overrideTimeout = -1);
+	void sendSyncDatagram(const AmptekSDD123Packet &packet, int overrideTimeout = -1);
 	/// helper function to send fake request datagram
-	void fakeSendDatagram(AmptekSDD123Packet packet, int overrideTimeout = -1);
+	void fakeSendDatagram(const AmptekSDD123Packet &packet, int overrideTimeout = -1);
 
 	/// helper function to percess pending diagrams
 	void processPendingDatagrams();
@@ -124,17 +125,17 @@ protected slots:
 
 protected:
 	/// helper function to handle the local timedout message queue for the responsePacket
-	void processLocalStoredPacket(AmptekSDD123Packet responsePacket);
+	void processLocalStoredPacket(const AmptekSDD123Packet &responsePacket);
 
 	/// helper function to send the response packet
-	void processResponseFeedback(AmptekSDD123Packet responsePacket);
+	void processResponseFeedback(const AmptekSDD123Packet &responsePacket);
 	/// helper function to post the spectrumPlusStatusReady response
-	void postSpectrumPlusStatusReadyResponse(QByteArray spectrumByteArray, QByteArray statusByteArray, int channelCount);
+	void postSpectrumPlusStatusReadyResponse(const QByteArray &spectrumByteArray, const QByteArray &statusByteArray, int channelCount);
 	/// helper function to post the configuration readback response
 	void postConfigurationReadbackResponse(const QString &ASCIICommands);
 
 	/// helper funtion to check the last request packet
-	void processLastRequestPacket(AmptekSDD123Packet lastRequestPacket);
+	void processLastRequestPacket(const AmptekSDD123Packet &lastRequestPacket);
 	/// helper function to send the first packet in queue
 	void sendPacketInQueue();
 

@@ -21,7 +21,7 @@ public:
 	~AmptekSDD123ThreadedDataServerGroup();
 
 	/// returns the AmptekServer at index
-	AmptekSDD123Server* serverAt(int index);
+	AmptekSDD123Server* serverAt(int index) const;
 
 signals:
 	/// signal to indicate that a server (index) changed to configuration state, which is originated from amptekServerGroup_
@@ -53,7 +53,7 @@ public:
 	virtual ~AmptekSDD123ServerGroup();
 
 	/// returns the AmptekServer at given index
-	AmptekSDD123Server* serverAt(int index);
+	AmptekSDD123Server* serverAt(int index) const;
 
 public slots:
 	/// slot to set the state of one server

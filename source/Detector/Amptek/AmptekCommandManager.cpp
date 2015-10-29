@@ -14,7 +14,7 @@ AmptekCommand AmptekCommandManager::amptekCommandFromHex(const QString &hex) con
 	return amptekCommand(command);
 }
 
-int AmptekCommandManager::commandId(const QString &command)
+int AmptekCommandManager::commandId(const QString &command) const
 {
 	return amptekCommand(command).commandId();
 }

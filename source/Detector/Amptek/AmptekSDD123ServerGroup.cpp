@@ -29,7 +29,7 @@ AmptekSDD123ThreadedDataServerGroup::~AmptekSDD123ThreadedDataServerGroup()
 	amptekServerGroupThread_->deleteLater();
 }
 
-AmptekSDD123Server*  AmptekSDD123ThreadedDataServerGroup::serverAt(int index)
+AmptekSDD123Server*  AmptekSDD123ThreadedDataServerGroup::serverAt(int index) const
 {
 	return amptekServerGroup_->serverAt(index);
 }
@@ -97,7 +97,8 @@ AmptekSDD123ServerGroup::~AmptekSDD123ServerGroup()
 	serverDwellStateMapper_->deleteLater();
 }
 
-AmptekSDD123Server* AmptekSDD123ServerGroup::serverAt(int index){
+AmptekSDD123Server* AmptekSDD123ServerGroup::serverAt(int index) const
+{
 	return servers_.at(index);
 }
 

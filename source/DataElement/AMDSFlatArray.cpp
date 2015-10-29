@@ -331,44 +331,34 @@ quint32 AMDSFlatArray::size() const{
 void AMDSFlatArray::clear(){
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:
-		vectorQint8_.clear();
-		vectorQint8_.resize(0);
+		vectorQint8_ = QVector<qint8>();
 		break;
 	case AMDSDataTypeDefinitions::Unsigned8:
-		vectorQuint8_.clear();
-		vectorQuint8_.resize(0);
+		vectorQuint8_ = QVector<quint8>();
 		break;
 	case AMDSDataTypeDefinitions::Signed16:
-		vectorQint16_.clear();
-		vectorQint16_.resize(0);
+		vectorQint16_ = QVector<qint16>();
 		break;
 	case AMDSDataTypeDefinitions::Unsigned16:
-		vectorQuint16_.clear();
-		vectorQuint16_.resize(0);
+		vectorQuint16_ = QVector<quint16>();
 		break;
 	case AMDSDataTypeDefinitions::Signed32:
-		vectorQint32_.clear();
-		vectorQint32_.resize(0);
+		vectorQint32_ = QVector<qint32>();
 		break;
 	case AMDSDataTypeDefinitions::Unsigned32:
-		vectorQuint32_.clear();
-		vectorQuint32_.resize(0);
+		vectorQuint32_ = QVector<quint32>();
 		break;
 	case AMDSDataTypeDefinitions::Signed64:
-		vectorQint64_.clear();
-		vectorQint64_.resize(0);
+		vectorQint64_ = QVector<qint64>();
 		break;
 	case AMDSDataTypeDefinitions::Unsigned64:
-		vectorQuint64_.clear();
-		vectorQuint64_.resize(0);
+		vectorQuint64_ = QVector<quint64>();
 		break;
 	case AMDSDataTypeDefinitions::Float:
-		vectorFloat_.clear();
-		vectorFloat_.resize(0);
+		vectorFloat_ = QVector<float>();
 		break;
 	case AMDSDataTypeDefinitions::Double:
-		vectorDouble_.clear();
-		vectorDouble_.resize(0);
+		vectorDouble_ = QVector<double>();
 		break;
 	case AMDSDataTypeDefinitions::InvalidType:
 		break;

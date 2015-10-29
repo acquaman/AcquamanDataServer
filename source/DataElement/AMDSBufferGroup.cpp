@@ -61,7 +61,7 @@ void AMDSBufferGroup::clear()
 	}
 }
 
-AMDSDataHolder* AMDSBufferGroup::at(int index)
+AMDSDataHolder* AMDSBufferGroup::at(int index) const
 {
 	QReadLocker readLock(&lock_);
 
@@ -320,7 +320,9 @@ void AMDSBufferGroup::populateData(AMDSClientContinuousDataRequest *clientDataRe
 		clientDataRequest->setLastFetchTime(lastDataTime);
 		// Since the last fetch actually included the data at the given time, we need to increment the index
 		// by one, to start from the one following:
-		populateData(clientDataRequest, startIndex++, dataHolders_.count());
+		populateData(clientDataRequest, startIndex, dataHolders_.count());
+
+		startIndex++;
 	}
 }
 

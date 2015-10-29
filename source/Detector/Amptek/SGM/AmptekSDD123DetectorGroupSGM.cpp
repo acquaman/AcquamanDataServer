@@ -4,7 +4,7 @@
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 #include "Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.h"
 
-AmptekSDD123DetectorGroupSGM::AmptekSDD123DetectorGroupSGM(QList<AmptekSDD123ConfigurationMap *> configurationMaps, QObject *parent) :
+AmptekSDD123DetectorGroupSGM::AmptekSDD123DetectorGroupSGM(const QList<AmptekSDD123ConfigurationMap *> &configurationMaps, QObject *parent) :
 	QObject(parent)
 {
 	QThread *amptekDetectorManagerThread;
@@ -37,6 +37,7 @@ AmptekSDD123DetectorGroupSGM::~AmptekSDD123DetectorGroupSGM()
 	detectorManagers_.clear();
 }
 
-QList<AmptekSDD123DetectorManager*> AmptekSDD123DetectorGroupSGM::detectorManagers(){
+QList<AmptekSDD123DetectorManager*> AmptekSDD123DetectorGroupSGM::detectorManagers() const
+{
 	return detectorManagers_.values();
 }

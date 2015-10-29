@@ -108,31 +108,31 @@ void AMDSCentralServerSGM::onServerChangedToDwellState(int index){
 	emit serverChangedToDwellState(index);
 }
 
-void AMDSCentralServerSGM::onClearHistrogramData(QString detectorName)
+void AMDSCentralServerSGM::onClearHistrogramData(const QString &detectorName)
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
 	bufferGroup->clear();
 }
 
-void AMDSCentralServerSGM::onClearDwellHistrogramData(QString detectorName)
+void AMDSCentralServerSGM::onClearDwellHistrogramData(const QString &detectorName)
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
 	bufferGroup->clear();
 }
 
-void AMDSCentralServerSGM::onNewHistrogramReceived(QString detectorName, AMDSDataHolder *dataHolder)
+void AMDSCentralServerSGM::onNewHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder)
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
 	bufferGroup->append(dataHolder);
 }
 
-void AMDSCentralServerSGM::onNewDwellHistrogramReceived(QString detectorName, AMDSDataHolder *dataHolder, double elapsedTime)
+void AMDSCentralServerSGM::onNewDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder, double elapsedTime)
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
 	bufferGroup->append(dataHolder, elapsedTime);
 }
 
-void AMDSCentralServerSGM::onDwellFinishedUpdate(QString detectorName, double elapsedTime)
+void AMDSCentralServerSGM::onDwellFinishedUpdate(const QString &detectorName, double elapsedTime)
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
 	bufferGroup->finishDwellDataUpdate(elapsedTime);

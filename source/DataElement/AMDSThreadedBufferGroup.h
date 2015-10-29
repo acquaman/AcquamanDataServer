@@ -13,7 +13,7 @@ class AMDSThreadedBufferGroup : public QObject
 {
 	Q_OBJECT
 public:
-	AMDSThreadedBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxCountSize, bool enableCumulative = false, QObject *parent = 0);
+	AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, bool enableCumulative = false, QObject *parent = 0);
 	~AMDSThreadedBufferGroup();
 
 	/// returns the bufferGroupInfo of the bufferGroupManager

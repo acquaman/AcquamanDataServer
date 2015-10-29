@@ -18,11 +18,11 @@ public:
 
 protected slots:
 	/// slot to handle continuous data update
-	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime) ;
+	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime) ;
 	/// slot to handle dwell finish data update
-	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime);
+	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime);
 	/// slot to handle configuration value update signal
-	void onConfigurationValuesUpdate(AmptekConfigurationData configurationData);
+	void onConfigurationValuesUpdate(const AmptekConfigurationData &configurationData);
 
 	void onSpectrumControlValueChanged();
 
