@@ -57,7 +57,8 @@ void AMDSLightWeightEventData::cloneData(AMDSEventData *sourceEventData)
 	setEventTime(sourceEventData->eventTime());
 }
 
-bool AMDSLightWeightEventData::writeToDataStream(QDataStream *dataStream) const{
+bool AMDSLightWeightEventData::writeToDataStream(QDataStream *dataStream)
+{
 	//encodeEventDataType
 	QString eventDataClassNameAsString(metaObject()->className());
 	*dataStream << eventDataClassNameAsString;
@@ -126,7 +127,8 @@ void AMDSFullEventData::cloneData(AMDSEventData *sourceEventData)
 	}
 }
 
-bool AMDSFullEventData::writeToDataStream(QDataStream *dataStream) const{
+bool AMDSFullEventData::writeToDataStream(QDataStream *dataStream)
+{
 	if(!lightWeightEventData_->writeToDataStream(dataStream))
 		return false;
 

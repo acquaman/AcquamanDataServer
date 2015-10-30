@@ -40,7 +40,7 @@ public:
 
 protected:
 	/// Writes this AMDSClientIntrospectionRequest to an QDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(QDataStream *dataStream) const;
+	virtual int writeToDataStream(QDataStream *dataStream);
 	/// Reads this AMDSClientIntrospectionRequest from the QDataStream, returns 0 if no errors are encountered
 	virtual int readFromDataStream(QDataStream *dataStream);
 

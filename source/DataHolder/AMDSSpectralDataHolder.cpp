@@ -118,7 +118,7 @@ void AMDSDwellSpectralDataHolder::setDwellStatusData(const AMDSDwellStatusData &
 	eventData_->setEventTime(eventTime)*/;
 }
 
-bool AMDSDwellSpectralDataHolder::writeToDataStream(QDataStream *dataStream) const
+bool AMDSDwellSpectralDataHolder::writeToDataStream(QDataStream *dataStream)
 {
 	if (!AMDSLightWeightSpectralDataHolder::writeToDataStream(dataStream))
 		return false;

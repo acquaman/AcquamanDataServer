@@ -22,7 +22,7 @@ public:
 	/// read data from dataStream and write to the dwellStatusData
 	bool readFromDataStream(QDataStream *dataStream);
 	/// write status data of the dataArray to dataStream
-	bool writeToDataStream(QDataStream *dataStream) const;
+	bool writeToDataStream(QDataStream *dataStream);
 
 	/// print the result of DwellStatusData to a string
 	QString toString() const;

@@ -47,7 +47,7 @@ void AMDSClientRelativeCountPlusCountDataRequest::setAttributesValues(const QStr
 }
 
 
-int AMDSClientRelativeCountPlusCountDataRequest::writeToDataStream(QDataStream *dataStream) const
+int AMDSClientRelativeCountPlusCountDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

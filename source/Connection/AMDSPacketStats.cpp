@@ -11,7 +11,7 @@ AMDSPacketStats::AMDSPacketStats(const QString &name, quint64 inboundBytes, quin
 	maxTotalBytes_ = maxTotalBytes;
 }
 
-bool AMDSPacketStats::writeToDataStream(QDataStream *dataStream) const
+bool AMDSPacketStats::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream << name();
 	*dataStream <<((quint64)(inboundBytes()));

@@ -160,7 +160,7 @@ void AMDSClientContinuousDataRequest::onDataRequestTimerTimeout()
 	emit sendNewContinuousDataRequest(this);
 }
 
-int AMDSClientContinuousDataRequest::writeToDataStream(QDataStream *dataStream) const
+int AMDSClientContinuousDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

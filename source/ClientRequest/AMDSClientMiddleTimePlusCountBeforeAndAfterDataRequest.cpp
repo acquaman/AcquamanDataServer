@@ -49,7 +49,7 @@ void AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::setAttributesValues
 	setCountAfter(countAfter);
 }
 
-int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::writeToDataStream(QDataStream *dataStream) const
+int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

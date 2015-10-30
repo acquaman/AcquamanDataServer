@@ -93,7 +93,7 @@ void AMDSClientRequest::printData()
 	AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
 }
 
-int AMDSClientRequest::writeToDataStream(QDataStream *dataStream) const
+int AMDSClientRequest::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream <<((quint8)requestType());
 	if(dataStream->status() != QDataStream::Ok)

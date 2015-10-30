@@ -45,7 +45,7 @@ void AMDSClientStartTimeToEndTimeDataRequest::setAttributesValues(const QString 
 	setEndTime(endTime);
 }
 
-int AMDSClientStartTimeToEndTimeDataRequest::writeToDataStream(QDataStream *dataStream) const
+int AMDSClientStartTimeToEndTimeDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

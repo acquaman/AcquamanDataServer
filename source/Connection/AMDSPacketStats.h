@@ -11,7 +11,7 @@ public:
 	AMDSPacketStats(const QString &name = QString(), quint64 inboundBytes = 0, quint64 outboundBytes = 0, quint64 maxInboundBytes = 0, quint64 maxOutboundBytes = 0, quint64 maxTotalBytes = 0);
 
 	/// Writes this AMDSPacketStats to an QDataStream, returns true if no errors are encountered
-	bool writeToDataStream(QDataStream *dataStream) const;
+	bool writeToDataStream(QDataStream *dataStream);
 	/// Reads this AMDSPacketStats from the QDataStream, returns true if no errors are encountered
 	bool readFromDataStream(QDataStream *dataStream);
 

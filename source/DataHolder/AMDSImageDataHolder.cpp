@@ -11,7 +11,7 @@ AMDSLightWeightImageDataHolder::~AMDSLightWeightImageDataHolder()
 {
 }
 
-bool AMDSLightWeightImageDataHolder::writeToDataStream(QDataStream *dataStream) const
+bool AMDSLightWeightImageDataHolder::writeToDataStream(QDataStream *dataStream)
 {
 	if (!AMDSLightWeightGenericFlatArrayDataHolder::writeToDataStream(dataStream))
 		return false;

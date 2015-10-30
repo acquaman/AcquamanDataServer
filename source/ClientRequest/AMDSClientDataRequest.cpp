@@ -100,7 +100,7 @@ QString AMDSClientDataRequest::toString() const
 	return messageData;
 }
 
-int AMDSClientDataRequest::writeToDataStream(QDataStream *dataStream) const
+int AMDSClientDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
 	if(errorCode != AMDS_CLIENTREQUEST_SUCCESS)

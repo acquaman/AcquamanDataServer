@@ -44,7 +44,7 @@ void AMDSClientStartTimePlusCountDataRequest::setAttributesValues(const QString 
 	setCount(count);
 }
 
-int AMDSClientStartTimePlusCountDataRequest::writeToDataStream(QDataStream *dataStream) const
+int AMDSClientStartTimePlusCountDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

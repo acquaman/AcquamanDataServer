@@ -48,7 +48,7 @@ public:
 	virtual AMDSEventData& operator =(AMDSEventData &sourceEventData);
 
 	/// Writes this AMDSEventData to an QDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(QDataStream *dataStream) const = 0;
+	virtual bool writeToDataStream(QDataStream *dataStream) = 0;
 	/// Reads this AMDSEventData from the QDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(QDataStream *dataStream) = 0;
 };
@@ -75,7 +75,7 @@ public:
 	virtual void cloneData(AMDSEventData *sourceEventData);
 
 	/// Writes this AMDSEventData to an QDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(QDataStream *dataStream) const;
+	virtual bool writeToDataStream(QDataStream *dataStream);
 	/// Reads this AMDSEventData from the QDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(QDataStream *dataStream);
 
@@ -105,7 +105,7 @@ public:
 	virtual void cloneData(AMDSEventData *sourceEventData);
 
 	/// Writes this AMDSEventData to an QDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(QDataStream *dataStream) const;
+	virtual bool writeToDataStream(QDataStream *dataStream);
 	/// Reads this AMDSEventData from the QDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(QDataStream *dataStream);
 

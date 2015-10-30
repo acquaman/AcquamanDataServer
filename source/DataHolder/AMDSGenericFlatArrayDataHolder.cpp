@@ -55,7 +55,7 @@ void AMDSLightWeightGenericFlatArrayDataHolder::cloneData(AMDSDataHolder *source
 	sourceLightWeightGenericFlatArrayDataHolder->dataArray().resetTargetArrayAndReplaceData(&valueFlatArray_);
 }
 
-bool AMDSLightWeightGenericFlatArrayDataHolder::writeToDataStream(QDataStream *dataStream) const
+bool AMDSLightWeightGenericFlatArrayDataHolder::writeToDataStream(QDataStream *dataStream)
 {
 	// This will take care of encoding and writing our eventData to the stream
 	if(!AMDSLightWeightDataHolder::writeToDataStream(dataStream))

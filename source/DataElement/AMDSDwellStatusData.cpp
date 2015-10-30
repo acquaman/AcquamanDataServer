@@ -106,7 +106,7 @@ bool AMDSDwellStatusData::readFromDataStream(QDataStream *dataStream)
 	return true;
 }
 
-bool AMDSDwellStatusData::writeToDataStream(QDataStream *dataStream) const
+bool AMDSDwellStatusData::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream << fastCounts_;
 	if(dataStream->status() != QDataStream::Ok)

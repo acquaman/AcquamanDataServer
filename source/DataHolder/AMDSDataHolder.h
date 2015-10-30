@@ -91,7 +91,7 @@ public:
 
 	/// NOTE: although this is public, but it is NOT suggested to use by the classes other than DataHolder classes
 	/// virtual function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered. By default the data type is encoded into the stream; however, this can be disabled and moved to a higher level if need be.
-	virtual bool writeToDataStream(QDataStream *dataStream) const;
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
 	/// virtual function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered. By default the data type is decoded from the stream; however, passing a particular data type will assume that there is no data type encoded in the stream.
 	virtual bool readFromDataStream(QDataStream *dataStream);
 };
@@ -129,7 +129,7 @@ public:
 
 	/// NOTE: although this is public, but it is NOT suggested to use by the classes other than DataHolder classes
 	/// implement the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(QDataStream *dataStream) const;
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
 	/// implement the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(QDataStream *dataStream);
 
@@ -193,7 +193,7 @@ public:
 
 protected:
 	/// implment the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(QDataStream *dataStream) const;
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
 	/// implent the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(QDataStream *dataStream);
 

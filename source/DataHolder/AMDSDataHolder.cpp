@@ -44,7 +44,7 @@ AMDSDataHolder& AMDSDataHolder::operator =(AMDSDataHolder &dataHolder)
 	return (*this);
 }
 
-bool AMDSDataHolder::writeToDataStream(QDataStream *dataStream) const
+bool AMDSDataHolder::writeToDataStream(QDataStream *dataStream)
 {
 
 	*dataStream << QString(metaObject()->className());
@@ -105,7 +105,7 @@ void AMDSLightWeightDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 	}
 }
 
-bool AMDSLightWeightDataHolder::writeToDataStream(QDataStream *dataStream) const
+bool AMDSLightWeightDataHolder::writeToDataStream(QDataStream *dataStream)
 {
 	if (! AMDSDataHolder::writeToDataStream(dataStream)) {
 		return false;
@@ -189,7 +189,7 @@ void AMDSFullDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 	}
 }
 
-bool AMDSFullDataHolder::writeToDataStream(QDataStream *dataStream) const
+bool AMDSFullDataHolder::writeToDataStream(QDataStream *dataStream)
 {
 	if (!AMDSDataHolder::writeToDataStream(dataStream)) {
 		return false;
@@ -214,7 +214,8 @@ bool AMDSFullDataHolder::writeToDataStream(QDataStream *dataStream) const
 		return false;
 
 	for(int x = 0, size = axes_.count(); x < size; x++){
-		if (!axes_.at(x).writeToDataStream(dataStream))
+		AMDSAxisInfo axisInfo = axes_.at(x);
+		if (!axisInfo.writeToDataStream(dataStream))
 			return false;
 	}
 

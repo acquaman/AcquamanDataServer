@@ -31,7 +31,7 @@ public:
 
 protected:
 	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an QDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(QDataStream *dataStream) const;
+	virtual int writeToDataStream(QDataStream *dataStream);
 	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the QDataStream, returns 0 if no errors are encountered
 	virtual int readFromDataStream(QDataStream *dataStream);
 

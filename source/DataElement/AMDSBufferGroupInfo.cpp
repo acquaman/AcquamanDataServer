@@ -26,7 +26,7 @@ AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& o
 	return *this;
 }
 
-bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream) const
+bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream << name();
 	*dataStream << description();
@@ -34,7 +34,8 @@ bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream) const
 	*dataStream << ((quint8)flattenMethod());
 	*dataStream <<((quint8)(axes().count()));
 	for(int x = 0, size = axes().count(); x < size; x++) {
-		axes().at(x).writeToDataStream(dataStream);
+		AMDSAxisInfo axisInfo = axes().at(x);
+		axisInfo.writeToDataStream(dataStream);
 	}
 
 	return true;

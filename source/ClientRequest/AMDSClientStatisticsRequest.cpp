@@ -34,7 +34,7 @@ AMDSClientStatisticsRequest& AMDSClientStatisticsRequest::operator =(const AMDSC
 	return (*this);
 }
 
-int AMDSClientStatisticsRequest::writeToDataStream(QDataStream *dataStream) const
+int AMDSClientStatisticsRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -44,8 +44,10 @@ int AMDSClientStatisticsRequest::writeToDataStream(QDataStream *dataStream) cons
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_PACKET_STATS_COUNT;
 
-	for(int x = 0, size = packetStats().count(); x < size; x++)
-		packetStats().at(x).writeToDataStream(dataStream);
+	for(int x = 0, size = packetStats().count(); x < size; x++) {
+		AMDSPacketStats newPacketStats = packetStats().at(x);
+		newPacketStats.writeToDataStream(dataStream);
+	}
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }

@@ -35,7 +35,7 @@ public:
 
 	/// NOTE: although this is public, but it is NOT suggested to use by the classes other than DataHolder classes
 	/// reimplement the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(QDataStream *dataStream) const;
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
 	/// reimplement the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
 	virtual bool readFromDataStream(QDataStream *dataStream);
 

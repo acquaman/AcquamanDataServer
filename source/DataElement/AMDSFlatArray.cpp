@@ -435,7 +435,7 @@ bool AMDSFlatArray::readFromDataStream(QDataStream *dataStream)
 	return true;
 }
 
-bool AMDSFlatArray::writeToDataStream(QDataStream *dataStream) const
+bool AMDSFlatArray::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream << ((quint8)dataType_);
 	*dataStream << (size());

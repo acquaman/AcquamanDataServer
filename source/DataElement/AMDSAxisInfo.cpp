@@ -69,7 +69,7 @@ bool AMDSAxisInfo::readFromDataStream(QDataStream *dataStream)
 	return true;
 }
 
-bool AMDSAxisInfo::writeToDataStream(QDataStream *dataStream) const
+bool AMDSAxisInfo::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream << name();
 	*dataStream << description();
