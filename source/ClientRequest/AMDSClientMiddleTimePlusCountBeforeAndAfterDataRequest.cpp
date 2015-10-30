@@ -1,7 +1,5 @@
 #include "AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
-
 AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)
 {
@@ -51,7 +49,7 @@ void AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::setAttributesValues
 	setCountAfter(countAfter);
 }
 
-int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::writeToDataStream(QDataStream *dataStream) const
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -70,7 +68,7 @@ int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::writeToDataStream(AM
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

@@ -373,10 +373,25 @@ void AMDSFlatArray::clearAndReset(AMDSDataTypeDefinitions::DataType dataType, qu
 	resizeType(dataType, size);
 }
 
-void AMDSFlatArray::read(QDataStream *dataStream, quint32 size)
+bool AMDSFlatArray::readFromDataStream(QDataStream *dataStream)
 {
+	// read the data type
+	quint8 dataTypeAsInt;
+	*dataStream >>(dataTypeAsInt);
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
+	dataType_ = (AMDSDataTypeDefinitions::DataType)dataTypeAsInt;
+
+	// read the data size
+	quint32 size;
+	*dataStream >>(size);
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	clearAndReset(dataType_, size);
 
+	// read the data
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:
 		*dataStream >> vectorQint8();
@@ -413,10 +428,18 @@ void AMDSFlatArray::read(QDataStream *dataStream, quint32 size)
 	default:
 		break;
 	}
+
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
+	return true;
 }
 
-void AMDSFlatArray::write(QDataStream *dataStream) const
+bool AMDSFlatArray::writeToDataStream(QDataStream *dataStream) const
 {
+	*dataStream << ((quint8)dataType_);
+	*dataStream << (size());
+
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:
 		*dataStream << constVectorQint8();
@@ -453,6 +476,8 @@ void AMDSFlatArray::write(QDataStream *dataStream) const
 	default:
 		break;
 	}
+
+	return true;
 }
 
 bool AMDSFlatArray::copyDataToTargetArray(AMDSFlatArray *targetArray) const{

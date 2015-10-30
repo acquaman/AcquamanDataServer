@@ -1,7 +1,5 @@
 #include "AMDSSpectralDataHolder.h"
 
-#include "source/Connection/AMDSDataStream.h"
-
 /// ===================== Implementation of AMDSLightWeightSpectralDataHolder ==============================
 AMDSLightWeightSpectralDataHolder::AMDSLightWeightSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, QObject *parent) :
 	AMDSLightWeightGenericFlatArrayDataHolder(dataType, size, parent)
@@ -19,14 +17,6 @@ AMDSLightWeightSpectralDataHolder::~AMDSLightWeightSpectralDataHolder()
 {
 }
 
-bool AMDSLightWeightSpectralDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
-	return AMDSLightWeightGenericFlatArrayDataHolder::writeToDataStream(dataStream, encodeDataType);
-}
-
-bool AMDSLightWeightSpectralDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
-	return AMDSLightWeightGenericFlatArrayDataHolder::readFromDataStream(dataStream, decodeAsDataType);
-}
-
 /// ===================== Implementation of AMDSFullSpectralDataHolder ==============================
 AMDSFullSpectralDataHolder::AMDSFullSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, AMDSDataHolder::AxesStyle axesStyle, AMDSDataHolder::DataTypeStyle dataTypeStyle, const QList<AMDSAxisInfo> &axes, QObject *parent) :
 	AMDSFullGenericFlatArrayDataHolder(dataType, size, axesStyle, dataTypeStyle, axes, parent)
@@ -36,22 +26,6 @@ AMDSFullSpectralDataHolder::AMDSFullSpectralDataHolder(AMDSDataTypeDefinitions::
 
 AMDSFullSpectralDataHolder::~AMDSFullSpectralDataHolder()
 {
-}
-
-bool AMDSFullSpectralDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
-	// This will take care of encoding and writing our lightWeightDataHolder to the stream
-	if(!AMDSFullGenericFlatArrayDataHolder::writeToDataStream(dataStream, encodeDataType))
-		return false;
-
-	return true;
-}
-
-bool AMDSFullSpectralDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
-	// This will take care of decoding and instantiating our lightWeightDataHolder from the stream (and deleting any old memory we allocated for one before)
-	if(!AMDSFullGenericFlatArrayDataHolder::readFromDataStream(dataStream, decodeAsDataType))
-		return false;
-
-	return true;
 }
 
 /// ===================== Implementation of AMDSDwellSpectralDataHolder ==============================
@@ -134,9 +108,19 @@ void AMDSDwellSpectralDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 	}
 }
 
-bool AMDSDwellSpectralDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const
+
+void AMDSDwellSpectralDataHolder::setDwellStatusData(const AMDSDwellStatusData &statusData){
+	dwellStatusData_ = statusData;
+/*
+	QDateTime eventTime = eventData_->eventTime();
+	eventTime.setTime(statusData.dwellStartTime());
+
+	eventData_->setEventTime(eventTime)*/;
+}
+
+bool AMDSDwellSpectralDataHolder::writeToDataStream(QDataStream *dataStream) const
 {
-	if (!AMDSLightWeightSpectralDataHolder::writeToDataStream(dataStream, encodeDataType))
+	if (!AMDSLightWeightSpectralDataHolder::writeToDataStream(dataStream))
 		return false;
 
 	dwellStatusData_.writeToDataStream(dataStream);
@@ -146,9 +130,9 @@ bool AMDSDwellSpectralDataHolder::writeToDataStream(AMDSDataStream *dataStream, 
 	return true;
 }
 
-bool AMDSDwellSpectralDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType)
+bool AMDSDwellSpectralDataHolder::readFromDataStream(QDataStream *dataStream)
 {
-	if (!AMDSLightWeightSpectralDataHolder::readFromDataStream(dataStream, decodeAsDataType))
+	if (!AMDSLightWeightSpectralDataHolder::readFromDataStream(dataStream))
 		return false;
 
 	dwellStatusData_.readFromDataStream(dataStream);
@@ -156,13 +140,4 @@ bool AMDSDwellSpectralDataHolder::readFromDataStream(AMDSDataStream *dataStream,
 		return false;
 
 	return true;
-}
-
-void AMDSDwellSpectralDataHolder::setDwellStatusData(const AMDSDwellStatusData &statusData){
-	dwellStatusData_ = statusData;
-/*
-	QDateTime eventTime = eventData_->eventTime();
-	eventTime.setTime(statusData.dwellStartTime());
-
-	eventData_->setEventTime(eventTime)*/;
 }

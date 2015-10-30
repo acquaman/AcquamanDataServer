@@ -1,8 +1,8 @@
 #ifndef AMDSCLIENTSTATISTICSREQUEST_H
 #define AMDSCLIENTSTATISTICSREQUEST_H
 
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/Connection/AMDSPacketStats.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "Connection/AMDSPacketStats.h"
 
 class AMDSClientStatisticsRequest : public AMDSClientRequest
 {
@@ -25,10 +25,11 @@ public:
 	/// Clears the list of packet stats
 	inline void clearPacketStats() { packetStats_.clear(); }
 
-	/// Writes this AMDSClientStatisticsRequest to an AMDSDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientStatisticsRequest from the AMDSDataStream, returns 0 if no errors are encountered
-	virtual int readFromDataStream(AMDSDataStream *dataStream);
+protected:
+	/// Writes this AMDSClientStatisticsRequest to an QDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(QDataStream *dataStream) const;
+	/// Reads this AMDSClientStatisticsRequest from the QDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(QDataStream *dataStream);
 
 	/// implement the function to return a data string of the message
 	virtual QString toString() const;

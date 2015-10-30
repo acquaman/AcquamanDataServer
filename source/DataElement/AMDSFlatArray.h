@@ -4,7 +4,7 @@
 #include <QVector>
 #include <QString>
 
-#include "source/DataElement/AMDSDataTypeDefinitions.h"
+#include "DataElement/AMDSDataTypeDefinitions.h"
 
 class AMDSFlatArray
 {
@@ -49,9 +49,9 @@ public:
 	void clearAndReset(AMDSDataTypeDefinitions::DataType dataType, quint32 size);
 
 	/// read data from dataStream and write to the dataArray
-	void read(QDataStream *dataStream, quint32 size);
+	bool readFromDataStream(QDataStream *dataStream);
 	/// write data of the dataArray to dataStream
-	void write(QDataStream *dataStream) const;
+	bool writeToDataStream(QDataStream *dataStream) const;
 
 	/// copy the data array of the current dataset to the target array
 	bool copyDataToTargetArray(AMDSFlatArray *targetArray) const;

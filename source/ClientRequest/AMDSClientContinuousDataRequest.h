@@ -62,11 +62,6 @@ public:
 	/// Sets the values of all the data attributes of client request
 	void setAttributesValues(bool includeStatusData, bool flattenResultData, const QStringList &bufferNames, quint64 updateInterval, const QString &handShakeSocketKey);
 
-	/// Writes this AMDSClientContinuousRequest to an AMDSDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientContinuousRequest from the AMDSDataStream, returns 0 if no errors are encountered
-	virtual int readFromDataStream(AMDSDataStream *dataStream);
-
 	/// start the coninuousRequestTimer for next message
 	bool startContinuousRequestTimer();
 
@@ -84,6 +79,12 @@ signals:
 protected slots:
 	/// to handle the timeout message of the timer: to send the new message
 	void onDataRequestTimerTimeout();
+
+protected:
+	/// Writes this AMDSClientContinuousRequest to an QDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(QDataStream *dataStream) const;
+	/// Reads this AMDSClientContinuousRequest from the QDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// the timer of continuous request

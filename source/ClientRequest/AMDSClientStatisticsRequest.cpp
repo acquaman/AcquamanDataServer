@@ -1,6 +1,5 @@
-#include "source/ClientRequest/AMDSClientStatisticsRequest.h"
+#include "AMDSClientStatisticsRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(QObject *parent) :
 	AMDSClientRequest(parent)
@@ -35,7 +34,7 @@ AMDSClientStatisticsRequest& AMDSClientStatisticsRequest::operator =(const AMDSC
 	return (*this);
 }
 
-int AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientStatisticsRequest::writeToDataStream(QDataStream *dataStream) const
 {
 	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -51,7 +50,7 @@ int AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) c
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientStatisticsRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::readFromDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

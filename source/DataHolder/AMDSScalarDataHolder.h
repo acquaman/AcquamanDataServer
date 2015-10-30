@@ -1,7 +1,7 @@
 #ifndef AMDSSCALARDATAHOLDER_H
 #define AMDSSCALARDATAHOLDER_H
 
-#include "source/DataHolder/AMDSGenericFlatArrayDataHolder.h"
+#include "DataHolder/AMDSGenericFlatArrayDataHolder.h"
 
 class AMDSLightWeightScalarDataHolder : public AMDSLightWeightGenericFlatArrayDataHolder
 {
@@ -33,11 +33,6 @@ public:
 	virtual inline bool setSingleValue(quint64 singleValue);
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
-
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
 class AMDSFullScalarDataHolder : public AMDSFullGenericFlatArrayDataHolder
@@ -58,11 +53,6 @@ public:
 	virtual inline bool setSingleValue(quint64 singleValue);
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
-
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
 };
 

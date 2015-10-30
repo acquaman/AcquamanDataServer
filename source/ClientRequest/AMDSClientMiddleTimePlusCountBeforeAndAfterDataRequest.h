@@ -1,9 +1,9 @@
 #ifndef AMDSCLIENTMIDDLETIMEPLUSCOUNTBEFOREANDAFTERDATAREQUEST_H
 #define AMDSCLIENTMIDDLETIMEPLUSCOUNTBEFOREANDAFTERDATAREQUEST_H
 
-#include "AMDSClientDataRequest.h"
-
 #include <QDateTime>
+
+#include "ClientRequest/AMDSClientDataRequest.h"
 
 class AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest : public AMDSClientDataRequest
 {
@@ -35,10 +35,11 @@ public:
 	/// Sets the values of all the data attributes of client request
 	void setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &MiddleTime, quint64 countBefore, quint64 countAfter);
 
-	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an AMDSDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the AMDSDataStream, returns 0 if no errors are encountered
-	virtual int readFromDataStream(AMDSDataStream *dataStream);
+protected:
+	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an QDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(QDataStream *dataStream) const;
+	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the QDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// Middle time for data

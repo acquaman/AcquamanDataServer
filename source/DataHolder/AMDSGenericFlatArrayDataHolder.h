@@ -1,7 +1,7 @@
 #ifndef AMDSGENERICFLATARRAYDATAHOLDER_H
 #define AMDSGENERICFLATARRAYDATAHOLDER_H
 
-#include "source/DataHolder/AMDSDataHolder.h"
+#include "DataHolder/AMDSDataHolder.h"
 
 class AMDSLightWeightGenericFlatArrayDataHolder : public AMDSLightWeightDataHolder
 {
@@ -13,6 +13,8 @@ public:
 
 	/// Implement the function to return the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const;
+	/// Returns the flat data array
+	inline AMDSFlatArray &dataArray() { return valueFlatArray_; }
 
 	/// Implement the PLUS operation of AMDSLightWeightDataHolder, which will plus the value of the two instances of AMDSLightWeightDataHolder and return the new instance
 	virtual AMDSDataHolder* operator +(AMDSDataHolder &dataHolder);
@@ -30,13 +32,12 @@ public:
 
 	/// reimplement the function copy the value of source instance to the current instance
 	virtual void cloneData(AMDSDataHolder *dataHolder);
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 
-	/// Returns the flat data array
-	inline AMDSFlatArray &dataArray() { return valueFlatArray_; }
+	/// NOTE: although this is public, but it is NOT suggested to use by the classes other than DataHolder classes
+	/// reimplement the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream) const;
+	/// reimplement the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// the data array instance
@@ -49,11 +50,6 @@ Q_OBJECT
 public:
 	AMDSFullGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, AMDSDataHolder::AxesStyle axesStyle = AMDSDataHolder::UniformAxes, AMDSDataHolder::DataTypeStyle dataTypeStyle = AMDSDataHolder::UniformDataType, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>(), QObject *parent = 0);
 	virtual ~AMDSFullGenericFlatArrayDataHolder();
-
-	/// Reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
 ////////////////////////////////////////

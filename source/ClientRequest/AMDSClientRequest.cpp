@@ -1,7 +1,53 @@
-#include "source/ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
+#include "ClientRequest/AMDSClientRequestSupport.h"
 #include "util/AMErrorMonitor.h"
+
+AMDSClientRequest* AMDSClientRequest::decodeAndInstantiateClientRequest(QDataStream *dataStream)
+{
+	AMDSClientRequest* clientRequest = 0;
+	int parseResult = AMDS_CLIENTREQUEST_SUCCESS;
+
+	AMDSClientRequestDefinitions::RequestType clientRequestType = AMDSClientRequestDefinitions::InvalidRequest;
+
+	quint8 clientRequestTypeAsInt;
+	*dataStream >>(clientRequestTypeAsInt);
+	if(dataStream->status() != QDataStream::Ok) {
+		parseResult = AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_MESSAGE_TYPE;
+	}
+
+	if (parseResult == AMDS_CLIENTREQUEST_SUCCESS) {
+		clientRequestType = (AMDSClientRequestDefinitions::RequestType)clientRequestTypeAsInt;
+		clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
+		if (!clientRequest) {
+			parseResult = AMDS_CLIENTREQUEST_INVALID_MESSAGE_TYPE;
+		} else {
+			parseResult = clientRequest->readFromDataStream(dataStream);
+		}
+	}
+
+	if (parseResult != AMDS_CLIENTREQUEST_SUCCESS) {
+		clientRequest = 0;
+
+		QString errMessage = AMDSClientRequestDefinitions::errorMessage(parseResult, AMDSClientRequestDefinitions::Read, clientRequestType);
+		AMErrorMon::information(0, parseResult, QString("AMDSClientRequest::Failed to parse clientRequest. Error: %1").arg(errMessage));
+	}
+
+	return clientRequest;
+}
+
+bool AMDSClientRequest::encodeAndwriteClientRequest(QDataStream *dataStream, AMDSClientRequest *clientRequest)
+{
+	int result = clientRequest->writeToDataStream(dataStream);
+	if ( result != AMDS_CLIENTREQUEST_SUCCESS ) {
+		QString errorMsg = AMDSClientRequestDefinitions::errorMessage(result, AMDSClientRequestDefinitions::Write, clientRequest->requestType());
+		AMErrorMon::error(0, result, errorMsg);
+
+		return false;
+	}
+
+	return true;
+}
 
 AMDSClientRequest::AMDSClientRequest(QObject *parent) :
 	QObject(parent)
@@ -42,14 +88,25 @@ bool AMDSClientRequest::isDataClientRequest() {
 			|| requestType() == AMDSClientRequestDefinitions::Continuous ;
 }
 
-int AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const
+void AMDSClientRequest::printData()
 {
+	AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
+}
+
+int AMDSClientRequest::writeToDataStream(QDataStream *dataStream) const
+{
+	*dataStream <<((quint8)requestType());
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_MESSAGE_TYPE;
+
 	*dataStream << socketKey_;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_SOCKET_KEY;
+
 	*dataStream << errorMessage_;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_ERROR_MESSAGE;
+
 	*dataStream << (quint8)responseType_;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_RESPONSE_TYPE;
@@ -57,8 +114,9 @@ int AMDSClientRequest::writeToDataStream(AMDSDataStream *dataStream) const
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientRequest::readFromDataStream(QDataStream *dataStream)
 {
+
 	QString readSocketKey;
 	QString readErrorMessage;
 	quint8 readResponseType;
@@ -66,9 +124,11 @@ int AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
 	*dataStream >> readSocketKey;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_STATUS;
+
 	*dataStream >> readErrorMessage;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_ERROR_MESSAGE;
+
 	*dataStream >> readResponseType;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_RESPONSE_TYPE;
@@ -77,11 +137,6 @@ int AMDSClientRequest::readFromDataStream(AMDSDataStream *dataStream)
 	setBaseAttributesValues(readSocketKey, readErrorMessage, requestType(), (AMDSClientRequest::ResponseType)readResponseType);
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
-}
-
-void AMDSClientRequest::printData()
-{
-	AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
 }
 
 void AMDSClientRequest::setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType)

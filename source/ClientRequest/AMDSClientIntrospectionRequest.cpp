@@ -1,7 +1,5 @@
 #include "AMDSClientIntrospectionRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
-
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(QObject *parent) :
 	AMDSClientRequest(parent)
 {
@@ -52,7 +50,7 @@ QStringList AMDSClientIntrospectionRequest::getAllBufferNames()
 	return bufferNames;
 }
 
-int AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientIntrospectionRequest::writeToDataStream(QDataStream *dataStream) const
 {
 	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -73,7 +71,7 @@ int AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientIntrospectionRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::readFromDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

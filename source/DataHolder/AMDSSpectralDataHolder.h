@@ -13,11 +13,6 @@ public:
 	Q_INVOKABLE AMDSLightWeightSpectralDataHolder(AMDSLightWeightSpectralDataHolder *sourceDataHolder, QObject *parent = 0);
 	virtual ~AMDSLightWeightSpectralDataHolder();
 
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
-
 	/// implement the function to return axes information
 	virtual inline QList<AMDSAxisInfo> axes() const;
 	/// implement the function to return the rank information (size of Axes)
@@ -34,11 +29,6 @@ Q_OBJECT
 public:
 	Q_INVOKABLE AMDSFullSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, AMDSDataHolder::AxesStyle axesStyle = AMDSDataHolder::UniformAxes, AMDSDataHolder::DataTypeStyle dataTypeStyle = AMDSDataHolder::UniformDataType, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>(), QObject *parent = 0);
 	virtual ~AMDSFullSpectralDataHolder();
-
-	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
 class AMDSDwellSpectralDataHolder: public AMDSLightWeightSpectralDataHolder
@@ -62,17 +52,18 @@ public:
 	/// function to copy the value of source instance to the current instance
 	virtual void cloneData(AMDSDataHolder *dataHolder);
 
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
-
 	/// The status data relating to the detector response
 	inline AMDSDwellStatusData dwellStatusData() const { return dwellStatusData_; }
 
 public slots:
 	/// Sets the status data for the histogram
 	void setDwellStatusData(const AMDSDwellStatusData &dwellStatusData);
+
+protected:
+	/// reimplement the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream) const;
+	/// reimplement the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// the dwell status

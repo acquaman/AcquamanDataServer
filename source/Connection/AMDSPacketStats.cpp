@@ -1,6 +1,5 @@
 #include "AMDSPacketStats.h"
 
-#include "Connection/AMDSDataStream.h"
 
 AMDSPacketStats::AMDSPacketStats(const QString &name, quint64 inboundBytes, quint64 outboundBytes, quint64 maxInboundBytes, quint64 maxOutboundBytes, quint64 maxTotalBytes)
 {
@@ -12,7 +11,7 @@ AMDSPacketStats::AMDSPacketStats(const QString &name, quint64 inboundBytes, quin
 	maxTotalBytes_ = maxTotalBytes;
 }
 
-bool AMDSPacketStats::writeToDataStream(AMDSDataStream *dataStream) const
+bool AMDSPacketStats::writeToDataStream(QDataStream *dataStream) const
 {
 	*dataStream << name();
 	*dataStream <<((quint64)(inboundBytes()));
@@ -24,7 +23,7 @@ bool AMDSPacketStats::writeToDataStream(AMDSDataStream *dataStream) const
 	return true;
 }
 
-bool AMDSPacketStats::readFromDataStream(AMDSDataStream *dataStream)
+bool AMDSPacketStats::readFromDataStream(QDataStream *dataStream)
 {
 	QString name;
 	quint64 inboundBytes;

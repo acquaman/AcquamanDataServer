@@ -3,7 +3,7 @@
 
 #include <QStringList>
 
-#include "source/ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientRequest.h"
 
 class AMDSClientIntrospectionRequest : public AMDSClientRequest
 {
@@ -38,10 +38,11 @@ public:
 	/// Clears the list of buffer group infos
 	inline void clearBufferGroupInfos() { bufferGroupInfos_.clear(); }
 
-	/// Writes this AMDSClientIntrospectionRequest to an AMDSDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientIntrospectionRequest from the AMDSDataStream, returns 0 if no errors are encountered
-	virtual int readFromDataStream(AMDSDataStream *dataStream);
+protected:
+	/// Writes this AMDSClientIntrospectionRequest to an QDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(QDataStream *dataStream) const;
+	/// Reads this AMDSClientIntrospectionRequest from the QDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(QDataStream *dataStream);
 
 	/// implement the function to return a data string of the message
 	virtual QString toString() const;
