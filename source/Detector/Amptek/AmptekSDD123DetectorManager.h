@@ -115,9 +115,9 @@ public slots:
 
 protected slots:
 	/// slot to handle continuous data update
-	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime) = 0;
+	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime) = 0;
 	/// slot to handle dwell data update
-	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime) = 0;
+	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime) = 0;
 
 protected:
 	/// helper function to handle the incoming SpectrumEvent

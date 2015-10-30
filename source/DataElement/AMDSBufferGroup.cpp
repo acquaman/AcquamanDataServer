@@ -61,7 +61,7 @@ void AMDSBufferGroup::clear()
 	}
 }
 
-AMDSDataHolder* AMDSBufferGroup::at(int index) const
+AMDSDataHolder* AMDSBufferGroup::at(int index)
 {
 	QReadLocker readLock(&lock_);
 
