@@ -81,6 +81,7 @@ bool AmptekSDD123Detector::event(QEvent *e){
 	return QObject::event(e);
 }
 
+#include <QDebug>
 void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEvent* event)
 {
 
@@ -136,7 +137,8 @@ AMDSFlatArray *AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrum
 		backwardsMid(index*3, 3, spectrumData, tmpData);
 		spectrum.append(tmpData.toHex().toInt(&ok, 16));
 
-		spectrumArray->setValue(index, tmpData.toHex().toInt(&ok, 16));
+//		spectrumArray->setValue(index, tmpData.toHex().toInt(&ok, 16));
+		spectrumArray->setValue(index, spectrum.last());
 	}
 
 	//qDebug() << "Spectrum ready:\n " << spectrum;
