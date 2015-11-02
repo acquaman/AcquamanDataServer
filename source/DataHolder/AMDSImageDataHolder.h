@@ -1,7 +1,7 @@
 #ifndef AMDSIMAGEDATAHOLDER_H
 #define AMDSIMAGEDATAHOLDER_H
 
-#include "source/DataHolder/AMDSGenericFlatArrayDataHolder.h"
+#include "DataHolder/AMDSGenericFlatArrayDataHolder.h"
 
 class AMDSLightWeightImageDataHolder : public AMDSLightWeightGenericFlatArrayDataHolder
 {
@@ -22,10 +22,11 @@ public:
 	/// reimplement the function to set the axes information, return True is the set is successful
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
+protected:
+	/// reimplement the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
+	/// reimplement the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// the size of fast axis

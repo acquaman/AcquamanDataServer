@@ -34,7 +34,6 @@ HEADERS  += \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h \
 	source/ClientRequest/AMDSClientContinuousDataRequest.h \
-	source/Connection/AMDSDataStream.h \
 	source/Connection/AMDSPacketStats.h \
 	source/Connection/AMDSServer.h \
 	source/Connection/AMDSClientTCPSocket.h \
@@ -67,7 +66,6 @@ SOURCES += \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
 	source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.cpp \
 	source/ClientRequest/AMDSClientContinuousDataRequest.cpp \
-	source/Connection/AMDSDataStream.cpp \
 	source/Connection/AMDSPacketStats.cpp \
 	source/Connection/AMDSServer.cpp \
 	source/Connection/AMDSClientTCPSocket.cpp \

@@ -1,7 +1,5 @@
 #include "AMDSClientIntrospectionRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
-
 AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(QObject *parent) :
 	AMDSClientRequest(parent)
 {
@@ -52,7 +50,7 @@ QStringList AMDSClientIntrospectionRequest::getAllBufferNames()
 	return bufferNames;
 }
 
-int AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientIntrospectionRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -67,13 +65,15 @@ int AMDSClientIntrospectionRequest::writeToDataStream(AMDSDataStream *dataStream
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_GROUP_INFO_COUNT;
 
-	for(int x = 0, size = bufferGroupInfos_.count(); x < size; x++)
-		bufferGroupInfos_.at(x).writeToDataStream(dataStream);
+	for(int x = 0, size = bufferGroupInfos_.count(); x < size; x++) {
+		AMDSBufferGroupInfo bufferGroupInfo = bufferGroupInfos_.at(x);
+		bufferGroupInfo.writeToDataStream(dataStream);
+	}
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientIntrospectionRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientIntrospectionRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::readFromDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

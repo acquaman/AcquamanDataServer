@@ -1,7 +1,7 @@
 #ifndef AMDSCLIENTRELATIVECOUNTPLUSCOUNTDATAREQUEST_H
 #define AMDSCLIENTRELATIVECOUNTPLUSCOUNTDATAREQUEST_H
 
-#include "source/ClientRequest/AMDSClientDataRequest.h"
+#include "ClientRequest/AMDSClientDataRequest.h"
 
 class AMDSClientRelativeCountPlusCountDataRequest : public AMDSClientDataRequest
 {
@@ -28,10 +28,12 @@ public:
 
 	/// Sets the values of all the data attributes of client request
 	void setAttributesValues(const QString &bufferName, bool includeStatusData, bool flattenResultData, quint64 relativeCount, quint64 count);
-	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an AMDSDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the AMDSDataStream, returns 0 if no errors are encountered
-	virtual int readFromDataStream(AMDSDataStream *dataStream);
+
+protected:
+	/// Writes this AMDSClientRelativeCountPlusCountDataRequest to an QDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(QDataStream *dataStream);
+	/// Reads this AMDSClientRelativeCountPlusCountDataRequest from the QDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// the relative count to start

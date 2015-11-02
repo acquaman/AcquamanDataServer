@@ -1,6 +1,4 @@
-#include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
-
-#include "source/Connection/AMDSDataStream.h"
+#include "AMDSClientStartTimePlusCountDataRequest.h"
 
 AMDSClientStartTimePlusCountDataRequest::AMDSClientStartTimePlusCountDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)
@@ -46,7 +44,7 @@ void AMDSClientStartTimePlusCountDataRequest::setAttributesValues(const QString 
 	setCount(count);
 }
 
-int AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientStartTimePlusCountDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -62,7 +60,7 @@ int AMDSClientStartTimePlusCountDataRequest::writeToDataStream(AMDSDataStream *d
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientStartTimePlusCountDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientStartTimePlusCountDataRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

@@ -27,7 +27,7 @@ public:
 	AMDSBufferGroupInfo& operator=(const AMDSBufferGroupInfo& other);
 
 	/// Writes this AMDSBufferGroupInfo to a DataStream, returns true if no errors are encountered
-	bool writeToDataStream(QDataStream *dataStream) const;
+	bool writeToDataStream(QDataStream *dataStream);
 	/// Reads this AMDSBufferGroupInfo from the DataStream, returns true if no errors are encountered
 	bool readFromDataStream(QDataStream *dataStream);
 

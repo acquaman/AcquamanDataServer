@@ -3,15 +3,9 @@
 #include <QDateTime>
 #include <QTimer>
 
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
-#include "source/ClientRequest/AMDSClientStatisticsRequest.h"
-#include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
-#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
-#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
-#include "source/Connection/AMDSDataStream.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientStatisticsRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
 
 #include "util/AMErrorMonitor.h"
 
@@ -140,12 +134,11 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 	if(requestingSocket != 0)
 	{
 		QByteArray block;
-		AMDSDataStream output(&block, QIODevice::WriteOnly);
+		QDataStream output(&block, QIODevice::WriteOnly);
 		output.setVersion(QDataStream::Qt_4_0);
 		output << (quint32)0;
 
-		output.encodeClientRequestType(*processedRequest);
-		output.write(*processedRequest);
+		AMDSClientRequest::encodeAndwriteClientRequest(&output, processedRequest);
 
 		output.device()->seek(0);
 		output << (quint32)(block.size() - sizeof(quint32));
@@ -275,7 +268,7 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 	if(requestingSocket == 0)
 		return;
 
-	AMDSDataStream incoming(requestingSocket);
+	QDataStream incoming(requestingSocket);
 
 	incoming.setVersion(QDataStream::Qt_4_0);
 
@@ -315,17 +308,17 @@ void AMDSTCPDataServer::onClientSentRequest(const QString &clientKey)
 	oneSecondsStats_.setInboundBytes(oneSecondsStats_.inboundBytes()+inboundBytes);
 	tenSecondsStats_.setInboundBytes(tenSecondsStats_.inboundBytes()+inboundBytes);
 
-	AMDSClientRequest *clientRequest = incoming.decodeAndInstantiateClientRequestType();
-	incoming.read(*clientRequest);
+	AMDSClientRequest *clientRequest = AMDSClientRequest::decodeAndInstantiateClientRequest(&incoming);
+	if (clientRequest) {
+		clientRequest->setSocketKey(clientKey);
 
-	clientRequest->setSocketKey(clientKey);
-
-	if(clientRequest->isStatisticsMessage()){
-		onClientStaticsRequestReceived(clientRequest);
-	} else if (clientRequest->isContinuousMessage()) {
-		onClientContinuousRequestReceived(clientRequest);
-	} else {
-		emit clientRequestRead(clientRequest);
+		if(clientRequest->isStatisticsMessage()){
+			onClientStaticsRequestReceived(clientRequest);
+		} else if (clientRequest->isContinuousMessage()) {
+			onClientContinuousRequestReceived(clientRequest);
+		} else {
+			emit clientRequestRead(clientRequest);
+		}
 	}
 }
 

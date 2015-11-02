@@ -47,7 +47,7 @@ AmptekSDD123Packet::AmptekSDD123Packet(int packetID, const AmptekSDD123Packet &o
 
 AmptekSDD123Packet::~AmptekSDD123Packet()
 {
-
+	relatedSyncRequestIDs_.clear();
 }
 
 
@@ -227,6 +227,11 @@ AmptekSDD123PacketMonitor::AmptekSDD123PacketMonitor(QObject *parent) :
 
 }
 
+AmptekSDD123PacketMonitor::~AmptekSDD123PacketMonitor()
+{
+	monitorList.clear();
+}
+
 int AmptekSDD123PacketMonitor::totalOccurances() const{
 	return monitorList.count();
 }
@@ -270,6 +275,6 @@ double AmptekSDD123PacketMonitor::rateSince(QDateTime timeOfInterest) const{
 	return totalRate();
 }
 
-void AmptekSDD123PacketMonitor::appendPacket(QDateTime timeOfIncident, AmptekSDD123Packet packet){
+void AmptekSDD123PacketMonitor::appendPacket(QDateTime timeOfIncident, const AmptekSDD123Packet &packet){
 	monitorList.append(qMakePair(timeOfIncident, packet));
 }

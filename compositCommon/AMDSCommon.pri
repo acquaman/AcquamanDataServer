@@ -35,7 +35,6 @@ HEADERS *= \
 	source/Connection/AMDSTCPDataServer.h \
 	source/Connection/AMDSThreadedTCPDataServer.h \
 	source/Connection/AMDSPacketStats.h \
-	source/Connection/AMDSDataStream.h \
 	source/DataElement/AMDSLikely.h \
 	source/DataElement/AMDSDataTypeDefinitions.h \
 	source/DataElement/AMDSBuffer.h \
@@ -70,7 +69,6 @@ SOURCES *= \
 	source/Connection/AMDSTCPDataServer.cpp \
 	source/Connection/AMDSThreadedTCPDataServer.cpp \
 	source/Connection/AMDSPacketStats.cpp \
-	source/Connection/AMDSDataStream.cpp \
 	source/DataElement/AMDSAxisInfo.cpp \
 	source/DataElement/AMDSnDIndex.cpp \
 	source/DataElement/AMDSEventData.cpp \

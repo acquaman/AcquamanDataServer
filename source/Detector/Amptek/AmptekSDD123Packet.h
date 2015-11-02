@@ -126,6 +126,7 @@ Q_OBJECT
 
 public:
 	AmptekSDD123PacketMonitor(QObject *parent = 0);
+	~AmptekSDD123PacketMonitor();
 
 	/// returns the value total occurances of the packets
 	int totalOccurances() const;
@@ -137,7 +138,7 @@ public:
 	double rateSince(QDateTime timeOfInterest) const;
 
 	/// append a packet
-	void appendPacket(QDateTime timeOfIncident, AmptekSDD123Packet packet);
+	void appendPacket(QDateTime timeOfIncident, const AmptekSDD123Packet &packet);
 
 protected:
 	/// the list of packets based on datetime
