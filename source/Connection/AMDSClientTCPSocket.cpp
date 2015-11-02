@@ -56,7 +56,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	if (tcpSocket_->bytesAvailable() < (int)sizeof(quint32))
 		return;
 
-	QDataStream *inDataStream ;
+	QDataStream *inDataStream = 0;
 	if (!waitingMorePackages_) {
 		inDataStream= new QDataStream(tcpSocket_);
 		inDataStream->setVersion(QDataStream::Qt_4_0);
@@ -83,7 +83,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	}
 
 	// finish reading this message, waiting for the future data
-	if (waitingMorePackages_)
+	if (waitingMorePackages_ || !inDataStream)
 		return;
 
 	AMDSClientRequest *clientRequest = AMDSClientRequest::decodeAndInstantiateClientRequest(inDataStream);

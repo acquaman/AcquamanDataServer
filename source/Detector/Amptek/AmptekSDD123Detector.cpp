@@ -81,7 +81,6 @@ bool AmptekSDD123Detector::event(QEvent *e){
 	return QObject::event(e);
 }
 
-#include <QDebug>
 void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEvent* event)
 {
 
@@ -137,7 +136,6 @@ AMDSFlatArray *AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrum
 		backwardsMid(index*3, 3, spectrumData, tmpData);
 		spectrum.append(tmpData.toHex().toInt(&ok, 16));
 
-//		spectrumArray->setValue(index, tmpData.toHex().toInt(&ok, 16));
 		spectrumArray->setValue(index, spectrum.last());
 	}
 
@@ -595,7 +593,6 @@ void AmptekSDD123Detector::internalSetDeviceID(int deviceID){
 	if(deviceID != deviceID_){
 		deviceID_ = deviceID;
 		emit deviceIDChanged(deviceID_);
-//		emit deviceIDChanged(stringFromBool(deviceID_));
 	}
 }
 
@@ -603,7 +600,6 @@ void AmptekSDD123Detector::internalSetPresetTime(double presetTime){
 	if(presetTime_ != presetTime){
 		presetTime_ = presetTime;
 		emit presetTimeChanged(presetTime_);
-//		emit presetTimeChanged(QString("%1").arg(presetTime_));
 	}
 }
 
@@ -611,6 +607,5 @@ void AmptekSDD123Detector::internalSetMCAChannels(int mcaChannels){
 	if(mcaChannels_ != mcaChannels){
 		mcaChannels_ = mcaChannels;
 		emit mcaChannelsChanged(mcaChannels_);
-//		emit mcaChannelsChanged(QString("%1").arg(mcaChannels_));
 	}
 }
