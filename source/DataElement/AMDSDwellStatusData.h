@@ -7,14 +7,14 @@
 class AMDSDwellStatusData
 {
 public:
-	AMDSDwellStatusData(quint32 fastCounts = -1, quint32 slowCounts = -1, quint64 detectorTemperature = -1, quint64 accumulationTime = -1, quint64 liveTime = -1, quint64 realTime = -1, quint32 generalPurposeCounter = -1, const QTime &dwellStartTime = QTime(), const QTime &dwellEndTime = QTime(), const QTime &dwellReplyTime = QTime());
+	AMDSDwellStatusData(int fastCounts = -1, int slowCounts = -1, double detectorTemperature = -1, double accumulationTime = -1, double liveTime = -1, double realTime = -1, int generalPurposeCounter = -1, const QTime &dwellStartTime = QTime(), const QTime &dwellEndTime = QTime(), const QTime &dwellReplyTime = QTime());
 	AMDSDwellStatusData(const AMDSDwellStatusData &other);
 	~AMDSDwellStatusData();
 
 	/// the + operation of ADMSDwellStatusData
 	AMDSDwellStatusData& operator +(const AMDSDwellStatusData &other);
 	/// the / operation of ADMSDwellStatusData
-	AMDSDwellStatusData& operator /(quint32 divisor);
+	AMDSDwellStatusData& operator /(int divisor);
 
 	/// the assign ( = ) operation of ADMSDwellStatusData
 	AMDSDwellStatusData& operator =(const AMDSDwellStatusData &other);
@@ -28,19 +28,19 @@ public:
 	QString toString() const;
 
 	/// returns the vlaue of fastCounts
-	inline quint32 fastCounts() const { return fastCounts_; }
+	inline int fastCounts() const { return fastCounts_; }
 	/// returns the value of slowCounts
-	inline quint32 slowCounts() const { return slowCounts_; }
+	inline int slowCounts() const { return slowCounts_; }
 	/// returns the value of detectorTemperature
-	inline quint64 detectorTemperature() const { return detectorTemperature_; }
+	inline double detectorTemperature() const { return detectorTemperature_; }
 	/// returns the value of accumulationTime
-	inline quint64 accumulationTime() const { return accumulationTime_; }
+	inline double accumulationTime() const { return accumulationTime_; }
 	/// returns the value of liveTime
-	inline quint64 liveTime() const { return liveTime_; }
+	inline double liveTime() const { return liveTime_; }
 	/// returns the value of realTime
-	inline quint64 realTime() const { return realTime_; }
+	inline double realTime() const { return realTime_; }
 	/// returns the value of generalPurposeCounter
-	inline quint32 generalPurposeCounter() const { return generalPurposeCounter_; }
+	inline int generalPurposeCounter() const { return generalPurposeCounter_; }
 	/// returns the value of dwellStartTime
 	inline QTime dwellStartTime() const { return dwellStartTime_; }
 	/// returns the value of dwellEndTime
@@ -50,23 +50,23 @@ public:
 
 protected:
 	/// helper function to update all the properties
-	void setStatusData(quint32 fastCounts, quint32 slowCounts, quint64 detectorTemperature, quint64 accumulationTime, quint64 liveTime, quint64 realTime, quint32 generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime);
+	void setStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime);
 
 protected:
 	/// the value of fastCounts
-	quint32 fastCounts_;
+	int fastCounts_;
 	/// the value of slowCounts
-	quint32 slowCounts_;
+	int slowCounts_;
 	/// the value of detectorTemperature
-	quint64 detectorTemperature_;
+	double detectorTemperature_;
 	/// the value of accumulationTime
-	quint64 accumulationTime_;
+	double accumulationTime_;
 	/// the value of liveTime
-	quint64 liveTime_;
+	double liveTime_;
 	/// the value of realTime
-	quint64 realTime_;
+	double realTime_;
 	/// the value of generalPurposeCounter
-	quint32 generalPurposeCounter_;
+	int generalPurposeCounter_;
 	/// the value of dwellStartTime
 	QTime dwellStartTime_;
 	/// the value of dwellEndTime
