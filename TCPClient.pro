@@ -16,7 +16,7 @@ contains(USERNAME, liux0) {
 
 contains(USERNAME, sgm) {
 	PATH_TO_AMDS_WORKSPACE = .
-	PATH_TO_ACQUAMAN_WORKSPACE = beamline/programming
+	PATH_TO_ACQUAMAN_WORKSPACE = acquaman_new
 }
 
 PATH_TO_SOURCE = $$HOME_FOLDER/$$PATH_TO_AMDS_WORKSPACE/AcquamanDataServer/source
