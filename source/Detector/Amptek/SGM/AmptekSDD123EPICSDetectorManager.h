@@ -15,6 +15,7 @@ class AmptekSDD123EPICSDetectorManager : public AmptekSDD123DetectorManager
 Q_OBJECT
 public:
 	AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent = 0);
+	~AmptekSDD123EPICSDetectorManager();
 
 protected slots:
 	/// slot to handle continuous data update

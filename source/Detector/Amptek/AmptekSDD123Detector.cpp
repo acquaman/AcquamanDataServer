@@ -68,6 +68,12 @@ AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &b
 	connect(this, SIGNAL(postSpectrumPacketEventReceived(QStringList)), this, SLOT(onPostSpectrumPacketEventReceived(QStringList)));
 }
 
+AmptekSDD123Detector::~AmptekSDD123Detector()
+{
+	if (spectrumReceiver_ != 0)
+		spectrumReceiver_ = 0;
+}
+
 bool AmptekSDD123Detector::event(QEvent *e){
 	if(e->type() == (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent){
 		onSpectrumPacketEventReceived((AmptekSpectrumPacketEvent*)e);
@@ -91,7 +97,7 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 	AMDSFlatArray *spectrumArray = readSpectrumData(spectrumByteArray, channelCount);
 	readStatusData(statusDataArray);
 
-	if(spectrumReceiver_){
+	if(spectrumReceiver_ != 0){
 
 		AMDSDwellStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), event->dwellStartTime_, event->dwellEndTime_, event->dwellReplyTime_);
 
@@ -99,7 +105,6 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 		spectrumEvent->detectorSourceName_ = name();
 		spectrumEvent->spectrum_ = *spectrumArray;
 		spectrumEvent->statusData_ = statusData;
-
 		QCoreApplication::postEvent(spectrumReceiver_, spectrumEvent);
 	} else {
 		AMErrorMon::alert(this, AMPTEK_ALERT_NO_SPECTRUM_EVENT_RECEIVER, QString("No spectrum receiver"));
@@ -108,7 +113,7 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 
 void AmptekSDD123Detector::onConfigurationReadbackEventReceived(AmptekConfigurationReadbackEvent* event)
 {
-	if (spectrumReceiver_) {
+	if (spectrumReceiver_ != 0) {
 		QStringList allConfigurations = event->configurationReadback_.split(';');
 
 		AmptekConfigurationValuesEvent *configurationValuesEvent = new AmptekConfigurationValuesEvent();

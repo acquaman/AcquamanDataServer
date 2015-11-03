@@ -55,7 +55,7 @@ void AMDSBufferGroup::clear()
 	}
 	dataHolders_.clear();
 
-	if (enableCumulative_) {
+	if (enableCumulative_ && cumulativeDataHolder_) {
 		cumulativeDataHolder_->deleteLater();
 		cumulativeDataHolder_ = 0;
 	}

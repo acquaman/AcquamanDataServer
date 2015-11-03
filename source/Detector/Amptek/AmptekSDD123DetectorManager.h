@@ -34,6 +34,7 @@ public:
 	};
 
 	AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent = 0);
+	~AmptekSDD123DetectorManager();
 
 	/// function to handle QEvent
 	bool event(QEvent *e);

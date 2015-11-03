@@ -45,7 +45,10 @@ void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, bool elapsedDwellTim
 
 void AMDSThreadedBufferGroup::clear() {
 	QWriteLocker writeLock(&lock_);
-	bufferGroup_->clear();
+
+	if (bufferGroup_)
+		bufferGroup_->clear();
+
 }
 
 void AMDSThreadedBufferGroup::finishDwellDataUpdate(double elapsedTime)

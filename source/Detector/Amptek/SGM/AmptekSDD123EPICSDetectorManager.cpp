@@ -178,6 +178,10 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	/**/
 }
 
+AmptekSDD123EPICSDetectorManager::~AmptekSDD123EPICSDetectorManager()
+{
+}
+
 void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime)
 {
 	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){

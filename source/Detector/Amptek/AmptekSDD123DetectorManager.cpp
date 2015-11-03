@@ -12,6 +12,8 @@
 AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent) :
 	QObject(parent)
 {
+	requestEventReceiver_ = 0;
+
 	initialized_ = false;
 
 	detector_ = new AmptekSDD123Detector(amptekConfiguration->detectorName(), amptekConfiguration->detectorBasePVName(), amptekConfiguration->dataType(), amptekConfiguration->spectrumCountSize());
@@ -23,6 +25,12 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	setPresetDwellEndTimeOnNextEvent_ = false;
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
+}
+
+AmptekSDD123DetectorManager::~AmptekSDD123DetectorManager()
+{
+	detector_->deleteLater();
+	detector_ = 0;
 }
 
 bool AmptekSDD123DetectorManager::event(QEvent *e){
@@ -41,6 +49,7 @@ bool AmptekSDD123DetectorManager::event(QEvent *e){
 		e->accept();
 		return true;
 	}
+
 	return QObject::event(e);
 }
 
@@ -223,23 +232,22 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 		emit clearHistrogramData(detectorName());
 		emit clearDwellHistrogramData(detectorName());
 		initialized_ = true;
-	} else {
+	}
 
-		// generate the spectrum data holder and notice the bufferGroup new data is ready
-		AMDSDwellSpectralDataHolder *oneHistogram = new AMDSDwellSpectralDataHolder(detector_->dataType(), detector_->bufferSize(), this);
-		oneHistogram->setData(&spectrumData);
-		oneHistogram->setDwellStatusData(statusData);
+	// generate the spectrum data holder and notice the bufferGroup new data is ready
+	AMDSDwellSpectralDataHolder *oneHistogram = new AMDSDwellSpectralDataHolder(detector_->dataType(), detector_->bufferSize(), this);
+	oneHistogram->setData(&spectrumData);
+	oneHistogram->setDwellStatusData(statusData);
 
-		emit newHistrogramReceived(detectorName(), oneHistogram);
-		if (dwellActive_) {
-			presetDwellLocalEndTime_ = statusData.dwellEndTime();
+	emit newHistrogramReceived(detectorName(), oneHistogram);
+	if (dwellActive_) {
+		presetDwellLocalEndTime_ = statusData.dwellEndTime();
 
-			double elapsedTime = 0;
-			if (presetDwellLocalStartTime_.isValid())
-				elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
+		double elapsedTime = 0;
+		if (presetDwellLocalStartTime_.isValid())
+			elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
 
-			emit newDwellHistrogramReceived(detectorName(), oneHistogram, elapsedTime);
-		}
+		emit newDwellHistrogramReceived(detectorName(), oneHistogram, elapsedTime);
 	}
 }
 
@@ -269,45 +277,45 @@ void AmptekSDD123DetectorManager::onConfigurationModeConfirmationEventReceived(A
 
 void AmptekSDD123DetectorManager::postDwellRequestEvent()
 {
-	if(requestEventReceiver_){
+	if(requestEventReceiver_ != 0){
 		AmptekDwellRequestEvent *dwellRequestEvent = new AmptekDwellRequestEvent();
 		dwellRequestEvent->dwellMode_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, dwellRequestEvent);
 	} else {
-		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The equesetEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
+		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 
 void AmptekSDD123DetectorManager::postConfigurationInitiateRequestEvent(){
-	if(requestEventReceiver_){
+	if(requestEventReceiver_ != 0){
 		AmptekConfigurationInitiateRequestEvent *configurationInitiateRequestEvent = new AmptekConfigurationInitiateRequestEvent();
 		configurationInitiateRequestEvent->configurationMode_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationInitiateRequestEvent);
 	} else {
-		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The equesetEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
+		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 void AmptekSDD123DetectorManager::postConfigurationRequestEvent()
 {
-	if(requestEventReceiver_){
+	if(requestEventReceiver_ != 0){
 		AmptekConfigurationRequestEvent *configurationRequestEvent = new AmptekConfigurationRequestEvent();
 		configurationRequestEvent->allParametersRequest_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationRequestEvent);
 	} else {
-		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The equesetEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
+		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 
 void AmptekSDD123DetectorManager::postConfigurationSetEvent()
 {
-	if(requestEventReceiver_){
+	if(requestEventReceiver_ != 0){
 		AmptekConfigurationSetEvent *configurationSetEvent = new AmptekConfigurationSetEvent();
 		QStringList configurationCommands;
 		configurationCommands << configurationSetCommand_;
 		configurationSetEvent->configurationCommands_ = configurationCommands;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationSetEvent);
 	} else {
-		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The equesetEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
+		AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 
 }
