@@ -206,11 +206,13 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 	AMDSDwellStatusData statusData = spectrumEvent->statusData_;
 
 	if(setPresetDwellEndTimeOnNextEvent_){
+		qDebug() << "In the first if";
 		setPresetDwellEndTimeOnNextEvent_ = false;
 		presetDwellLocalStartTime_ = statusData.dwellStartTime();
 		presetDwellEndTime_ = statusData.dwellStartTime().addMSecs(dwellTime_*1000);
 	}
 	else if (dwellActive_ && isPresetDwell() && presetDwellLocalEndTime_.isValid()) {
+		qDebug() << "In the first elseif";
 		if ( presetDwellLocalEndTime_ >= presetDwellEndTime_ ) { //dwellToBeDeactived
 			dwellActive_ = false;
 
@@ -220,6 +222,7 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 	}
 
 	if (!initialized_) {
+		qDebug() << "In the second if";
 		emit clearHistrogramData(detectorName());
 		emit clearDwellHistrogramData(detectorName());
 		initialized_ = true;
@@ -232,6 +235,7 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 
 		emit newHistrogramReceived(detectorName(), oneHistogram);
 		if (dwellActive_) {
+			qDebug() << "In the second else, if";
 			presetDwellLocalEndTime_ = statusData.dwellEndTime();
 
 			double elapsedTime = 0;

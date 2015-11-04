@@ -256,10 +256,11 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(const AmptekC
 }
 
 void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime){
+	qDebug() << "In AmptekSDD123EPICSDetectorManager::dataHelper before connected check";
 	if(!connected_)
 		return;
 
-//	qDebug() << "Going to put " << spectrum;
+	qDebug() << "Going to put " << spectrum;
 	AMDSFlatArray spectrumData;
 	spectrum->data(&spectrumData);
 	if (spectrumData.dataType() == AMDSDataTypeDefinitions::Double)
@@ -310,7 +311,9 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDS
 
 void AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange(double newValue){
 	Q_UNUSED(newValue)
+	qDebug() << "In AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange";
 	if(startDwellControl_->withinTolerance(1)){
+		qDebug() << "And withinTolerance(1)";
 		startDwell();
 		startDwellControl_->move(0);
 		dwellStateControl_->move(1);
@@ -335,6 +338,7 @@ void AmptekSDD123EPICSDetectorManager::onClearSpectrumControlValueChange(double 
 }
 
 void AmptekSDD123EPICSDetectorManager::onDwellTimeControlValueChange(double newValue){
+	qDebug() << "Got a value changed on dwellTime control as " << newValue;
 	if(!dwellTimeControl_->withinTolerance(dwellTime()))
 		setDwellTime((int)newValue);
 }
@@ -590,11 +594,14 @@ void AmptekSDD123EPICSDetectorManager::onROI8HighIndexControlValueChanged(double
 }
 
 void AmptekSDD123EPICSDetectorManager::onAllControlsConnected(bool connected){
+	qDebug() << "Checking allControls for connected";
 	if(connected_ != connected)
 		connected_ = connected;
 
 	if(!connected_)
 		return;
+
+	qDebug() << "allControls CONNECTED";
 
 	isAvailableControl_->move(1);
 

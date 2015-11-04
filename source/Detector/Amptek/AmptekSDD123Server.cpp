@@ -166,7 +166,8 @@ void AmptekSDD123Server::requestAllTextConfigurationParameters()
 			<< "SCAI=6" << "SCAH" << "SCAL"
 			<< "SCAI=7" << "SCAH" << "SCAL"
 			<< "SCAI=8" << "SCAH" << "SCAL"
-			<< "TECS" << "THFA" << "THSL" << "TPEA" << "TPFA";
+			<< "TECS" << "THFA" << "THSL" << "TPEA" << "TPFA"
+			<< "GPIN" << "GPMC" << "GPME" << "GPED";
 	textConfigurationReadback(manyCommands);
 }
 
@@ -492,9 +493,12 @@ void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(const QByteArray &s
 	}
 }
 
+#include <QDebug>
 void AmptekSDD123Server::postConfigurationReadbackResponse(const QString &ASCIICommands)
 {
+	qDebug() << "About to check on the ConfigurationReadbackResponse";
 	if(ASCIICommands.contains("ALLP")){
+		qDebug() << "Did so, it's: " << ASCIICommands;
 		emit allParametersTextConfiguration(ASCIICommands);
 
 		if(spectrumPacketReceiver_){
