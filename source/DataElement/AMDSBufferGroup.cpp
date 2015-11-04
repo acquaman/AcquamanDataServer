@@ -61,16 +61,6 @@ void AMDSBufferGroup::clear()
 	}
 }
 
-AMDSDataHolder* AMDSBufferGroup::at(int index)
-{
-	QReadLocker readLock(&lock_);
-
-	if (index < 0 || index >= dataHolders_.count())
-		return 0;
-
-	return dataHolders_[index];
-}
-
 void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
 {
 	QWriteLocker writeLock(&lock_);
