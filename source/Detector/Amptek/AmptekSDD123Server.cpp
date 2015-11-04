@@ -18,10 +18,11 @@ qDebug() << "In ASCII " << QString(QByteArray::fromHex(dataString.toAscii())) <<
 AmptekSDD123Server::AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurationMap, const QString &serverName, QObject *parent) :
 	QObject(parent) , currentRequestPacket_(-1, QString("NONE")), currentSyncPacket_(-1, QString("NONE")), timedOutPacket_(-1, QString("NONE"))
 {
-	configurationMap_ = configurationMap;
-	serverName_ = serverName;
 	spectrumPacketReceiver_ = 0;
 	confirmationPacketReceiver_ = 0;
+
+	configurationMap_ = configurationMap;
+	serverName_ = serverName;
 	requestIntervalTimer_ = -1;
 
 	if(configurationMap_){
@@ -59,6 +60,14 @@ AmptekSDD123Server::AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurati
 
 AmptekSDD123Server::~AmptekSDD123Server()
 {
+	spectrumPacketReceiver_ = 0;
+	confirmationPacketReceiver_ = 0;
+
+	udpDetectorSocket_->deleteLater();
+
+	requestPacketTimer_->deleteLater();
+	syncPacketTimer_->deleteLater();
+
 	delete requestSpectrumTime_;
 	delete lastRequestSpectrumTime_;
 	delete replySpectrumTime_;
@@ -81,7 +90,6 @@ QList<double> AmptekSDD123Server::unrequestedPacketStatistics() const{
 
 bool AmptekSDD123Server::event(QEvent *e)
 {
-
 	if(e->type() == (QEvent::Type)AmptekEventDefinitions::ConfigurationInitiateRequestEvent){
 		if(((AmptekConfigurationInitiateRequestEvent*)e)->configurationMode_){
 			emit serverAboutToChangeToConfigurationState();
@@ -108,6 +116,7 @@ bool AmptekSDD123Server::event(QEvent *e)
 		e->accept();
 		return true;
 	}
+
 	return QObject::event(e);
 }
 
@@ -134,6 +143,12 @@ void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekComman
 		requestStatusPacket.appendRelatedSyncRequestID(timeOutIDCounter_);
 		sendSyncDatagram(requestStatusPacket, overrideTimeout);
 	} else {
+
+		if(requestStatusPacket.amptekCommand().commandId() == 23){
+			lastRequestSpectrumTime_->setHMS(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
+			requestSpectrumTime_->restart();
+		}
+
 		sendRequestDatagram(requestStatusPacket);
 	}
 }
@@ -480,7 +495,7 @@ void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(const QByteArray &s
 	emit spectrumDataReady(spectrumByteArray, channelCount);
 	emit statusDataReady(statusByteArray);
 
-	if(spectrumPacketReceiver_) {
+	if(spectrumPacketReceiver_ != 0) {
 		QTime dwellStartTime(lastRequestSpectrumTime_->hour(), lastRequestSpectrumTime_->minute(), lastRequestSpectrumTime_->second(), lastRequestSpectrumTime_->msec());
 		QTime dwellEndTime(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
 		QTime dwellReplyTime(replySpectrumTime_->hour(), replySpectrumTime_->minute(), replySpectrumTime_->second(), replySpectrumTime_->msec());
@@ -501,7 +516,7 @@ void AmptekSDD123Server::postConfigurationReadbackResponse(const QString &ASCIIC
 		qDebug() << "Did so, it's: " << ASCIICommands;
 		emit allParametersTextConfiguration(ASCIICommands);
 
-		if(spectrumPacketReceiver_){
+		if(spectrumPacketReceiver_ != 0){
 			AmptekConfigurationReadbackEvent *configurationReadbackEvent = new AmptekConfigurationReadbackEvent();
 			configurationReadbackEvent->configurationReadback_ = ASCIICommands;
 
@@ -522,7 +537,7 @@ void AmptekSDD123Server::processLastRequestPacket(const AmptekSDD123Packet &last
 	} else if(lastRequestPacket.commandId() == AmptekCommandManagerSGM::RequestDisableMCAMCS){
 		emit serverChangedToConfigurationState();
 
-		if(confirmationPacketReceiver_){
+		if(confirmationPacketReceiver_ != 0){
 			AmptekConfigurationModeConfirmationEvent *configurationConfirmationEvent = new AmptekConfigurationModeConfirmationEvent();
 			configurationConfirmationEvent->confirmConfigurationMode_ = true;
 			QCoreApplication::postEvent(confirmationPacketReceiver_, configurationConfirmationEvent);

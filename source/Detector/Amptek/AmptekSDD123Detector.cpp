@@ -68,6 +68,12 @@ AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &b
 	connect(this, SIGNAL(postSpectrumPacketEventReceived(QStringList)), this, SLOT(onPostSpectrumPacketEventReceived(QStringList)));
 }
 
+AmptekSDD123Detector::~AmptekSDD123Detector()
+{
+	if (spectrumReceiver_ != 0)
+		spectrumReceiver_ = 0;
+}
+
 bool AmptekSDD123Detector::event(QEvent *e){
 	if(e->type() == (QEvent::Type)AmptekEventDefinitions::SpectrumPacketEvent){
 		onSpectrumPacketEventReceived((AmptekSpectrumPacketEvent*)e);
@@ -93,6 +99,8 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 	readStatusData(statusDataArray);
 
 	if(spectrumReceiver_){
+
+//		qDebug() << "At the AmptekSDD123Detector level: dwellStartTime, dwellEndTime, dwellReplyTime: " << event->dwellStartTime_ << event->dwellEndTime_ << event->dwellReplyTime_;
 
 		AMDSDwellStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), event->dwellStartTime_, event->dwellEndTime_, event->dwellReplyTime_);
 

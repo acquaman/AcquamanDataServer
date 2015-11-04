@@ -27,6 +27,7 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	EPICSSpectrumUpdateMSecs_ = 249;
 	lastEPICSSpectrumUpdateTime_ = QTime::currentTime().addMSecs(-EPICSSpectrumUpdateMSecs_-100);
 	spectrumControl_ = new AMWaveformBinningSinglePVControl("Amptek Array", QString("%1:spectrum").arg(detectorBasePVName), 0, 1023, this);
+	spectrumControl_->setAttemptDouble(true);
 
 	/**/
 	fastCountsControl_ = new AMSinglePVControl("Fast Counts", QString("%1:spectrum:fastCounts").arg(detectorBasePVName), this, 0.5);
@@ -178,6 +179,10 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 	/**/
 }
 
+AmptekSDD123EPICSDetectorManager::~AmptekSDD123EPICSDetectorManager()
+{
+}
+
 void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime)
 {
 	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){
@@ -256,13 +261,12 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(const AmptekC
 }
 
 void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime){
-	qDebug() << "In AmptekSDD123EPICSDetectorManager::dataHelper before connected check";
 	if(!connected_)
 		return;
 
-	qDebug() << "Going to put " << spectrum;
 	AMDSFlatArray spectrumData;
 	spectrum->data(&spectrumData);
+
 	if (spectrumData.dataType() == AMDSDataTypeDefinitions::Double)
 		spectrumControl_->setValues(spectrumData.constVectorDouble());
 	else
@@ -311,9 +315,7 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDS
 
 void AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange(double newValue){
 	Q_UNUSED(newValue)
-	qDebug() << "In AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange";
 	if(startDwellControl_->withinTolerance(1)){
-		qDebug() << "And withinTolerance(1)";
 		startDwell();
 		startDwellControl_->move(0);
 		dwellStateControl_->move(1);

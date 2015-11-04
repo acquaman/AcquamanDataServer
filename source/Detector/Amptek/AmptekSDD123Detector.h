@@ -18,6 +18,7 @@ class AmptekSDD123Detector : public QObject
 
 public:
 	AmptekSDD123Detector(const QString &name, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, QObject *parent = 0);
+	~AmptekSDD123Detector();
 
 	/// function to handle the system events
 	virtual bool event(QEvent *e);
