@@ -134,6 +134,12 @@ int AmptekSDD123Server::forwardDatagram(const QByteArray &datagram)
 
 void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekCommandDefSGM command, const QString &dataStringHex, bool sendFakeRequest, bool sendSyncRequest, int overrideTimeout)
 {
+	// Need to restart the requestSpectrumtime form RequestAndClearSpecturmPlusStatus (ID 23)
+	if(command == AmptekCommandManagerSGM::RequestAndClearSpecturmPlusStatus) {
+		lastRequestSpectrumTime_->setHMS(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
+		requestSpectrumTime_->restart();
+	}
+
 	AmptekSDD123Packet requestStatusPacket(packetIDCounter_, AmptekCommandManagerSGM::sddCommands()->amptekCommand(command).hex(), dataStringHex);
 	packetIDCounter_++;
 
@@ -143,12 +149,6 @@ void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekComman
 		requestStatusPacket.appendRelatedSyncRequestID(timeOutIDCounter_);
 		sendSyncDatagram(requestStatusPacket, overrideTimeout);
 	} else {
-
-		if(requestStatusPacket.amptekCommand().commandId() == 23){
-			lastRequestSpectrumTime_->setHMS(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
-			requestSpectrumTime_->restart();
-		}
-
 		sendRequestDatagram(requestStatusPacket);
 	}
 }
@@ -508,7 +508,6 @@ void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(const QByteArray &s
 	}
 }
 
-#include <QDebug>
 void AmptekSDD123Server::postConfigurationReadbackResponse(const QString &ASCIICommands)
 {
 	qDebug() << "About to check on the ConfigurationReadbackResponse";
