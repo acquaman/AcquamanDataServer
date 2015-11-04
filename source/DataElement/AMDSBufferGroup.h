@@ -35,8 +35,6 @@ public:
 	/// returns the current dataholder of cumulative data
 	AMDSDataHolder *cumulativeDataHolder() const;
 
-	/// returns the dataHolder at given index
-	AMDSDataHolder* at(int index);
 	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will always return maxSize)
 	int count() const;
 	/// Clears the buffer of all its members, and frees their resources
