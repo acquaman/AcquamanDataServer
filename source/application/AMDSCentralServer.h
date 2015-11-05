@@ -43,6 +43,8 @@ protected:
 
 	/// pure virtual function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
 	virtual void initializeBufferGroup() = 0;
+	/// pure virtual function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
+	virtual void initializeDetectorManager() = 0;
 	/// pure virtual function to initialize the data server to update the buffer groups
 	virtual void initializeAndStartDataServer() = 0;
 	/// pure virtual function to finalize the initialization

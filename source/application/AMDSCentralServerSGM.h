@@ -5,10 +5,12 @@
 
 #include "application/AMDSCentralServer.h"
 
+class AMDSDataHolder;
+
 class AmptekSDD123ConfigurationMap;
 class AmptekSDD123ThreadedDataServerGroup;
 class AmptekSDD123DetectorGroupSGM;
-class AMDSDataHolder;
+class AMDSScalerDetectorManager;
 
 class AMDSCentralServerSGM : public AMDSCentralServer
 {
@@ -42,9 +44,14 @@ protected slots:
 	/// slot to handle dwell data update finished request  for a given buffer (detector)
 	void onDwellFinishedUpdate(const QString &detectorName, double elapsedTime);
 
+	/// slot to handle new scaler data request to add the data to buffergroup
+	void onNewScalerScanDataReceivedd(const QList<AMDSDataHolder *> &scalerScanCountsDataHolder);
+
 protected:
 	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
 	virtual void initializeBufferGroup();
+	/// function to initialize the detector manager
+	virtual void initializeDetectorManager();
 	/// function to initialize the data server to update the buffer groups
 	virtual void initializeAndStartDataServer();
 	/// function to finalize the initialization
@@ -63,6 +70,9 @@ protected:
 
 	/// the AmptekDetector group, which will manange and hold the Amptek data and manage the communications with the PVs
 	AmptekSDD123DetectorGroupSGM *amptekDetectorGroup_;
+
+	/// the Scaler detector manager
+	AMDSScalerDetectorManager *scalerDetectorManager_;
 };
 
 #endif // AMDSCENTRALSERVERSGM_H

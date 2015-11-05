@@ -39,6 +39,9 @@ void AMDSCentralServer::initializeAndStartServices()
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the bufferGroup ...");
 	initializeBufferGroup();
 
+	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the detector managers ...");
+	initializeDetectorManager();
+
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the Data server...");
 	initializeAndStartDataServer();
 

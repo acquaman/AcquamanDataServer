@@ -43,7 +43,8 @@ HEADERS *= \
 	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.h \
 	source/Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.h \
         source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.h \
-        source/Detector/Scaler/AMDSScalerDetector.h
+        source/Detector/Scaler/AMDSScalerDetector.h \
+    source/Detector/Scaler/AMDSScalerDetectorManager.h
 
 SOURCES *= \
 	source/AMDSMainSGM.cpp \
@@ -60,4 +61,7 @@ SOURCES *= \
 	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.cpp \
 	source/Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.cpp \
         source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.cpp \
-        source/Detector/Scaler/AMDSScalerDetector.cpp
+        source/Detector/Scaler/AMDSScalerDetector.cpp \
+    source/Detector/Scaler/AMDSScalerDetectorManager.cpp
+
+

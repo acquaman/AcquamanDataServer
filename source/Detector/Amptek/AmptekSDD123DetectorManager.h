@@ -55,18 +55,18 @@ public:
 
 signals:
 	/// signal to request clear histrogram data
-	void clearHistrogramData(QString detectorName);
+	void clearHistrogramData(const QString &detectorName);
 	/// signal to request clear dwell histrogram data
-	void clearDwellHistrogramData(QString detectorName);
+	void clearDwellHistrogramData(const QString &detectorName);
 	/// signal to indicate new histrogram data
-	void newHistrogramReceived(QString detectorName, AMDSDataHolder *);
+	void newHistrogramReceived(const QString &detectorName, const AMDSDataHolder *);
 	/// signal to indicate new dwell histrogram data
-	void newDwellHistrogramReceived(QString detectorName, AMDSDataHolder * dataHolder, double elapsedDwellTime);
+	void newDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder * dataHolder, double elapsedDwellTime);
 	/// signal to indicate dwell finished updating data
-	void dwellFinishedUpdate(QString detectorName, double elapsedTime);
+	void dwellFinishedUpdate(const QString &detectorName, double elapsedTime);
 
 	/// signal to indicate that configuration value is updated
-	void configurationValuesUpdate(AmptekConfigurationData configurationData);
+	void configurationValuesUpdate(const AmptekConfigurationData &configurationData);
 
 public slots:
 	/// function to set the event receiver to handle the request
