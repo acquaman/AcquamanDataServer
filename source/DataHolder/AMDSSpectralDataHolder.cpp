@@ -92,12 +92,10 @@ void AMDSDwellSpectralDataHolder::clear()
 	setDwellStatusData(newStatusData);
 }
 
-#include <QDebug>
 QString AMDSDwellSpectralDataHolder::printData()
 {
-	qDebug() << "In AMDSDwellSpectralDataHolder::printData()";
-//	return QString("%1 \n	%2").arg(AMDSLightWeightSpectralDataHolder::printData()).arg(dwellStatusData_.toString());
-	return QString("%1").arg(dwellStatusData_.toString());
+	return QString("%1 \n	%2").arg(AMDSLightWeightSpectralDataHolder::printData()).arg(dwellStatusData_.toString());
+//	return QString("%1").arg(dwellStatusData_.toString());
 }
 
 void AMDSDwellSpectralDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
