@@ -143,7 +143,7 @@ void AMDSScalerDetector::initializePVControls()
 
 	AMSinglePVControl *channelStatusControl;
 	foreach (quint8 channelId, enabledChannelIds()) {
-		QString scalerChannelPVName = QString("%1%2:Enable").arg(scalerBasePVName()).arg(channelId);
+		QString scalerChannelPVName = QString("%1%2:enable").arg(scalerBasePVName()).arg(channelId);
 		channelStatusControl = new AMSinglePVControl(scalerName()+"_channel_"+channelId, scalerChannelPVName, this);
 
 		channelStatusControlList_.append(channelStatusControl);
