@@ -59,7 +59,7 @@ signals:
 	/// signal to request clear dwell histrogram data
 	void clearDwellHistrogramData(const QString &detectorName);
 	/// signal to indicate new histrogram data
-	void newHistrogramReceived(const QString &detectorName, const AMDSDataHolder *);
+	void newHistrogramReceived(const QString &detectorName, AMDSDataHolder *);
 	/// signal to indicate new dwell histrogram data
 	void newDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder * dataHolder, double elapsedDwellTime);
 	/// signal to indicate dwell finished updating data

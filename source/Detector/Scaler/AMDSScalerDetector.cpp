@@ -147,7 +147,7 @@ void AMDSScalerDetector::initializePVControls()
 	foreach (quint8 channelId, enabledChannelIdList_) {
 		channelStatusControl = new AMSinglePVControl(scalerName_+"Channel_"+channelId, basePVName_+channelId+":Enable", this);
 
-		channelStatusControlList_->append(channelStatusControl);
+		channelStatusControlList_.append(channelStatusControl);
 		pvControlSet_->addControl(channelStatusControl);
 	}
 

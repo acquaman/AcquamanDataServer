@@ -65,8 +65,6 @@ AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &b
 	pc5Preamp8p5VInitialized_ = false;
 
 	deviceID_ = -1;
-
-	connect(this, SIGNAL(postSpectrumPacketEventReceived(QStringList)), this, SLOT(onPostSpectrumPacketEventReceived(QStringList)));
 }
 
 AmptekSDD123Detector::~AmptekSDD123Detector()

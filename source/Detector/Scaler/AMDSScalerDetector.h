@@ -80,10 +80,7 @@ protected:
 	AMWaveformBinningSinglePVControl *scanControl_;
 
 	/// the list of PV controls for channel status
-	QList<AMSinglePVControl *> *channelStatusControlList_;
-	/// the list of PV controls for channel count feedback
-	QList<AMSinglePVControl *> *channelCountFeedbackControlList_;
-
+	QList<AMSinglePVControl *> channelStatusControlList_;
 
 	/// running status
 	/// flag to indicate whether all PVs are connected
