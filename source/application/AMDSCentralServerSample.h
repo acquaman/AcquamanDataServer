@@ -23,6 +23,8 @@ protected slots:
 protected:
 	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
 	virtual void initializeBufferGroup();
+	/// function to initialize the detector manager
+	virtual void initializeDetectorManager();
 	/// function to initialize the data server to update the buffer groups
 	virtual void initializeAndStartDataServer();
 	/// function to finalize the initialization

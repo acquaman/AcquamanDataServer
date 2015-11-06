@@ -4,13 +4,14 @@
 #include <QObject>
 #include <QThread>
 
+class AMDSScalerConfigurationMap;
 class AMDSScalerDetector;
 
 class AMDSScalerDetectorManager : public QObject
 {
     Q_OBJECT
 public:
-	explicit AMDSScalerDetectorManager(const QString &scalerName, const QString &basePVName, const QList<quint8> &enabledChannelIdList, QObject *parent = 0);
+	explicit AMDSScalerDetectorManager(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent = 0);
 	~AMDSScalerDetectorManager();
 
 	inline AMDSScalerDetector *scalerDetector() { return scalerDetector_; }

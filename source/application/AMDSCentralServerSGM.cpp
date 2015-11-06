@@ -11,6 +11,8 @@
 #include "Detector/Amptek/AmptekSDD123ServerGroup.h"
 #include "Detector/Amptek/AmptekSDD123Server.h"
 #include "Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.h"
+#include "Detector/Scaler/AMDSScalerConfigurationMap.h"
+#include "Detector/Scaler/AMDSScalerDetector.h"
 #include "Detector/Scaler/AMDSScalerDetectorManager.h"
 #include "util/AMErrorMonitor.h"
 
@@ -21,21 +23,15 @@ AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 
 	qRegisterMetaType<AMDSDwellStatusData>();
 
-	// Commented out PV and IP details for actual beamline ampteks, so can test on some detectors without interfering with beamline operations
-//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 239", "amptek:sdd1", QHostAddress("192.168.0.239"), QHostAddress("192.168.0.139"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 240", "amptek:sdd2", QHostAddress("192.168.0.240"), QHostAddress("192.168.0.140"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 241", "amptek:sdd3", QHostAddress("192.168.0.241"), QHostAddress("192.168.0.141"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 242", "amptek:sdd4", QHostAddress("192.168.0.242"), QHostAddress("192.168.0.142"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 243", "amptek:sdd5", QHostAddress("192.168.0.243"), QHostAddress("192.168.0.143"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-
+	initializeConfiguration();
 }
 
 AMDSCentralServerSGM::~AMDSCentralServerSGM()
 {
-	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, configurationMaps_) {
+	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, amptekConfigurationMaps_) {
 		amptekConfiguration->deleteLater();
 	}
-	configurationMaps_.clear();
+	amptekConfigurationMaps_.clear();
 
 	foreach (AMDSThreadedBufferGroup *bufferGroup, dwellBufferGroupManagers_) {
 		bufferGroup->deleteLater();
@@ -45,12 +41,30 @@ AMDSCentralServerSGM::~AMDSCentralServerSGM()
 	amptekThreadedDataServerGroup_->deleteLater();
 	amptekThreadedDataServerGroup_ = 0;
 
+	scalerConfigurationMap_->deleteLater();
 	scalerDetectorManager_->deleteLater();
+}
+
+void AMDSCentralServerSGM::initializeConfiguration()
+{
+	// initialize the configuration for SGM amptek
+
+	// Commented out PV and IP details for actual beamline ampteks, so can test on some detectors without interfering with beamline operations
+//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 239", "amptek:sdd1", QHostAddress("192.168.0.239"), QHostAddress("192.168.0.139"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+	amptekConfigurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 240", "amptek:sdd2", QHostAddress("192.168.0.240"), QHostAddress("192.168.0.140"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 241", "amptek:sdd3", QHostAddress("192.168.0.241"), QHostAddress("192.168.0.141"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 242", "amptek:sdd4", QHostAddress("192.168.0.242"), QHostAddress("192.168.0.142"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 243", "amptek:sdd5", QHostAddress("192.168.0.243"), QHostAddress("192.168.0.143"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+
+	// initialize the detector manager for SGM scaler
+	QList<quint8> enabledChannelIds = QList<quint8>() << 11 << 12 << 13 << 14;
+	scalerConfigurationMap_ = new AMDSScalerConfigurationMap("Scaler (BL1611-ID-1)", "BL1611-ID-1:mcs", AMDSDataTypeDefinitions::Unsigned16, enabledChannelIds);
 }
 
 void AMDSCentralServerSGM::initializeBufferGroup()
 {
-	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, configurationMaps_) {
+	// initialize buffergroup for Amptek
+	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, amptekConfigurationMaps_) {
 
 		QList<AMDSAxisInfo> amptekBufferGroupAxes;
 		amptekBufferGroupAxes << AMDSAxisInfo("Energy", amptekConfiguration->spectrumCountSize(), "Energy Axis", "eV");
@@ -66,12 +80,21 @@ void AMDSCentralServerSGM::initializeBufferGroup()
 		dwellBufferGroupManagers_.insert(amptekDwellThreadedBufferGroup->bufferGroupName(), amptekDwellThreadedBufferGroup);
 	}
 
+	// initialize bufferGroup for scaler
+	QList<AMDSAxisInfo> scalerBufferGroupAxes;
+	scalerBufferGroupAxes << AMDSAxisInfo("Channel", scalerConfigurationMap_->enabledChannels().count(), "Channel Axis", "");
+	AMDSBufferGroupInfo scalerBufferGroupInfo(scalerConfigurationMap_->scalerName(), scalerConfigurationMap_->scalerName(), "Counts", scalerConfigurationMap_->dataType(), AMDSBufferGroupInfo::NoFlatten, scalerBufferGroupAxes);
+
+	AMDSThreadedBufferGroup *scalerThreadedBufferGroup = new AMDSThreadedBufferGroup(scalerBufferGroupInfo, maxBufferSize_, false);
+	connect(scalerThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+
+	bufferGroupManagers_.insert(scalerThreadedBufferGroup->bufferGroupName(), scalerThreadedBufferGroup);
 }
 
 void AMDSCentralServerSGM::initializeDetectorManager()
 {
 	// initialize the detector managers for SGM Amptek
-	amptekDetectorGroup_ = new AmptekSDD123DetectorGroupSGM(configurationMaps_);
+	amptekDetectorGroup_ = new AmptekSDD123DetectorGroupSGM(amptekConfigurationMaps_);
 	foreach (AmptekSDD123DetectorManager * detectorManager, amptekDetectorGroup_->detectorManagers()) {
 		connect(detectorManager, SIGNAL(clearHistrogramData(QString)), this, SLOT(onClearHistrogramData(QString)));
 		connect(detectorManager, SIGNAL(clearDwellHistrogramData(QString)), this, SLOT(onClearDwellHistrogramData(QString)));
@@ -81,19 +104,19 @@ void AMDSCentralServerSGM::initializeDetectorManager()
 	}
 
 	// initialize the detector manager for SGM scaler
-	QList<quint8> enabledChannelIds = QList<quint8>() << 11 << 12 << 13 << 14;
-	scalerDetectorManager_ = new AMDSScalerDetectorManager("Scaler (BL1611-ID-1)", "BL1611-ID-1:mcs", enabledChannelIds);
-//	connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(QList<AMDSDataHolder *>)), this, SLOT(onNewScalerScanDataReceivedd(QList<AMDSDataHolder *>)));
+	scalerDetectorManager_ = new AMDSScalerDetectorManager(scalerConfigurationMap_);
+	connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(QList<AMDSDataHolder *>)), this, SLOT(onNewScalerScanDataReceivedd(QList<AMDSDataHolder *>)));
 }
 
 void AMDSCentralServerSGM::initializeAndStartDataServer()
 {
 	// initialize the amptek dataserver
-	amptekThreadedDataServerGroup_ = new AmptekSDD123ThreadedDataServerGroup(configurationMaps_);
+	amptekThreadedDataServerGroup_ = new AmptekSDD123ThreadedDataServerGroup(amptekConfigurationMaps_);
 
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SLOT(onServerChangedToConfigurationState(int)));
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));
 
+	// initialize the scaler dataserver
 }
 
 void AMDSCentralServerSGM::wrappingUpInitialization()
@@ -130,39 +153,62 @@ void AMDSCentralServerSGM::onServerChangedToDwellState(int index){
 void AMDSCentralServerSGM::onClearHistrogramData(const QString &detectorName)
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
-	if (bufferGroup)
+	if (bufferGroup) {
 		bufferGroup->clear();
+	} else {
+		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+	}
 }
 
 void AMDSCentralServerSGM::onClearDwellHistrogramData(const QString &detectorName)
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
-	if (bufferGroup)
+	if (bufferGroup) {
 		bufferGroup->clear();
+	} else {
+		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+	}
 }
 
 void AMDSCentralServerSGM::onNewHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder)
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
-	if (bufferGroup)
+	if (bufferGroup) {
 		bufferGroup->append(dataHolder);
+	} else {
+		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+	}
 }
 
 void AMDSCentralServerSGM::onNewDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder, double elapsedTime)
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
-	if (bufferGroup)
+	if (bufferGroup) {
 		bufferGroup->append(dataHolder, elapsedTime);
+	} else {
+		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+	}
 }
 
 void AMDSCentralServerSGM::onDwellFinishedUpdate(const QString &detectorName, double elapsedTime)
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
-	if (bufferGroup)
+	if (bufferGroup) {
 		bufferGroup->finishDwellDataUpdate(elapsedTime);
+	} else {
+		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+	}
 }
 
 void AMDSCentralServerSGM::onNewScalerScanDataReceivedd(const QList<AMDSDataHolder *> &scalerScanCountsDataHolder)
 {
+	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
+	if (bufferGroup) {
+		foreach (AMDSDataHolder *dataHolder, scalerScanCountsDataHolder) {
+			bufferGroup->append(dataHolder);
+		}
+	} else {
+		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
+	}
 
 }

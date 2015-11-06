@@ -1,12 +1,13 @@
 #include "AMDSScalerDetectorManager.h"
 
+#include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 #include "Detector/Scaler/AMDSScalerDetector.h"
 
-AMDSScalerDetectorManager::AMDSScalerDetectorManager(const QString &scalerName, const QString &basePVName, const QList<quint8> &enabledChannelIdList, QObject *parent)
+AMDSScalerDetectorManager::AMDSScalerDetectorManager(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent)
 {
 	detectorManagerThread_ = new QThread();
 
-	scalerDetector_ = new AMDSScalerDetector(scalerName, basePVName, enabledChannelIdList);
+	scalerDetector_ = new AMDSScalerDetector(scalerConfiguration->scalerName(), scalerConfiguration->scalerBasePVName(), scalerConfiguration->enabledChannels());
 	scalerDetector_->moveToThread(detectorManagerThread_);
 
 	connect(detectorManagerThread_, SIGNAL(finished()), scalerDetector_, SLOT(deleteLater()));
