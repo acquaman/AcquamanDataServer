@@ -1,5 +1,8 @@
 #include "AMDSDwellStatusData.h"
 
+#include <QDebug>
+
+
 /// =============== implementation of AMDSStatusData ================
 AMDSDwellStatusData::AMDSDwellStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime)
 {
@@ -88,6 +91,7 @@ bool AMDSDwellStatusData::readFromDataStream(QDataStream *dataStream)
 		return false;
 
 	*dataStream >> generalPurposeCounter_;
+
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
@@ -153,7 +157,8 @@ bool AMDSDwellStatusData::writeToDataStream(QDataStream *dataStream)
 
 QString AMDSDwellStatusData::toString() const
 {
-	return QString("Status: %1 %2 %3 %4").arg(dwellStartTime_.toString()).arg(dwellEndTime_.toString()).arg(dwellReplyTime_.toString()).arg(liveTime_);
+//	return QString("Status: %1 %2 %3 %4").arg(dwellStartTime_.toString()).arg(dwellEndTime_.toString()).arg(dwellReplyTime_.toString()).arg(liveTime_);
+	return QString("Status: %1 %2 %3 %4 %5").arg(dwellStartTime_.toString("hh:mm:ss.zzz")).arg(dwellEndTime_.toString("hh:mm:ss.zzz")).arg(dwellReplyTime_.toString("hh:mm:ss.zzz")).arg(liveTime_).arg(generalPurposeCounter_);
 }
 
 void AMDSDwellStatusData::setStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime)

@@ -96,6 +96,9 @@ void AMDSClientAppController::openNetworkSession()
 			emit networkSessionOpening();
 			networkSession_->open();
 		}
+		else{
+			emit networkSessionOpened();
+		}
 	}
 }
 
