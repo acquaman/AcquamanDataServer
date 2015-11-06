@@ -7,7 +7,7 @@ AMDSScalerDetectorManager::AMDSScalerDetectorManager(AMDSScalerConfigurationMap 
 {
 	detectorManagerThread_ = new QThread();
 
-	scalerDetector_ = new AMDSScalerDetector(scalerConfiguration->scalerName(), scalerConfiguration->scalerBasePVName(), scalerConfiguration->enabledChannels());
+	scalerDetector_ = new AMDSScalerDetector(scalerConfiguration);
 	scalerDetector_->moveToThread(detectorManagerThread_);
 
 	connect(detectorManagerThread_, SIGNAL(finished()), scalerDetector_, SLOT(deleteLater()));

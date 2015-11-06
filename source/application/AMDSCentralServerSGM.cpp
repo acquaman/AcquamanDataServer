@@ -1,6 +1,5 @@
 #include "AMDSCentralServerSGM.h"
 
-#include <QtCore/QCoreApplication>
 #include <QTimer>
 
 #include "Connection/AMDSThreadedTCPDataServer.h"
@@ -20,8 +19,6 @@ AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 	AMDSCentralServer(parent)
 {
 	maxBufferSize_ = 20 * 60 * 1000; // 20 minuntes
-
-	qRegisterMetaType<AMDSDwellStatusData>();
 
 	initializeConfiguration();
 }
@@ -57,8 +54,8 @@ void AMDSCentralServerSGM::initializeConfiguration()
 //	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 243", "amptek:sdd5", QHostAddress("192.168.0.243"), QHostAddress("192.168.0.143"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
 
 	// initialize the detector manager for SGM scaler
-	QList<quint8> enabledChannelIds = QList<quint8>() << 11 << 12 << 13 << 14;
-	scalerConfigurationMap_ = new AMDSScalerConfigurationMap("Scaler (BL1611-ID-1)", "BL1611-ID-1:mcs", AMDSDataTypeDefinitions::Unsigned16, enabledChannelIds);
+	QList<quint8> enabledChannelIds = QList<quint8>() << 10 << 11 << 12 << 13 << 14 << 15;
+	scalerConfigurationMap_ = new AMDSScalerConfigurationMap("Scaler (BL1611-ID-1)", "BL1611-ID-1:mcs", AMDSDataTypeDefinitions::Signed32, enabledChannelIds);
 }
 
 void AMDSCentralServerSGM::initializeBufferGroup()
@@ -105,7 +102,7 @@ void AMDSCentralServerSGM::initializeDetectorManager()
 
 	// initialize the detector manager for SGM scaler
 	scalerDetectorManager_ = new AMDSScalerDetectorManager(scalerConfigurationMap_);
-	connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(QList<AMDSDataHolder *>)), this, SLOT(onNewScalerScanDataReceivedd(QList<AMDSDataHolder *>)));
+	connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(AMDSDataHolderList)), this, SLOT(onNewScalerScanDataReceivedd(AMDSDataHolderList)));
 }
 
 void AMDSCentralServerSGM::initializeAndStartDataServer()
@@ -200,12 +197,12 @@ void AMDSCentralServerSGM::onDwellFinishedUpdate(const QString &detectorName, do
 	}
 }
 
-void AMDSCentralServerSGM::onNewScalerScanDataReceivedd(const QList<AMDSDataHolder *> &scalerScanCountsDataHolder)
+void AMDSCentralServerSGM::onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder)
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
 	if (bufferGroup) {
-		foreach (AMDSDataHolder *dataHolder, scalerScanCountsDataHolder) {
-			bufferGroup->append(dataHolder);
+		foreach (AMDSDataHolder *scalerDataHolder, scalerScanCountsDataHolder) {
+			bufferGroup->append(scalerDataHolder);
 		}
 	} else {
 		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));

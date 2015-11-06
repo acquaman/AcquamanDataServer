@@ -4,11 +4,12 @@
 #include <QObject>
 #include <QTimer>
 
+#include "DataHolder/AMDSDataHolder.h"
+#include "Detector/Scaler/AMDSScalerConfigurationMap.h"
+
 class AMControlSet;
 class AMSinglePVControl;
 class AMWaveformBinningSinglePVControl;
-
-class AMDSDataHolder;
 
 class AMDSScalerDetector : public QObject
 {
@@ -20,17 +21,21 @@ class AMDSScalerDetector : public QObject
 	};
 
 public:
-	explicit AMDSScalerDetector(const QString &scalerName, const QString &basePVName, const QList<quint8> &enabledChannelIdList, QObject *parent = 0);
+	explicit AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent = 0);
 	virtual ~AMDSScalerDetector();
 
 	/// returns the name of the scaler
-	inline QString scalerName() const { return scalerName_; }
+	inline QString scalerName() const { return scalerConfiguration_->scalerName(); }
+	/// returns the basePVName of the scaler
+	inline QString scalerBasePVName() const { return scalerConfiguration_->scalerBasePVName(); }
+	/// returns the enabled channelIds
+	inline QList<quint8> enabledChannelIds() const { return scalerConfiguration_->enabledChannels(); }
 	/// returns the number of channels
-	inline quint8 enabledChannelCount() const { return enabledChannelIdList_.count(); }
+	inline quint8 enabledChannelCount() const { return enabledChannelIds().count(); }
 
 signals:
 	/// signal to indicate that we received new counts data
-	void newScalerScanDataReceived(const QList<AMDSDataHolder *> &scanCountsDataHolder);
+	void newScalerScanDataReceived(const AMDSDataHolderList &scanCountsDataHolder);
 
 public slots:
 	/// slot to fetch the channel data buffer from the scaler scan control
@@ -54,13 +59,8 @@ protected:
 	void initializePVControls();
 
 protected:
-	/// the name of the scaler
-	QString scalerName_;
-	/// the PV baseName
-	QString basePVName_;
-
-	/// the list of enabled channel
-	QList<quint8> enabledChannelIdList_;
+	/// the configuration of the scaler
+	AMDSScalerConfigurationMap *scalerConfiguration_;
 
 	/// the control set to manager all the controls
 	AMControlSet *pvControlSet_;
@@ -86,10 +86,13 @@ protected:
 	/// flag to indicate whether all PVs are connected
 	bool connected_;
 	/// the dwell time to read the scaler buffer (in ms, default 1ms)
+	int defaultDwellTime_;
 	int dwellTime_;
 	/// the number of scans in a single buffer (default 1000)
+	int defaultScansInABuffer_;
 	int scansInABuffer_;
 	/// the total number of scans (default 0)
+	int defaultTotalNumberOfScans_;
 	int totalNumberOfScans_;
 
 	/// the timer to fetch the scaler scan data

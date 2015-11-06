@@ -8,15 +8,20 @@
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
 #include "ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "DataElement/AMDSDwellStatusData.h"
 #include "DataElement/AMDSBufferGroup.h"
 #include "DataElement/AMDSBufferGroupInfo.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
+#include "DataHolder/AMDSDataHolder.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
+
+	qRegisterMetaType<AMDSDwellStatusData>();
+	qRegisterMetaType<AMDSDataHolderList>();
 
 	maxBufferSize_ = 1000*60*60*10;
 }

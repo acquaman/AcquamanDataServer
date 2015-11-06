@@ -4,8 +4,7 @@
 #include <QObject>
 
 #include "application/AMDSCentralServer.h"
-
-class AMDSDataHolder;
+#include "DataHolder/AMDSDataHolder.h"
 
 class AmptekSDD123ConfigurationMap;
 class AmptekSDD123ThreadedDataServerGroup;
@@ -49,7 +48,7 @@ protected slots:
 	void onDwellFinishedUpdate(const QString &detectorName, double elapsedTime);
 
 	/// slot to handle new scaler data request to add the data to buffergroup
-	void onNewScalerScanDataReceivedd(const QList<AMDSDataHolder *> &scalerScanCountsDataHolder);
+	void onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder);
 
 protected:
 	/// function to initialize the system configurations
