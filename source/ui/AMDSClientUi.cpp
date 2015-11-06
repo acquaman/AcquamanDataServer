@@ -177,7 +177,7 @@ void AMDSClientUi::onNetworkSessionOpening()
 void AMDSClientUi::onNetworkSessionOpened()
 {
 	statusLabel_->setText("This examples requires that you run the Acquaman Data Server example as well.");
-	enableRequestDataButton();
+//	enableRequestDataButton();
 }
 
 void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
@@ -195,6 +195,7 @@ void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
 
 void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 {
+	qDebug() << "TCPClient sees request data ready";
 	if (clientRequest->isContinuousMessage()) {
 		resetActiveContinuousConnection(activeServerComboBox_->currentText());
 	} else {
@@ -264,6 +265,7 @@ void AMDSClientUi::enableRequestDataButton()
 void AMDSClientUi::sendClientRequest()
 {
 	AMDSServer * server = clientAppController_->getServerByServerIdentifier(activeServerComboBox_->currentText());
+	qDebug() << "That server identification is " << activeServerComboBox_->currentText();
 	if (!server) {
 		QMessageBox::information( this, "AMDS Client Example", "Didn't select any active server!");
 		return;
@@ -284,6 +286,8 @@ void AMDSClientUi::sendClientRequest()
 	QString value1 = count1Edit_->text();
 	QString value2 = count2Edit_->text();
 	QString continuousSocket = activeContinuousConnectionComboBox_->currentText();
+
+	qDebug() << hostName << portNumber << requestTypeId << bufferName << time1 << time2 << value1 << value2;
 
 	bool includeStatus = includeStatusDataCheckbox_->isChecked();
 	bool enableFlattening = enableFlattenDataCheckbox_->isChecked();

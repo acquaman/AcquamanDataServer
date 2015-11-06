@@ -49,8 +49,10 @@ QStringList AMDSClientAppController::getBufferNamesByServer(const QString &serve
 {
 	QStringList bufferNames;
 
+	qDebug() << "Checking server from idenifier " << serverIdentifier;
 	AMDSServer *server = getServerByServerIdentifier(serverIdentifier);
 	if (server) {
+		qDebug() << "Found it";
 		bufferNames = server->bufferNames();
 	}
 
@@ -74,9 +76,12 @@ QStringList AMDSClientAppController::getActiveSocketKeysByServer(const QString &
 
 void AMDSClientAppController::openNetworkSession()
 {
+	qDebug() << "Checking on network session";
 	if (!networkSession_) {
+		qDebug() << "Making the manager and about to check capabilities";
 		QNetworkConfigurationManager manager;
 		if (manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired) {
+			qDebug() << "Seems to be working, get the configuration";
 			// Get saved network configuration
 			QSettings settings(QSettings::UserScope, QLatin1String("AMDSClient"));
 			settings.beginGroup(QLatin1String("Network"));
@@ -96,6 +101,10 @@ void AMDSClientAppController::openNetworkSession()
 			emit networkSessionOpening();
 			networkSession_->open();
 		}
+		else{
+			qDebug() << "Session not required";
+			emit networkSessionOpened();
+		}
 	}
 }
 
@@ -113,6 +122,7 @@ void AMDSClientAppController::connectToServer(const QString &hostName, quint16 p
 
 		// request the introspection data for all the buffers defined in this server
 		QString bufferName = "All";
+		qDebug() << "ClientAppController about to request some introspection data";
 		requestClientData(hostName, portNumber, bufferName);
 	}
 }

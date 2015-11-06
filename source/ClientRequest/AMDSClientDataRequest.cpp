@@ -92,6 +92,7 @@ QString AMDSClientDataRequest::toString() const
 	if (data().count() == 0)
 		messageData = QString("%1\n\tNo data for this message yet").arg(messageData);
 	else {
+		messageData = QString("The data type looks like %1").arg(data().at(0)->metaObject()->className());
 		for(int x = 0, size = data().count(); x < size; x++){
 			messageData = QString("%1\n\tData at %2 - %3").arg(messageData).arg(x).arg(data().at(x)->printData());
 		}

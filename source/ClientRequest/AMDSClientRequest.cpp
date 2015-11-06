@@ -88,8 +88,10 @@ bool AMDSClientRequest::isDataClientRequest() {
 			|| requestType() == AMDSClientRequestDefinitions::Continuous ;
 }
 
+#include <QDebug>
 void AMDSClientRequest::printData()
 {
+	qDebug() << "Is it this thing?";
 	AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
 }
 
