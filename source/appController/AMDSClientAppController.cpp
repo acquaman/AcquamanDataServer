@@ -297,5 +297,6 @@ AMDSClientRequest *AMDSClientAppController::instantiateClientRequest(AMDSClientR
 		AMErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
 	}
 
+	clientRequest->setClientLocalTime(QDateTime::currentDateTimeUtc());
 	return clientRequest;
 }
