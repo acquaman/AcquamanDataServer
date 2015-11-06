@@ -47,11 +47,14 @@ protected slots:
 	/// slot to handle the PV connected timout signal
 	void onAllControlsTimedOut();
 
-	///
+	/// slot to update the timer for dwell time
 	void onDwellTimeControlValueChanged(double);
+	/// slot to update the # of scans in a buffer
 	void onScansInABufferControlValueChanged(double);
+	/// slot to update the # of continuous scans
 	void onContinuousScanControlValueChanged(double);
 
+	/// slot to try to start the timer to update scan counts
 	void onStartScalerScanTimer();
 
 protected:
@@ -83,7 +86,7 @@ protected:
 	AMWaveformBinningSinglePVControl *scanControl_;
 
 	/// the list of PV controls for channel status
-	QList<AMSinglePVControl *> channelStatusControlList_;
+	AMControlSet *channelStatusControlSet_;
 
 	/// running status
 	/// flag to indicate whether all PVs are connected
