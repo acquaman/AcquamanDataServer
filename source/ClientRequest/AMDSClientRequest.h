@@ -2,6 +2,7 @@
 #define AMDSCLIENTREQUEST_H
 
 #include <QDataStream>
+#include <QDateTime>
 
 #include "ClientRequest/AMDSClientRequestDefinitions.h"
 #include "DataElement/AMDSBufferGroupInfo.h"
@@ -21,7 +22,7 @@ public:
 	};
 
 	explicit AMDSClientRequest(QObject *parent = 0);
-	explicit AMDSClientRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, QObject *parent = 0);
+	explicit AMDSClientRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QDateTime &localTime, QObject *parent = 0);
 	virtual ~AMDSClientRequest();
 
 	/// Copy constructor
@@ -50,6 +51,8 @@ public:
 	/// The response type the client has specified. If an error is encountered, this will be changed
 	/// to Error
 	inline AMDSClientRequest::ResponseType responseType() const { return responseType_; }
+	/// returns the client local time so that the server can calculate the delta
+	inline QDateTime clientLocalTime() const { return clientLocalTime_; }
 
 	/// Sets the socket key identifier
 	virtual void setSocketKey(const QString &socketKey) { socketKey_ = socketKey; }
@@ -59,6 +62,8 @@ public:
 	inline void setRequestType(AMDSClientRequestDefinitions::RequestType requestType) { requestType_ = requestType; }
 	/// Sets the repsonse type
 	inline void setResponseType(ResponseType responseType) { responseType_ = responseType; }
+	/// Sets the client local time
+	inline void setClientLocalTime(const QDateTime &localTime) { clientLocalTime_ = localTime; }
 
 	/// print out the message data
 	void printData();
@@ -75,7 +80,7 @@ protected:
 
 private:
 	/// To set the values of all the attributes
-	void setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType);
+	void setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QDateTime &localTime);
 
 protected:
 	/// the socket key to identify a connection
@@ -86,6 +91,9 @@ protected:
 	AMDSClientRequestDefinitions::RequestType requestType_;
 	/// the response type of the message
 	AMDSClientRequest::ResponseType responseType_;
+	/// the client local time, in UTC
+	QDateTime clientLocalTime_;
+
 };
 
 #endif // AMDSCLIENTREQUEST_H
