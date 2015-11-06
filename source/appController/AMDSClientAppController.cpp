@@ -16,8 +16,17 @@
 #include "Connection/AMDSServer.h"
 #include "util/AMErrorMonitor.h"
 
+AMDSClientAppController *AMDSClientAppController::clientAppController()
+{
+	if (!appController_) {
+		appController_ = new AMDSClientAppController();
+	}
+
+	return qobject_cast<AMDSClientAppController *>(appController_);
+}
+
 AMDSClientAppController::AMDSClientAppController(QObject *parent) :
-	QObject(parent)
+	AMDSAppController(AMDSAppController::Client, parent)
 {
 	networkSession_ = 0;
 }

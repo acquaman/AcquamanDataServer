@@ -1,5 +1,6 @@
 #include "ClientRequest/AMDSClientRequest.h"
 
+#include "appController/AMDSAppController.h"
 #include "ClientRequest/AMDSClientRequestSupport.h"
 #include "util/AMErrorMonitor.h"
 
@@ -93,6 +94,14 @@ void AMDSClientRequest::printData()
 	AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
 }
 
+int AMDSClientRequest::calculateTimeDelta()
+{
+	QDateTime serverLocalTime = QDateTime::currentDateTimeUtc();
+
+	int timeDelta = serverLocalTime.toMSecsSinceEpoch() - clientLocalTime().toMSecsSinceEpoch();
+	return timeDelta;
+}
+
 int AMDSClientRequest::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream <<((quint8)requestType());
@@ -153,4 +162,10 @@ void AMDSClientRequest::setBaseAttributesValues(const QString &socketKey, const 
 	setRequestType(requestType);
 	setResponseType(responseType);
 	setClientLocalTime(localTime);
+
+	AMDSAppController *appController = AMDSAppController::appController();
+	if (appController && appController->appType() == AMDSAppController::Server)
+		timeDelta_ = calculateTimeDelta();
+	else
+		timeDelta_ = 0;
 }

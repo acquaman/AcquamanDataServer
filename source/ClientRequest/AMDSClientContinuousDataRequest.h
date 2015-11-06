@@ -28,7 +28,7 @@ public:
 	/// Returns the list of buffernames
 	inline QStringList bufferNames() const { return bufferNameList_; }
 	/// Returns the start time for the data request
-	inline QDateTime startTime() const { return startTime_; }
+	inline QDateTime startTime() const { return startTime_.addMSecs(timeDelta()); }
 	/// Returns the update interval
 	inline quint32 updateInterval() const { return updateInterval_; }
 	/// Returns the last fetch time for the data request

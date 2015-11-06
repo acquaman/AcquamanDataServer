@@ -18,7 +18,7 @@ public:
 	AMDSClientStartTimePlusCountDataRequest(const AMDSClientStartTimePlusCountDataRequest &other);
 
 	/// Returns the start time for the data request
-	inline QDateTime startTime() const { return startTime_; }
+	inline QDateTime startTime() const { return startTime_.addMSecs(timeDelta()); }
 	/// Returns the number of data points after the start time to collect
 	inline quint64 count() const { return count_; }
 

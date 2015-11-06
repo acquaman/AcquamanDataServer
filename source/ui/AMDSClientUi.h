@@ -92,9 +92,6 @@ private:
 
 	QComboBox* activeContinuousConnectionComboBox_;
 	QTextEdit* resultsEdit_;
-
-	/// the handler of the clientAppController
-	AMDSClientAppController *clientAppController_;
 };
 
 #endif // AMDSCLIENTUI_H

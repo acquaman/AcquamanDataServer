@@ -11,7 +11,7 @@ AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(QObject *parent
 	setUpdateInterval(500);
 	setHandShakeSocketKey("");
 
-	setStartTime(QDateTime::currentDateTime());
+	setStartTime(QDateTime::currentDateTimeUtc());
 	setLastFetchTime(startTime());
 	setHandShakeTime(startTime());
 
@@ -25,7 +25,7 @@ AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType re
 	setUpdateInterval(msgUpdateInterval);
 	setHandShakeSocketKey(msgHandShakeSocketKey);
 
-	setStartTime(QDateTime::currentDateTime());
+	setStartTime(QDateTime::currentDateTimeUtc());
 	setLastFetchTime(startTime());
 	setHandShakeTime(startTime());
 
@@ -84,7 +84,7 @@ void AMDSClientContinuousDataRequest::setBufferNames(const QStringList &names) {
 
 bool AMDSClientContinuousDataRequest::isExpired()
 {
-	QDateTime nowDateTime = QDateTime::currentDateTime();
+	QDateTime nowDateTime = QDateTime::currentDateTimeUtc();
 	quint64 timeSpanInSecond =  nowDateTime.toTime_t() - lastHandShakingTime().toTime_t();
 
 	if (timeSpanInSecond > 60)
@@ -128,7 +128,7 @@ bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 */
 void AMDSClientContinuousDataRequest::handShaking(AMDSClientContinuousDataRequest *handShakingMessage)
 {
-	setHandShakeTime(QDateTime::currentDateTime());
+	setHandShakeTime(QDateTime::currentDateTimeUtc());
 
 	QStringList handShakeBufferNames = handShakingMessage->bufferNames();
 	if (handShakeBufferNames.size() == 0) {

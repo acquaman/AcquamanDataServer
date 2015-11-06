@@ -3,6 +3,7 @@
 #include <QtCore/QCoreApplication>
 #include <QTimer>
 
+#include "appController/AMDSServerAppController.h"
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
@@ -17,6 +18,9 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
+
+	// initialize the app controller
+	AMDSServerAppController::serverAppController();
 
 	maxBufferSize_ = 1000*60*60*10;
 }

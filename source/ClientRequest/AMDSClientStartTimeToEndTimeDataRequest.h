@@ -19,9 +19,9 @@ public:
 	AMDSClientStartTimeToEndTimeDataRequest& operator =(const AMDSClientStartTimeToEndTimeDataRequest &other);
 
 	/// Returns the start time for the data request
-	inline QDateTime startTime() const { return startTime_; }
+	inline QDateTime startTime() const { return startTime_.addMSecs(timeDelta()); }
 	/// Returns the endtime for the data request
-	inline QDateTime endTime() const { return endTime_; }
+	inline QDateTime endTime() const { return endTime_.addMSecs(timeDelta()); }
 
 	/// Sets the start time for the data request
 	inline void setStartTime(const QDateTime &startTime) { startTime_ = startTime; }

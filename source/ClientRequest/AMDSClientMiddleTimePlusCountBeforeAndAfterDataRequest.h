@@ -19,7 +19,7 @@ public:
 	AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest& operator =(const AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest &other);
 
 	/// Returns the middle time for the data request
-	inline QDateTime middleTime() const { return middleTime_; }
+	inline QDateTime middleTime() const { return middleTime_.addMSecs(timeDelta()); }
 	/// Returns the countBefore for the data request
 	inline quint64 countBefore() const { return countBefore_; }
 	/// Returns the countAfter for the data request

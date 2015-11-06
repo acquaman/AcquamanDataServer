@@ -53,6 +53,8 @@ public:
 	inline AMDSClientRequest::ResponseType responseType() const { return responseType_; }
 	/// returns the client local time so that the server can calculate the delta
 	inline QDateTime clientLocalTime() const { return clientLocalTime_; }
+	/// returns the timeDelta between the server local time and the client local time
+	inline int timeDelta() const { return timeDelta_; }
 
 	/// Sets the socket key identifier
 	virtual void setSocketKey(const QString &socketKey) { socketKey_ = socketKey; }
@@ -73,6 +75,9 @@ public:
 	virtual QString toString() const = 0;
 
 protected:
+	/// calculate the delta between the client time and the server time i(in ms)
+	int calculateTimeDelta();
+
 	/// Writes this AMDSClientRequest to an QDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(QDataStream *dataStream);
 	/// Reads this AMDSClientRequest from the QDataStream, returns 0 if no errors are encountered
@@ -93,6 +98,9 @@ protected:
 	AMDSClientRequest::ResponseType responseType_;
 	/// the client local time, in UTC
 	QDateTime clientLocalTime_;
+
+	/// the timeDelta between the server local time and the client localtime
+	int timeDelta_;
 
 };
 
