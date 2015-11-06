@@ -125,6 +125,10 @@ void AMDSScalerDetector::onStartScalerScanTimer()
 	if (scalerScanTimer_->isActive())
 		scalerScanTimer_->stop();
 
+	if (!isListedChannelEnabled()) {
+		return;
+	}
+
 	scalerScanTimer_->start(dwellTime_);
 }
 
@@ -163,4 +167,16 @@ void AMDSScalerDetector::initializePVControls()
 
 	connect(pvControlSet_, SIGNAL(connected(bool)), this, SLOT(onAllControlsConnected(bool)));
 	connect(pvControlSet_, SIGNAL(controlSetTimedOut()), this, SLOT(onAllControlsTimedOut()));
+}
+
+bool AMDSScalerDetector::isListedChannelEnabled()
+{
+	foreach (AMSinglePVControl* channelStatusControl, channelStatusControlList_) {
+		if (channelStatusControl->value() != 1) {
+			AMErrorMon::alert(this, 0, QString("Channel %1 is NOT enabled.").arg(channelStatusControl->name()));
+			return false;
+		}
+	}
+
+	return true;
 }

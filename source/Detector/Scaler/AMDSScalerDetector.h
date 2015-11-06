@@ -58,6 +58,9 @@ protected:
 	/// helper function to initialize the PV controls of the scaler
 	void initializePVControls();
 
+	/// helper function to check whether all the listed channel is enabled or not
+	bool isListedChannelEnabled();
+
 protected:
 	/// the configuration of the scaler
 	AMDSScalerConfigurationMap *scalerConfiguration_;
