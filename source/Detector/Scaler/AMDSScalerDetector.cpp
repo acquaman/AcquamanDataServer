@@ -27,18 +27,10 @@ AMDSScalerDetector::AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfigu
 	totalNumberOfScans_ = 0;
 
 	initializePVControls();
-
-	scalerScanTimer_ = new QTimer(this);
-	connect(scalerScanTimer_, SIGNAL(timeout()), this, SLOT(onFetchScanBuffer()));
 }
 
 AMDSScalerDetector::~AMDSScalerDetector()
 {
-	if (scalerScanTimer_->isActive())
-		scalerScanTimer_->stop();
-
-	scalerScanTimer_->deleteLater();
-
 	channelStatusControlSet_->clear();
 	pvControlSet_->clear();
 }
@@ -52,6 +44,7 @@ void AMDSScalerDetector::onFetchScanBuffer()
 
 	int channelCount = enabledChannelCount();
 	QVector<int> countBuffer(channelCount * scansInABuffer_ + 1); // need one extra buffer for the # of channels
+	qDebug()<<"==== read data: " << QDateTime::currentDateTime();
 	scanControl_->values(channelCount, countBuffer.data());
 
 	// put the counts array to the FlatArrayList
@@ -87,8 +80,6 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 	totalNumberOfScansControl_->move(defaultTotalNumberOfScans_);
 
 	continuousScanControl_->move(AMDSScalerDetector::Continuous); // switch to continuous mode
-
-	onStartScalerScanTimer();
 }
 
 void AMDSScalerDetector::onAllControlsTimedOut()
@@ -103,7 +94,6 @@ void AMDSScalerDetector::onDwellTimeControlValueChanged(double newValue)
 		AMErrorMon::alert(this, 0, QString("Scaler %1 dwell time changed from %2ms to %3ms.").arg(scalerName()).arg(dwellTime_).arg(newValue));
 
 		dwellTime_ = (int)newValue;
-		onStartScalerScanTimer();
 	}
 }
 
@@ -123,19 +113,6 @@ void AMDSScalerDetector::onContinuousScanControlValueChanged(double newValue)
 	}
 }
 
-void AMDSScalerDetector::onStartScalerScanTimer()
-{
-	if (scalerScanTimer_->isActive())
-		scalerScanTimer_->stop();
-
-	if (!isListedChannelEnabled()) {
-		return;
-	}
-
-	scalerScanTimer_->start(dwellTime_);
-}
-
-
 void AMDSScalerDetector::initializePVControls()
 {
 	channelStatusControlSet_ = new AMControlSet(this);
@@ -152,7 +129,7 @@ void AMDSScalerDetector::initializePVControls()
 	AMSinglePVControl *channelStatusControl;
 	foreach (quint8 channelId, enabledChannelIds()) {
 		QString scalerChannelPVName = QString("%1%2:enable").arg(scalerBasePVName()).arg(channelId);
-		channelStatusControl = new AMSinglePVControl(scalerName()+"_channel_"+channelId, scalerChannelPVName, this);
+		channelStatusControl = new AMSinglePVControl(scalerChannelPVName, scalerChannelPVName, this);
 
 		channelStatusControlSet_->addControl(channelStatusControl);
 		pvControlSet_->addControl(channelStatusControl);
@@ -168,20 +145,9 @@ void AMDSScalerDetector::initializePVControls()
 	connect(dwellTimeControl_, SIGNAL(valueChanged(double)), this, SLOT(onDwellTimeControlValueChanged(double)));
 	connect(scansInABufferControl_, SIGNAL(valueChanged(double)), this, SLOT(onScansInABufferControlValueChanged(double)));
 	connect(continuousScanControl_, SIGNAL(valueChanged(double)), this, SLOT(onContinuousScanControlValueChanged(double)));
+	connect(scanControl_, SIGNAL(valueChanged(double)), this, SLOT(onFetchScanBuffer()));
 
 	connect(pvControlSet_, SIGNAL(controlSetValuesChanged()), this, SLOT(onStartScalerScanTimer()));
 	connect(pvControlSet_, SIGNAL(connected(bool)), this, SLOT(onAllControlsConnected(bool)));
 	connect(pvControlSet_, SIGNAL(controlSetTimedOut()), this, SLOT(onAllControlsTimedOut()));
-}
-
-bool AMDSScalerDetector::isListedChannelEnabled()
-{
-	foreach (AMControl* channelStatusControl, channelStatusControlSet_->toList()) {
-		if (channelStatusControl->value() != 1) {
-			AMErrorMon::alert(this, 0, QString("Channel %1 is NOT enabled.").arg(channelStatusControl->name()));
-			return false;
-		}
-	}
-
-	return true;
 }

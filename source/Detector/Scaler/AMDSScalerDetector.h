@@ -54,15 +54,9 @@ protected slots:
 	/// slot to update the # of continuous scans
 	void onContinuousScanControlValueChanged(double);
 
-	/// slot to try to start the timer to update scan counts
-	void onStartScalerScanTimer();
-
 protected:
 	/// helper function to initialize the PV controls of the scaler
 	void initializePVControls();
-
-	/// helper function to check whether all the listed channel is enabled or not
-	bool isListedChannelEnabled();
 
 protected:
 	/// the configuration of the scaler
