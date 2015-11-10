@@ -61,7 +61,8 @@ namespace AMDSClientRequestDefinitions {
 		StartTimeToEndTime = 4,
 		MiddleTimePlusCountBeforeAndAfter = 5,
 		Continuous = 6,
-		InvalidRequest = 7 // NOTE: this must be the last item of the RequestType definition
+		Configuration = 7,
+		InvalidRequest = 8 // NOTE: this must be the last item of the RequestType definition
 	};
 
 	inline static QString errorMessage(int errorCode, OperationType operType, RequestType msgType) {

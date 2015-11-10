@@ -27,7 +27,7 @@ HEADERS *= \
 	source/ClientRequest/AMDSClientDataRequest.h \
 	source/ClientRequest/AMDSClientIntrospectionRequest.h \
 	source/ClientRequest/AMDSClientStatisticsRequest.h \
-#    source/ClientRequest/AMDSClientConfigurationRequest.h \
+	source/ClientRequest/AMDSClientConfigurationRequest.h \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
@@ -63,7 +63,7 @@ SOURCES *= \
 	source/ClientRequest/AMDSClientDataRequest.cpp \
 	source/ClientRequest/AMDSClientIntrospectionRequest.cpp \
 	source/ClientRequest/AMDSClientStatisticsRequest.cpp \
-#    source/ClientRequest/AMDSClientConfigurationRequest.cpp \
+	source/ClientRequest/AMDSClientConfigurationRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
