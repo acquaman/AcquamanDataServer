@@ -15,7 +15,6 @@ AMDSLightWeightScalarDataHolder::AMDSLightWeightScalarDataHolder(AMDSLightWeight
 
 AMDSLightWeightScalarDataHolder::~AMDSLightWeightScalarDataHolder()
 {
-	qDebug() << "==== delete AMDSLightWeightScalarDataHolder";
 }
 
 /// ======================= implementation of AMDSFullScalarDataHolder =======================

@@ -31,10 +31,8 @@ AMDSDataHolder::AMDSDataHolder(QObject *parent)
 {
 }
 
-#include <QDebug>
 AMDSDataHolder::~AMDSDataHolder()
 {
-	qDebug() << "==== delete dataHolder: " ;
 }
 
 AMDSDataHolder& AMDSDataHolder::operator =(AMDSDataHolder &dataHolder)
@@ -80,7 +78,6 @@ AMDSLightWeightDataHolder::AMDSLightWeightDataHolder(AMDSLightWeightDataHolder &
 
 AMDSLightWeightDataHolder::~AMDSLightWeightDataHolder()
 {
-	qDebug() << "==== delete AMDSLightWeightDataHolder";
 	if (eventData_) {
 		eventData_->deleteLater();
 		eventData_ = 0;

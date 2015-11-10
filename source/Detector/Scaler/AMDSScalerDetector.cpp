@@ -44,7 +44,6 @@ void AMDSScalerDetector::onFetchScanBuffer()
 
 	int channelCount = enabledChannelCount();
 	QVector<int> countBuffer(channelCount * scansInABuffer_ + 1); // need one extra buffer for the # of channels
-	qDebug()<<"==== read data: " << QDateTime::currentDateTime();
 	scanControl_->values(channelCount, countBuffer.data());
 
 	// put the counts array to the FlatArrayList

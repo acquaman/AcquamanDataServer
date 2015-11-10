@@ -17,7 +17,6 @@ AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHo
 
 AMDSLightWeightGenericFlatArrayDataHolder::~AMDSLightWeightGenericFlatArrayDataHolder()
 {
-	qDebug() << "==== delete AMDSLightWeightGenericFlatArrayDataHolder";
 	valueFlatArray_.clear();
 }
 
