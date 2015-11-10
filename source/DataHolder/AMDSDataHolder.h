@@ -69,7 +69,7 @@ public:
 	/// pure virtual function to copy the data of inputArray to local instance
 	virtual void setData(AMDSFlatArray *inputArray) = 0;
 	/// pure virtual function to return the data in the dataholder
-	virtual QString printData() = 0;
+	virtual QString toString() = 0;
 
 	/// pure virtual function to set the Axes information
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes) = 0;
@@ -174,7 +174,7 @@ public:
 	/// implement the setData() function to copy the data of inputArray to local instance
 	virtual void setData(AMDSFlatArray *inputValues) { return lightWeightDataHolder_->setData(inputValues); }
 	/// implement the function to return the data string
-	virtual QString printData() { return lightWeightDataHolder_->printData(); }
+	virtual QString toString() { return lightWeightDataHolder_->toString(); }
 	/// implement the setAxes() function to set the axes information of the instance
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 

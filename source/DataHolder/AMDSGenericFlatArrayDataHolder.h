@@ -28,7 +28,7 @@ public:
 	/// implement the setData function to update valueFlatArray_ with given inputArray
 	virtual void setData(AMDSFlatArray *inputArray) { inputArray->resetTargetArrayAndReplaceData(&valueFlatArray_); }
 	/// implement the function to return the data string
-	virtual QString printData();
+	virtual QString toString();
 
 	/// reimplement the function copy the value of source instance to the current instance
 	virtual void cloneData(AMDSDataHolder *dataHolder);

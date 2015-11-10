@@ -71,7 +71,7 @@ public:
 	/// clear the target array and copy the data array of the current dataset to the target array
 	bool resetTargetArrayAndReplaceData(AMDSFlatArray *targetArray) const;
 	/// print all the data in the FlatArray to a QString
-	QString printData() const;
+	QString toString() const;
 
 	/// returns the current type of data
 	inline AMDSDataTypeDefinitions::DataType dataType() const { return dataType_; }
