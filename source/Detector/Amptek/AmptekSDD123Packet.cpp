@@ -163,7 +163,7 @@ void AmptekSDD123Packet::removeRelatedSynchRequestID(int syncRequestID){
 /// set the AmptekCommand
 void AmptekSDD123Packet::setAmptekCommand(const QString &commandHex)
 {
-	amptekCommand_ = AmptekCommandManagerSGM::sddCommands()->amptekCommandFromHex(commandHex);
+	amptekCommand_ = AmptekCommandManagerSGM::sddCommands()->amdsCommandFromHex(commandHex);
 }
 
 void AmptekSDD123Packet::calculatePacket(){

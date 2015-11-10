@@ -140,7 +140,7 @@ void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekComman
 		requestSpectrumTime_->restart();
 	}
 
-	AmptekSDD123Packet requestStatusPacket(packetIDCounter_, AmptekCommandManagerSGM::sddCommands()->amptekCommand(command).hex(), dataStringHex);
+	AmptekSDD123Packet requestStatusPacket(packetIDCounter_, AmptekCommandManagerSGM::sddCommands()->amdsCommand(command).hex(), dataStringHex);
 	packetIDCounter_++;
 
 	if (sendFakeRequest) {

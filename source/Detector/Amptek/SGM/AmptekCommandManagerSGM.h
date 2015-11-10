@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QStringList>
 
-#include "Detector/Amptek/AmptekCommandManager.h"
+#include "DataElement/AMDSCommandManager.h"
 
-class AmptekCommandManagerSGM : public AmptekCommandManager
+class AmptekCommandManagerSGM : public AMDSCommandManager
 {
 	Q_OBJECT
 
@@ -88,7 +88,7 @@ protected:
 	AmptekCommandManagerSGM();
 
 	/// implementation of the function to initialize the amptek commands and the hex mappling
-	virtual void initiateAmptekCommands();
+	virtual void initiateAMDSCommands();
 	/// helper function to create response from given texts
 	QStringList internalCreateResponsesFromText(const QStringList &texts);
 
