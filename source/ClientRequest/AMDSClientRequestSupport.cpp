@@ -1,15 +1,16 @@
 #include "AMDSClientRequestSupport.h"
 
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
-#include "source/ClientRequest/AMDSClientStatisticsRequest.h"
-#include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
-#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
-#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "ClientRequest/AMDSClientStatisticsRequest.h"
+#include "ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "ClientRequest/AMDSClientConfigurationRequest.h"
 
-#include "source/util/AMDSMetaObjectSupport.h"
+#include "util/AMDSMetaObjectSupport.h"
 
 AMDSClientRequestObjectInfo::AMDSClientRequestObjectInfo()
 {
@@ -63,6 +64,8 @@ namespace AMDSClientRequestSupport{
 			AMDSClientRequestSupport::registerClass<AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest>(AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter);
 		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Continuous))
 			AMDSClientRequestSupport::registerClass<AMDSClientContinuousDataRequest>(AMDSClientRequestDefinitions::Continuous);
+		if(!AMDSClientRequestSupport::registeredClasses()->contains(AMDSClientRequestDefinitions::Configuration))
+			AMDSClientRequestSupport::registerClass<AMDSClientConfigurationRequest>(AMDSClientRequestDefinitions::Configuration);
 	}
 
 	const QHash<AMDSClientRequestDefinitions::RequestType, AMDSClientRequestObjectInfo>* registeredClasses() {

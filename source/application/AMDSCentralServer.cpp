@@ -7,6 +7,7 @@
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
+#include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "DataElement/AMDSDwellStatusData.h"
 #include "DataElement/AMDSBufferGroup.h"
@@ -76,11 +77,18 @@ void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 erro
 	}
 }
 
-void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *clientRequest){
-	if(clientRequest->isInstrospectionMessage()) {
+void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *clientRequest)
+{
+	switch ( clientRequest->requestType() ) {
+	case AMDSClientRequestDefinitions::Introspection:
 		processIntrospectionClientRequest(clientRequest);
-	} else {
+		break;
+	case AMDSClientRequestDefinitions::Configuration:
+		processConfigurationClientRequest(clientRequest);
+		break;
+	default:
 		processClientDataRequest(clientRequest);
+		break;
 	}
 }
 
@@ -107,6 +115,17 @@ void AMDSCentralServer::processIntrospectionClientRequest(AMDSClientRequest *cli
 	}
 
 	emit clientRequestProcessed(clientIntrospectionRequest);
+}
+
+void AMDSCentralServer::processConfigurationClientRequest(AMDSClientRequest *clientRequest)
+{
+	QString errorMessage = "Succeeded to process the data request";
+	AMDSClientConfigurationRequest *clientConfigurationRequest = qobject_cast<AMDSClientConfigurationRequest*>(clientRequest);
+
+	// TODO
+
+	clientConfigurationRequest->setErrorMessage(errorMessage);
+	emit clientRequestProcessed(clientConfigurationRequest);
 }
 
 void AMDSCentralServer::processClientDataRequest(AMDSClientRequest *clientRequest)

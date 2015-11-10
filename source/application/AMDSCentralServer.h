@@ -52,6 +52,8 @@ protected:
 
 	/// function to process the instrospection client request from the TCP Data server
 	void processIntrospectionClientRequest(AMDSClientRequest *clientRequest);
+	/// function to process the configuration client request from the TCP Data server
+	void processConfigurationClientRequest(AMDSClientRequest *clientRequest);
 	/// function to process the client data request from the TCP Data server
 	void processClientDataRequest(AMDSClientRequest *clientRequest);
 

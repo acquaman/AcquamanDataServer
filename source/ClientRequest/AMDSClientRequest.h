@@ -34,10 +34,10 @@ public:
 	inline bool isInstrospectionMessage() { return requestType() == AMDSClientRequestDefinitions::Introspection; }
 	/// returns whether this is a statistics message
 	inline bool isStatisticsMessage() { return requestType() == AMDSClientRequestDefinitions::Statistics; }
-	/// returns whether this is a data client data request
+	/// returns whether this is a data client request
 	bool isDataClientRequest();
-	/// returns whether this is an introspection message
-	inline bool isIntrospectionMessage() { return requestType() == AMDSClientRequestDefinitions::Introspection;}
+	/// returns whether this is a configuration client request
+	bool isConfigurationClientRequest();
 	/// returns whether this is a continuous message
 	inline bool isContinuousMessage() { return requestType() == AMDSClientRequestDefinitions::Continuous;}
 
