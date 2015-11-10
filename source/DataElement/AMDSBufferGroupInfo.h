@@ -1,8 +1,11 @@
 #ifndef AMDSBUFFERGROUPINFO_H
 #define AMDSBUFFERGROUPINFO_H
 
-#include "source/DataElement/AMDSAxisInfo.h"
-#include "source/DataElement/AMDSnDIndex.h"
+#include <QDataStream>
+
+#include "DataElement/AMDSAxisInfo.h"
+#include "DataElement/AMDSnDIndex.h"
+#include "DataElement/AMDSDataTypeDefinitions.h"
 
 #define AMDS_SERVER_ERR_BUFFER_GROUP 20200
 #define AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN 20201
@@ -16,11 +19,17 @@ public:
 		NoFlatten = 2
 	};
 
-	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
+	AMDSBufferGroupInfo(const QString& name = QString(), const QString& description = QString(), const QString& units = QString(), AMDSDataTypeDefinitions::DataType dataType=AMDSDataTypeDefinitions::Double, const DataFlattenMethod flattenMethod=AMDSBufferGroupInfo::NoFlatten, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>());
 	/// Copy constructor
 	AMDSBufferGroupInfo(const AMDSBufferGroupInfo& other);
+
 	/// Assignment operator
 	AMDSBufferGroupInfo& operator=(const AMDSBufferGroupInfo& other);
+
+	/// Writes this AMDSBufferGroupInfo to a DataStream, returns true if no errors are encountered
+	bool writeToDataStream(QDataStream *dataStream);
+	/// Reads this AMDSBufferGroupInfo from the DataStream, returns true if no errors are encountered
+	bool readFromDataStream(QDataStream *dataStream);
 
 	/// returns the name of the bufferGroupInfo
 	inline QString name() const { return name_; }
@@ -28,6 +37,8 @@ public:
 	inline QString description() const { return description_; }
 	/// returns the units of the bufferGroupInfo
 	inline QString units() const { return units_; }
+	/// returns the dataType of the bufferGroup
+	inline AMDSDataTypeDefinitions::DataType dataType() const { return dataType_; }
 	/// returns whether the bufferGroup is enabled flatten
 	inline bool isFlattenEnabled() const { return flattenMethod_ != NoFlatten; }
 	/// returns the flatten method of the bufferGroup
@@ -49,18 +60,20 @@ public:
 	inline quint64 spanSize() const;
 
 	/// Set the name of the bufferGroupInfo
-	void setName(const QString &name) { name_ = name; }
+	inline void setName(const QString &name) { name_ = name; }
 	/// Set the description of the bufferGroupInfo
-	void setDescription(const QString &description) { description_ = description; }
+	inline void setDescription(const QString &description) { description_ = description; }
 	/// Set the units of the bufferGroupInfo
-	void setUnits(const QString &units) { units_ = units; }
+	inline void setUnits(const QString &units) { units_ = units; }
+	/// Set the dataType of the bufferGroupInfo
+	inline void setDataType(AMDSDataTypeDefinitions::DataType dataType) { dataType_ = dataType; }
 	/// Set the axes of the bufferGroupInfo
-	void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
+	inline void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
 	/// Set how the bufferGroup should be flattened
-	void setFlattenMethod(DataFlattenMethod method) { flattenMethod_ = method; }
+	inline void setFlattenMethod(DataFlattenMethod method) { flattenMethod_ = method; }
 
 	/// If the bufferGrou name is "Invalid", there should be no Data
-	bool includeData() const { return name_ != "Invalid"; }
+	inline bool includeData() const { return name_ != "Invalid"; }
 
 	/// convert the buffer group to a string
 	QString toString() const;
@@ -72,6 +85,8 @@ protected:
 	QString description_;
 	/// the unit of the bufferGroupInfo
 	QString units_;
+	/// the type of the data
+	AMDSDataTypeDefinitions::DataType dataType_;
 	/// the definition on how the data should be flattened
 	DataFlattenMethod flattenMethod_;
 

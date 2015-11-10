@@ -46,6 +46,8 @@ namespace AMDSDataHolderSupport{
 			AMDSDataHolderSupport::registerClass<AMDSLightWeightScalarDataHolder>();
 		if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSLightWeightSpectralDataHolder::staticMetaObject.className()))
 			AMDSDataHolderSupport::registerClass<AMDSLightWeightSpectralDataHolder>();
+		if(!AMDSDataHolderSupport::registeredClasses()->contains(AMDSDwellSpectralDataHolder::staticMetaObject.className()))
+			AMDSDataHolderSupport::registerClass<AMDSDwellSpectralDataHolder>();
 	}
 
 	const QHash<QString, AMDSDataHolderObjectInfo>* registeredClasses() {

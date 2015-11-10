@@ -1,15 +1,30 @@
 #include "AMDSThreadedBufferGroup.h"
 
-#include "source/DataElement/AMDSBufferGroup.h"
+#include "DataElement/AMDSBufferGroup.h"
+#include "DataHolder/AMDSSpectralDataHolder.h"
+#include "ClientRequest/AMDSClientDataRequest.h"
+#include "util/AMErrorMonitor.h"
 
-AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(AMDSBufferGroup *bufferGroup, QObject *parent) :
+AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
 	QObject(parent)
 {
-	bufferGroup_ = bufferGroup;
-	bufferGroupThread_= new QThread(this);
+	bufferGroupThread_= new QThread();
+
+	bufferGroup_ = new AMDSBufferGroup(bufferGroupInfo, maxCountSize, enableCumulative);
 	bufferGroup_->moveToThread(bufferGroupThread_);
+
 	connect(bufferGroupThread_, SIGNAL(started()), this, SLOT(onBufferGroupThreadStarted()));
+	connect(bufferGroupThread_, SIGNAL(finished()), bufferGroup_, SLOT(deleteLater()));
+
 	bufferGroupThread_->start();
+}
+
+AMDSThreadedBufferGroup::~AMDSThreadedBufferGroup()
+{
+	if (bufferGroupThread_->isRunning())
+		bufferGroupThread_->quit();
+
+	bufferGroupThread_->deleteLater();
 }
 
 AMDSBufferGroupInfo AMDSThreadedBufferGroup::bufferGroupInfo() const{
@@ -17,11 +32,37 @@ AMDSBufferGroupInfo AMDSThreadedBufferGroup::bufferGroupInfo() const{
 	return bufferGroup_->bufferGroupInfo();
 }
 
-AMDSBufferGroup * AMDSThreadedBufferGroup::bufferGroup() const
+QString AMDSThreadedBufferGroup::bufferGroupName() const
 {
-	return bufferGroup_;
+	return bufferGroupInfo().name();
+}
+
+void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, bool elapsedDwellTime)
+{
+	QWriteLocker writeLock(&lock_);
+	bufferGroup_->append(value, elapsedDwellTime);
+}
+
+void AMDSThreadedBufferGroup::clear() {
+	QWriteLocker writeLock(&lock_);
+
+	if (bufferGroup_)
+		bufferGroup_->clear();
+
+}
+
+void AMDSThreadedBufferGroup::finishDwellDataUpdate(double elapsedTime)
+{
+	QReadLocker readLock(&lock_);
+	bufferGroup_->finishDwellDataUpdate(elapsedTime);
 }
 
 void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){
 	emit bufferGroupReady();
 }
+
+void AMDSThreadedBufferGroup::forwardClientRequest(AMDSClientRequest *clientRequest)
+{
+	bufferGroup_->processClientRequest(clientRequest);
+}
+

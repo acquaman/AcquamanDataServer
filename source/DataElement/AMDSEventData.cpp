@@ -1,9 +1,22 @@
-#include "source/DataElement/AMDSEventData.h"
+#include "AMDSEventData.h"
 
-#include "source/Connection/AMDSDataStream.h"
-#include "source/DataElement/AMDSEventDataSupport.h"
+#include "DataElement/AMDSEventDataSupport.h"
 
 // ======== implementation of AMDSEventData  ===========
+AMDSEventData *AMDSEventData::decodeAndInstantiateEventData(QDataStream *dataStream)
+{
+	QString eventDataClassName;
+	*dataStream >> eventDataClassName;
+	if(dataStream->status() != QDataStream::Ok)
+		return 0;
+
+	AMDSEventData *eventData = AMDSEventDataSupport::instantiateEventDataFromClassName(eventDataClassName);
+	if (eventData)
+		eventData->readFromDataStream(dataStream);
+
+	return eventData;
+}
+
 AMDSEventData::AMDSEventData(QObject *parent) :
 	QObject(parent)
 {
@@ -44,7 +57,14 @@ void AMDSLightWeightEventData::cloneData(AMDSEventData *sourceEventData)
 	setEventTime(sourceEventData->eventTime());
 }
 
-bool AMDSLightWeightEventData::writeToDataStream(AMDSDataStream *dataStream) const{
+bool AMDSLightWeightEventData::writeToDataStream(QDataStream *dataStream)
+{
+	//encodeEventDataType
+	QString eventDataClassNameAsString(metaObject()->className());
+	*dataStream << eventDataClassNameAsString;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
 	*dataStream << eventTime_;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
@@ -52,7 +72,7 @@ bool AMDSLightWeightEventData::writeToDataStream(AMDSDataStream *dataStream) con
 	return true;
 }
 
-bool AMDSLightWeightEventData::readFromDataStream(AMDSDataStream *dataStream){
+bool AMDSLightWeightEventData::readFromDataStream(QDataStream *dataStream){
 	QDateTime readEventTime;
 	*dataStream >> readEventTime;
 	if(dataStream->status() != QDataStream::Ok)
@@ -107,7 +127,8 @@ void AMDSFullEventData::cloneData(AMDSEventData *sourceEventData)
 	}
 }
 
-bool AMDSFullEventData::writeToDataStream(AMDSDataStream *dataStream) const{
+bool AMDSFullEventData::writeToDataStream(QDataStream *dataStream)
+{
 	if(!lightWeightEventData_->writeToDataStream(dataStream))
 		return false;
 
@@ -124,7 +145,7 @@ bool AMDSFullEventData::writeToDataStream(AMDSDataStream *dataStream) const{
 	return true;
 }
 
-bool AMDSFullEventData::readFromDataStream(AMDSDataStream *dataStream){
+bool AMDSFullEventData::readFromDataStream(QDataStream *dataStream){
 	if (lightWeightEventData_) {
 		lightWeightEventData_->deleteLater();
 	}

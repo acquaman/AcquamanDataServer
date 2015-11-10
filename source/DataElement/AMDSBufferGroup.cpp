@@ -1,25 +1,121 @@
 #include "AMDSBufferGroup.h"
 
-#include "source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
-#include "source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
-#include "source/ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
-#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "ClientRequest/AMDSClientStartTimePlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
+#include "ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
+
+#include "DataHolder/AMDSSpectralDataHolder.h"
+
 #include "util/AMErrorMonitor.h"
 
-AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
+AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, bool enableCumulative, QObject *parent) :
 	QObject(parent), dataHolders_(maxSize)
 {
 	bufferGroupInfo_ = bufferGroupInfo;
+
+	enableCumulative_ = enableCumulative;
+	cumulativeDataHolder_ = 0;
 }
 
 AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
-	QObject(other.parent()), dataHolders_(other.dataHolders_)
+	QObject(other.parent()), dataHolders_(other.dataHolders_.maxSize())
 {
+	bufferGroupInfo_ = other.bufferGroupInfo();
+
+	enableCumulative_ = other.enableCumulative_;
+	cumulativeDataHolder_ = other.cumulativeDataHolder_;
+}
+
+AMDSBufferGroup::~AMDSBufferGroup()
+{
+	clear();
+}
+
+
+AMDSDataHolder * AMDSBufferGroup::cumulativeDataHolder() const
+{
+	QReadLocker readLock(&lock_);
+	return cumulativeDataHolder_;
+}
+
+int AMDSBufferGroup::count() const
+{
+	QReadLocker readLock(&lock_);
+	return dataHolders_.count();
+}
+
+void AMDSBufferGroup::clear()
+{
+	QWriteLocker writeLock(&lock_);
+
+	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++) {
+		dataHolders_[iElement]->deleteLater();
+	}
+	dataHolders_.clear();
+
+	if (enableCumulative_ && cumulativeDataHolder_) {
+		cumulativeDataHolder_->deleteLater();
+		cumulativeDataHolder_ = 0;
+	}
+}
+
+void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
+{
+	QWriteLocker writeLock(&lock_);
+
+	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(newData);
+	if(dataHolderRemoved)
+		dataHolderRemoved->deleteLater();
+
+	if (enableCumulative_) {
+		if (cumulativeDataHolder_) {
+			AMDSDataHolder *tempDataHolder = cumulativeDataHolder_;
+
+			cumulativeDataHolder_ = (*cumulativeDataHolder_) + (*newData);
+			tempDataHolder->deleteLater();
+		} else {
+			cumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromClassName(newData->metaObject()->className());
+			cumulativeDataHolder_->cloneData(newData);
+		}
+
+		AMDSDwellSpectralDataHolder *specturalCumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(cumulativeDataHolder_);
+		if (specturalCumulativeDataHolder) {
+			AMDSDwellStatusData cumulativeStatusData = specturalCumulativeDataHolder->dwellStatusData();
+
+//			emit continuousDataUpdate(specturalCumulativeDataHolder);
+//			emit continuousStatusDataUpdate(cumulativeStatusData, count());
+//			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
+		} else {
+			AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
+		}
+	}
+}
+
+void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
+{
+	if (cumulativeEnabled()) {
+		AMDSDwellSpectralDataHolder *specturalCumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(cumulativeDataHolder());
+		if (specturalCumulativeDataHolder) {
+			AMDSDwellStatusData cumulativeStatusData = specturalCumulativeDataHolder->dwellStatusData();
+
+			emit dwellFinishedTimeUpdate(elapsedTime);
+			emit dwellFinishedDataUpdate(specturalCumulativeDataHolder);
+			emit dwellFinishedStatusDataUpdate(cumulativeStatusData, count());
+			emit dwellFinishedAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedTime);
+		} else {
+			AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
+		}
+	}
 }
 
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	QReadLocker readLock(&lock_);
+
+	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest *>(clientRequest);
+	if (clientDataRequest)
+		clientDataRequest->setBufferGroupInfo(bufferGroupInfo());
 
 	switch(clientRequest->requestType()){
 	case AMDSClientRequestDefinitions::Introspection:
@@ -65,6 +161,7 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	default:
 		break;
 	}
+
 	emit clientRequestProcessed(clientRequest);
 }
 
@@ -213,7 +310,9 @@ void AMDSBufferGroup::populateData(AMDSClientContinuousDataRequest *clientDataRe
 		clientDataRequest->setLastFetchTime(lastDataTime);
 		// Since the last fetch actually included the data at the given time, we need to increment the index
 		// by one, to start from the one following:
-		populateData(clientDataRequest, startIndex++, dataHolders_.count());
+		populateData(clientDataRequest, startIndex, dataHolders_.count());
+
+		startIndex++;
 	}
 }
 

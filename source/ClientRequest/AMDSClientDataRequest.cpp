@@ -1,8 +1,7 @@
 #include "AMDSClientDataRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
-#include "source/DataHolder/AMDSScalarDataHolder.h"
-#include "source/DataHolder/AMDSDataHolderSupport.h"
+#include "DataHolder/AMDSScalarDataHolder.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
@@ -58,9 +57,13 @@ AMDSClientDataRequest& AMDSClientDataRequest::operator =(const AMDSClientDataReq
 void AMDSClientDataRequest::copyAndAppendData(AMDSDataHolder *dataHolder)
 {
 	AMDSDataHolder *cloneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dataHolder);
-	(*cloneDataHolder) = (*dataHolder);
+	if (cloneDataHolder) {
+		(*cloneDataHolder) = (*dataHolder);
 
-	data_.append(cloneDataHolder);
+		data_.append(cloneDataHolder);
+	} else {
+		AMErrorMon::error(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("This type (%1) of dataHolder might NOT be registered. Please contact Acquaman Developers.").arg(dataHolder->metaObject()->className()));
+	}
 }
 
 void AMDSClientDataRequest::clearData()
@@ -71,7 +74,33 @@ void AMDSClientDataRequest::clearData()
 	data_.clear();
 }
 
-int AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+bool AMDSClientDataRequest::validateResponse()
+{
+	bool noError = true;
+	if(responseType() == AMDSClientRequest::Error) {
+		AMErrorMon::alert(this, AMDS_CLIENTREQUEST_ERR_FAILED_TO_RETRIEVE_DATA, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
+		noError = false;
+	}
+
+	return noError;
+}
+
+QString AMDSClientDataRequest::toString() const
+{
+	QString messageData = QString("Data of Data message (%1 -- %2):").arg(socketKey()).arg(bufferName());
+
+	if (data().count() == 0)
+		messageData = QString("%1\n\tNo data for this message yet").arg(messageData);
+	else {
+		for(int x = 0, size = data().count(); x < size; x++){
+			messageData = QString("%1\n\tData at %2 - %3").arg(messageData).arg(x).arg(data().at(x)->printData());
+		}
+	}
+
+	return messageData;
+}
+
+int AMDSClientDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
 	if(errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -94,8 +123,7 @@ int AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 
 	// write data to the data stream
 	if(includeData){
-
-		dataStream->write(bufferGroupInfo_);
+		bufferGroupInfo_.writeToDataStream(dataStream);
 
 		quint8 uniformDataType = (quint8)uniformDataType_;
 		*dataStream << uniformDataType;
@@ -104,30 +132,11 @@ int AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 
 		quint16 dataCount = data_.count();
 		*dataStream << dataCount;
-		if(dataStream->status() != QDataStream::Ok || dataCount == 0)
+		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_COUNT;
 
-		bool encodeDataTypeInDataHolder = true;
-		AMDSDataTypeDefinitions::DataType underlyingDataType = data_.at(0)->dataType();
-		if(underlyingDataType != AMDSDataTypeDefinitions::InvalidType)
-			encodeDataTypeInDataHolder = false;
-		*dataStream << encodeDataTypeInDataHolder;
-		if(dataStream->status() != QDataStream::Ok)
-			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DECODE_DATA_TYPE_IN_DATA_HOLDER;
-
-		if(!encodeDataTypeInDataHolder){
-			dataStream->encodeDataType(underlyingDataType);
-			if(dataStream->status() != QDataStream::Ok)
-				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_HOLDER_TYPE;
-		}
-
-		dataStream->encodeDataHolderType(*(data_.at(0)));
-		if(dataStream->status() != QDataStream::Ok)
-			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DECODE_DATA_TYPE;
-
 		for(int x = 0, size = data_.count(); x < size; x++){
-			dataStream->write(*(data_.at(x)), encodeDataTypeInDataHolder);
-			if(dataStream->status() != QDataStream::Ok)
+			if (!AMDSDataHolder::encodeAndwriteDataHolder(dataStream, data_.at(x)))
 				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_HOLDER_DATA;
 		}
 	}
@@ -135,7 +144,7 @@ int AMDSClientDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientDataRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::readFromDataStream(dataStream);
 	if(errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -148,8 +157,6 @@ int AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 	AMDSBufferGroupInfo readBufferGroupInfo;
 	quint8 readUniformDataType;
 	quint16 readDataCount;
-	bool decodeDataTypeInDataHolder;
-	AMDSDataTypeDefinitions::DataType readDataType;
 	QList<AMDSDataHolder*> readDataHolder;
 
 	*dataStream >> readBufferName;
@@ -169,7 +176,9 @@ int AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INCLUDE_DATA;
 
 	if(readIncludeData){
-		dataStream->read(readBufferGroupInfo);
+		if (! readBufferGroupInfo.readFromDataStream(dataStream))
+			return false;
+
 		*dataStream >> readUniformDataType;
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_UNIFORM_DATA_TYPE;
@@ -178,36 +187,17 @@ int AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_COUNT;
 
-		*dataStream >> decodeDataTypeInDataHolder;
-		if(dataStream->status() != QDataStream::Ok)
-			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DECODE_DATA_TYPE_IN_DATA_HOLDER;
-
-		if(!decodeDataTypeInDataHolder){
-			readDataType = dataStream->decodeDataType();
-			if(dataStream->status() != QDataStream::Ok)
-				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DECODE_DATA_TYPE;
-		}
-		else
-			readDataType = AMDSDataTypeDefinitions::InvalidType;
-
-		QString readDataHolderType;
-		readDataHolderType = dataStream->decodeDataHolderType();
-		if(readDataHolderType.isEmpty())
-			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_HOLDER_TYPE;
-
-		AMDSDataHolder *oneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(readDataHolderType);
-		if(!oneDataHolder)
-			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_INSTANTIATE_DATA_HOLDER;
-
+		AMDSDataHolder *oneDataHolder = 0;
 		for(int x = 0; x < readDataCount; x++){
-			oneDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(readDataHolderType);
-			dataStream->read(*oneDataHolder, readDataType);
-			if(dataStream->status() != QDataStream::Ok)
+			oneDataHolder = AMDSDataHolder::decodeAndInstantiateDataHolder(dataStream);
+			if (oneDataHolder == 0)
 				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_DATA_HOLDER_DATA;
+
 			readDataHolder.append(oneDataHolder);
 		}
 	}
 
+	// set the values of the variables
 	setBufferName(readBufferName);
 	setIncludeStatusData(readIncludeStatusData);
 	setFlattenResultData(readFlattenResultData);
@@ -223,32 +213,3 @@ int AMDSClientDataRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
-
-bool AMDSClientDataRequest::validateResponse()
-{
-	bool noError = true;
-	if(responseType() == AMDSClientRequest::Error) {
-		AMErrorMon::alert(this, AMDS_CLIENTREQUEST_ERR_FAILED_TO_RETRIEVE_DATA, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
-		noError = false;
-	}
-
-	return noError;
-}
-
-QString AMDSClientDataRequest::toString() const
-{
-	QString messageData = QString("Data of Data message (%1 -- %2):").arg(socketKey()).arg(bufferName());
-
-	if (data().count() == 0)
-		messageData = QString("%1\n\tNo data for this message yet").arg(messageData);
-	else {
-		for(int x = 0, size = data().count(); x < size; x++){
-			AMDSFlatArray oneFlatArray = AMDSFlatArray(uniformDataType(), bufferGroupInfo().spanSize());
-			data().at(x)->data(&oneFlatArray);
-			messageData = QString("%1\n\tData at %2 - %3").arg(messageData).arg(x).arg(oneFlatArray.printData());
-		}
-	}
-
-	return messageData;
-}
-

@@ -1,7 +1,7 @@
 #ifndef AMDSSCALARDATAHOLDER_H
 #define AMDSSCALARDATAHOLDER_H
 
-#include "source/DataHolder/AMDSGenericFlatArrayDataHolder.h"
+#include "DataHolder/AMDSGenericFlatArrayDataHolder.h"
 
 class AMDSLightWeightScalarDataHolder : public AMDSLightWeightGenericFlatArrayDataHolder
 {
@@ -33,11 +33,6 @@ public:
 	virtual inline bool setSingleValue(quint64 singleValue);
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
-
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
 class AMDSFullScalarDataHolder : public AMDSFullGenericFlatArrayDataHolder
@@ -59,11 +54,6 @@ public:
 	virtual inline bool setSingleValue(float singleValue);
 	virtual inline bool setSingleValue(double singleValue);
 
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
-
 };
 
 ////////////////////////////////////////
@@ -75,83 +65,43 @@ quint32 AMDSLightWeightScalarDataHolder::size(int axisId) const{
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(qint8 singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Signed8)
-		return false;
-
-	valueFlatArray_.vectorQint8()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(quint8 singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Unsigned8)
-		return false;
-
-	valueFlatArray_.vectorQuint8()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(qint16 singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Signed16)
-		return false;
-
-	valueFlatArray_.vectorQint16()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(quint16 singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Unsigned16)
-		return false;
-
-	valueFlatArray_.vectorQuint16()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(qint32 singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Signed32)
-		return false;
-
-	valueFlatArray_.vectorQint32()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(quint32 singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Unsigned32)
-		return false;
-
-	valueFlatArray_.vectorQuint32()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(qint64 singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Signed64)
-		return false;
-
-	valueFlatArray_.vectorQint64()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(quint64 singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Unsigned64)
-		return false;
-
-	valueFlatArray_.vectorQuint64()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(float singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Float)
-		return false;
-
-	valueFlatArray_.vectorFloat()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 bool AMDSLightWeightScalarDataHolder::setSingleValue(double singleValue){
-	if(valueFlatArray_.dataType() != AMDSDataTypeDefinitions::Double)
-		return false;
-
-	valueFlatArray_.vectorDouble()[0] = singleValue;
-	return true;
+	return valueFlatArray_.setValue(0, singleValue);
 }
 
 ////////////////////////////////////////

@@ -1,11 +1,31 @@
 #include "AMDSDataHolder.h"
 
-#include "source/Connection/AMDSDataStream.h"
-#include "source/DataHolder/AMDSDataHolderSupport.h"
-#include "source/DataElement/AMDSEventDataSupport.h"
-#include "source/util/AMDSMetaObjectSupport.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
+#include "DataElement/AMDSEventDataSupport.h"
+#include "util/AMDSMetaObjectSupport.h"
 
 // ======== implementation of AMDSDataHolder ===========
+AMDSDataHolder *AMDSDataHolder::decodeAndInstantiateDataHolder(QDataStream *dataStream)
+{
+	QString dataHolderClassName;
+	*dataStream >> dataHolderClassName;
+	if(dataStream->status() != QDataStream::Ok)
+		return 0;
+
+	AMDSDataHolder *dataHolder = AMDSDataHolderSupport::instantiateDataHolderFromClassName(dataHolderClassName);
+	if (dataHolder) {
+		if (!dataHolder->readFromDataStream(dataStream))
+			dataHolder = 0;
+	}
+
+	return dataHolder;
+}
+
+bool AMDSDataHolder::encodeAndwriteDataHolder(QDataStream *dataStream, AMDSDataHolder *dataHolder)
+{
+	return dataHolder->writeToDataStream(dataStream);
+}
+
 AMDSDataHolder::AMDSDataHolder(QObject *parent)
 	:QObject(parent)
 {
@@ -22,6 +42,25 @@ AMDSDataHolder& AMDSDataHolder::operator =(AMDSDataHolder &dataHolder)
 	}
 
 	return (*this);
+}
+
+bool AMDSDataHolder::writeToDataStream(QDataStream *dataStream)
+{
+
+	*dataStream << QString(metaObject()->className());
+	if (dataStream->status() != QDataStream::Ok)
+		return false;
+
+	return true;
+}
+
+bool AMDSDataHolder::readFromDataStream(QDataStream *dataStream)
+{
+	Q_UNUSED(dataStream)
+
+	/// NOTE: the class name is read out in the static function
+
+	return true;
 }
 
 // ======== implementation of AMDSLightWeightDataHolder ===========
@@ -66,21 +105,28 @@ void AMDSLightWeightDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 	}
 }
 
-bool AMDSLightWeightDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
-	Q_UNUSED(encodeDataType)
-	dataStream->encodeEventDataType(*eventData_);
+bool AMDSLightWeightDataHolder::writeToDataStream(QDataStream *dataStream)
+{
+	if (! AMDSDataHolder::writeToDataStream(dataStream)) {
+		return false;
+	}
+
 	if(!eventData_->writeToDataStream(dataStream))
 		return false;
 
 	return true;
 }
 
-bool AMDSLightWeightDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
-	Q_UNUSED(decodeAsDataType)
+bool AMDSLightWeightDataHolder::readFromDataStream(QDataStream *dataStream)
+{
+	if (! AMDSDataHolder::readFromDataStream(dataStream))
+		return false;
+
 	if(eventData_)
 		eventData_->deleteLater();
-	eventData_ = dataStream->decodeAndInstantiateEventData();
-	if(!eventData_->readFromDataStream(dataStream))
+
+	eventData_ = AMDSEventData::decodeAndInstantiateEventData(dataStream);
+	if(eventData_ == 0)
 		return false;
 
 	return true;
@@ -143,14 +189,21 @@ void AMDSFullDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 	}
 }
 
-bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const{
-	dataStream->encodeDataHolderType(*lightWeightDataHolder_);
-	if(!lightWeightDataHolder_->writeToDataStream(dataStream, encodeDataType))
+bool AMDSFullDataHolder::writeToDataStream(QDataStream *dataStream)
+{
+	if (!AMDSDataHolder::writeToDataStream(dataStream)) {
+		return false;
+	}
+
+	/// write the lightWeightDataHolder to dataStream
+	if(!lightWeightDataHolder_->writeToDataStream(dataStream))
 		return false;
 
+	/// write the data of AMDSFullDataHolder
 	*dataStream << (quint8)axesStyle_;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
+
 	*dataStream << (quint8)dataTypeStyle_;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
@@ -159,28 +212,32 @@ bool AMDSFullDataHolder::writeToDataStream(AMDSDataStream *dataStream, bool enco
 	*dataStream << axesCount;
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
+
 	for(int x = 0, size = axes_.count(); x < size; x++){
-		dataStream->write(axes_.at(x));
-		if(dataStream->status() != QDataStream::Ok)
+		AMDSAxisInfo axisInfo = axes_.at(x);
+		if (!axisInfo.writeToDataStream(dataStream))
 			return false;
 	}
 
 	return true;
 }
 
-bool AMDSFullDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType){
+bool AMDSFullDataHolder::readFromDataStream(QDataStream *dataStream)
+{
+	if (!AMDSDataHolder::readFromDataStream(dataStream))
+		return false;
+
+	/// initialize and read the lightWeightDataHolder
 	if(lightWeightDataHolder_)
 		lightWeightDataHolder_->deleteLater();
 
-	AMDSDataHolder *asDataHolder = dataStream->decodeAndInstantiateDataHolder();
+	AMDSDataHolder *asDataHolder = AMDSDataHolder::decodeAndInstantiateDataHolder(dataStream);
 	if(AMDSMetaObjectSupport::inheritsClass(asDataHolder->metaObject(), &(AMDSLightWeightDataHolder::staticMetaObject), &(AMDSDataHolder::staticMetaObject)))
 		lightWeightDataHolder_ = qobject_cast<AMDSLightWeightDataHolder*>(asDataHolder);
 	else
 		return false;
 
-	if(!lightWeightDataHolder_->readFromDataStream(dataStream, decodeAsDataType))
-		return false;
-
+	/// read the data of AMDSFullDataHolder
 	quint8 readAxesStyleAsInt;
 	quint8 readDataTypeStyleAsInt;
 	quint8 readAxesCount;
@@ -197,18 +254,15 @@ bool AMDSFullDataHolder::readFromDataStream(AMDSDataStream *dataStream, AMDSData
 		return false;
 	for(int x = 0, size = readAxesCount; x < size; x++){
 		AMDSAxisInfo oneAxisInfo("Invalid", 0);
-		dataStream->read(oneAxisInfo);
+		oneAxisInfo.readFromDataStream(dataStream);
 		if(oneAxisInfo.name() == "Invalid")
 			return false;
 		readAxes.append(oneAxisInfo);
 	}
 
-	AMDSDataHolder::AxesStyle readAxesStyle = (AMDSDataHolder::AxesStyle)readAxesStyleAsInt;
-	AMDSDataHolder::DataTypeStyle readDataTypeStyle = (AMDSDataHolder::DataTypeStyle)readDataTypeStyleAsInt;
-
-	axesStyle_ = readAxesStyle;
-	dataTypeStyle_ = readDataTypeStyle;
+	axesStyle_ = (AMDSDataHolder::AxesStyle)readAxesStyleAsInt;
+	dataTypeStyle_ = (AMDSDataHolder::DataTypeStyle)readDataTypeStyleAsInt;
 	setAxes(readAxes);
 
-	return false;
+	return true;
 }

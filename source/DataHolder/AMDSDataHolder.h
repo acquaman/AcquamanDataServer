@@ -2,23 +2,28 @@
 #define AMDSDATAHOLDER_H
 
 #include <QObject>
+#include <QDataStream>
 
-#include "source/DataElement/AMDSDataTypeDefinitions.h"
-#include "source/DataElement/AMDSAxisInfo.h"
-#include "source/DataElement/AMDSnDIndex.h"
-#include "source/DataElement/AMDSEventData.h"
-#include "source/DataElement/AMDSFlatArray.h"
+#include "DataElement/AMDSDataTypeDefinitions.h"
+#include "DataElement/AMDSAxisInfo.h"
+#include "DataElement/AMDSnDIndex.h"
+#include "DataElement/AMDSEventData.h"
+#include "DataElement/AMDSFlatArray.h"
 
-
-class AMDSDataStream;
 
 #define AMDS_SERVER_ERR_DATA_HOLDER 20300
 #define AMDS_SERVER_ERR_UNMATCH_DATA_HOLDER_FOR_PLUS 20301
+#define AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT 20302
+#define AMDS_ALERT_INVALID_DATA_TYPE 20303
 
 class AMDSDataHolder : public QObject
 {
 Q_OBJECT
 public:
+	static AMDSDataHolder *decodeAndInstantiateDataHolder(QDataStream *dataStream);
+	static bool encodeAndwriteDataHolder(QDataStream *dataStream, AMDSDataHolder *dataHolder);
+
+
 	/// Definition of the AxesStyle
 	enum AxesStyle{
 		UniformAxes = 0,
@@ -56,6 +61,8 @@ public:
 	/// Returns the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const  = 0;
 
+	/// pure virtual function to clear the data of the instance
+	virtual void clear() = 0;
 	/// pure virtual function to copy the data of the instance to outputArray
 	virtual bool data(AMDSFlatArray *outputArray) const = 0;
 	/// pure virtual function to copy the data of inputArray to local instance
@@ -82,10 +89,11 @@ public:
 	/// implement the = operation of AMDSDataHolder, which will copy the value of source instance to the target one
 	virtual AMDSDataHolder& operator =(AMDSDataHolder &dataHolder);
 
-	/// pure virtual function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered. By default the data type is encoded into the stream; however, this can be disabled and moved to a higher level if need be.
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType = true) const = 0;
-	/// pure virtual function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered. By default the data type is decoded from the stream; however, passing a particular data type will assume that there is no data type encoded in the stream.
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType = AMDSDataTypeDefinitions::InvalidType) = 0;
+	/// NOTE: although this is public, but it is NOT suggested to use by the classes other than DataHolder classes
+	/// virtual function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered. By default the data type is encoded into the stream; however, this can be disabled and moved to a higher level if need be.
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
+	/// virtual function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered. By default the data type is decoded from the stream; however, passing a particular data type will assume that there is no data type encoded in the stream.
+	virtual bool readFromDataStream(QDataStream *dataStream);
 };
 
 class AMDSLightWeightDataHolder : public AMDSDataHolder
@@ -106,6 +114,9 @@ public:
 	virtual AMDSDataTypeDefinitions::DataType dataType() const;
 	/// implement the setAxes function
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
+	/// getter function to get the eventData_ of AMDSEventData.
+	/// The reason to encapsulate this as protected is that the user of AMDSEventData should NOT be aware the existence of the instance of eventData_
+	inline AMDSEventData * eventData() { return eventData_; }
 
 	/// implement the event time and related comparison functions
 	virtual QDateTime eventTime() { return eventData()->eventTime(); }
@@ -116,14 +127,11 @@ public:
 	/// implement the function copy the value of source instance to the current instance
 	virtual void cloneData(AMDSDataHolder *dataHolder);
 
-	/// implement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// implement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
-
-	/// getter function to get the eventData_ of AMDSEventData.
-	/// The reason to encapsulate this as protected is that the user of AMDSEventData should NOT be aware the existence of the instance of eventData_
-	inline AMDSEventData * eventData() { return eventData_; }
+	/// NOTE: although this is public, but it is NOT suggested to use by the classes other than DataHolder classes
+	/// implement the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
+	/// implement the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// the instance of event data, which provides the event information about the dataHolder
@@ -158,6 +166,8 @@ public:
 	/// implement the spanSize() function to return the number of points this measurement spans (A scalar value is "1" point, a 1D Detector is the same as its dimension, higher-D detectors are the products of their dimensions)
 	virtual inline quint64 spanSize() const;
 
+	/// implement the clear function to clear the data of the instance
+	virtual void clear() { lightWeightDataHolder_->clear(); }
 	/// implement the data() function to copy the data of the instance to outputArray
 	virtual bool data(AMDSFlatArray *outputValues) const { return lightWeightDataHolder_->data(outputValues); }
 	/// implement the setData() function to copy the data of inputArray to local instance
@@ -181,12 +191,12 @@ public:
 	/// implement the Division operation of AMDSDataHolder: the value of the given handler will be divided by the given divisior
 	virtual AMDSDataHolder* operator /(quint32 divisor)  { return lightWeightDataHolder_->operator /(divisor); }
 
-	/// implment the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// implent the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
-
 protected:
+	/// implment the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
+	/// implent the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream);
+
 	/// getter function to get the lightweightDataHolder of AMDSFullDataHolder.
 	/// The reason to encapsulate this as protected is that the user of AMDSFullDataHolder should NOT be aware the existence of the instance of lightweightDataHolder
 	inline AMDSLightWeightDataHolder * lightWeightDataHolder() { return lightWeightDataHolder_; }

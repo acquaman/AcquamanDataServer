@@ -4,7 +4,6 @@
 #
 #-------------------------------------------------
 
-
 QT       += core network gui sql
 
 CONFIG   += console
@@ -21,6 +20,7 @@ RCC_DIR=build_files
 QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
+	source/AMDSMainCommon.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
@@ -35,7 +35,6 @@ HEADERS *= \
 	source/Connection/AMDSTCPDataServer.h \
 	source/Connection/AMDSThreadedTCPDataServer.h \
 	source/Connection/AMDSPacketStats.h \
-	source/Connection/AMDSDataStream.h \
 	source/DataElement/AMDSLikely.h \
 	source/DataElement/AMDSDataTypeDefinitions.h \
 	source/DataElement/AMDSBuffer.h \
@@ -47,6 +46,7 @@ HEADERS *= \
 	source/DataElement/AMDSBufferGroup.h \
 	source/DataElement/AMDSBufferGroupInfo.h \
 	source/DataElement/AMDSThreadedBufferGroup.h \
+	source/DataElement/AMDSDwellStatusData.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
@@ -69,15 +69,15 @@ SOURCES *= \
 	source/Connection/AMDSTCPDataServer.cpp \
 	source/Connection/AMDSThreadedTCPDataServer.cpp \
 	source/Connection/AMDSPacketStats.cpp \
-	source/Connection/AMDSDataStream.cpp \
 	source/DataElement/AMDSAxisInfo.cpp \
 	source/DataElement/AMDSnDIndex.cpp \
 	source/DataElement/AMDSEventData.cpp \
 	source/DataElement/AMDSEventDataSupport.cpp \
 	source/DataElement/AMDSFlatArray.cpp \
-	source/DataElement/AMDSBufferGroup.cpp \
 	source/DataElement/AMDSBufferGroupInfo.cpp \
+	source/DataElement/AMDSBufferGroup.cpp \
 	source/DataElement/AMDSThreadedBufferGroup.cpp \
+	source/DataElement/AMDSDwellStatusData.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
@@ -85,4 +85,5 @@ SOURCES *= \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp
+
 

@@ -1,12 +1,10 @@
 #ifndef AMDSCLIENTDATAREQUEST_H
 #define AMDSCLIENTDATAREQUEST_H
 
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/DataElement/AMDSDataTypeDefinitions.h"
-#include "source/DataHolder/AMDSDataHolder.h"
-#include "source/DataHolder/AMDSDataHolderSupport.h"
-
-//class AMDSDataHolder;
+#include "ClientRequest/AMDSClientRequest.h"
+#include "DataElement/AMDSDataTypeDefinitions.h"
+#include "DataHolder/AMDSDataHolder.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
 
 class AMDSClientDataRequest : public AMDSClientRequest
 {
@@ -52,15 +50,16 @@ public:
 	/// Clears the list of data holders
 	void clearData();
 
-	/// Writes this AMDSClienDatatRequest to an AMDSDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientDataRequest from the AMDSDataStream, returns 0 if no errors are encountered
-	virtual int readFromDataStream(AMDSDataStream *dataStream);
-
 	/// validate the message response
 	virtual bool validateResponse();
 	/// implement the function to return a data string of the message
 	virtual QString toString() const;
+
+protected:
+	/// Writes this AMDSClienDatatRequest to an QDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(QDataStream *dataStream);
+	/// Reads this AMDSClientDataRequest from the QDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// The string identifier for the buffer data is being request from or received from

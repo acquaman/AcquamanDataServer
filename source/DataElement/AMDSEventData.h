@@ -3,13 +3,14 @@
 
 #include <QObject>
 #include <QDateTime>
-
-class AMDSDataStream;
+#include <QDataStream>
 
 class AMDSEventData : public QObject
 {
 Q_OBJECT
 public:
+	static AMDSEventData *decodeAndInstantiateEventData(QDataStream *dataStream);
+
 	enum EventType{
 		UniformEvent = 0,
 		SingleEvent = 1,
@@ -46,10 +47,10 @@ public:
 	/// implementationt the function to copy the data of the source eventData to the target instance
 	virtual AMDSEventData& operator =(AMDSEventData &sourceEventData);
 
-	/// Writes this AMDSEventData to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const = 0;
-	/// Reads this AMDSEventData from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream) = 0;
+	/// Writes this AMDSEventData to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream) = 0;
+	/// Reads this AMDSEventData from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream) = 0;
 };
 
 class AMDSLightWeightEventData : public AMDSEventData
@@ -73,10 +74,10 @@ public:
 	/// implement the function to copy the data of the source eventData to the current instance
 	virtual void cloneData(AMDSEventData *sourceEventData);
 
-	/// Writes this AMDSEventData to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSEventData from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// Writes this AMDSEventData to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream);
+	/// Reads this AMDSEventData from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream);
 
 protected:
 	QDateTime eventTime_;
@@ -103,10 +104,10 @@ public:
 	/// implement the function to copy the data of the source eventData to the current instance
 	virtual void cloneData(AMDSEventData *sourceEventData);
 
-	/// Writes this AMDSEventData to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSEventData from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream);
+	/// Writes this AMDSEventData to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream);
+	/// Reads this AMDSEventData from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// getter function to get the lightWeightEventData_ of AMDSFullEventData.

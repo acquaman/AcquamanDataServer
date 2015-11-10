@@ -1,7 +1,9 @@
 #ifndef AMDSSPECTRALDATAHOLDER_H
 #define AMDSSPECTRALDATAHOLDER_H
 
-#include "source/DataHolder/AMDSGenericFlatArrayDataHolder.h"
+#include "DataHolder/AMDSGenericFlatArrayDataHolder.h"
+#include "DataElement/AMDSDwellStatusData.h"
+#include "util/AMErrorMonitor.h"
 
 class AMDSLightWeightSpectralDataHolder : public AMDSLightWeightGenericFlatArrayDataHolder
 {
@@ -19,11 +21,6 @@ public:
 	virtual inline quint32 size(int axisId) const;
 	/// implement the function to return the lenght of axes
 	virtual inline AMDSnDIndex size() const;
-
-	/// reimplement the function to write this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// reimplement the function to read this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
 };
 
 class AMDSFullSpectralDataHolder : public AMDSFullGenericFlatArrayDataHolder
@@ -32,11 +29,45 @@ Q_OBJECT
 public:
 	Q_INVOKABLE AMDSFullSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, AMDSDataHolder::AxesStyle axesStyle = AMDSDataHolder::UniformAxes, AMDSDataHolder::DataTypeStyle dataTypeStyle = AMDSDataHolder::UniformDataType, const QList<AMDSAxisInfo>& axes = QList<AMDSAxisInfo>(), QObject *parent = 0);
 	virtual ~AMDSFullSpectralDataHolder();
+};
 
-	/// Writes this AMDSDataHolder to an AMDSDataStream, returns true if no errors are encountered
-	virtual bool writeToDataStream(AMDSDataStream *dataStream, bool encodeDataType) const;
-	/// Reads this AMDSDataHolder from the AMDSDataStream, returns true if no errors are encountered
-	virtual bool readFromDataStream(AMDSDataStream *dataStream, AMDSDataTypeDefinitions::DataType decodeAsDataType);
+class AMDSDwellSpectralDataHolder: public AMDSLightWeightSpectralDataHolder
+{
+	Q_OBJECT
+public:
+	Q_INVOKABLE AMDSDwellSpectralDataHolder(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::Double, quint32 size = 2, QObject *parent = 0);
+	Q_INVOKABLE AMDSDwellSpectralDataHolder(AMDSDwellSpectralDataHolder *sourceDataHolder, QObject *parent = 0);
+	virtual ~AMDSDwellSpectralDataHolder();
+
+	/// Implement the PLUS operation of AMDSLightWeightDataHolder, which will plus the value of the two instances of AMDSLightWeightDataHolder and return the new instance
+	virtual AMDSDataHolder* operator +(AMDSDataHolder &dataHolder);
+	/// Implement the Division operation of AMDSLightWeightDataHolder: the value of the given handler will be divided by the given divisior
+	virtual AMDSDataHolder* operator /(quint32 divisor);
+
+	/// reimplement the function to clear the data of the instance
+	virtual void clear();
+	/// implement the function to return the data string
+	virtual QString printData();
+
+	/// function to copy the value of source instance to the current instance
+	virtual void cloneData(AMDSDataHolder *dataHolder);
+
+	/// The status data relating to the detector response
+	inline AMDSDwellStatusData dwellStatusData() const { return dwellStatusData_; }
+
+public slots:
+	/// Sets the status data for the histogram
+	void setDwellStatusData(const AMDSDwellStatusData &dwellStatusData);
+
+protected:
+	/// reimplement the function to write this AMDSDataHolder to an QDataStream, returns true if no errors are encountered
+	virtual bool writeToDataStream(QDataStream *dataStream) ;
+	/// reimplement the function to read this AMDSDataHolder from the QDataStream, returns true if no errors are encountered
+	virtual bool readFromDataStream(QDataStream *dataStream);
+
+protected:
+	/// the dwell status
+	AMDSDwellStatusData dwellStatusData_;
 };
 
 ////////////////////////////////////////

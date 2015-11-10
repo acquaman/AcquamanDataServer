@@ -1,12 +1,13 @@
 #include "AMDSBufferGroupInfo.h"
 
-AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &description, const QString &units, const DataFlattenMethod flattenMethod, const QList<AMDSAxisInfo> &axes)
+AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &description, const QString &units, AMDSDataTypeDefinitions::DataType dataType, const DataFlattenMethod flattenMethod, const QList<AMDSAxisInfo> &axes)
 {
 	setName(name);
 	setDescription(description);
 	setUnits(units);
 	setFlattenMethod(flattenMethod);
 	setAxes(axes);
+	setDataType(dataType);
 }
 
 AMDSBufferGroupInfo::AMDSBufferGroupInfo(const AMDSBufferGroupInfo &other) {
@@ -20,8 +21,67 @@ AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& o
 	setUnits(other.units());
 	setFlattenMethod(other.flattenMethod());
 	setAxes(other.axes());
+	setDataType(other.dataType());
 
 	return *this;
+}
+
+bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream)
+{
+	*dataStream << name();
+	*dataStream << description();
+	*dataStream << units();
+	*dataStream << ((quint8)flattenMethod());
+	*dataStream <<((quint8)(axes().count()));
+	for(int x = 0, size = axes().count(); x < size; x++) {
+		AMDSAxisInfo axisInfo = axes().at(x);
+		axisInfo.writeToDataStream(dataStream);
+	}
+
+	return true;
+}
+
+bool AMDSBufferGroupInfo::readFromDataStream(QDataStream *dataStream)
+{
+	QString name;
+	QString description;
+	QString units;
+	quint8 axesCount;
+	quint8 flattenMethod;
+	QList<AMDSAxisInfo> axes;
+
+	*dataStream >> name;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+	*dataStream >> description;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+	*dataStream >> units;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+	*dataStream >> flattenMethod;
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+	*dataStream >>(axesCount);
+	if(dataStream->status() != QDataStream::Ok)
+		return false;
+
+	for(int x = 0, size = axesCount; x < size; x++){
+		AMDSAxisInfo oneAxisInfo("Invalid", 0);
+		oneAxisInfo.readFromDataStream(dataStream);
+
+		if(oneAxisInfo.name() == "Invalid")
+			return false;
+		axes.append(oneAxisInfo);
+	}
+
+	setName(name);
+	setDescription(description);
+	setUnits(units);
+	setFlattenMethod((DataFlattenMethod)flattenMethod);
+	setAxes(axes);
+
+	return true;
 }
 
 QString AMDSBufferGroupInfo::toString() const

@@ -3,89 +3,147 @@
 #include <QtCore/QCoreApplication>
 #include <QTimer>
 
-#include "source/AMDSThreadedTCPDataServer.h"
-#include "source/AMDSThreadedBufferGroup.h"
-#include "source/AMDSBufferGroup.h"
-#include "source/AMDSBufferGroupInfo.h"
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
-#include "source/ClientRequest/AMDSClientDataRequest.h"
-#include "source/ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "Connection/AMDSThreadedTCPDataServer.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "DataElement/AMDSThreadedBufferGroup.h"
+#include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
+#include "Detector/Amptek/AmptekSDD123DetectorManager.h"
+#include "Detector/Amptek/AmptekSDD123ServerGroup.h"
+#include "Detector/Amptek/AmptekSDD123Server.h"
+#include "Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 	AMDSCentralServer(parent)
 {
-	fiftyMillisecondTimer_ = new QTimer(this);
-	hundredMillisecondTimer_ = new QTimer(this);
+	maxBufferSize_ = 20 * 60 * 1000; // 20 minuntes
 
-	initializeBufferGroup(1000*60*60*10); // 10 hours of 1kHz signal
+	qRegisterMetaType<AMDSDwellStatusData>();
 
-	connect(fiftyMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onFiftyMillisecondTimerUpdate()));
-	connect(hundredMillisecondTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondTimerUpdate()));
+	// Commented out PV and IP details for actual beamline ampteks, so can test on some detectors without interfering with beamline operations
+//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 239", "amptek:sdd1", QHostAddress("192.168.0.239"), QHostAddress("192.168.0.139"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 240", "amptek:sdd2", QHostAddress("192.168.0.240"), QHostAddress("192.168.0.140"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 241", "amptek:sdd3", QHostAddress("192.168.0.241"), QHostAddress("192.168.0.141"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 242", "amptek:sdd4", QHostAddress("192.168.0.242"), QHostAddress("192.168.0.142"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 243", "amptek:sdd5", QHostAddress("192.168.0.243"), QHostAddress("192.168.0.143"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
 
-	startTimer();
 }
 
-#include "source/DataHolder/AMDSScalarDataHolder.h"
-void AMDSCentralServerSGM::onFiftyMillisecondTimerUpdate(){
-	AMDSLightWeightScalarDataHolder *oneScalerDataHolder = new AMDSLightWeightScalarDataHolder();
-	double valueAsDouble = (double)simpleCounter_++;
-	oneScalerDataHolder->setSingleValue(valueAsDouble);
-
-	energyBufferGroup_->append(oneScalerDataHolder);
-}
-
-#include "source/DataHolder/AMDSSpectralDataHolder.h"
-void AMDSCentralServerSGM::onHundredMillisecondTimerUpdate(){
-	AMDSLightWeightSpectralDataHolder *oneSpectralDataHolder = new AMDSLightWeightSpectralDataHolder(AMDSDataTypeDefinitions::Signed64, amptek1BufferGroup_->bufferGroupInfo().size(0));
-
-	AMDSFlatArray oneSpectralFlatArray(AMDSDataTypeDefinitions::Signed64, amptek1BufferGroup_->bufferGroupInfo().size(0));
-	spectralCounter_++;
-	qint64 oneValue;
-	for(int x = 0; x < oneSpectralFlatArray.constVectorQint64().size(); x++){
-		oneValue = (spectralCounter_+x)*2;
-		oneSpectralFlatArray.vectorQint64()[x] = oneValue;
+AMDSCentralServerSGM::~AMDSCentralServerSGM()
+{
+	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, configurationMaps_) {
+		amptekConfiguration->deleteLater();
 	}
-	oneSpectralDataHolder->setData(&oneSpectralFlatArray);
+	configurationMaps_.clear();
 
-	amptek1BufferGroup_->append(oneSpectralDataHolder);
+	foreach (AMDSThreadedBufferGroup *bufferGroup, dwellBufferGroupManagers_) {
+		bufferGroup->deleteLater();
+	}
+	dwellBufferGroupManagers_.clear();
+
+	amptekThreadedDataServerGroup_->deleteLater();
+	amptekThreadedDataServerGroup_ = 0;
 }
 
-void AMDSCentralServerSGM::initializeBufferGroup(quint64 maxCountSize)
+void AMDSCentralServerSGM::initializeBufferGroup()
 {
-	QList<AMDSAxisInfo> mcpBufferGroupAxes;
-	mcpBufferGroupAxes << AMDSAxisInfo("X", 1024, "X Axis", "pixel");
-	mcpBufferGroupAxes << AMDSAxisInfo("Y", 512, "Y Axis", "pixel");
-	AMDSBufferGroupInfo mcpBufferGroupInfo("AFakeMCP", "Fake MCP Image", "Counts", false, AMDSBufferGroupInfo::NoFlatten, mcpBufferGroupAxes);
-	AMDSBufferGroup *mcpBufferGroup = new AMDSBufferGroup(mcpBufferGroupInfo, maxCountSize);
-	AMDSThreadedBufferGroup *mcpThreadedBufferGroup = new AMDSThreadedBufferGroup(mcpBufferGroup);
-	bufferGroups_.insert(mcpThreadedBufferGroup->bufferGroupInfo().name(), mcpThreadedBufferGroup);
+	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, configurationMaps_) {
 
-	QList<AMDSAxisInfo> amptek1BufferGroupAxes;
-	amptek1BufferGroupAxes << AMDSAxisInfo("Energy", 1024, "Energy Axis", "eV");
-	AMDSBufferGroupInfo amptek1BufferGroupInfo("Amptek1", "Amptek 1", "Counts", false, AMDSBufferGroupInfo::NoFlatten, amptek1BufferGroupAxes);
-	amptek1BufferGroup_ = new AMDSBufferGroup(amptek1BufferGroupInfo, maxCountSize);
-	AMDSThreadedBufferGroup *amptek1ThreadedBufferGroup = new AMDSThreadedBufferGroup(amptek1BufferGroup_);
-	bufferGroups_.insert(amptek1ThreadedBufferGroup->bufferGroupInfo().name(), amptek1ThreadedBufferGroup);
+		QList<AMDSAxisInfo> amptekBufferGroupAxes;
+		amptekBufferGroupAxes << AMDSAxisInfo("Energy", amptekConfiguration->spectrumCountSize(), "Energy Axis", "eV");
 
-	AMDSBufferGroupInfo energyBufferGroupInfo("Energy", "SGM Beamline Energy", "eV", true, AMDSBufferGroupInfo::Average);
-	energyBufferGroup_ = new AMDSBufferGroup(energyBufferGroupInfo, maxCountSize);
-	AMDSThreadedBufferGroup *energyThreadedBufferGroup = new AMDSThreadedBufferGroup(energyBufferGroup_);
-	bufferGroups_.insert(energyThreadedBufferGroup->bufferGroupInfo().name(), energyThreadedBufferGroup);
+		AMDSBufferGroupInfo amptekBufferGroupInfo(amptekConfiguration->detectorName(), amptekConfiguration->localAddress().toString(), "Counts", amptekConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, amptekBufferGroupAxes);
 
-	connect(mcpBufferGroup, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-	connect(amptek1BufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
-	connect(energyBufferGroup_, SIGNAL(clientRequestProcessed(AMDSClientRequest*)), dataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+		AMDSThreadedBufferGroup *amptekThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_, false);
+		connect(amptekThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
+		AMDSThreadedBufferGroup *amptekDwellThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_, true);
+
+		bufferGroupManagers_.insert(amptekThreadedBufferGroup->bufferGroupName(), amptekThreadedBufferGroup);
+		dwellBufferGroupManagers_.insert(amptekDwellThreadedBufferGroup->bufferGroupName(), amptekDwellThreadedBufferGroup);
+	}
+
+
+	amptekDetectorGroup_ = new AmptekSDD123DetectorGroupSGM(configurationMaps_);
+	foreach (AmptekSDD123DetectorManager * detectorManager, amptekDetectorGroup_->detectorManagers()) {
+		connect(detectorManager, SIGNAL(clearHistrogramData(QString)), this, SLOT(onClearHistrogramData(QString)));
+		connect(detectorManager, SIGNAL(clearDwellHistrogramData(QString)), this, SLOT(onClearDwellHistrogramData(QString)));
+		connect(detectorManager, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder*)), this, SLOT(onNewHistrogramReceived(QString, AMDSDataHolder*)));
+		connect(detectorManager, SIGNAL(newDwellHistrogramReceived(QString, AMDSDataHolder*, double)), this, SLOT(onNewDwellHistrogramReceived(QString, AMDSDataHolder*, double)));
+		connect(detectorManager, SIGNAL(dwellFinishedUpdate(QString,double)), this, SLOT(onDwellFinishedUpdate(QString,double)));
+	}
 }
 
-void AMDSCentralServerSGM::startTimer()
+void AMDSCentralServerSGM::initializeAndStartDataServer()
 {
-	AMErrorMon::information(this, 0, "Starting the timer to update data buffer ...");
-	simpleCounter_ = 0;
-	spectralCounter_ = 0;
+	amptekThreadedDataServerGroup_ = new AmptekSDD123ThreadedDataServerGroup(configurationMaps_);
 
-	fiftyMillisecondTimer_->start(50);
-	hundredMillisecondTimer_->start(100);
+	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SLOT(onServerChangedToConfigurationState(int)));
+	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));
+}
+
+void AMDSCentralServerSGM::wrappingUpInitialization()
+{
+	QList<AmptekSDD123DetectorManager*> amptekDetectorManagerList = amptekDetectorGroup_->detectorManagers();
+
+	// connect the event among the amptek data servers and the detectors
+	for(int x = 0, size = amptekDetectorManagerList.count(); x < size; x++){
+		AmptekSDD123DetectorManager *amptekDetectorManager = amptekDetectorManagerList.at(x);
+		AmptekSDD123Server *amptekServer = amptekThreadedDataServerGroup_->serverAt(x);
+//		AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroupManagers_.value(amptekDetectorManager->detectorName());
+		AMDSThreadedBufferGroup *threadedBufferGroup = dwellBufferGroupManagers_.value(amptekDetectorManager->detectorName());
+
+		amptekServer->setSpectrumPacketReceiver((QObject *)amptekDetectorManager->detector());
+		amptekServer->setConfirmationPacketReceiver(amptekDetectorManager);
+
+		amptekDetectorManager->setRequestEventReceiver(amptekServer);
+
+		connect(threadedBufferGroup->bufferGroup(), SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onContinuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)));
+		connect(threadedBufferGroup->bufferGroup(), SIGNAL(dwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onDwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)));
+
+
+	}
+}
+
+void AMDSCentralServerSGM::onServerChangedToConfigurationState(int index){
+	emit serverChangedToConfigurationState(index);
+}
+
+void AMDSCentralServerSGM::onServerChangedToDwellState(int index){
+	emit serverChangedToDwellState(index);
+}
+
+void AMDSCentralServerSGM::onClearHistrogramData(const QString &detectorName)
+{
+	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
+	if (bufferGroup)
+		bufferGroup->clear();
+}
+
+void AMDSCentralServerSGM::onClearDwellHistrogramData(const QString &detectorName)
+{
+	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
+	if (bufferGroup)
+		bufferGroup->clear();
+}
+
+void AMDSCentralServerSGM::onNewHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder)
+{
+	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
+	if (bufferGroup)
+		bufferGroup->append(dataHolder);
+}
+
+void AMDSCentralServerSGM::onNewDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder, double elapsedTime)
+{
+	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
+	if (bufferGroup)
+		bufferGroup->append(dataHolder, elapsedTime);
+}
+
+void AMDSCentralServerSGM::onDwellFinishedUpdate(const QString &detectorName, double elapsedTime)
+{
+	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
+	if (bufferGroup)
+		bufferGroup->finishDwellDataUpdate(elapsedTime);
 }

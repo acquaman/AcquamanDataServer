@@ -1,6 +1,5 @@
-#include "source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h"
+#include "AMDSClientRelativeCountPlusCountDataRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientRelativeCountPlusCountDataRequest::AMDSClientRelativeCountPlusCountDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)
@@ -48,7 +47,7 @@ void AMDSClientRelativeCountPlusCountDataRequest::setAttributesValues(const QStr
 }
 
 
-int AMDSClientRelativeCountPlusCountDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientRelativeCountPlusCountDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -64,7 +63,7 @@ int AMDSClientRelativeCountPlusCountDataRequest::writeToDataStream(AMDSDataStrea
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientRelativeCountPlusCountDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientRelativeCountPlusCountDataRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

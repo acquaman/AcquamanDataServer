@@ -3,9 +3,10 @@
 
 #include <QObject>
 
-#include "source/DataElement/AMDSBuffer.h"
-#include "source/DataElement/AMDSBufferGroupInfo.h"
-#include "source/DataHolder/AMDSDataHolder.h"
+#include "DataElement/AMDSDwellStatusData.h"
+#include "DataElement/AMDSBuffer.h"
+#include "DataElement/AMDSBufferGroupInfo.h"
+#include "DataHolder/AMDSDataHolder.h"
 
 class AMDSClientRequest;
 class AMDSClientDataRequest;
@@ -25,28 +26,29 @@ class AMDSBufferGroup : public QObject
 	Q_OBJECT
 public:
 	/// Creates a new buffer group with a maximum capacity maxSize and data dimensions based on the bufferGroupInfo
-	AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent = 0);
+	/// If enableCumulative, a cumulativeDataHolder will be created automatically and cumulative operation will be applied when a new data holder is appended
+	AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, bool enableCumulative = false, QObject *parent = 0);
 	/// Copy constructor
 	AMDSBufferGroup(const AMDSBufferGroup& other);
+	~AMDSBufferGroup();
+
+	/// returns the current dataholder of cumulative data
+	AMDSDataHolder *cumulativeDataHolder() const;
+
+	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will always return maxSize)
+	int count() const;
+	/// Clears the buffer of all its members, and frees their resources
+	void clear();
+	/// Adds a new AMDSDataHolder pointer to the end of the buffer. The buffer group takes ownership
+	/// of the passed AMDSDataHolder, becoming responsible for its destruction
+	void append(AMDSDataHolder* value, bool elapsedDwellTime=0);
+	/// finish dwell data update
+	void finishDwellDataUpdate(double elapsedTime=0);
 
 	/// Returns the data dimension and other information included in the bufferGroupInfo
 	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
-
-	/// Subscript operator for use in lhs assignment (ie b[i] = 5)
-	/// Returns the pointer at provided index
-	inline AMDSDataHolder* operator[](int index);
-	/// Subscript operator for use in rhs assignment (ie x = b[i])
-	/// Returns the pointer at provided index
-	inline const AMDSDataHolder* operator[](int index) const;
-	/// The total capacity of the buffer
-	inline quint64 maxSize() const;
-	/// Adds a new AMDSDataHolder pointer to the end of the buffer. The buffer group takes ownership
-	/// of the passed AMDSDataHolder, becoming responsible for its destruction
-	inline void append(AMDSDataHolder* value);
-	/// Clears the buffer of all its members, and frees their resources
-	inline void clear();
-	/// The number of items currently stored in the buffer (once the buffer reaches maxSize, this will always return maxSize)
-	inline int count() const;
+	/// returns whether Cumulative is enabled or not
+	inline bool cumulativeEnabled() const { return enableCumulative_; }
 
 public slots:
 	/// Slot which handles a request for data. The buffer group will attempt to populate the request
@@ -57,9 +59,23 @@ signals:
 	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
 	void clientRequestProcessed(AMDSClientRequest *clientRequest);
 
-protected:
-	/// Helper functions which populate request data based on the parameters passed:
+	/// signal to indicate that the new data added for conitunous monitor
+	void continuousDataUpdate(AMDSDataHolder *continuousDataHolder);
+	/// signal to indicate that the new status update for conitunous monitor
+	void continuousStatusDataUpdate(AMDSDwellStatusData statusData, int count);
+	/// signal to indicate that the new update for conitunous monitor
+	void continuousAllDataUpdate(AMDSDataHolder *continuousDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
 
+	/// signal to indicate that dwell update is finished, with the elapsedTime
+	void dwellFinishedTimeUpdate(double elapsedTime);
+	/// signal to indicate that dwell update is finished, with the dataHolder
+	void dwellFinishedDataUpdate(AMDSDataHolder *accumulateDataHolder);
+	/// signal to indicate that dwell update is finished, with the statusData
+	void dwellFinishedStatusDataUpdate(AMDSDwellStatusData statusData, int count);
+	/// signal to indicate that dwell update is finished, with all data
+	void dwellFinishedAllDataUpdate(AMDSDataHolder *accumlatedDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
+
+protected:
 	/// Flatten the data based on the given flatten method, return True if no error happened
 	bool flattenData(QList<AMDSDataHolder *> *dataArray);
 	/// Fills the data to the clientRequest
@@ -80,39 +96,17 @@ protected:
 	int getDataIndexByDateTime(const QDateTime& dwellTime);
 
 protected:
-	AMDSBufferGroupInfo bufferGroupInfo_;
 	mutable QReadWriteLock lock_;
+	/// the buffergroup information about this buffer group
+	AMDSBufferGroupInfo bufferGroupInfo_;
+
+	/// the flag to indicate whether we enabled the cumultive feature
+	bool enableCumulative_;
+	/// the Dataholder to holder the cumulative data
+	AMDSDataHolder *cumulativeDataHolder_;
+
 	/// A buffer which contains histogram data collection, sorted by the startDwellTime
 	AMDSBuffer<AMDSDataHolder*> dataHolders_;
 };
-
-quint64 AMDSBufferGroup::maxSize() const
-{
-	QReadLocker readLock(&lock_);
-	return dataHolders_.maxSize();
-}
-
-void AMDSBufferGroup::append(AMDSDataHolder *value)
-{
-	QWriteLocker writeLock(&lock_);
-	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(value);
-	if(dataHolderRemoved)
-		delete dataHolderRemoved;
-}
-
-void AMDSBufferGroup::clear()
-{
-	QWriteLocker writeLock(&lock_);
-	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++)
-		delete dataHolders_[iElement];
-
-	dataHolders_.clear();
-}
-
-int AMDSBufferGroup::count() const
-{
-	QReadLocker readLock(&lock_);
-	return dataHolders_.count();
-}
 
 #endif // AMDSBUFFERGROUP_H

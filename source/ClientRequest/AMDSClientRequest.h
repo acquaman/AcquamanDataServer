@@ -1,15 +1,18 @@
 #ifndef AMDSCLIENTREQUEST_H
 #define AMDSCLIENTREQUEST_H
 
-#include "source/ClientRequest/AMDSClientRequestDefinitions.h"
-#include "source/DataElement/AMDSBufferGroupInfo.h"
+#include <QDataStream>
 
-class AMDSDataStream;
+#include "ClientRequest/AMDSClientRequestDefinitions.h"
+#include "DataElement/AMDSBufferGroupInfo.h"
 
 class AMDSClientRequest : public QObject
 {
 Q_OBJECT
 public:
+	static AMDSClientRequest* decodeAndInstantiateClientRequest(QDataStream *dataStream);
+	static bool encodeAndwriteClientRequest(QDataStream *dataStream, AMDSClientRequest *clientRequest);
+
 	enum ResponseType{
 		Binary = 0,
 		JSON = 1,
@@ -27,6 +30,8 @@ public:
 	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
 	AMDSClientRequest& operator=(const AMDSClientRequest& other);
 
+	/// returns whether this is an instrospection message
+	inline bool isInstrospectionMessage() { return requestType() == AMDSClientRequestDefinitions::Introspection; }
 	/// returns whether this is a statistics message
 	inline bool isStatisticsMessage() { return requestType() == AMDSClientRequestDefinitions::Statistics; }
 	/// returns whether this is a data client data request
@@ -55,17 +60,18 @@ public:
 	/// Sets the repsonse type
 	inline void setResponseType(ResponseType responseType) { responseType_ = responseType; }
 
-	/// Writes this AMDSClientRequest to an AMDSDataStream, returns 0 if no errors are encountered
-	virtual int writeToDataStream(AMDSDataStream *dataStream) const;
-	/// Reads this AMDSClientRequest from the AMDSDataStream, returns 0 if no errors are encountered
-	virtual int readFromDataStream(AMDSDataStream *dataStream);
-
 	/// print out the message data
 	void printData();
 	/// validate the message response
 	virtual bool validateResponse() {return true;}
 	/// pure virtual to return a data string of the message
 	virtual QString toString() const = 0;
+
+protected:
+	/// Writes this AMDSClientRequest to an QDataStream, returns 0 if no errors are encountered
+	virtual int writeToDataStream(QDataStream *dataStream);
+	/// Reads this AMDSClientRequest from the QDataStream, returns 0 if no errors are encountered
+	virtual int readFromDataStream(QDataStream *dataStream);
 
 private:
 	/// To set the values of all the attributes

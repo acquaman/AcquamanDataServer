@@ -1,8 +1,8 @@
 #include "AMDSClientTCPSocket.h"
 
-#include "source/Connection/AMDSDataStream.h"
-#include "source/ClientRequest/AMDSClientRequestSupport.h"
-#include "source/ClientRequest/AMDSClientRequest.h"
+#include <QDataStream>
+
+#include "ClientRequest/AMDSClientRequest.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port, QObject *parent)
@@ -56,9 +56,9 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	if (tcpSocket_->bytesAvailable() < (int)sizeof(quint32))
 		return;
 
-	AMDSDataStream *inDataStream ;
+	QDataStream *inDataStream = 0;
 	if (!waitingMorePackages_) {
-		inDataStream= new AMDSDataStream(tcpSocket_);
+		inDataStream= new QDataStream(tcpSocket_);
 		inDataStream->setVersion(QDataStream::Qt_4_0);
 		*inDataStream >> expectedBufferSize_;
 
@@ -78,16 +78,17 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 		if (readedBufferSize_ == expectedBufferSize_) {
 			waitingMorePackages_ = false;
 
-			inDataStream = new AMDSDataStream(incomeDataBuffer_);
+			inDataStream = new QDataStream(incomeDataBuffer_);
 		}
 	}
 
 	// finish reading this message, waiting for the future data
-	if (waitingMorePackages_)
+	if (waitingMorePackages_ || !inDataStream)
 		return;
 
-	AMDSClientRequest *clientRequest = inDataStream->decodeAndInstantiateClientRequestType();
-	inDataStream->read(*clientRequest);
+	AMDSClientRequest *clientRequest = AMDSClientRequest::decodeAndInstantiateClientRequest(inDataStream);
+	if (clientRequest == 0)
+		return;
 
 	switch (clientRequest->requestType()) {
 	case AMDSClientRequestDefinitions::Introspection:
@@ -120,12 +121,11 @@ void AMDSClientTCPSocket::sendClientRequest(AMDSClientRequest *clientRequest)
 void AMDSClientTCPSocket::sendData(AMDSClientRequest *clientRequest)
 {
 	QByteArray block;
-	AMDSDataStream outDataStream(&block, QIODevice::WriteOnly);
+	QDataStream outDataStream(&block, QIODevice::WriteOnly);
 	outDataStream.setVersion(QDataStream::Qt_4_0);
 	outDataStream << (quint16)0;
 
-	outDataStream.encodeClientRequestType(*clientRequest);
-	outDataStream.write(*clientRequest);
+	AMDSClientRequest::encodeAndwriteClientRequest(&outDataStream, clientRequest);
 
 	outDataStream.device()->seek(0);
 	outDataStream << (quint16)(block.size() - sizeof(quint16));

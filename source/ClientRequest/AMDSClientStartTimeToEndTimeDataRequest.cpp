@@ -1,7 +1,5 @@
 #include "AMDSClientStartTimeToEndTimeDataRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
-
 AMDSClientStartTimeToEndTimeDataRequest::AMDSClientStartTimeToEndTimeDataRequest(QObject *parent) :
 	AMDSClientDataRequest(parent)
 {
@@ -47,7 +45,7 @@ void AMDSClientStartTimeToEndTimeDataRequest::setAttributesValues(const QString 
 	setEndTime(endTime);
 }
 
-int AMDSClientStartTimeToEndTimeDataRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientStartTimeToEndTimeDataRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -63,7 +61,7 @@ int AMDSClientStartTimeToEndTimeDataRequest::writeToDataStream(AMDSDataStream *d
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientStartTimeToEndTimeDataRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientStartTimeToEndTimeDataRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientDataRequest::readFromDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)

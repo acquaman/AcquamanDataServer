@@ -1,6 +1,5 @@
-#include "source/ClientRequest/AMDSClientStatisticsRequest.h"
+#include "AMDSClientStatisticsRequest.h"
 
-#include "source/Connection/AMDSDataStream.h"
 
 AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(QObject *parent) :
 	AMDSClientRequest(parent)
@@ -35,7 +34,7 @@ AMDSClientStatisticsRequest& AMDSClientStatisticsRequest::operator =(const AMDSC
 	return (*this);
 }
 
-int AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) const
+int AMDSClientStatisticsRequest::writeToDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::writeToDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -45,13 +44,15 @@ int AMDSClientStatisticsRequest::writeToDataStream(AMDSDataStream *dataStream) c
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_PACKET_STATS_COUNT;
 
-	for(int x = 0, size = packetStats().count(); x < size; x++)
-		dataStream->write(packetStats().at(x));
+	for(int x = 0, size = packetStats().count(); x < size; x++) {
+		AMDSPacketStats newPacketStats = packetStats().at(x);
+		newPacketStats.writeToDataStream(dataStream);
+	}
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-int AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
+int AMDSClientStatisticsRequest::readFromDataStream(QDataStream *dataStream)
 {
 	int errorCode = AMDSClientRequest::readFromDataStream(dataStream);
 	if( errorCode != AMDS_CLIENTREQUEST_SUCCESS)
@@ -66,7 +67,7 @@ int AMDSClientStatisticsRequest::readFromDataStream(AMDSDataStream *dataStream)
 
 	for(int x = 0, size = readPacketStatsCount; x < size; x++){
 		AMDSPacketStats onePacketStat("Invalid");
-		dataStream->read(onePacketStat);
+		onePacketStat.readFromDataStream(dataStream);
 		if(onePacketStat.name() == "Invalid")
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_PACKET_STATS;
 		readPacketStats.append(onePacketStat);
