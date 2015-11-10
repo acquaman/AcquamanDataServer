@@ -18,7 +18,7 @@
 AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 	AMDSCentralServer(parent)
 {
-	maxBufferSize_ = 20 * 60 * 1000; // 20 minuntes
+	maxBufferSize_ = 1 * 60 * 1000; // 20 minuntes
 
 	initializeConfiguration();
 }

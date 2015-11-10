@@ -3,6 +3,7 @@
 #include "DataHolder/AMDSDataHolderSupport.h"
 #include "util/AMErrorMonitor.h"
 
+#include <QDebug>
 AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHolder(AMDSDataTypeDefinitions::DataType dataType, quint32 size, QObject *parent)
 	:AMDSLightWeightDataHolder(parent), valueFlatArray_(dataType, size)
 {
@@ -16,6 +17,8 @@ AMDSLightWeightGenericFlatArrayDataHolder::AMDSLightWeightGenericFlatArrayDataHo
 
 AMDSLightWeightGenericFlatArrayDataHolder::~AMDSLightWeightGenericFlatArrayDataHolder()
 {
+	qDebug() << "==== delete AMDSLightWeightGenericFlatArrayDataHolder";
+	valueFlatArray_.clear();
 }
 
 AMDSDataHolder* AMDSLightWeightGenericFlatArrayDataHolder::operator +(AMDSDataHolder &dataHolder)
