@@ -84,9 +84,9 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
 		if (specturalCumulativeDataHolder) {
 			AMDSDwellStatusData cumulativeStatusData = specturalCumulativeDataHolder->dwellStatusData();
 
-			emit continuousDataUpdate(specturalCumulativeDataHolder);
-			emit continuousStatusDataUpdate(cumulativeStatusData, count());
-			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
+//			emit continuousDataUpdate(specturalCumulativeDataHolder);
+//			emit continuousStatusDataUpdate(cumulativeStatusData, count());
+//			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
 		} else {
 			AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
 		}

@@ -4,6 +4,8 @@
 #include <QTime>
 #include <QDataStream>
 
+#include <QMetaType>
+
 class AMDSDwellStatusData
 {
 public:
@@ -74,5 +76,7 @@ protected:
 	/// the value of dwellReplyTime
 	QTime dwellReplyTime_;
 };
+
+Q_DECLARE_METATYPE(AMDSDwellStatusData)
 
 #endif // AMDSDWELLSTATUSDATA_H

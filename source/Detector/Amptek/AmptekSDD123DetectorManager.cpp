@@ -240,6 +240,7 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 	oneHistogram->setDwellStatusData(statusData);
 
 	emit newHistrogramReceived(detectorName(), oneHistogram);
+
 	if (dwellActive_) {
 		presetDwellLocalEndTime_ = statusData.dwellEndTime();
 
