@@ -38,6 +38,7 @@ HEADERS  += \
 	source/Connection/AMDSServer.h \
 	source/Connection/AMDSClientTCPSocket.h \
 	source/DataElement/AMDSDataTypeDefinitions.h \
+	source/DataElement/AMDSConfigurationDef.h \
 	source/DataElement/AMDSAxisInfo.h \
 	source/DataElement/AMDSnDIndex.h \
 	source/DataElement/AMDSEventData.h \
@@ -82,3 +83,4 @@ SOURCES += \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp
+

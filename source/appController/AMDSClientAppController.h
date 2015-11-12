@@ -12,7 +12,8 @@ class AMDSServer;
 class AMDSClientTCPSocket;
 class AMDSClientRequest;
 
-#include "source/ClientRequest/AMDSClientRequestDefinitions.h"
+#include "ClientRequest/AMDSClientRequestDefinitions.h"
+#include "DataElement/AMDSConfigurationDef.h"
 
 #define AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE 10100
 #define AMDS_CLIENT_INFO_NETWORK_SESSION_STARTED 10101
@@ -29,7 +30,9 @@ class AMDSClientAppController : public QObject
     Q_OBJECT
 
 public:
-	explicit AMDSClientAppController(QObject *parent = 0);
+	static AMDSClientAppController* clientAppController();
+	static void release();
+
 	~AMDSClientAppController();
 
 	/// helper function to check whether the network session is openned or not
@@ -46,24 +49,26 @@ public:
 	void openNetworkSession();
 
 	/// request to establish a connection to a specific hostName and the portNumber
+	void connectToServer(const AMDSServerConfiguration &serverConfiguration);
+	/// request to establish a connection to a specific hostName and the portNumber
 	void connectToServer(const QString &hostName, quint16 portNumber);
 	/// request disconnection with a given server identifier
 	void disconnectWithServer(const QString &serverIdentifier);
 
 	/// request data from server for Statistics
-	void requestClientData(const QString &hostName, quint16 portNumber);
+	bool requestClientData(const QString &hostName, quint16 portNumber);
 	/// request data from server for Instrospection
-	void requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName);
+	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName);
 	/// request data from server for StartTimePlusCount
-	void requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QDateTime &startTime, quint64 count, bool includeStatus=false, bool enableFlattening=false);
+	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QDateTime &startTime, quint64 count, bool includeStatus=false, bool enableFlattening=false);
 	/// request data from server for RelativeCountPlusCount
-	void requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, quint64 relativeCount, quint64 count, bool includeStatus=false, bool enableFlattening=false);
+	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, quint64 relativeCount, quint64 count, bool includeStatus=false, bool enableFlattening=false);
 	/// request data from server for StartTimeToEndTime
-	void requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QDateTime &startTime, const QDateTime &endTime, bool includeStatus=false, bool enableFlattening=false);
+	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QDateTime &startTime, const QDateTime &endTime, bool includeStatus=false, bool enableFlattening=false);
 	/// request data from server for MiddleTimePlusCountBeforeAndAfter
-	void requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QDateTime &middleTime, quint64 countBefore, quint64 countAfter, bool includeStatus=false, bool enableFlattening=false);
+	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QDateTime &middleTime, quint64 countBefore, quint64 countAfter, bool includeStatus=false, bool enableFlattening=false);
 	/// request data from server for Continuous
-	void requestClientData(const QString &hostName, quint16 portNumber, const QStringList &bufferNames, quint64 updateInterval, bool includeStatus=false, bool enableFlattening=false, QString handShakeSocketKey="");
+	bool requestClientData(const QString &hostName, quint16 portNumber, const QStringList &bufferNames, quint64 updateInterval, bool includeStatus=false, bool enableFlattening=false, QString handShakeSocketKey="");
 
 signals:
 	/// signal to indicate that the manager object is opening a network session
@@ -81,6 +86,13 @@ signals:
 public slots:
 	/// slot to handle socket error signal from the server
 	void onAMDSServerError(AMDSServer* server, int errorCode, const QString &socketKey, const QString &errorMessage);
+
+protected:
+	/// the static instance for the singleton appcontroller
+	static AMDSClientAppController *instance_;
+
+	/// make the constructor protected for SINGLETON usage
+	explicit AMDSClientAppController(QObject *parent = 0);
 
 private slots:
 	/// slot to handle the signal of network session opened
