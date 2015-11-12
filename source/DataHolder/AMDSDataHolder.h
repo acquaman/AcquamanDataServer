@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDataStream>
+#include <QMetaType>
 
 #include "DataElement/AMDSDataTypeDefinitions.h"
 #include "DataElement/AMDSAxisInfo.h"
@@ -243,5 +244,9 @@ bool AMDSFullDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
 	axes_ = axes;
 	return true;
 }
+
+typedef QList<AMDSDataHolder *> AMDSDataHolderList;
+
+Q_DECLARE_METATYPE(AMDSDataHolderList);
 
 #endif // AMDSDATAHOLDER_H

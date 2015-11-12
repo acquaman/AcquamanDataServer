@@ -35,8 +35,6 @@ HEADERS *= \
 	$$PATH_TO_ACQUAMAN/dataman/database/AMDbObject.h \
 	$$PATH_TO_ACQUAMAN/dataman/database/AMDbObjectSupport.h \
 	$$PATH_TO_ACQUAMAN/dataman/database/AMDatabase.h \
-	$$PATH_TO_ACQUAMAN/dataman/datasource/AMDataSource.h \
-	$$PATH_TO_ACQUAMAN/dataman/datasource/AMDataSourceSeriesData.h \
 	$$PATH_TO_ACQUAMAN/dataman/info/AMControlInfo.h \
 	$$PATH_TO_ACQUAMAN/dataman/info/AMControlInfoList.h \
 	$$PATH_TO_ACQUAMAN/util/AMBiHash.h \
@@ -82,8 +80,6 @@ SOURCES *= \
 	$$PATH_TO_ACQUAMAN/dataman/database/AMDbObject.cpp \
 	$$PATH_TO_ACQUAMAN/dataman/database/AMDbObjectSupport.cpp \
 	$$PATH_TO_ACQUAMAN/dataman/database/AMDatabase.cpp \
-	$$PATH_TO_ACQUAMAN/dataman/datasource/AMDataSource.cpp \
-	$$PATH_TO_ACQUAMAN/dataman/datasource/AMDataSourceSeriesData.cpp \
 	$$PATH_TO_ACQUAMAN/dataman/info/AMControlInfo.cpp \
 	$$PATH_TO_ACQUAMAN/dataman/info/AMControlInfoList.cpp \
 	$$PATH_TO_ACQUAMAN/util/AMRange.cpp \

@@ -9,15 +9,20 @@
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
 #include "ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "DataElement/AMDSDwellStatusData.h"
 #include "DataElement/AMDSBufferGroup.h"
 #include "DataElement/AMDSBufferGroupInfo.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
+#include "DataHolder/AMDSDataHolder.h"
 #include "util/AMErrorMonitor.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
+
+	qRegisterMetaType<AMDSDwellStatusData>();
+	qRegisterMetaType<AMDSDataHolderList>();
 
 	// initialize the app controller
 	AMDSServerAppController::serverAppController();
@@ -33,6 +38,8 @@ AMDSCentralServer::~AMDSCentralServer()
 	bufferGroupManagers_.clear();
 
 	tcpDataServer_->deleteLater();
+
+	AMDSServerAppController::releaseAppController();
 }
 
 void AMDSCentralServer::initializeAndStartServices()
@@ -42,6 +49,9 @@ void AMDSCentralServer::initializeAndStartServices()
 
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the bufferGroup ...");
 	initializeBufferGroup();
+
+	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the detector managers ...");
+	initializeDetectorManager();
 
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the Data server...");
 	initializeAndStartDataServer();
