@@ -11,14 +11,14 @@ class AMDSClientStartTimePlusCountDataRequest : public AMDSClientDataRequest
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientStartTimePlusCountDataRequest(QObject *parent = 0);
-	explicit AMDSClientStartTimePlusCountDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 count, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientStartTimePlusCountDataRequest(ResponseType responseType, const QDateTime &localDateTime, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 count, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientStartTimePlusCountDataRequest();
 
 	/// Copy constructor
 	AMDSClientStartTimePlusCountDataRequest(const AMDSClientStartTimePlusCountDataRequest &other);
 
 	/// Returns the start time for the data request
-	inline QDateTime startTime() const { return startTime_; }
+	inline QDateTime startTime() const { return startTime_.addMSecs(timeDelta()); }
 	/// Returns the number of data points after the start time to collect
 	inline quint64 count() const { return count_; }
 

@@ -50,7 +50,8 @@ HEADERS  += \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
-	source/util/AMDSMetaObjectSupport.h
+	source/util/AMDSMetaObjectSupport.h \
+    source/appController/AMDSAppController.h
 
 SOURCES += \
 	$$PATH_TO_ACQUAMAN/util/AMErrorMonitor.cpp \
@@ -81,4 +82,7 @@ SOURCES += \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
-	source/util/AMDSMetaObjectSupport.cpp
+	source/util/AMDSMetaObjectSupport.cpp \
+    source/appController/AMDSAppController.cpp
+
+
