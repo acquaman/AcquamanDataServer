@@ -22,7 +22,7 @@ AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 
 	// Commented out PV and IP details for actual beamline ampteks, so can test on some detectors without interfering with beamline operations
 //	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 239", "amptek:sdd1", QHostAddress("192.168.0.239"), QHostAddress("192.168.0.139"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Unsigned16, 1024, this));
-	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 240", "amptek:sdd2", QHostAddress("192.168.0.240"), QHostAddress("192.168.0.140"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Unsigned16, 1024, this));
+	amptekConfigurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 240", "amptek:sdd2", QHostAddress("192.168.0.240"), QHostAddress("192.168.0.140"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Unsigned16, 1024, this));
 //	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 241", "amptek:sdd3", QHostAddress("192.168.0.241"), QHostAddress("192.168.0.141"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Unsigned16, 1024, this));
 //	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 242", "amptek:sdd4", QHostAddress("192.168.0.242"), QHostAddress("192.168.0.142"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Unsigned16, 1024, this));
 //	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 243", "amptek:sdd5", QHostAddress("192.168.0.243"), QHostAddress("192.168.0.143"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Unsigned16, 1024, this));
@@ -31,10 +31,10 @@ AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 
 AMDSCentralServerSGM::~AMDSCentralServerSGM()
 {
-	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, configurationMaps_) {
+	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, amptekConfigurationMaps_) {
 		amptekConfiguration->deleteLater();
 	}
-	configurationMaps_.clear();
+	amptekConfigurationMaps_.clear();
 
 	foreach (AMDSThreadedBufferGroup *bufferGroup, dwellBufferGroupManagers_) {
 		bufferGroup->deleteLater();
@@ -47,7 +47,7 @@ AMDSCentralServerSGM::~AMDSCentralServerSGM()
 
 void AMDSCentralServerSGM::initializeBufferGroup()
 {
-	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, configurationMaps_) {
+	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, amptekConfigurationMaps_) {
 
 		QList<AMDSAxisInfo> amptekBufferGroupAxes;
 		amptekBufferGroupAxes << AMDSAxisInfo("Energy", amptekConfiguration->spectrumCountSize(), "Energy Axis", "eV");
@@ -64,7 +64,7 @@ void AMDSCentralServerSGM::initializeBufferGroup()
 	}
 
 
-	amptekDetectorGroup_ = new AmptekSDD123DetectorGroupSGM(configurationMaps_);
+	amptekDetectorGroup_ = new AmptekSDD123DetectorGroupSGM(amptekConfigurationMaps_);
 	foreach (AmptekSDD123DetectorManager * detectorManager, amptekDetectorGroup_->detectorManagers()) {
 		connect(detectorManager, SIGNAL(clearHistrogramData(QString)), this, SLOT(onClearHistrogramData(QString)));
 		connect(detectorManager, SIGNAL(clearDwellHistrogramData(QString)), this, SLOT(onClearDwellHistrogramData(QString)));
@@ -76,7 +76,7 @@ void AMDSCentralServerSGM::initializeBufferGroup()
 
 void AMDSCentralServerSGM::initializeAndStartDataServer()
 {
-	amptekThreadedDataServerGroup_ = new AmptekSDD123ThreadedDataServerGroup(configurationMaps_);
+	amptekThreadedDataServerGroup_ = new AmptekSDD123ThreadedDataServerGroup(amptekConfigurationMaps_);
 
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SLOT(onServerChangedToConfigurationState(int)));
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));

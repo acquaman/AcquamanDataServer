@@ -52,7 +52,7 @@ protected:
 
 protected:
 	/// the list of configuration map of SGM amptek
-	QList<AmptekSDD123ConfigurationMap*> configurationMaps_;
+	QList<AmptekSDD123ConfigurationMap*> amptekConfigurationMaps_;
 
 	/// the list of bufferGroupManagers for dwell data buffers
 	QMap<QString, AMDSThreadedBufferGroup*> dwellBufferGroupManagers_;
