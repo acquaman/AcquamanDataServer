@@ -76,7 +76,7 @@ public:
 
 protected:
 	/// calculate the delta between the client time and the server time i(in ms)
-	int calculateTimeDelta();
+	int calculateTimeDelta() const;
 
 	/// Writes this AMDSClientRequest to an QDataStream, returns 0 if no errors are encountered
 	virtual int writeToDataStream(QDataStream *dataStream);

@@ -18,7 +18,7 @@ public:
 	~AMDSAppController() {}
 
 	/// returns the current type of the app controller
-	inline AMDSAppController::AMDSAppType appType() { return appType_; }
+	inline AMDSAppController::AMDSAppType appType() const { return appType_; }
 
 protected:
 	/// the singalton instance of the appController
