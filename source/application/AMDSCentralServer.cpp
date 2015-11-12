@@ -3,6 +3,7 @@
 #include <QtCore/QCoreApplication>
 #include <QTimer>
 
+#include "appController/AMDSServerAppController.h"
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
@@ -23,6 +24,9 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	qRegisterMetaType<AMDSDwellStatusData>();
 	qRegisterMetaType<AMDSDataHolderList>();
 
+	// initialize the app controller
+	AMDSServerAppController::serverAppController();
+
 	maxBufferSize_ = 1000*60*60*10;
 }
 
@@ -34,6 +38,8 @@ AMDSCentralServer::~AMDSCentralServer()
 	bufferGroupManagers_.clear();
 
 	tcpDataServer_->deleteLater();
+
+	AMDSServerAppController::releaseAppController();
 }
 
 void AMDSCentralServer::initializeAndStartServices()

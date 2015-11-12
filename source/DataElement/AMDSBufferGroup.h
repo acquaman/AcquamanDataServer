@@ -76,6 +76,8 @@ signals:
 	void dwellFinishedAllDataUpdate(AMDSDataHolder *accumlatedDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
 
 protected:
+	/// calculate the delta between the client time and the server time i(in ms)
+	int calculateTimeDelta(AMDSClientRequest *clientRequest);
 	/// Flatten the data based on the given flatten method, return True if no error happened
 	bool flattenData(QList<AMDSDataHolder *> *dataArray);
 	/// Fills the data to the clientRequest

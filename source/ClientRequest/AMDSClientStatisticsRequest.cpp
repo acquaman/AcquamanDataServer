@@ -7,8 +7,8 @@ AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(QObject *parent) :
 	setRequestType(AMDSClientRequestDefinitions::Statistics);
 }
 
-AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(AMDSClientRequest::ResponseType responseType, const QString socketKey, QObject *parent) :
-	AMDSClientRequest(socketKey, QString(), AMDSClientRequestDefinitions::Statistics, responseType, parent)
+AMDSClientStatisticsRequest::AMDSClientStatisticsRequest(AMDSClientRequest::ResponseType responseType, const QDateTime &localDateTime, const QString socketKey, QObject *parent) :
+	AMDSClientRequest(socketKey, QString(), AMDSClientRequestDefinitions::Statistics, responseType, localDateTime, parent)
 {
 
 }

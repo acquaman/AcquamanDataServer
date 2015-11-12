@@ -57,7 +57,7 @@ class AMDSLightWeightEventData : public AMDSEventData
 {
 Q_OBJECT
 public:
-	Q_INVOKABLE AMDSLightWeightEventData(QDateTime eventTime = QDateTime::currentDateTime(), QObject *parent = 0);
+	Q_INVOKABLE AMDSLightWeightEventData(QDateTime eventTime = QDateTime::currentDateTimeUtc(), QObject *parent = 0);
 	Q_INVOKABLE AMDSLightWeightEventData(AMDSLightWeightEventData &eventData, QObject *parent = 0);
 	virtual ~AMDSLightWeightEventData();
 
@@ -87,7 +87,7 @@ class AMDSFullEventData : public AMDSEventData
 {
 Q_OBJECT
 public:
-	Q_INVOKABLE AMDSFullEventData(QDateTime eventTime = QDateTime::currentDateTime(), AMDSEventData::EventType eventType = AMDSEventData::SingleEvent, AMDSEventData::TimeScale timeScale = AMDSEventData::SecondsScale, quint16 timeUncertainty = 0, QObject *parent = 0);
+	Q_INVOKABLE AMDSFullEventData(QDateTime eventTime = QDateTime::currentDateTimeUtc(), AMDSEventData::EventType eventType = AMDSEventData::SingleEvent, AMDSEventData::TimeScale timeScale = AMDSEventData::SecondsScale, quint16 timeUncertainty = 0, QObject *parent = 0);
 	Q_INVOKABLE AMDSFullEventData(AMDSFullEventData &eventData, QObject *parent = 0);
 	virtual ~AMDSFullEventData();
 

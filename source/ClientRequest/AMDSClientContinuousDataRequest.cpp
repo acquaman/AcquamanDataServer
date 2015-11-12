@@ -11,21 +11,21 @@ AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(QObject *parent
 	setUpdateInterval(500);
 	setHandShakeSocketKey("");
 
-	setStartTime(QDateTime::currentDateTime());
+	setStartTime(QDateTime::currentDateTimeUtc());
 	setLastFetchTime(startTime());
 	setHandShakeTime(startTime());
 
 	connect(&continuousDataRequestTimer_, SIGNAL(timeout()), this, SLOT(onDataRequestTimerTimeout()));
 }
 
-AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool flattenResultData, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
-	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, QString(""), includeStatusData, flattenResultData, bufferGroupInfo, parent)
+AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(ResponseType responseType, const QDateTime &localDateTime, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool flattenResultData, const quint32 msgUpdateInterval, const QString &msgHandShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::Continuous, responseType, localDateTime, QString(""), includeStatusData, flattenResultData, bufferGroupInfo, parent)
 {
 	setBufferNames(bufferNames);
 	setUpdateInterval(msgUpdateInterval);
 	setHandShakeSocketKey(msgHandShakeSocketKey);
 
-	setStartTime(QDateTime::currentDateTime());
+	setStartTime(QDateTime::currentDateTimeUtc());
 	setLastFetchTime(startTime());
 	setHandShakeTime(startTime());
 
@@ -84,7 +84,7 @@ void AMDSClientContinuousDataRequest::setBufferNames(const QStringList &names) {
 
 bool AMDSClientContinuousDataRequest::isExpired()
 {
-	QDateTime nowDateTime = QDateTime::currentDateTime();
+	QDateTime nowDateTime = QDateTime::currentDateTimeUtc();
 	quint64 timeSpanInSecond =  nowDateTime.toTime_t() - lastHandShakingTime().toTime_t();
 
 	if (timeSpanInSecond > 60)
@@ -128,7 +128,7 @@ bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 */
 void AMDSClientContinuousDataRequest::handShaking(AMDSClientContinuousDataRequest *handShakingMessage)
 {
-	setHandShakeTime(QDateTime::currentDateTime());
+	setHandShakeTime(QDateTime::currentDateTimeUtc());
 
 	QStringList handShakeBufferNames = handShakingMessage->bufferNames();
 	if (handShakeBufferNames.size() == 0) {
