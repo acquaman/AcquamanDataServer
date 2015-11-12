@@ -9,7 +9,7 @@ class AMDSClientStatisticsRequest : public AMDSClientRequest
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientStatisticsRequest(QObject *parent = 0);
-	explicit AMDSClientStatisticsRequest(AMDSClientRequest::ResponseType responseType, const QString socketKey, QObject *parent = 0);
+	explicit AMDSClientStatisticsRequest(AMDSClientRequest::ResponseType responseType, const QDateTime &localDateTime, const QString socketKey, QObject *parent = 0);
 	virtual ~AMDSClientStatisticsRequest();
 
 	/// Copy constructor

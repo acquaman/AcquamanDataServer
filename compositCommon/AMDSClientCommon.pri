@@ -22,6 +22,7 @@ RCC_DIR=build_files
 HEADERS  += \
 	$$PATH_TO_ACQUAMAN/util/AMErrorMonitor.h \
 	$$PATH_TO_ACQUAMAN/ui/util/AMMessageBoxWTimeout.h \
+	source/appController/AMDSAppController.h \
 	source/appController/AMDSClientAppController.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
@@ -56,6 +57,7 @@ HEADERS  += \
 SOURCES += \
 	$$PATH_TO_ACQUAMAN/util/AMErrorMonitor.cpp \
 	$$PATH_TO_ACQUAMAN/ui/util/AMMessageBoxWTimeout.cpp \
+	source/appController/AMDSAppController.cpp \
 	source/appController/AMDSClientAppController.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
@@ -83,4 +85,3 @@ SOURCES += \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp
-

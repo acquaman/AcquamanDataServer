@@ -12,6 +12,7 @@ class AMDSServer;
 class AMDSClientTCPSocket;
 class AMDSClientRequest;
 
+#include "appController/AMDSAppController.h"
 #include "ClientRequest/AMDSClientRequestDefinitions.h"
 #include "DataElement/AMDSConfigurationDef.h"
 
@@ -25,13 +26,12 @@ class AMDSClientRequest;
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG 10302
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG 10303
 
-class AMDSClientAppController : public QObject
+class AMDSClientAppController : public AMDSAppController
 {
     Q_OBJECT
 
 public:
 	static AMDSClientAppController* clientAppController();
-	static void release();
 
 	~AMDSClientAppController();
 
@@ -88,9 +88,6 @@ public slots:
 	void onAMDSServerError(AMDSServer* server, int errorCode, const QString &socketKey, const QString &errorMessage);
 
 protected:
-	/// the static instance for the singleton appcontroller
-	static AMDSClientAppController *instance_;
-
 	/// make the constructor protected for SINGLETON usage
 	explicit AMDSClientAppController(QObject *parent = 0);
 

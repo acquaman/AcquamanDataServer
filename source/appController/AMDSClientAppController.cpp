@@ -16,30 +16,18 @@
 #include "Connection/AMDSServer.h"
 #include "util/AMErrorMonitor.h"
 
-AMDSClientAppController* AMDSClientAppController::instance_ = 0;
-
-AMDSClientAppController* AMDSClientAppController::clientAppController()
+AMDSClientAppController *AMDSClientAppController::clientAppController()
 {
-	if (!instance_) {
-		instance_ = new AMDSClientAppController();
-
-		instance_->openNetworkSession();
+	if (!appController_) {
+		appController_ = new AMDSClientAppController();
+		((AMDSClientAppController *)appController_)->openNetworkSession();
 	}
 
-	return instance_;
+	return qobject_cast<AMDSClientAppController *>(appController_);
 }
-
-void AMDSClientAppController::release()
-{
-	if (instance_) {
-		instance_->deleteLater();
-		instance_ = 0;
-	}
-}
-
 
 AMDSClientAppController::AMDSClientAppController(QObject *parent) :
-	QObject(parent)
+	AMDSAppController(AMDSAppController::Client, parent)
 {
 	networkSession_ = 0;
 }
@@ -346,5 +334,6 @@ AMDSClientRequest *AMDSClientAppController::instantiateClientRequest(AMDSClientR
 		AMErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
 	}
 
+	clientRequest->setClientLocalTime(QDateTime::currentDateTimeUtc());
 	return clientRequest;
 }

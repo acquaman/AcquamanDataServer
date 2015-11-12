@@ -10,7 +10,7 @@ class AMDSClientIntrospectionRequest : public AMDSClientRequest
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientIntrospectionRequest(QObject *parent = 0);
-	explicit AMDSClientIntrospectionRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, QObject *parent = 0);
+	explicit AMDSClientIntrospectionRequest(ResponseType responseType, const QDateTime &localDateTime, const QString &socketKey, const QString &bufferName, QObject *parent = 0);
 	virtual ~AMDSClientIntrospectionRequest();
 
 	/// Copy constructor

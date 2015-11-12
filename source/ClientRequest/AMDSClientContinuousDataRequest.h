@@ -13,7 +13,7 @@ class AMDSClientContinuousDataRequest : public AMDSClientDataRequest
 Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientContinuousDataRequest(QObject *parent = 0);
-	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool flattenResultData, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientContinuousDataRequest(ResponseType responseType, const QDateTime &localDateTime, const QString &socketKey, const QStringList &bufferNames, bool includeStatusData, bool flattenResultData, const quint32 updateInterval, const QString &handShakeSocketKey, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientContinuousDataRequest();
 	/// Copy constructor
 	AMDSClientContinuousDataRequest(const AMDSClientContinuousDataRequest &other);
@@ -28,7 +28,7 @@ public:
 	/// Returns the list of buffernames
 	inline QStringList bufferNames() const { return bufferNameList_; }
 	/// Returns the start time for the data request
-	inline QDateTime startTime() const { return startTime_; }
+	inline QDateTime startTime() const { return startTime_.addMSecs(timeDelta()); }
 	/// Returns the update interval
 	inline quint32 updateInterval() const { return updateInterval_; }
 	/// Returns the last fetch time for the data request

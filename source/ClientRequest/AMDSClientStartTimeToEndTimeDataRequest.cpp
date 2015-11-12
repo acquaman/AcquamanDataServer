@@ -9,8 +9,8 @@ AMDSClientStartTimeToEndTimeDataRequest::AMDSClientStartTimeToEndTimeDataRequest
 	setEndTime(QDateTime());
 }
 
-AMDSClientStartTimeToEndTimeDataRequest::AMDSClientStartTimeToEndTimeDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, const QDateTime &endTime, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
-	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::StartTimeToEndTime, responseType, bufferName, includeStatusData, flattenResultData, bufferGroupInfo, parent)
+AMDSClientStartTimeToEndTimeDataRequest::AMDSClientStartTimeToEndTimeDataRequest(ResponseType responseType, const QDateTime &localDateTime, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, const QDateTime &endTime, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::StartTimeToEndTime, responseType, localDateTime, bufferName, includeStatusData, flattenResultData, bufferGroupInfo, parent)
 {
 	setStartTime(startTime);
 	setEndTime(endTime);

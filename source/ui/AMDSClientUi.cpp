@@ -76,9 +76,9 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 	QStringList bufferNames("All");
 	resetBufferListView(bufferNames);
 
-	time1Edit_ = new QDateTimeEdit(QDateTime::currentDateTime());
+	time1Edit_ = new QDateTimeEdit(QDateTime::currentDateTimeUtc());
 	time1Edit_->setDisplayFormat("HH:mm:ss.zzz");
-	time2Edit_ = new QDateTimeEdit(QDateTime::currentDateTime());
+	time2Edit_ = new QDateTimeEdit(QDateTime::currentDateTimeUtc());
 	time2Edit_->setDisplayFormat("HH:mm:ss.zzz");
 	count1Edit_ = new QLineEdit();
 	count2Edit_ = new QLineEdit();
@@ -145,7 +145,7 @@ AMDSClientUi::~AMDSClientUi()
 	disconnect(clientAppController, SIGNAL(serverError(int,bool,QString,QString)), this, SLOT(onServerError(int,bool,QString,QString)));
 	disconnect(clientAppController, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
 
-	AMDSClientAppController::release();
+	AMDSClientAppController::releaseAppController();
 
 	QAbstractItemModel *currentListModel = bufferNameListView_->model();
 	if (currentListModel)
