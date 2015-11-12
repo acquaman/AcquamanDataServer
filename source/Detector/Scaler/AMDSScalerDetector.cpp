@@ -89,10 +89,11 @@ void AMDSScalerDetector::onAllControlsTimedOut()
 
 void AMDSScalerDetector::onDwellTimeControlValueChanged(double newValue)
 {
-	if (dwellTime_ != newValue) {
-		AMErrorMon::alert(this, 0, QString("Scaler %1 dwell time changed from %2ms to %3ms.").arg(scalerName()).arg(dwellTime_).arg(newValue));
+	int newDwellControlValue = (int)newValue;
+	if (dwellTime_ != newDwellControlValue) {
+		AMErrorMon::alert(this, 0, QString("Scaler %1 dwell time changed from %2ms to %3ms.").arg(scalerName()).arg(dwellTime_).arg(newDwellControlValue));
 
-		dwellTime_ = (int)newValue;
+		dwellTime_ = newDwellControlValue;
 	}
 }
 

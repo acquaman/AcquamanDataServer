@@ -1,7 +1,6 @@
 #include "AMDSScalarDataHolder.h"
 
 
-#include <QDebug>
 AMDSLightWeightScalarDataHolder::AMDSLightWeightScalarDataHolder(AMDSDataTypeDefinitions::DataType dataType, QObject *parent) :
 	AMDSLightWeightGenericFlatArrayDataHolder(dataType, 1, parent)
 {

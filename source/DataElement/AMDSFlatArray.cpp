@@ -200,103 +200,103 @@ AMDSFlatArray AMDSFlatArray::operator /(const quint32 divisor)
 	return newDataFlatArray;
 }
 
-bool AMDSFlatArray::setValues(QVector<quint8> values)
+bool AMDSFlatArray::setValues(const QVector<quint8> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Unsigned8 || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Unsigned8 || size() != values.size()) {
 		return false;
 	}
 
-	vectorQuint8_ = QVector<quint8>(values);
+	vectorQuint8_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<qint8> values)
+bool AMDSFlatArray::setValues(const QVector<qint8> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Signed8 || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Signed8 || size() != values.size()) {
 		return false;
 	}
 
-	vectorQint8_ = QVector<qint8>(values);
+	vectorQint8_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<quint16> values)
+bool AMDSFlatArray::setValues(const QVector<quint16> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Unsigned16 || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Unsigned16 || size() != values.size()) {
 		return false;
 	}
 
-	vectorQuint16_ = QVector<quint16>(values);
+	vectorQuint16_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<qint16> values)
+bool AMDSFlatArray::setValues(const QVector<qint16> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Signed16 || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Signed16 || size() != values.size()) {
 		return false;
 	}
 
-	vectorQint16_ = QVector<qint16>(values);
+	vectorQint16_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<quint32> values)
+bool AMDSFlatArray::setValues(const QVector<quint32> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Unsigned32 || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Unsigned32 || size() != values.size()) {
 		return false;
 	}
 
-	vectorQuint32_ = QVector<quint32>(values);
+	vectorQuint32_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<qint32> values)
+bool AMDSFlatArray::setValues(const QVector<qint32> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Signed32 || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Signed32 || size() != values.size()) {
 		return false;
 	}
 
-	vectorQint32_ = QVector<qint32>(values);
+	vectorQint32_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<quint64> values)
+bool AMDSFlatArray::setValues(const QVector<quint64> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Unsigned64 || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Unsigned64 || size() != values.size()) {
 		return false;
 	}
 
-	vectorQuint64_ = QVector<quint64>(values);
+	vectorQuint64_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<qint64> values)
+bool AMDSFlatArray::setValues(const QVector<qint64> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Signed64 || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Signed64 || size() != values.size()) {
 		return false;
 	}
 
-	vectorQint64_ = QVector<qint64>(values);
+	vectorQint64_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<float> values)
+bool AMDSFlatArray::setValues(const QVector<float> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Float || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Float || size() != values.size()) {
 		return false;
 	}
 
-	vectorFloat_ = QVector<float>(values);
+	vectorFloat_ = values;
 	return true;
 }
 
-bool AMDSFlatArray::setValues(QVector<double> values)
+bool AMDSFlatArray::setValues(const QVector<double> &values)
 {
-	if (dataType_ != AMDSDataTypeDefinitions::Double || size() > values.size()) {
+	if (dataType_ != AMDSDataTypeDefinitions::Double || size() != values.size()) {
 		return false;
 	}
 
-	vectorDouble_ = QVector<double>(values);
+	vectorDouble_ = values;
 	return true;
 }
 

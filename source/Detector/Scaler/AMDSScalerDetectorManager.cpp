@@ -18,7 +18,7 @@ AMDSScalerDetectorManager::AMDSScalerDetectorManager(AMDSScalerConfigurationMap 
 AMDSScalerDetectorManager::~AMDSScalerDetectorManager()
 {
 	if (detectorManagerThread_->isRunning())
-		detectorManagerThread_->terminate();
+		detectorManagerThread_->quit();
 
 	detectorManagerThread_->deleteLater();
 	detectorManagerThread_ = 0;

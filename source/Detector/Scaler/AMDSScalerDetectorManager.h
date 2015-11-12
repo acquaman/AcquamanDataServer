@@ -14,14 +14,13 @@ public:
 	explicit AMDSScalerDetectorManager(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent = 0);
 	~AMDSScalerDetectorManager();
 
-	inline AMDSScalerDetector *scalerDetector() { return scalerDetector_; }
-
-signals:
-
-public slots:
+	/// returns the instance of scaler detector
+	inline AMDSScalerDetector *scalerDetector() const { return scalerDetector_; }
 
 protected:
+	/// the instance of detector manager thread
 	QThread *detectorManagerThread_;
+	/// the instance of scaler detector
 	AMDSScalerDetector *scalerDetector_;
 };
 
