@@ -19,16 +19,16 @@ public:
 	virtual AMDSFlatArray operator /(quint32 divisor);
 
 	/// set the values of the data with the given vector
-	bool setValues(QVector<quint8> values) ;
-	bool setValues(QVector<qint8> values) ;
-	bool setValues(QVector<quint16> values) ;
-	bool setValues(QVector<qint16> values) ;
-	bool setValues(QVector<quint32> values) ;
-	bool setValues(QVector<qint32> values) ;
-	bool setValues(QVector<quint64> values) ;
-	bool setValues(QVector<qint64> values) ;
-	bool setValues(QVector<float> values) ;
-	bool setValues(QVector<double> values) ;
+	bool setValues(const QVector<quint8> &values) ;
+	bool setValues(const QVector<qint8> &values) ;
+	bool setValues(const QVector<quint16> &values) ;
+	bool setValues(const QVector<qint16> &values) ;
+	bool setValues(const QVector<quint32> &values) ;
+	bool setValues(const QVector<qint32> &values) ;
+	bool setValues(const QVector<quint64> &values) ;
+	bool setValues(const QVector<qint64> &values) ;
+	bool setValues(const QVector<float> &values) ;
+	bool setValues(const QVector<double> &values) ;
 
 	/// set the value of the data at a specific index
 	bool setValue(int index, qint8   value) ;

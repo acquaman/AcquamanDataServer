@@ -1,5 +1,6 @@
 #include "ClientRequest/AMDSClientRequest.h"
 
+#include "appController/AMDSAppController.h"
 #include "ClientRequest/AMDSClientRequestSupport.h"
 #include "util/AMErrorMonitor.h"
 
@@ -52,13 +53,13 @@ bool AMDSClientRequest::encodeAndwriteClientRequest(QDataStream *dataStream, AMD
 AMDSClientRequest::AMDSClientRequest(QObject *parent) :
 	QObject(parent)
 {
-	setBaseAttributesValues(QString(), QString(), AMDSClientRequestDefinitions::InvalidRequest, AMDSClientRequest::InvalidResponse);
+	setBaseAttributesValues(QString(), QString(), AMDSClientRequestDefinitions::InvalidRequest, AMDSClientRequest::InvalidResponse, QDateTime::currentDateTimeUtc());
 }
 
-AMDSClientRequest::AMDSClientRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, QObject *parent) :
+AMDSClientRequest::AMDSClientRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QDateTime &localTime, QObject *parent) :
 	QObject(parent)
 {
-	setBaseAttributesValues(socketKey, errorMessage, requestType, responseType);
+	setBaseAttributesValues(socketKey, errorMessage, requestType, responseType, localTime);
 }
 
 AMDSClientRequest::~AMDSClientRequest()
@@ -74,7 +75,7 @@ AMDSClientRequest::AMDSClientRequest(const AMDSClientRequest &other) :
 AMDSClientRequest& AMDSClientRequest::operator =(const AMDSClientRequest &other)
 {
 	if(this != &other){
-		setBaseAttributesValues(other.socketKey(), other.errorMessage(), other.requestType(), other.responseType());
+		setBaseAttributesValues(other.socketKey(), other.errorMessage(), other.requestType(), other.responseType(), other.clientLocalTime());
 	}
 
 	return (*this);
@@ -98,6 +99,14 @@ void AMDSClientRequest::printData()
 	AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
 }
 
+int AMDSClientRequest::calculateTimeDelta() const
+{
+	QDateTime serverLocalTime = QDateTime::currentDateTimeUtc();
+
+	int timeDelta = serverLocalTime.toMSecsSinceEpoch() - clientLocalTime().toMSecsSinceEpoch();
+	return timeDelta;
+}
+
 int AMDSClientRequest::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream <<((quint8)requestType());
@@ -115,6 +124,9 @@ int AMDSClientRequest::writeToDataStream(QDataStream *dataStream)
 	*dataStream << (quint8)responseType_;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_RESPONSE_TYPE;
+	*dataStream << clientLocalTime_;
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CLIENT_LOCAL_TIME;
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
@@ -125,6 +137,7 @@ int AMDSClientRequest::readFromDataStream(QDataStream *dataStream)
 	QString readSocketKey;
 	QString readErrorMessage;
 	quint8 readResponseType;
+	QDateTime localTime;
 
 	*dataStream >> readSocketKey;
 	if(dataStream->status() != QDataStream::Ok)
@@ -137,17 +150,27 @@ int AMDSClientRequest::readFromDataStream(QDataStream *dataStream)
 	*dataStream >> readResponseType;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_RESPONSE_TYPE;
+	*dataStream >> localTime;
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CLIENT_LOCAL_TIME;
 
 	//NOTE: we won't change the requestType :)
-	setBaseAttributesValues(readSocketKey, readErrorMessage, requestType(), (AMDSClientRequest::ResponseType)readResponseType);
+	setBaseAttributesValues(readSocketKey, readErrorMessage, requestType(), (AMDSClientRequest::ResponseType)readResponseType, localTime);
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }
 
-void AMDSClientRequest::setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType)
+void AMDSClientRequest::setBaseAttributesValues(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QDateTime &localTime)
 {
 	setSocketKey(socketKey);
 	setErrorMessage(errorMessage);
 	setRequestType(requestType);
 	setResponseType(responseType);
+	setClientLocalTime(localTime);
+
+	AMDSAppController *appController = AMDSAppController::appController();
+	if (appController && appController->appType() == AMDSAppController::Server)
+		timeDelta_ = calculateTimeDelta();
+	else
+		timeDelta_ = 0;
 }

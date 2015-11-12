@@ -12,10 +12,10 @@ public:
 	explicit AMDSScalerConfigurationMap(const QString &scalerName, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, const QList<quint8> &enabledChannelId, QObject *parent = 0);
 	~AMDSScalerConfigurationMap();
 
-	inline const QString scalerName() { return scalerName_; }
-	inline const QString scalerBasePVName() { return scalerBasePVName_; }
-	inline AMDSDataTypeDefinitions::DataType dataType() { return dataType_; }
-	inline const QList<quint8> enabledChannels() { return enabledChannels_; }
+	inline QString scalerName() const { return scalerName_; }
+	inline QString scalerBasePVName() const { return scalerBasePVName_; }
+	inline AMDSDataTypeDefinitions::DataType dataType() const { return dataType_; }
+	inline QList<quint8> enabledChannels() const { return enabledChannels_; }
 
 protected:
 	/// the name of the scaler

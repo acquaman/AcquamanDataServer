@@ -75,14 +75,14 @@ AmptekSDD123Server::~AmptekSDD123Server()
 
 QList<double> AmptekSDD123Server::droppedPacketStatistics() const
 {
-	QDateTime last30Seconds = QDateTime::currentDateTime().addSecs(-30);
+	QDateTime last30Seconds = QDateTime::currentDateTimeUtc().addSecs(-30);
 	QList<double> retVal;
 	retVal << droppedPackets_.totalOccurances() << droppedPackets_.totalRate() << droppedPackets_.occurancesSince(last30Seconds) << droppedPackets_.rateSince(last30Seconds);
 	return retVal;
 }
 
 QList<double> AmptekSDD123Server::unrequestedPacketStatistics() const{
-	QDateTime last30Seconds = QDateTime::currentDateTime().addSecs(-30);
+	QDateTime last30Seconds = QDateTime::currentDateTimeUtc().addSecs(-30);
 	QList<double> retVal;
 	retVal << unrequestedPackets_.totalOccurances() << unrequestedPackets_.totalRate()<< unrequestedPackets_.occurancesSince(last30Seconds) << unrequestedPackets_.rateSince(last30Seconds);
 	return retVal;
@@ -428,7 +428,7 @@ void AmptekSDD123Server::processLocalStoredPacket(const AmptekSDD123Packet &resp
 				if(headPacket.command() == currentRequestPacket_.command() && responsePacket.dataString() == currentSyncPacket_.dataString())
 					rerequestRequired = true;
 
-				droppedPackets_.appendPacket(QDateTime::currentDateTime(), headPacket);
+				droppedPackets_.appendPacket(QDateTime::currentDateTimeUtc(), headPacket);
 				emit dropPacketDetected();
 			}
 		}
@@ -444,7 +444,7 @@ void AmptekSDD123Server::processLocalStoredPacket(const AmptekSDD123Packet &resp
 			AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
 			currentSyncPacket_ = emptyPacket;
 		} else {
-			unrequestedPackets_.appendPacket(QDateTime::currentDateTime(), responsePacket);
+			unrequestedPackets_.appendPacket(QDateTime::currentDateTimeUtc(), responsePacket);
 			emit unrequestedPacketDetected();
 		}
 	}

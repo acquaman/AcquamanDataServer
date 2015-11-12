@@ -12,7 +12,8 @@ class AMDSServer;
 class AMDSClientTCPSocket;
 class AMDSClientRequest;
 
-#include "source/ClientRequest/AMDSClientRequestDefinitions.h"
+#include "appController/AMDSAppController.h"
+#include "ClientRequest/AMDSClientRequestDefinitions.h"
 
 #define AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE 10100
 #define AMDS_CLIENT_INFO_NETWORK_SESSION_STARTED 10101
@@ -24,12 +25,13 @@ class AMDSClientRequest;
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG 10302
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG 10303
 
-class AMDSClientAppController : public QObject
+class AMDSClientAppController : public AMDSAppController
 {
     Q_OBJECT
 
 public:
-	explicit AMDSClientAppController(QObject *parent = 0);
+	static AMDSClientAppController *clientAppController();
+
 	~AMDSClientAppController();
 
 	/// helper function to check whether the network session is openned or not
@@ -81,6 +83,9 @@ signals:
 public slots:
 	/// slot to handle socket error signal from the server
 	void onAMDSServerError(AMDSServer* server, int errorCode, const QString &socketKey, const QString &errorMessage);
+
+protected:
+	explicit AMDSClientAppController(QObject *parent = 0);
 
 private slots:
 	/// slot to handle the signal of network session opened

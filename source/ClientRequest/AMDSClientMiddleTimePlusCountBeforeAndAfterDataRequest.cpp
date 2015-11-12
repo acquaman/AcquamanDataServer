@@ -10,8 +10,8 @@ AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::AMDSClientMiddleTimePlus
 	setCountAfter(1);
 }
 
-AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 countBefore, quint64 countAfter, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
-	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter, responseType, bufferName, includeStatusData, flattenResultData, bufferGroupInfo, parent)
+AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest::AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest(ResponseType responseType, const QDateTime &localDateTime, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 countBefore, quint64 countAfter, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+	AMDSClientDataRequest(socketKey, QString(), AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter, responseType, localDateTime, bufferName, includeStatusData, flattenResultData, bufferGroupInfo, parent)
 {
 	setMiddleTime(startTime);
 	setCountBefore(countBefore);

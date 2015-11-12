@@ -14,8 +14,8 @@ AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	setFlattenResultData(false);
 }
 
-AMDSClientDataRequest::AMDSClientDataRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QString &bufferName, bool includeStatusData, bool flattenResultData, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
-	AMDSClientRequest(socketKey, errorMessage, requestType, responseType, parent)
+AMDSClientDataRequest::AMDSClientDataRequest(const QString &socketKey, const QString &errorMessage, AMDSClientRequestDefinitions::RequestType requestType, AMDSClientRequest::ResponseType responseType, const QDateTime &localDateTime, const QString &bufferName, bool includeStatusData, bool flattenResultData, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent) :
+	AMDSClientRequest(socketKey, errorMessage, requestType, responseType, localDateTime, parent)
 {
 	bufferName_ = bufferName;
 	includeStatusData_ = includeStatusData;

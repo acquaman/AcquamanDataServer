@@ -16,6 +16,12 @@ contains(USERNAME, sgm) {
 	PATH_TO_MPLOT_WORKSPACE = beamline/programming
 }
 
+contains(USERNAME, helfrij) {
+	PATH_TO_AMDS_WORKSPACE = beamline/programming/acquaman
+	PATH_TO_ACQUAMAN_WORKSPACE = beamline/programming/acquaman
+	PATH_TO_MPLOT_WORKSPACE = beamline/programming/acquaman
+}
+
 PATH_TO_SOURCE = $$HOME_FOLDER/$$PATH_TO_AMDS_WORKSPACE/AcquamanDataServer/source
 PATH_TO_ACQUAMAN = $$HOME_FOLDER/$$PATH_TO_ACQUAMAN_WORKSPACE/acquaman/source
 PATH_TO_MPLOT = $$HOME_FOLDER/$$PATH_TO_MPLOT_WORKSPACE/MPlot/src

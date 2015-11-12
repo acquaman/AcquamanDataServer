@@ -21,6 +21,8 @@ QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
 	source/AMDSMainCommon.h \
+	source/appController/AMDSAppController.h \
+	source/appController/AMDSServerAppController.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
@@ -58,6 +60,8 @@ HEADERS *= \
 	source/util/AMDSMetaObjectSupport.h
 
 SOURCES *= \
+	source/appController/AMDSAppController.cpp \
+	source/appController/AMDSServerAppController.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
 	source/ClientRequest/AMDSClientDataRequest.cpp \

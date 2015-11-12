@@ -240,14 +240,14 @@ double AmptekSDD123PacketMonitor::totalRate() const{
 	if(monitorList.count() == 0)
 		return 0;
 	double count = monitorList.count();
-	double time = monitorList.first().first.secsTo(QDateTime::currentDateTime());
+	double time = monitorList.first().first.secsTo(QDateTime::currentDateTimeUtc());
 	if(time == 0)
 		time = 1;
 	return count/time;
 }
 
 int AmptekSDD123PacketMonitor::occurancesSince(QDateTime timeOfInterest) const{
-	if(timeOfInterest.secsTo(QDateTime::currentDateTime()) <= 0)
+	if(timeOfInterest.secsTo(QDateTime::currentDateTimeUtc()) <= 0)
 		return 0;
 	int secsTo = 0;
 	for(int x = monitorList.count(); x > 0; x--){
@@ -259,14 +259,14 @@ int AmptekSDD123PacketMonitor::occurancesSince(QDateTime timeOfInterest) const{
 }
 
 double AmptekSDD123PacketMonitor::rateSince(QDateTime timeOfInterest) const{
-	if(timeOfInterest.secsTo(QDateTime::currentDateTime()) <= 0)
+	if(timeOfInterest.secsTo(QDateTime::currentDateTimeUtc()) <= 0)
 		return 0;
 	int secsTo = 0;
 	for(int x = monitorList.count(); x > 0; x--){
 		secsTo = monitorList.at(x-1).first.secsTo(timeOfInterest);
 		if(secsTo > 0){
 			double count = monitorList.count()-x;
-			double time = monitorList.at(x).first.secsTo(QDateTime::currentDateTime());
+			double time = monitorList.at(x).first.secsTo(QDateTime::currentDateTimeUtc());
 			if(time == 0)
 				time = 1;
 			return count/time;
