@@ -38,6 +38,8 @@ public:
 	int commandId(const QString &command) const;
 	/// returns the command string from the command hex code
 	QString commandFromHex(const QString &hex) const;
+	/// returns the list of commands
+	QList<AMDSCommand> commands() const {return commands_; }
 
 protected:
 	/// constructor of AMDSCommandManager class, which is protected since AMDSCommandManager should be used as singleton
@@ -61,12 +63,19 @@ protected:
 class AMDSCommand
 {
 public:
+	/// static helper function to decode a command defintion from the datastream
+	static AMDSCommand decodeAndInstantiateAMDSCommand(QDataStream *dataStream);
+	/// static helper function to write a command defintion to the datastream
+	static bool encodeAndwriteAMDSCommand(QDataStream *dataStream, AMDSCommand command);
+
 	/// the definition of an AMDS command
 	AMDSCommand(const int commandId=-1, const QString &hex = "", const QString &command = "", int timeout = -1, int retries = 0, QStringList responseHexes = QStringList());
 
 	/// returns a string of the command
 	QString toString() const;
 
+	/// check whether this command is a valid command
+	inline bool isValid() { return commandId_ != -1; }
 	/// the commandId value of the AMDS command
 	inline int commandId() const { return commandId_; }
 	/// the hex value of the AMDS command
@@ -79,6 +88,12 @@ public:
 	inline int retries() const  { return retries_; }
 	/// the predefined response of the AMDS command
 	inline QStringList responseHexes() const { return responseHexes_; }
+
+protected:
+	/// write the command to dataStream
+	bool writeToDataStream(QDataStream *dataStream);
+	/// read the command from dataStream
+	bool readFromDataStream(QDataStream *dataStream);
 
 protected:
 	/// the ID of the AMDSCommand

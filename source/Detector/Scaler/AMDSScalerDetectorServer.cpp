@@ -21,13 +21,14 @@ void AMDSScalerDetectorServer::onConfigurationRequestReceived(AMDSClientRequest 
 	if (configureRequest) {
 		bool startDwellAfterConfiguration = false;
 
-		QMap<int, QVariant> commands = configureRequest->configurationCommands();
+		QMap<QString, QVariant> commands = configureRequest->configurationCommands();
 		for (int index = 0; index < commands.size(); index++) {
-			int commandId = commands.keys().at(index);
-			QVariant commandValue = commands.values(commandId);
+			QString command = commands.keys().at(index);
+			QVariant commandValue = commands.values(command);
 
 			// perform the configuration
-			if (commandId = AMDSCommandManager::RequestStartDwell)
+			int commandId = AMDSScalerCommandManager::scalerCommandManager()->commandId(command);
+			if (commandId == AMDSCommandManager::RequestStartDwell)
 				startDwellAfterConfiguration = true;
 			else
 				performConfiguration(commandId, commandValue);

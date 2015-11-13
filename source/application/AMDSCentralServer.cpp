@@ -137,8 +137,12 @@ void AMDSCentralServer::processConfigurationClientRequest(AMDSClientRequest *cli
 	AMDSClientConfigurationRequest *clientConfigurationRequest = qobject_cast<AMDSClientConfigurationRequest*>(clientRequest);
 
 	QString bufferGroup = clientConfigurationRequest->bufferName();
-
-	emit scalerConfigurationRequestReceived(clientRequest);
+	if (clientConfigurationRequest->configurationCommands().size() == 0) {
+		//request the list of available commands
+		fillConfigurationCommandForClientRequest(bufferGroup, clientConfigurationRequest);
+	} else {
+		emit scalerConfigurationRequestReceived(clientRequest);
+	}
 
 	clientConfigurationRequest->setErrorMessage(errorMessage);
 	emit clientRequestProcessed(clientConfigurationRequest);

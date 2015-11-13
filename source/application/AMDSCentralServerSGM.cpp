@@ -4,6 +4,7 @@
 
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 #include "Detector/Amptek/AmptekSDD123DetectorManager.h"
@@ -162,6 +163,16 @@ void AMDSCentralServerSGM::wrappingUpInitialization()
 		connect(scalerServer, SIGNAL(serverChangedToConfigurationState(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerStopDwelling()));
 		connect(scalerServer, SIGNAL(enableChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onEnableChannel(int)));
 		connect(scalerServer, SIGNAL(disableChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onDisableChannel(int)));
+	}
+}
+
+void AMDSCentralServerSGM::fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest)
+{
+	if (bufferName == scalerConfigurationMap_->scalerName()) {
+		AMDSCommandManager *commandMananger = AMDSScalerCommandManager::scalerCommandManager();
+		foreach(AMDSCommand commandDef, commandMananger->commands()) {
+			clientRequest->appendCommandDef(commandDef);
+		}
 	}
 }
 

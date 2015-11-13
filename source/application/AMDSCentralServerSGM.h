@@ -63,6 +63,9 @@ protected:
 	/// function to finalize the initialization
 	virtual void wrappingUpInitialization();
 
+	/// helper function to fill the configuration commands for the given bufferName
+	void fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest);
+
 protected:
 	/// the list of configuration map of SGM amptek
 	QList<AmptekSDD123ConfigurationMap*> amptekConfigurationMaps_;

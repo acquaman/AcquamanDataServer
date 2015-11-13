@@ -16,12 +16,13 @@ AMDSClientConfigurationRequest::AMDSClientConfigurationRequest(const QString &bu
 
 AMDSClientConfigurationRequest::~AMDSClientConfigurationRequest()
 {
-
+	configurationCommandDefs_.clear();
+	configurationCommands_.clear();
 }
 
-void AMDSClientConfigurationRequest::appendCommand(int commandId, const QVariant &value)
+void AMDSClientConfigurationRequest::appendCommand(const QString &command, const QVariant &value)
 {
-	configurationCommands_.insert(commandId, value);
+	configurationCommands_.insert(command, value);
 }
 
 int AMDSClientConfigurationRequest::writeToDataStream(QDataStream *dataStream)
@@ -34,17 +35,28 @@ int AMDSClientConfigurationRequest::writeToDataStream(QDataStream *dataStream)
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAME;
 
+	// write the AMDSCommand definitions if there are any
+	*dataStream << configurationCommandDefs_.size();
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE;
+
+	foreach (AMDSCommand commandDef, configurationCommandDefs_) {
+		if (!AMDSCommand::encodeAndwriteAMDSCommand(dataStream, commandDef));
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
+	}
+
+	// write the AMDSCommand configuration if there are any
 	*dataStream << configurationCommands_.size();
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE;
 
 	for (int index = 0; index < configurationCommands_.size(); index++) {
-		int commandId = configurationCommands_.key(index);
-		*dataStream << commandId;
+		QString command = configurationCommands_.key(index);
+		*dataStream << command;
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
 
-		*dataStream << configurationCommands_.value(commandId);
+		*dataStream << configurationCommands_.value(command);
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
 	}
@@ -59,21 +71,37 @@ int AMDSClientConfigurationRequest::readFromDataStream(QDataStream *dataStream)
 		return errorCode;
 
 	QString readBufferName;
+	int configurationCommandDefSize;
 	int configurationCommandSize;
 
 	*dataStream >> readBufferName;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAME;
 
+	// read the AMDSCommand definitions if there are any
+	*dataStream >> configurationCommandDefSize;
+	if(dataStream->status() != QDataStream::Ok)
+		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE;
+
+	configurationCommandDefs_.clear();
+	for (int index = 0; index < configurationCommandSize; index++) {
+		AMDSCommand commandDef = AMDSCommand::decodeAndInstantiateAMDSCommand(dataStream);
+		if (commandDef.isValid())
+			configurationCommandDefs_.append(commandDef);
+		else
+			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
+	}
+
+	// read the AMDSCommand configuration if there are any
 	*dataStream >> configurationCommandSize;
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE;
 
 	configurationCommands_.clear();
-	int commandId;
+	QString command;
 	QVariant commandValue;
 	for (int index = 0; index < configurationCommandSize; index++) {
-		*dataStream >> commandId;
+		*dataStream >> command;
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
 
@@ -81,7 +109,7 @@ int AMDSClientConfigurationRequest::readFromDataStream(QDataStream *dataStream)
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
 
-		appendCommand(commandId, commandValue);
+		appendCommand(command, commandValue);
 	}
 
 	// set the local variables

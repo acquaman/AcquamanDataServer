@@ -9,6 +9,7 @@ class QTimer;
 class AMDSThreadedBufferGroup;
 class AMDSThreadedTCPDataServer;
 class AMDSClientRequest;
+class AMDSClientConfigurationRequest;
 
 #define AMDS_SERVER_INFO_START_SERVER_APP 20100
 #define AMDS_SERVER_INFO_START_BUFFER_TIMER 20101
@@ -52,6 +53,8 @@ protected:
 	virtual void initializeAndStartDetectorServer() = 0;
 	/// pure virtual function to finalize the initialization
 	virtual void wrappingUpInitialization() = 0;
+	/// pure virtual function to fill the configuration commands for the given bufferName
+	virtual void fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest) = 0;
 
 	/// function to process the instrospection client request from the TCP Data server
 	void processIntrospectionClientRequest(AMDSClientRequest *clientRequest);
@@ -60,11 +63,13 @@ protected:
 	/// function to process the client data request from the TCP Data server
 	void processClientDataRequest(AMDSClientRequest *clientRequest);
 
+
 protected:
 	/// the max buffer size, default value: 1000*60*60*10 --- 10 hours data collection
 	quint64 maxBufferSize_;
 	/// the instance of threaded TCP data server
 	AMDSThreadedTCPDataServer *tcpDataServer_;
+
 	/// the list of bufferGroup managers
 	QMap<QString, AMDSThreadedBufferGroup*> bufferGroupManagers_;
 };

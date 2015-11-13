@@ -41,6 +41,7 @@ HEADERS  += \
 	source/Connection/AMDSClientTCPSocket.h \
 	source/DataElement/AMDSDataTypeDefinitions.h \
 	source/DataElement/AMDSConfigurationDef.h \
+	source/DataElement/AMDSCommandManager.h \
 	source/DataElement/AMDSAxisInfo.h \
 	source/DataElement/AMDSnDIndex.h \
 	source/DataElement/AMDSEventData.h \
@@ -74,6 +75,7 @@ SOURCES += \
 	source/Connection/AMDSPacketStats.cpp \
 	source/Connection/AMDSServer.cpp \
 	source/Connection/AMDSClientTCPSocket.cpp \
+	source/DataElement/AMDSCommandManager.cpp \
 	source/DataElement/AMDSAxisInfo.cpp \
 	source/DataElement/AMDSnDIndex.cpp \
 	source/DataElement/AMDSEventData.cpp \

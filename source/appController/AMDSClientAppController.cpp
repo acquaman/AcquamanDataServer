@@ -12,6 +12,7 @@
 #include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "ClientRequest/AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest.h"
 #include "ClientRequest/AMDSClientContinuousDataRequest.h"
+#include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "Connection/AMDSClientTCPSocket.h"
 #include "Connection/AMDSServer.h"
 #include "util/AMErrorMonitor.h"
@@ -271,6 +272,29 @@ bool AMDSClientAppController::requestClientData(const QString &hostName, quint16
 				clientContinuousDataRequest->setAttributesValues(includeStatus, enableFlattening, bufferNames, updateInterval, handShakeSocketKey);
 
 				clientTCPSocket->sendClientRequest(clientContinuousDataRequest);
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool AMDSClientAppController::requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QString &command, const QString &value)
+{
+	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
+	if (clientTCPSocket) {
+		AMDSClientRequest *clientRequest = instantiateClientRequest(AMDSClientRequestDefinitions::Configuration);
+		if (clientRequest) {
+			AMDSClientConfigurationRequest *clientConfigurationRequest = qobject_cast<AMDSClientConfigurationRequest*>(clientRequest);
+			if(clientConfigurationRequest){
+				clientConfigurationRequest->setBufferName(bufferName);
+
+				if (command.length() != 0) { // this is the command to ask for the list of configuration command for this buffergroup
+					clientConfigurationRequest->appendCommand(command, value);
+				}
+				clientTCPSocket->sendClientRequest(clientConfigurationRequest);
 
 				return true;
 			}
