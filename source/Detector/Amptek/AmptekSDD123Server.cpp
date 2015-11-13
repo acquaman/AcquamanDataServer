@@ -134,6 +134,12 @@ int AmptekSDD123Server::forwardDatagram(const QByteArray &datagram)
 
 void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekCommandDefSGM command, const QString &dataStringHex, bool sendFakeRequest, bool sendSyncRequest, int overrideTimeout)
 {
+	// Need to restart the requestSpectrumtime form RequestAndClearSpecturmPlusStatus (ID 23)
+	if(command == AmptekCommandManagerSGM::RequestAndClearSpecturmPlusStatus) {
+		lastRequestSpectrumTime_->setHMS(requestSpectrumTime_->hour(), requestSpectrumTime_->minute(), requestSpectrumTime_->second(), requestSpectrumTime_->msec());
+		requestSpectrumTime_->restart();
+	}
+
 	AmptekSDD123Packet requestStatusPacket(packetIDCounter_, AmptekCommandManagerSGM::sddCommands()->amptekCommand(command).hex(), dataStringHex);
 	packetIDCounter_++;
 
@@ -175,7 +181,8 @@ void AmptekSDD123Server::requestAllTextConfigurationParameters()
 			<< "SCAI=6" << "SCAH" << "SCAL"
 			<< "SCAI=7" << "SCAH" << "SCAL"
 			<< "SCAI=8" << "SCAH" << "SCAL"
-			<< "TECS" << "THFA" << "THSL" << "TPEA" << "TPFA";
+			<< "TECS" << "THFA" << "THSL" << "TPEA" << "TPFA"
+			<< "GPIN" << "GPMC" << "GPME" << "GPED";
 	textConfigurationReadback(manyCommands);
 }
 
@@ -503,7 +510,9 @@ void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(const QByteArray &s
 
 void AmptekSDD123Server::postConfigurationReadbackResponse(const QString &ASCIICommands)
 {
+	qDebug() << "About to check on the ConfigurationReadbackResponse";
 	if(ASCIICommands.contains("ALLP")){
+		qDebug() << "Did so, it's: " << ASCIICommands;
 		emit allParametersTextConfiguration(ASCIICommands);
 
 		if(spectrumPacketReceiver_ != 0){

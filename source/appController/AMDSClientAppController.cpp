@@ -102,7 +102,6 @@ void AMDSClientAppController::openNetworkSession()
 			networkSession_->open();
 		}
 		else{
-			qDebug() << "Session not required";
 			emit networkSessionOpened();
 		}
 	}

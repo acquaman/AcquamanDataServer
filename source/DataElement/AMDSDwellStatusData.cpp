@@ -1,5 +1,8 @@
 #include "AMDSDwellStatusData.h"
 
+#include <QDebug>
+
+
 /// =============== implementation of AMDSStatusData ================
 AMDSDwellStatusData::AMDSDwellStatusData(int fastCounts, int slowCounts, double detectorTemperature, double accumulationTime, double liveTime, double realTime, int generalPurposeCounter, const QTime &dwellStartTime, const QTime &dwellEndTime, const QTime &dwellReplyTime)
 {
@@ -88,6 +91,7 @@ bool AMDSDwellStatusData::readFromDataStream(QDataStream *dataStream)
 		return false;
 
 	*dataStream >> generalPurposeCounter_;
+
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 

@@ -61,16 +61,6 @@ void AMDSBufferGroup::clear()
 	}
 }
 
-AMDSDataHolder* AMDSBufferGroup::at(int index)
-{
-	QReadLocker readLock(&lock_);
-
-	if (index < 0 || index >= dataHolders_.count())
-		return 0;
-
-	return dataHolders_[index];
-}
-
 void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
 {
 	QWriteLocker writeLock(&lock_);
@@ -94,9 +84,9 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
 		if (specturalCumulativeDataHolder) {
 			AMDSDwellStatusData cumulativeStatusData = specturalCumulativeDataHolder->dwellStatusData();
 
-			emit continuousDataUpdate(specturalCumulativeDataHolder);
-			emit continuousStatusDataUpdate(cumulativeStatusData, count());
-			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
+//			emit continuousDataUpdate(specturalCumulativeDataHolder);
+//			emit continuousStatusDataUpdate(cumulativeStatusData, count());
+//			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
 		} else {
 			AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
 		}
@@ -120,6 +110,7 @@ void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
 	}
 }
 
+#include <QDebug>
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	QReadLocker readLock(&lock_);
 
@@ -135,6 +126,7 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	case AMDSClientRequestDefinitions::StartTimePlusCount: {
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
 		if(clientStartTimePlusCountDataRequest) {
+			qDebug() << "Looks like a StartTimePlusCount request with start " << clientStartTimePlusCountDataRequest->startTime().toString("hh:mm:ss.zzz") << " current time is " << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
 			populateData(clientStartTimePlusCountDataRequest);
 		}
 		break;
@@ -235,6 +227,8 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* clientDataRequest, int
 		dataHolder->data(&oneFlatArray);
 
 		targetDataArray.append(dataHolder);
+
+		qDebug() << "For dataHolder " << iCurrent << dataHolder->printData();
 	}
 
 	// when doing flattening, the data holders in the targetDataArray are new instances, which need to be released after usage

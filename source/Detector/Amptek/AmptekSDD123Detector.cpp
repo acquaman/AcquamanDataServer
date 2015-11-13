@@ -1,6 +1,7 @@
 #include "AmptekSDD123Detector.h"
 
 #include <QCoreApplication>
+#include <QDebug>
 
 #include "util/AMErrorMonitor.h"
 
@@ -97,7 +98,9 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 	AMDSFlatArray *spectrumArray = readSpectrumData(spectrumByteArray, channelCount);
 	readStatusData(statusDataArray);
 
-	if(spectrumReceiver_ != 0){
+	if(spectrumReceiver_){
+
+//		qDebug() << "At the AmptekSDD123Detector level: dwellStartTime, dwellEndTime, dwellReplyTime: " << event->dwellStartTime_ << event->dwellEndTime_ << event->dwellReplyTime_;
 
 		AMDSDwellStatusData statusData(fastCounts(), slowCounts(), detectorTemperature(), accumulationTime(), liveTime(), realTime(), generalPurposeCounter(), event->dwellStartTime_, event->dwellEndTime_, event->dwellReplyTime_);
 
@@ -105,6 +108,7 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 		spectrumEvent->detectorSourceName_ = name();
 		spectrumEvent->spectrum_ = *spectrumArray;
 		spectrumEvent->statusData_ = statusData;
+
 		QCoreApplication::postEvent(spectrumReceiver_, spectrumEvent);
 	} else {
 		AMErrorMon::alert(this, AMPTEK_ALERT_NO_SPECTRUM_EVENT_RECEIVER, QString("No spectrum receiver"));
@@ -113,7 +117,7 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 
 void AmptekSDD123Detector::onConfigurationReadbackEventReceived(AmptekConfigurationReadbackEvent* event)
 {
-	if (spectrumReceiver_ != 0) {
+	if (spectrumReceiver_) {
 		QStringList allConfigurations = event->configurationReadback_.split(';');
 
 		AmptekConfigurationValuesEvent *configurationValuesEvent = new AmptekConfigurationValuesEvent();
@@ -141,6 +145,7 @@ AMDSFlatArray *AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrum
 		backwardsMid(index*3, 3, spectrumData, tmpData);
 		spectrum.append(tmpData.toHex().toInt(&ok, 16));
 
+//		spectrumArray->setValue(index, tmpData.toHex().toInt(&ok, 16));
 		spectrumArray->setValue(index, spectrum.last());
 	}
 
@@ -172,7 +177,7 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 
 	backwardsMid(8, 4, statusData, tmpData);
 	internalSetGeneralPurposeCounter(tmpData.toHex().toInt(&ok, 16));
-	//qDebug() << "gpCounter: " << tmpData.toHex() << gpCounter;
+	//qDebug() << "gpCounter: " << tmpData.toHex() << generalPurposeCounter_;
 
 	backwardsMid(12, 1, statusData, tmpData);
 	int accTime = tmpData.toHex().toInt(&ok, 16);
@@ -319,6 +324,9 @@ void AmptekSDD123Detector::readStatusData(const QByteArray &statusData){
 	tmpData = statusData.mid(39, 1);
 	internalSetDeviceID(tmpData.toHex().toInt(&ok, 16));
 	//qDebug() << "deviceID: " << deviceID;
+
+	//qDebug() << QString("%1 GPCounter %2 %3").arg(serialNumber_).arg(QString(tmpData.toHex())).arg(generalPurposeCounter_);
+	//qDebug() << "gpCounter: " << tmpData.toHex() << generalPurposeCounter_;
 
 	//BYTES 40-63 ARE UNUSED
 	//qDebug() << "Emit statusDataRead" << name_;
