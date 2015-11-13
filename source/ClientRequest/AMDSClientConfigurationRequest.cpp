@@ -8,8 +8,8 @@ AMDSClientConfigurationRequest::AMDSClientConfigurationRequest(QObject *parent)
 	setBufferName("Invalid");
 }
 
-AMDSClientConfigurationRequest::AMDSClientConfigurationRequest(const QString &bufferName, const QString &socketKey, const QString &errorMessage, AMDSClientRequest::ResponseType responseType, QObject *parent)
-	: AMDSClientRequest(socketKey, errorMessage, AMDSClientRequestDefinitions::Configuration, responseType, parent)
+AMDSClientConfigurationRequest::AMDSClientConfigurationRequest(const QString &bufferName, const QString &socketKey, const QString &errorMessage, AMDSClientRequest::ResponseType responseType, const QDateTime &localTime, QObject *parent)
+	: AMDSClientRequest(socketKey, errorMessage, AMDSClientRequestDefinitions::Configuration, responseType, localTime, parent)
 {
 	setBufferName(bufferName);
 }
@@ -83,6 +83,9 @@ int AMDSClientConfigurationRequest::readFromDataStream(QDataStream *dataStream)
 
 		appendCommand(commandId, commandValue);
 	}
+
+	// set the local variables
+	setBufferName(readBufferName);
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
 }

@@ -89,11 +89,6 @@ bool AMDSClientRequest::isDataClientRequest() {
 			|| requestType() == AMDSClientRequestDefinitions::Continuous ;
 }
 
-bool AMDSClientRequest::isConfigurationClientRequest()
-{
-	return requestType() == AMDSClientRequestDefinitions::Configuration;
-}
-
 void AMDSClientRequest::printData()
 {
 	AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
