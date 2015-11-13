@@ -12,7 +12,6 @@
 #include "Detector/Scaler/AMDSScalerCommandManager.h"
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 #include "Detector/Scaler/AMDSScalerDetector.h"
-#include "Detector/Scaler/AMDSScalerDetectorManager.h"
 #include "Detector/Scaler/AMDSScalerDetectorServer.h"
 #include "Detector/AMDSDetectorServer.h"
 
@@ -127,11 +126,10 @@ void AMDSCentralServerSGM::initializeAndStartDataServer()
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SLOT(onServerChangedToConfigurationState(int)));
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));
 
-	// initialize the scaler dataserver
+	// initialize the scaler detector server
 	AMDSScalerDetectorServer *scalerServer = new AMDSScalerDetectorServer();
 	scalerServerManager_ = new AMDSDetectorServerManager(scalerServer);
 	connect(this, SIGNAL(configurationRequestReceived(const AMDSClientRequest*)), scalerServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
-
 }
 
 void AMDSCentralServerSGM::wrappingUpInitialization()
@@ -153,6 +151,15 @@ void AMDSCentralServerSGM::wrappingUpInitialization()
 		connect(threadedBufferGroup->bufferGroup(), SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onContinuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)));
 		connect(threadedBufferGroup->bufferGroup(), SIGNAL(dwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onDwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)));
 	}
+
+	// connect scaler detector with the scaler detector server
+	AMDSScalerDetectorServer *scalerServer = qobject_cast<AMDSScalerDetectorServer *>(scalerServerManager_->detectorServer());
+	if (scalerServer) {
+		connect(scalerServer, SIGNAL(serverGoingToStartDwelling()), scalerDetectorManager_->scalerDetector(), SLOT(onServerGoingToStartDwelling()));
+		connect(scalerServer, SIGNAL(enableChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onEnableChannel(int)));
+		connect(scalerServer, SIGNAL(disableChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onDisableChannel(int)));
+	}
+
 }
 
 void AMDSCentralServerSGM::onServerChangedToConfigurationState(int index){

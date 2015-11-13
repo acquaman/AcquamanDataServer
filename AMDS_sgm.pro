@@ -50,7 +50,6 @@ HEADERS *= \
 	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.h \
 	source/Detector/Scaler/AMDSScalerCommandManager.h \
 	source/Detector/Scaler/AMDSScalerDetector.h \
-	source/Detector/Scaler/AMDSScalerDetectorManager.h \
 	source/Detector/Scaler/AMDSScalerConfigurationMap.h \
 	source/Detector/AMDSDetectorServer.h \
     source/Detector/Scaler/AMDSScalerDetectorServer.h
@@ -71,7 +70,6 @@ SOURCES *= \
 	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.cpp \
 	source/Detector/Scaler/AMDSScalerCommandManager.cpp \
 	source/Detector/Scaler/AMDSScalerDetector.cpp \
-	source/Detector/Scaler/AMDSScalerDetectorManager.cpp \
 	source/Detector/Scaler/AMDSScalerConfigurationMap.cpp \
 	source/Detector/AMDSDetectorServer.cpp \
     source/Detector/Scaler/AMDSScalerDetectorServer.cpp

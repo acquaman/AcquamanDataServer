@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QThread>
 
 #include "DataHolder/AMDSDataHolder.h"
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
@@ -10,6 +11,25 @@
 class AMControlSet;
 class AMSinglePVControl;
 class AMWaveformBinningSinglePVControl;
+
+class AMDSScalerDetector ;
+
+class AMDSScalerDetectorManager : public QObject
+{
+	Q_OBJECT
+public:
+	explicit AMDSScalerDetectorManager(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent = 0);
+	~AMDSScalerDetectorManager();
+
+	/// returns the instance of scaler detector
+	inline AMDSScalerDetector *scalerDetector() const { return scalerDetector_; }
+
+protected:
+	/// the instance of detector manager thread
+	QThread *detectorManagerThread_;
+	/// the instance of scaler detector
+	AMDSScalerDetector *scalerDetector_;
+};
 
 class AMDSScalerDetector : public QObject
 {
