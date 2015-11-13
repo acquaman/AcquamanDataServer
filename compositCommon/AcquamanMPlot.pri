@@ -40,6 +40,7 @@ HEADERS *= \
 	$$PATH_TO_ACQUAMAN/util/AMSettings.h \
 	$$PATH_TO_ACQUAMAN/util/AMDeferredFunctionCall.h \
 	$$PATH_TO_ACQUAMAN/util/AMErrorMonitor.h \
+	$$PATH_TO_ACQUAMAN/util/AMUtility.h \
 	$$PATH_TO_ACQUAMAN/ui/util/AMMessageBoxWTimeout.h \
 	$$PATH_TO_MPLOT/MPlot/MPlot.h \
 	$$PATH_TO_MPLOT/MPlot/MPlotWidget.h \
@@ -82,6 +83,7 @@ SOURCES *= \
 	$$PATH_TO_ACQUAMAN/util/AMSettings.cpp \
 	$$PATH_TO_ACQUAMAN/util/AMDeferredFunctionCall.cpp \
 	$$PATH_TO_ACQUAMAN/util/AMErrorMonitor.cpp \
+	$$PATH_TO_ACQUAMAN/util/AMUtility.cpp \
 	$$PATH_TO_ACQUAMAN/ui/util/AMMessageBoxWTimeout.cpp \
 	$$PATH_TO_MPLOT/MPlot/MPlot.cpp \
 	$$PATH_TO_MPLOT/MPlot/MPlotWidget.cpp \
