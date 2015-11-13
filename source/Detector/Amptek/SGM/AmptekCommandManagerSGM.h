@@ -56,9 +56,9 @@ public:
 	};
 
 	/// the static function to get the object
-	static AmptekCommandManagerSGM* sddCommands();
+	static AmptekCommandManagerSGM* amptekCommandManager();
 	/// the static function to release the object
-	static void releaseSDDCommands();
+	static void releaseAmptekCommands();
 
 	virtual ~AmptekCommandManagerSGM();
 
@@ -84,11 +84,12 @@ public:
 //	bool isAcknowledgeErrorPacket(const QString &hexString) const;
 
 protected:
-	/// constructor of AmptekCommand class, which is protected since AmptekCommand is used as singleton
+	/// constructor of AMDSCommand class, which is protected since AMDSCommand is used as singleton
 	AmptekCommandManagerSGM();
 
 	/// implementation of the function to initialize the amptek commands and the hex mappling
 	virtual void initiateAMDSCommands();
+
 	/// helper function to create response from given texts
 	QStringList internalCreateResponsesFromText(const QStringList &texts);
 

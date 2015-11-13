@@ -195,10 +195,13 @@ void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
 
 void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 {
-	if (clientRequest->isContinuousMessage()) {
+	switch (clientRequest->requestType()) {
+	case AMDSClientRequestDefinitions::Continuous:
 		resetActiveContinuousConnection(activeServerComboBox_->currentText());
-	} else {
-		if (clientRequest->isIntrospectionMessage()) {
+		break;
+
+	case AMDSClientRequestDefinitions::Introspection:
+		{
 			AMDSClientIntrospectionRequest *introspectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
 			if (introspectionRequest){
 				if (introspectionRequest->readReady()){
@@ -217,6 +220,11 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 				}
 			}
 		}
+
+		break;
+
+	default:
+		break;
 	}
 }
 

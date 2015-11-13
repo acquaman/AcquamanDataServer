@@ -1,5 +1,12 @@
 #include "AMDSCommandManager.h"
 
+AMDSCommandManager::~AMDSCommandManager()
+{
+	commands_.clear();
+	commandHash_.clear();
+	commandHexMapping_.clear();
+}
+
 AMDSCommand AMDSCommandManager::amdsCommand(int commandID) const {
 	return commandHash_.value(commandID);
 }

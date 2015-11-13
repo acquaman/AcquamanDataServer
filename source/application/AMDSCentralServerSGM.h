@@ -12,6 +12,7 @@ class AmptekSDD123DetectorGroupSGM;
 
 class AMDSScalerConfigurationMap;
 class AMDSScalerDetectorManager;
+class AMDSDetectorServerManager;
 
 #define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
 
@@ -78,9 +79,10 @@ protected:
 
 	/// the scaler detector configruation map
 	AMDSScalerConfigurationMap *scalerConfigurationMap_;
-
 	/// the Scaler detector manager
 	AMDSScalerDetectorManager *scalerDetectorManager_;
+	/// the scaler server manager
+	AMDSDetectorServerManager *scalerServerManager_;
 };
 
 #endif // AMDSCENTRALSERVERSGM_H

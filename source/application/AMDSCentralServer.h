@@ -30,6 +30,7 @@ public:
 signals:
 	/// The signal when the AMDSCenterServer finished processing a client request, then the TCP data suppose to wrap the msg and send back to client
 	void clientRequestProcessed(AMDSClientRequest *processedRequest);
+	void configurationRequestReceived(AMDSClientRequest*);
 
 protected slots:
 	/// slot to handle the errors information from the TCP Data server

@@ -128,7 +128,9 @@ void AMDSCentralServer::processConfigurationClientRequest(AMDSClientRequest *cli
 	QString errorMessage = "Succeeded to process the data request";
 	AMDSClientConfigurationRequest *clientConfigurationRequest = qobject_cast<AMDSClientConfigurationRequest*>(clientRequest);
 
-	// TODO
+	QString bufferGroup = clientConfigurationRequest->bufferName();
+
+	emit configurationRequestReceived(clientRequest);
 
 	clientConfigurationRequest->setErrorMessage(errorMessage);
 	emit clientRequestProcessed(clientConfigurationRequest);

@@ -2,14 +2,14 @@
 
 /// ===================== implementation of the static instance and methods ==================
 AmptekCommandManagerSGM* AmptekCommandManagerSGM::instance_ = 0;
-AmptekCommandManagerSGM* AmptekCommandManagerSGM::sddCommands(){
-	if(instance_ == 0)
+AmptekCommandManagerSGM* AmptekCommandManagerSGM::amptekCommandManager(){
+	if(!instance_)
 		instance_ = new AmptekCommandManagerSGM();
 
 	return instance_;
 }
 
-void AmptekCommandManagerSGM::releaseSDDCommands(){
+void AmptekCommandManagerSGM::releaseAmptekCommands(){
 	if(instance_) {
 		delete instance_;
 		instance_ = 0;

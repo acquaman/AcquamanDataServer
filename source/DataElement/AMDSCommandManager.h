@@ -12,7 +12,18 @@ class AMDSCommandManager: public QObject
 {
 	Q_OBJECT
 public:
-	virtual ~AMDSCommandManager() {}
+	enum AMDSCommandDef{
+		// acknowledge type
+		AcknowledgeOk = 0,
+
+		// request type
+		RequestStartDwell,
+
+		// customized commands
+		CustomizedCommand = 1000
+	};
+
+	virtual ~AMDSCommandManager();
 
 	/// returns the AMDSCommand with given command ID
 	AMDSCommand amdsCommand(int commandID) const;

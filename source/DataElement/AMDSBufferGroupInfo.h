@@ -7,6 +7,8 @@
 #include "DataElement/AMDSnDIndex.h"
 #include "DataElement/AMDSDataTypeDefinitions.h"
 
+class AMDSCommandManager;
+
 #define AMDS_SERVER_ERR_BUFFER_GROUP 20200
 #define AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN 20201
 
@@ -27,9 +29,12 @@ public:
 	AMDSBufferGroupInfo& operator=(const AMDSBufferGroupInfo& other);
 
 	/// Writes this AMDSBufferGroupInfo to a DataStream, returns true if no errors are encountered
-	bool writeToDataStream(QDataStream *dataStream);
+	bool writeToDataStream(QDataStream *dataStream, bool withCommands = false);
 	/// Reads this AMDSBufferGroupInfo from the DataStream, returns true if no errors are encountered
-	bool readFromDataStream(QDataStream *dataStream);
+	bool readFromDataStream(QDataStream *dataStream, bool withCommands = false);
+
+	/// convert the buffer group to a string
+	QString toString() const;
 
 	/// returns the name of the bufferGroupInfo
 	inline QString name() const { return name_; }
@@ -71,12 +76,11 @@ public:
 	inline void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
 	/// Set how the bufferGroup should be flattened
 	inline void setFlattenMethod(DataFlattenMethod method) { flattenMethod_ = method; }
+	/// Set the ConfigurationCommandManager for this bufferGroup
+	inline void setConfigurationCommandManager(AMDSCommandManager *commandManager) { configurationCommandManager_ = commandManager; }
 
 	/// If the bufferGrou name is "Invalid", there should be no Data
 	inline bool includeData() const { return name_ != "Invalid"; }
-
-	/// convert the buffer group to a string
-	QString toString() const;
 
 protected:
 	/// the name of the bufferGroupInfo
@@ -92,6 +96,9 @@ protected:
 
 	/// the axes of the bufferGroupInfo
 	QList<AMDSAxisInfo> axes_;
+
+	/// the configuration command manager of this bufferGroup, if it is NULL, there is no configuration support for this buffergroup
+	AMDSCommandManager *configurationCommandManager_;
 };
 
 AMDSnDIndex AMDSBufferGroupInfo::size() const {

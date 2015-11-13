@@ -9,22 +9,29 @@
 #include "Detector/Amptek/AmptekSDD123DetectorManager.h"
 #include "Detector/Amptek/AmptekSDD123ServerGroup.h"
 #include "Detector/Amptek/AmptekSDD123Server.h"
-#include "Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.h"
+#include "Detector/Scaler/AMDSScalerCommandManager.h"
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 #include "Detector/Scaler/AMDSScalerDetector.h"
 #include "Detector/Scaler/AMDSScalerDetectorManager.h"
+#include "Detector/Scaler/AMDSScalerServer.h"
+#include "Detector/AMDSDetectorServer.h"
+
 #include "util/AMErrorMonitor.h"
+
+#include "Detector/Amptek/SGM/AmptekCommandManagerSGM.h"
+#include "Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.h"
 
 AMDSCentralServerSGM::AMDSCentralServerSGM(QObject *parent) :
 	AMDSCentralServer(parent)
 {
-	maxBufferSize_ = 1 * 60 * 1000; // 20 minuntes
+	maxBufferSize_ = 1 * 60 * 1000; // 20 minuntes data recording
 
 	initializeConfiguration();
 }
 
 AMDSCentralServerSGM::~AMDSCentralServerSGM()
 {
+	// release the Amptek information
 	foreach (AmptekSDD123ConfigurationMap *amptekConfiguration, amptekConfigurationMaps_) {
 		amptekConfiguration->deleteLater();
 	}
@@ -38,8 +45,13 @@ AMDSCentralServerSGM::~AMDSCentralServerSGM()
 	amptekThreadedDataServerGroup_->deleteLater();
 	amptekThreadedDataServerGroup_ = 0;
 
+	AmptekCommandManagerSGM::releaseAmptekCommands();
+
+	// release the Scaler information
 	scalerConfigurationMap_->deleteLater();
 	scalerDetectorManager_->deleteLater();
+	scalerServerManager_->deleteLater();
+	AMDSScalerCommandManager::releaseScalerCommands();
 }
 
 void AMDSCentralServerSGM::initializeConfiguration()
@@ -67,6 +79,7 @@ void AMDSCentralServerSGM::initializeBufferGroup()
 		amptekBufferGroupAxes << AMDSAxisInfo("Energy", amptekConfiguration->spectrumCountSize(), "Energy Axis", "eV");
 
 		AMDSBufferGroupInfo amptekBufferGroupInfo(amptekConfiguration->detectorName(), amptekConfiguration->localAddress().toString(), "Counts", amptekConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, amptekBufferGroupAxes);
+		amptekBufferGroupInfo.setConfigurationCommandManager(AmptekCommandManagerSGM::amptekCommandManager());
 
 		AMDSThreadedBufferGroup *amptekThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_, false);
 		connect(amptekThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
@@ -81,6 +94,7 @@ void AMDSCentralServerSGM::initializeBufferGroup()
 	QList<AMDSAxisInfo> scalerBufferGroupAxes;
 	scalerBufferGroupAxes << AMDSAxisInfo("Channel", scalerConfigurationMap_->enabledChannels().count(), "Channel Axis", "");
 	AMDSBufferGroupInfo scalerBufferGroupInfo(scalerConfigurationMap_->scalerName(), scalerConfigurationMap_->scalerName(), "Counts", scalerConfigurationMap_->dataType(), AMDSBufferGroupInfo::NoFlatten, scalerBufferGroupAxes);
+	scalerBufferGroupInfo.setConfigurationCommandManager(AMDSScalerCommandManager::scalerCommandManager());
 
 	AMDSThreadedBufferGroup *scalerThreadedBufferGroup = new AMDSThreadedBufferGroup(scalerBufferGroupInfo, maxBufferSize_, false);
 	connect(scalerThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
@@ -114,6 +128,10 @@ void AMDSCentralServerSGM::initializeAndStartDataServer()
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));
 
 	// initialize the scaler dataserver
+	AMDSScalerServer *scalerServer = new AMDSScalerServer();
+	scalerServerManager_ = new AMDSDetectorServerManager(scalerServer);
+	connect(this, SIGNAL(configurationRequestReceived(const AMDSClientRequest*)), scalerServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
+
 }
 
 void AMDSCentralServerSGM::wrappingUpInitialization()
@@ -134,8 +152,6 @@ void AMDSCentralServerSGM::wrappingUpInitialization()
 
 		connect(threadedBufferGroup->bufferGroup(), SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onContinuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)));
 		connect(threadedBufferGroup->bufferGroup(), SIGNAL(dwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onDwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)));
-
-
 	}
 }
 

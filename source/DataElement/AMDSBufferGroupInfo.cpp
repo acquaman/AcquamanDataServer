@@ -1,5 +1,7 @@
 #include "AMDSBufferGroupInfo.h"
 
+#include "DataElement/AMDSCommandManager.h"
+
 AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &description, const QString &units, AMDSDataTypeDefinitions::DataType dataType, const DataFlattenMethod flattenMethod, const QList<AMDSAxisInfo> &axes)
 {
 	setName(name);
@@ -26,22 +28,27 @@ AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& o
 	return *this;
 }
 
-bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream)
+bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream, bool withCommands)
 {
 	*dataStream << name();
 	*dataStream << description();
 	*dataStream << units();
 	*dataStream << ((quint8)flattenMethod());
+
 	*dataStream <<((quint8)(axes().count()));
 	for(int x = 0, size = axes().count(); x < size; x++) {
 		AMDSAxisInfo axisInfo = axes().at(x);
 		axisInfo.writeToDataStream(dataStream);
 	}
 
+	if (withCommands && configurationCommandManager_) {
+//		configurationCommandManager_->writeToDataStream(dataStream);
+	}
+
 	return true;
 }
 
-bool AMDSBufferGroupInfo::readFromDataStream(QDataStream *dataStream)
+bool AMDSBufferGroupInfo::readFromDataStream(QDataStream *dataStream, bool withCommands)
 {
 	QString name;
 	QString description;
@@ -73,6 +80,11 @@ bool AMDSBufferGroupInfo::readFromDataStream(QDataStream *dataStream)
 		if(oneAxisInfo.name() == "Invalid")
 			return false;
 		axes.append(oneAxisInfo);
+	}
+
+	// read the commands
+	if (withCommands) {
+
 	}
 
 	setName(name);
