@@ -29,9 +29,11 @@ void AMDSDetectorServerManager::forwardConfigurationRequest(AMDSClientRequest *c
 }
 
 // =================== implementation of AMDSDetectorServer =======================
-AMDSDetectorServer::AMDSDetectorServer(QObject *parent) :
+AMDSDetectorServer::AMDSDetectorServer(const QString &detectorName, QObject *parent) :
     QObject(parent)
 {
+	detectorName_ = detectorName;
+
 	setDetectorMode(AMDSDetectorServer::Configuration);
 }
 
@@ -45,9 +47,9 @@ void AMDSDetectorServer::setDetectorMode(AMDSDetectorServer::DetectorMode detect
 	if (detectorMode_ != detectorMode) {
 		detectorMode_ = detectorMode;
 		if (detectorMode_ == AMDSDetectorServer::Configuration) {
-			emit serverChangedToConfigurationState();
+			emit serverChangedToConfigurationState(detectorName_);
 		} else {
-			emit serverChangedToDwellState();
+			emit serverChangedToDwellState(detectorName_);
 		}
 	}
 }

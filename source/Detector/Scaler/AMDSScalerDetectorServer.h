@@ -7,14 +7,14 @@ class AMDSScalerDetectorServer : public AMDSDetectorServer
 {
     Q_OBJECT
 public:
-	explicit AMDSScalerDetectorServer(QObject *parent = 0);
+	explicit AMDSScalerDetectorServer(const QString &scalerName, QObject *parent = 0);
 	~AMDSScalerDetectorServer();
 
 signals:
 	/// signal to request enable channel for "channelId"
-	void enableChannel(int channelId);
+	void enableScalerChannel(int channelId);
 	/// signal to request disable channel for "channelId"
-	void disableChannel(int channelId);
+	void disableScalerChannel(int channelId);
 
 public slots:
 	/// the function to perform the configuration request

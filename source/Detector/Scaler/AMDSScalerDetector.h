@@ -2,6 +2,7 @@
 #define AMDSSCALERDETECTOR_H
 
 #include <QObject>
+#include <QMap>
 #include <QTimer>
 #include <QThread>
 
@@ -40,6 +41,11 @@ class AMDSScalerDetector : public QObject
 		Continuous = 1
 	};
 
+	enum ScalerChannelStatus {
+		Disabled = 0,
+		Enabled = 1
+	};
+
 public:
 	explicit AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent = 0);
 	virtual ~AMDSScalerDetector();
@@ -58,8 +64,14 @@ signals:
 	void newScalerScanDataReceived(const AMDSDataHolderList &scanCountsDataHolder);
 
 public slots:
-	/// slot to fetch the channel data buffer from the scaler scan control
-	void onFetchScanBuffer();
+	/// slot to start dwelling
+	void onServerGoingToStartDwelling();
+	/// slot to stop dwelling
+	void onServerStopDwelling();
+	/// slot to enable a given channel
+	void onEnableChannel(int channelId);
+	/// slot to disable a given channel
+	void onDisableChannel(int channelId);
 
 protected slots:
 	/// slot to handle the all PV connected signal
@@ -67,16 +79,26 @@ protected slots:
 	/// slot to handle the PV connected timout signal
 	void onAllControlsTimedOut();
 
+	/// slot to handle the value changed singale for channel controls
+	void onChannelControlValueChanged(double);
+
+	/// slot to update the # of continuous scans
+	void onContinuousScanControlValueChanged(double);
 	/// slot to update the timer for dwell time
 	void onDwellTimeControlValueChanged(double);
 	/// slot to update the # of scans in a buffer
 	void onScansInABufferControlValueChanged(double);
-	/// slot to update the # of continuous scans
-	void onContinuousScanControlValueChanged(double);
+	/// slot to update the total # of scans
+	void onTotalNumberOfScansControlValueChanged(double);
+	/// slot to fetch the channel data buffer from the scaler scan control
+	void onFetchScanBuffer();
 
 protected:
 	/// helper function to initialize the PV controls of the scaler
 	void initializePVControls();
+
+	/// helper function to configuration channel pv
+	void configureChannelControl(bool enable, int channelId);
 
 protected:
 	/// the configuration of the scaler
@@ -84,6 +106,8 @@ protected:
 
 	/// the control set to manager all the controls
 	AMControlSet *pvControlSet_;
+	/// the set of PV controls for channel control, to enable/disable the channel
+	QMap<int, AMSinglePVControl*> configuredChannelControlSet_;
 
 	/// the PV control to access to the scaler status Control (scanning / stopped )
 	AMSinglePVControl *statusControl_;
@@ -97,12 +121,12 @@ protected:
 	AMSinglePVControl *totalNumberOfScansControl_;
 
 	/// the pv control to access the channel scan array
-	AMWaveformBinningSinglePVControl *scanControl_;
+	AMWaveformBinningSinglePVControl *scanBufferControl_;
 
-	/// the list of PV controls for channel status
-	AMControlSet *channelStatusControlSet_;
 
 	/// running status
+	/// flag to indicate whether all PVs are initialized
+	bool initialized_;
 	/// flag to indicate whether all PVs are connected
 	bool connected_;
 	/// the dwell time to read the scaler buffer (in ms, default 1ms)

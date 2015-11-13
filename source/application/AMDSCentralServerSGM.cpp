@@ -49,7 +49,7 @@ AMDSCentralServerSGM::~AMDSCentralServerSGM()
 	// release the Scaler information
 	scalerConfigurationMap_->deleteLater();
 	scalerDetectorManager_->deleteLater();
-	scalerServerManager_->deleteLater();
+	scalerDetectorServerManager_->deleteLater();
 	AMDSScalerCommandManager::releaseScalerCommands();
 }
 
@@ -118,7 +118,7 @@ void AMDSCentralServerSGM::initializeDetectorManager()
 	connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(AMDSDataHolderList)), this, SLOT(onNewScalerScanDataReceivedd(AMDSDataHolderList)));
 }
 
-void AMDSCentralServerSGM::initializeAndStartDataServer()
+void AMDSCentralServerSGM::initializeAndStartDetectorServer()
 {
 	// initialize the amptek dataserver
 	amptekThreadedDataServerGroup_ = new AmptekSDD123ThreadedDataServerGroup(amptekConfigurationMaps_);
@@ -127,9 +127,9 @@ void AMDSCentralServerSGM::initializeAndStartDataServer()
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));
 
 	// initialize the scaler detector server
-	AMDSScalerDetectorServer *scalerServer = new AMDSScalerDetectorServer();
-	scalerServerManager_ = new AMDSDetectorServerManager(scalerServer);
-	connect(this, SIGNAL(configurationRequestReceived(const AMDSClientRequest*)), scalerServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
+	AMDSScalerDetectorServer *scalerDetectorServer = new AMDSScalerDetectorServer(scalerConfigurationMap_->scalerName());
+	scalerDetectorServerManager_ = new AMDSDetectorServerManager(scalerDetectorServer);
+	connect(this, SIGNAL(scalerConfigurationRequestReceived(const AMDSClientRequest*)), scalerDetectorServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
 }
 
 void AMDSCentralServerSGM::wrappingUpInitialization()
@@ -153,13 +153,16 @@ void AMDSCentralServerSGM::wrappingUpInitialization()
 	}
 
 	// connect scaler detector with the scaler detector server
-	AMDSScalerDetectorServer *scalerServer = qobject_cast<AMDSScalerDetectorServer *>(scalerServerManager_->detectorServer());
+	AMDSScalerDetectorServer *scalerServer = qobject_cast<AMDSScalerDetectorServer *>(scalerDetectorServerManager_->detectorServer());
 	if (scalerServer) {
-		connect(scalerServer, SIGNAL(serverGoingToStartDwelling()), scalerDetectorManager_->scalerDetector(), SLOT(onServerGoingToStartDwelling()));
+		// when we start/restart dwelling, we need to clear the exiting buffer since the existing data might NOT match the current configuration
+		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), this, SLOT(onDetectorServerStartDwelling()));
+
+		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerGoingToStartDwelling()));
+		connect(scalerServer, SIGNAL(serverChangedToConfigurationState(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerStopDwelling()));
 		connect(scalerServer, SIGNAL(enableChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onEnableChannel(int)));
 		connect(scalerServer, SIGNAL(disableChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onDisableChannel(int)));
 	}
-
 }
 
 void AMDSCentralServerSGM::onServerChangedToConfigurationState(int index){
@@ -174,7 +177,7 @@ void AMDSCentralServerSGM::onClearHistrogramData(const QString &detectorName)
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
 	if (bufferGroup) {
-		bufferGroup->clear();
+		bufferGroup->clearBufferGroup();
 	} else {
 		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
@@ -184,7 +187,7 @@ void AMDSCentralServerSGM::onClearDwellHistrogramData(const QString &detectorNam
 {
 	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
 	if (bufferGroup) {
-		bufferGroup->clear();
+		bufferGroup->clearBufferGroup();
 	} else {
 		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
@@ -224,9 +227,7 @@ void AMDSCentralServerSGM::onNewScalerScanDataReceivedd(const AMDSDataHolderList
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
 	if (bufferGroup) {
-		foreach (AMDSDataHolder *scalerDataHolder, scalerScanCountsDataHolder) {
-			bufferGroup->append(scalerDataHolder);
-		}
+		bufferGroup->append(scalerScanCountsDataHolder);
 	} else {
 		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
 	}

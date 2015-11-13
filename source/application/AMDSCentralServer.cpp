@@ -55,7 +55,7 @@ void AMDSCentralServer::initializeAndStartServices()
 	initializeDetectorManager();
 
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the Data server...");
-	initializeAndStartDataServer();
+	initializeAndStartDetectorServer();
 
 	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... wrap up initialization...");
 	wrappingUpInitialization();
@@ -98,6 +98,14 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 	}
 }
 
+void AMDSCentralServer::onDetectorServerStartDwelling(const QString &bufferName)
+{
+	AMDSThreadedBufferGroup* threadedBufferGroup = bufferGroupManagers_.value(bufferName);
+	if (threadedBufferGroup) {
+		threadedBufferGroup->clearBufferGroup();
+	}
+}
+
 void AMDSCentralServer::processIntrospectionClientRequest(AMDSClientRequest *clientRequest)
 {
 	AMDSClientIntrospectionRequest *clientIntrospectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
@@ -130,7 +138,7 @@ void AMDSCentralServer::processConfigurationClientRequest(AMDSClientRequest *cli
 
 	QString bufferGroup = clientConfigurationRequest->bufferName();
 
-	emit configurationRequestReceived(clientRequest);
+	emit scalerConfigurationRequestReceived(clientRequest);
 
 	clientConfigurationRequest->setErrorMessage(errorMessage);
 	emit clientRequestProcessed(clientConfigurationRequest);

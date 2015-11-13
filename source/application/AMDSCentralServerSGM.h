@@ -59,7 +59,7 @@ protected:
 	/// function to initialize the detector manager
 	virtual void initializeDetectorManager();
 	/// function to initialize the data server to update the buffer groups
-	virtual void initializeAndStartDataServer();
+	virtual void initializeAndStartDetectorServer();
 	/// function to finalize the initialization
 	virtual void wrappingUpInitialization();
 
@@ -82,7 +82,7 @@ protected:
 	/// the Scaler detector manager
 	AMDSScalerDetectorManager *scalerDetectorManager_;
 	/// the scaler server manager
-	AMDSDetectorServerManager *scalerServerManager_;
+	AMDSDetectorServerManager *scalerDetectorServerManager_;
 };
 
 #endif // AMDSCENTRALSERVERSGM_H

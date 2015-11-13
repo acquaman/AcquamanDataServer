@@ -30,13 +30,15 @@ public:
 signals:
 	/// The signal when the AMDSCenterServer finished processing a client request, then the TCP data suppose to wrap the msg and send back to client
 	void clientRequestProcessed(AMDSClientRequest *processedRequest);
-	void configurationRequestReceived(AMDSClientRequest*);
+	void scalerConfigurationRequestReceived(AMDSClientRequest*);
 
 protected slots:
 	/// slot to handle the errors information from the TCP Data server
 	void onDataServerErrorHandler(quint8 errorLevel, quint16 errorCode, const QString &errorMessage);
 	/// slot to handle the client request from the TCP Data server
 	void onDataServerClientRequestReady(AMDSClientRequest *clientRequest);
+
+	void onDetectorServerStartDwelling(const QString &bufferName);
 
 protected:
 	/// initialize and start the TCPServer to handle clientRequest
@@ -47,7 +49,7 @@ protected:
 	/// pure virtual function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
 	virtual void initializeDetectorManager() = 0;
 	/// pure virtual function to initialize the data server to update the buffer groups
-	virtual void initializeAndStartDataServer() = 0;
+	virtual void initializeAndStartDetectorServer() = 0;
 	/// pure virtual function to finalize the initialization
 	virtual void wrappingUpInitialization() = 0;
 

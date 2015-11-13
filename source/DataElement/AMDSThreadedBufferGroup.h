@@ -21,9 +21,9 @@ public:
 	/// returns the bufferGroup name
 	QString bufferGroupName() const;
 	/// appends a data to the bufferGroup
+	void append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime=0);
+	/// appends a data to the bufferGroup
 	void append(AMDSDataHolder *value, bool elapsedDwellTime=0);
-	/// to clear the data of the buffer group
-	void clear();
 
 	/// returns the buffergroup
 	inline AMDSBufferGroup *bufferGroup() { return bufferGroup_; }
@@ -33,6 +33,8 @@ signals:
 	void bufferGroupReady();
 
 public slots:
+	/// to clear the data of the buffer group
+	void clearBufferGroup();
 	/// slot to finish dwell data update
 	void finishDwellDataUpdate(double elapsedTime=0);
 	/// slot to forward clientRequest to the bufferGroup

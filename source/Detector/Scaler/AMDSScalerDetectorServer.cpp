@@ -3,8 +3,8 @@
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "Detector/Scaler/AMDSScalerCommandManager.h"
 
-AMDSScalerDetectorServer::AMDSScalerDetectorServer(QObject *parent)
-	: AMDSDetectorServer(parent)
+AMDSScalerDetectorServer::AMDSScalerDetectorServer(const QString &scalerName, QObject *parent)
+	: AMDSDetectorServer(scalerName, parent)
 {
 }
 
@@ -34,7 +34,7 @@ void AMDSScalerDetectorServer::onConfigurationRequestReceived(AMDSClientRequest 
 		}
 
 		if (startDwellAfterConfiguration) {
-			emit serverGoingToStartDwelling();
+			emit serverGoingToStartDwelling(detectorName());
 		}
 	}
 }
@@ -43,10 +43,10 @@ void AMDSScalerDetectorServer::performConfiguration(int commandId, QVariant valu
 {
 	switch (commandId) {
 	case AMDSScalerCommandManager::RequestEnableChannel:
-		emit enableChannel(value.toInt());
+		emit enableScalerChannel(value.toInt());
 		break;
 	case AMDSScalerCommandManager::RequestDisableChannel:
-		emit disableChannel(value.toInt());
+		emit disableScalerChannel(value.toInt());
 		break;
 	}
 
