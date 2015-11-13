@@ -53,6 +53,7 @@ void AMDSServer::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSCli
 		removeTCPSocket(clientTCPSocket);
 	}
 
+	qDebug() << "AMDSServer about to emit requestDataReady";
 	emit requestDataReady(clientRequest);
 }
 

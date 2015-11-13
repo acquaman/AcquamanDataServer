@@ -20,7 +20,10 @@ AMDSClientAppController *AMDSClientAppController::clientAppController()
 {
 	if (!appController_) {
 		appController_ = new AMDSClientAppController();
-		((AMDSClientAppController *)appController_)->openNetworkSession();
+
+		AMDSClientAppController *asClientAppController = qobject_cast<AMDSClientAppController *>(appController_);
+		QTimer::singleShot(0, asClientAppController, SLOT(openNetworkSession()));
+//		((AMDSClientAppController *)appController_)->openNetworkSession();
 	}
 
 	return qobject_cast<AMDSClientAppController *>(appController_);
@@ -59,8 +62,10 @@ QStringList AMDSClientAppController::getBufferNamesByServer(const QString &serve
 {
 	QStringList bufferNames;
 
+	qDebug() << "Checking server from idenifier " << serverIdentifier;
 	AMDSServer *server = getServerByServerIdentifier(serverIdentifier);
 	if (server) {
+		qDebug() << "Found it";
 		bufferNames = server->bufferNames();
 	}
 
@@ -84,9 +89,13 @@ QStringList AMDSClientAppController::getActiveSocketKeysByServer(const QString &
 
 void AMDSClientAppController::openNetworkSession()
 {
+	qDebug() << "NO REALLY, CHECK TO OPEN NETWORK SESSION";
+	qDebug() << "Checking on network session";
 	if (!networkSession_) {
+		qDebug() << "Making the manager and about to check capabilities";
 		QNetworkConfigurationManager manager;
 		if (manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired) {
+			qDebug() << "Seems to be working, get the configuration";
 			// Get saved network configuration
 			QSettings settings(QSettings::UserScope, QLatin1String("AMDSClient"));
 			settings.beginGroup(QLatin1String("Network"));
@@ -106,6 +115,10 @@ void AMDSClientAppController::openNetworkSession()
 			emit networkSessionOpening();
 			networkSession_->open();
 		}
+		else{
+			qDebug() << "No need, just emit networkSessionOpened";
+			emit networkSessionOpened();
+		}
 	}
 }
 
@@ -116,9 +129,11 @@ void AMDSClientAppController::connectToServer(const AMDSServerConfiguration &ser
 
 void AMDSClientAppController::connectToServer(const QString &hostName, quint16 portNumber)
 {
+	qDebug() << "Trying to connect to " << hostName << portNumber;
 	QString serverIdentifier = AMDSServer::generateServerIdentifier(hostName, portNumber);
 	AMDSServer * server = getServerByServerIdentifier(serverIdentifier);
 	if (!server) {
+		qDebug() << "There's a server there";
 		server = new AMDSServer(hostName, portNumber);
 		activeServers_.insert(serverIdentifier, server);
 
@@ -128,6 +143,7 @@ void AMDSClientAppController::connectToServer(const QString &hostName, quint16 p
 
 		// request the introspection data for all the buffers defined in this server
 		QString bufferName = "All";
+		qDebug() << "ClientAppController about to request some introspection data";
 		requestClientData(hostName, portNumber, bufferName);
 	}
 }

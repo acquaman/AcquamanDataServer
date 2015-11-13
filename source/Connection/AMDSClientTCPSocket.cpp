@@ -100,7 +100,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	case AMDSClientRequestDefinitions::Continuous:
 			if (clientRequest->validateResponse()) {
 				socketKey_ = clientRequest->socketKey();
-				clientRequest->printData();
+//				clientRequest->printData();
 			}
 			break;
 
