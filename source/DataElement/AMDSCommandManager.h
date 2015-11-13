@@ -19,8 +19,10 @@ public:
 		// request type
 		RequestStartDwell,
 
-		// customized commands
-		CustomizedCommand = 1000
+		// customized Scaler commands
+		CustomizedScalerCommand = 1000,
+		// customized Amptek commands
+		CustomizedAmptekCommand = 1100
 	};
 
 	virtual ~AMDSCommandManager();

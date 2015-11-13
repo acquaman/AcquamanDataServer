@@ -52,8 +52,8 @@ HEADERS *= \
 	source/Detector/Scaler/AMDSScalerDetector.h \
 	source/Detector/Scaler/AMDSScalerDetectorManager.h \
 	source/Detector/Scaler/AMDSScalerConfigurationMap.h \
-    source/Detector/Scaler/AMDSScalerServer.h \
-	source/Detector/AMDSDetectorServer.h
+	source/Detector/AMDSDetectorServer.h \
+    source/Detector/Scaler/AMDSScalerDetectorServer.h
 
 SOURCES *= \
 	source/AMDSMainSGM.cpp \
@@ -73,8 +73,12 @@ SOURCES *= \
 	source/Detector/Scaler/AMDSScalerDetector.cpp \
 	source/Detector/Scaler/AMDSScalerDetectorManager.cpp \
 	source/Detector/Scaler/AMDSScalerConfigurationMap.cpp \
-    source/Detector/Scaler/AMDSScalerServer.cpp \
-	source/Detector/AMDSDetectorServer.cpp
+	source/Detector/AMDSDetectorServer.cpp \
+    source/Detector/Scaler/AMDSScalerDetectorServer.cpp
+
+
+
+
 
 
 

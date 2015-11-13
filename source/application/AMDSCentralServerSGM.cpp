@@ -13,7 +13,7 @@
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 #include "Detector/Scaler/AMDSScalerDetector.h"
 #include "Detector/Scaler/AMDSScalerDetectorManager.h"
-#include "Detector/Scaler/AMDSScalerServer.h"
+#include "Detector/Scaler/AMDSScalerDetectorServer.h"
 #include "Detector/AMDSDetectorServer.h"
 
 #include "util/AMErrorMonitor.h"
@@ -128,7 +128,7 @@ void AMDSCentralServerSGM::initializeAndStartDataServer()
 	connect(amptekThreadedDataServerGroup_, SIGNAL(serverChangedToDwellState(int)), this, SLOT(onServerChangedToDwellState(int)));
 
 	// initialize the scaler dataserver
-	AMDSScalerServer *scalerServer = new AMDSScalerServer();
+	AMDSScalerDetectorServer *scalerServer = new AMDSScalerDetectorServer();
 	scalerServerManager_ = new AMDSDetectorServerManager(scalerServer);
 	connect(this, SIGNAL(configurationRequestReceived(const AMDSClientRequest*)), scalerServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
 

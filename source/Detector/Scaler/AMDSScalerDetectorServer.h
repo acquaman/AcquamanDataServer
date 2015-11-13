@@ -3,12 +3,12 @@
 
 #include "Detector/AMDSDetectorServer.h"
 
-class AMDSScalerServer : public AMDSDetectorServer
+class AMDSScalerDetectorServer : public AMDSDetectorServer
 {
     Q_OBJECT
 public:
-    explicit AMDSScalerServer(QObject *parent = 0);
-	~AMDSScalerServer();
+	explicit AMDSScalerDetectorServer(QObject *parent = 0);
+	~AMDSScalerDetectorServer();
 
 signals:
 	/// signal to request enable channel for "channelId"

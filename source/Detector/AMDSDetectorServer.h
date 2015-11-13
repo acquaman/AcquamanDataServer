@@ -41,6 +41,7 @@ public:
     explicit AMDSDetectorServer(QObject *parent = 0);
 	~AMDSDetectorServer();
 
+	/// helper function to change the working mode fo the detector
 	void setDetectorMode(AMDSDetectorServer::DetectorMode detectorMode);
 
 	/// returns whether the detector is working in dwell mode

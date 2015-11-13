@@ -1,5 +1,5 @@
-#ifndef SCALERCOMMANDMANAGERSGM_H
-#define SCALERCOMMANDMANAGERSGM_H
+#ifndef AMDSSCALERCOMMANDMANAGER_H
+#define AMDSSCALERCOMMANDMANAGER_H
 
 #include "DataElement/AMDSCommandManager.h"
 
@@ -8,7 +8,7 @@ class AMDSScalerCommandManager : public AMDSCommandManager
 public:
 	enum ScalerCommandDef {
 		// request type
-		RequestEnableChannel = CustomizedCommand + 1,
+		RequestEnableChannel = CustomizedScalerCommand + 1,
 		RequestDisableChannel
 	};
 
@@ -31,4 +31,4 @@ protected:
 	static AMDSScalerCommandManager* instance_;
 };
 
-#endif // SCALERCOMMANDMANAGERSGM_H
+#endif // AMDSSCALERCOMMANDMANAGER_H

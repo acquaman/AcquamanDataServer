@@ -1,19 +1,19 @@
-#include "AMDSScalerServer.h"
+#include "AMDSScalerDetectorServer.h"
 
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "Detector/Scaler/AMDSScalerCommandManager.h"
 
-AMDSScalerServer::AMDSScalerServer(QObject *parent)
+AMDSScalerDetectorServer::AMDSScalerDetectorServer(QObject *parent)
 	: AMDSDetectorServer(parent)
 {
 }
 
-AMDSScalerServer::~AMDSScalerServer()
+AMDSScalerDetectorServer::~AMDSScalerDetectorServer()
 {
 
 }
 
-void AMDSScalerServer::onConfigurationRequestReceived(AMDSClientRequest *clientRequest)
+void AMDSScalerDetectorServer::onConfigurationRequestReceived(AMDSClientRequest *clientRequest)
 {
 	AMDSDetectorServer::onConfigurationRequestReceived(clientRequest);
 
@@ -39,7 +39,7 @@ void AMDSScalerServer::onConfigurationRequestReceived(AMDSClientRequest *clientR
 	}
 }
 
-void AMDSScalerServer::performConfiguration(int commandId, QVariant value)
+void AMDSScalerDetectorServer::performConfiguration(int commandId, QVariant value)
 {
 	switch (commandId) {
 	case AMDSScalerCommandManager::RequestEnableChannel:
