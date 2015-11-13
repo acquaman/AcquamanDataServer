@@ -127,7 +127,6 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 
 	/// ==== initialize the app controller ==============
 	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
-
 	connect(clientAppController, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
 	connect(clientAppController, SIGNAL(networkSessionOpened()), this, SLOT(onNetworkSessionOpened()));
 	connect(clientAppController, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
@@ -140,7 +139,6 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 AMDSClientUi::~AMDSClientUi()
 {
 	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
-
 	disconnect(clientAppController, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
 	disconnect(clientAppController, SIGNAL(networkSessionOpened()), this, SLOT(onNetworkSessionOpened()));
 	disconnect(clientAppController, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
@@ -179,7 +177,7 @@ void AMDSClientUi::onNetworkSessionOpening()
 void AMDSClientUi::onNetworkSessionOpened()
 {
 	statusLabel_->setText("This examples requires that you run the Acquaman Data Server example as well.");
-	enableRequestDataButton();
+//	enableRequestDataButton();
 }
 
 void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
@@ -265,8 +263,7 @@ void AMDSClientUi::enableRequestDataButton()
 
 void AMDSClientUi::sendClientRequest()
 {
-	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
-	AMDSServer * server = clientAppController->getServerByServerIdentifier(activeServerComboBox_->currentText());
+	AMDSServer * server = AMDSClientAppController::clientAppController()->getServerByServerIdentifier(activeServerComboBox_->currentText());
 	if (!server) {
 		QMessageBox::information( this, "AMDS Client Example", "Didn't select any active server!");
 		return;
@@ -299,6 +296,7 @@ void AMDSClientUi::sendClientRequest()
 		return;
 	}
 
+	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
 	switch(clientRequestType) {
 	case AMDSClientRequestDefinitions::Introspection:
 		clientAppController->requestClientData(hostName, portNumber, bufferName);
