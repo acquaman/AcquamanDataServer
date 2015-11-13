@@ -110,7 +110,6 @@ void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
 	}
 }
 
-#include <QDebug>
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	QReadLocker readLock(&lock_);
 
@@ -126,7 +125,6 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	case AMDSClientRequestDefinitions::StartTimePlusCount: {
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
 		if(clientStartTimePlusCountDataRequest) {
-			qDebug() << "Looks like a StartTimePlusCount request with start " << clientStartTimePlusCountDataRequest->startTime().toString("hh:mm:ss.zzz") << " current time is " << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
 			populateData(clientStartTimePlusCountDataRequest);
 		}
 		break;
@@ -227,8 +225,6 @@ void AMDSBufferGroup::populateData(AMDSClientDataRequest* clientDataRequest, int
 		dataHolder->data(&oneFlatArray);
 
 		targetDataArray.append(dataHolder);
-
-		qDebug() << "For dataHolder " << iCurrent << dataHolder->printData();
 	}
 
 	// when doing flattening, the data holders in the targetDataArray are new instances, which need to be released after usage

@@ -1,6 +1,5 @@
 #include "AMDSDwellStatusData.h"
 
-#include <QDebug>
 
 
 /// =============== implementation of AMDSStatusData ================
@@ -91,7 +90,6 @@ bool AMDSDwellStatusData::readFromDataStream(QDataStream *dataStream)
 		return false;
 
 	*dataStream >> generalPurposeCounter_;
-
 	if(dataStream->status() != QDataStream::Ok)
 		return false;
 
