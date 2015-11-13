@@ -45,9 +45,6 @@ public:
 	/// helper function to return the list of socketKeys of active connection by a give host server
 	QStringList getActiveSocketKeysByServer(const QString &serverIdentifier);
 
-//	/// open a new network session
-//	void openNetworkSession();
-
 	/// request to establish a connection to a specific hostName and the portNumber
 	void connectToServer(const AMDSServerConfiguration &serverConfiguration);
 	/// request to establish a connection to a specific hostName and the portNumber
