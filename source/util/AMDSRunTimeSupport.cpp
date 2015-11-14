@@ -3,7 +3,7 @@
 namespace AMDSRunTimeSupport{
 	quint8 debugLevel_ = 0;
 
-	quint8 debugLevel(){
+	quint8 debugLevel() const{
 		return debugLevel_;
 	}
 
@@ -11,7 +11,7 @@ namespace AMDSRunTimeSupport{
 		debugLevel_ = debugLevel;
 	}
 
-	bool debugAtLevel(quint8 requestedLevel){
+	bool debugAtLevel(quint8 requestedLevel) const{
 		if(requestedLevel <= debugLevel_)
 			return true;
 		return false;
