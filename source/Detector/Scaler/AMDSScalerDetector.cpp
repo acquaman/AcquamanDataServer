@@ -12,6 +12,7 @@
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSScalerDetector::AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent)
     : QObject(parent)
@@ -44,7 +45,7 @@ void AMDSScalerDetector::onFetchScanBuffer()
 
 	int channelCount = enabledChannelCount();
 	QVector<int> countBuffer(channelCount * scansInABuffer_ + 1); // need one extra buffer for the # of channels
-	scanControl_->values(channelCount, countBuffer.data());
+	scanControl_->values(channelCount * scansInABuffer_ + 1, countBuffer.data());
 
 	// put the counts array to the FlatArrayList
 	for (int scanIndex=0; scanIndex < scansInABuffer_; scanIndex++) {
@@ -108,7 +109,7 @@ void AMDSScalerDetector::onScansInABufferControlValueChanged(double newValue)
 
 void AMDSScalerDetector::onContinuousScanControlValueChanged(double newValue)
 {
-	if (newValue != AMDSScalerDetector::Continuous) {
+	if ((newValue != AMDSScalerDetector::Continuous) && AMDSRunTimeSupport::debugAtLevel(1) ) {
 		AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Normal scan mode.").arg(scalerName()));
 	}
 }

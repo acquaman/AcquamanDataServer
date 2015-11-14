@@ -4,6 +4,7 @@
 #include "DataHolder/AMDSSpectralDataHolder.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
 	QObject(parent)

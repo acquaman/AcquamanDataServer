@@ -3,6 +3,7 @@
 #include "DataHolder/AMDSScalarDataHolder.h"
 #include "DataHolder/AMDSDataHolderSupport.h"
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSClientDataRequest::AMDSClientDataRequest(QObject *parent) :
 	AMDSClientRequest(parent)
@@ -62,7 +63,8 @@ void AMDSClientDataRequest::copyAndAppendData(AMDSDataHolder *dataHolder)
 
 		data_.append(cloneDataHolder);
 	} else {
-		AMErrorMon::error(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("This type (%1) of dataHolder might NOT be registered. Please contact Acquaman Developers.").arg(dataHolder->metaObject()->className()));
+		if(AMDSRunTimeSupport::debugAtLevel(0))
+			AMErrorMon::error(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("This type (%1) of dataHolder might NOT be registered. Please contact Acquaman Developers.").arg(dataHolder->metaObject()->className()));
 	}
 }
 
@@ -78,7 +80,8 @@ bool AMDSClientDataRequest::validateResponse()
 {
 	bool noError = true;
 	if(responseType() == AMDSClientRequest::Error) {
-		AMErrorMon::alert(this, AMDS_CLIENTREQUEST_ERR_FAILED_TO_RETRIEVE_DATA, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_CLIENTREQUEST_ERR_FAILED_TO_RETRIEVE_DATA, QString("(msg %1 --- %2) Failed to retrieve data. Error: %3").arg(socketKey()).arg(bufferName()).arg(errorMessage()));
 		noError = false;
 	}
 

@@ -1,6 +1,7 @@
 #include "AmptekEventDefinitions.h"
 
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 /// =============== implementation of AmptekConfigurationData ================
 AmptekConfigurationData::AmptekConfigurationData(int analogGainIndex, double fineGain, double totalGain, QString hvSet, int mcaCount, QString mcaEnabled, QString mcaSource, QString preampState, QString peakDetectMode, QString pileUpRejection, QList<int> scaIndices, QList<int> scaHighIndices, QList<int> scaLowIndices, QString coolerSetting, double fastThreshold, double slowThreshold, double peakingTime, int fastChannelPeakingTime)

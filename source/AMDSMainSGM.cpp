@@ -4,6 +4,7 @@
 
 #include "AMDSMainCommon.h"
 #include "application/AMDSCentralServerSGM.h"
+#include "util/AMDSRunTimeSupport.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
 
 	bool startServer = AMDSMain_Common::parseArgument("AcquamanDataServerSGM", args, &interfaceType, &port);
 	if (startServer) {
+		AMDSRunTimeSupport::setDebugLevel(1);
 		AMDSMain_Common::initializeAppSettings(interfaceType, port);
 		AMDSMain_Common::initializeRegisteredClasses();
 
