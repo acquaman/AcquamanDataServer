@@ -15,11 +15,13 @@
 #include "DataElement/AMDSThreadedBufferGroup.h"
 #include "DataHolder/AMDSDataHolder.h"
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
-	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
+	if(AMDSRunTimeSupport::debugAtLevel(2))
+		AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
 
 	qRegisterMetaType<AMDSDwellStatusData>();
 	qRegisterMetaType<AMDSDataHolderList>();
@@ -44,19 +46,24 @@ AMDSCentralServer::~AMDSCentralServer()
 
 void AMDSCentralServer::initializeAndStartServices()
 {
-	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the TCP server ...");
+	if(AMDSRunTimeSupport::debugAtLevel(2))
+		AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the TCP server ...");
 	initializeAndStartTCPServer();
 
-	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the bufferGroup ...");
+	if(AMDSRunTimeSupport::debugAtLevel(2))
+		AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the bufferGroup ...");
 	initializeBufferGroup();
 
-	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the detector managers ...");
+	if(AMDSRunTimeSupport::debugAtLevel(2))
+		AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize the detector managers ...");
 	initializeDetectorManager();
 
-	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the Data server...");
+	if(AMDSRunTimeSupport::debugAtLevel(2))
+		AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... initialize and start the Data server...");
 	initializeAndStartDataServer();
 
-	AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... wrap up initialization...");
+	if(AMDSRunTimeSupport::debugAtLevel(2))
+		AMErrorMon::information(this, AMDS_SERVER_INFO_START_SERVER_APP, " ... wrap up initialization...");
 	wrappingUpInitialization();
 }
 
@@ -73,11 +80,13 @@ void AMDSCentralServer::onDataServerErrorHandler(quint8 errorLevel, quint16 erro
 {
 	switch(errorLevel) {
 	case AMErrorReport::Serious:
-		AMErrorMon::error(this, errorCode, errorMessage);
+		if(AMDSRunTimeSupport::debugAtLevel(0))
+			AMErrorMon::error(this, errorCode, errorMessage);
 		QCoreApplication::quit();
 		break;
 	default:
-		AMErrorMon::alert(this, errorCode, errorMessage);
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, errorCode, errorMessage);
 		break;
 	}
 }
@@ -98,7 +107,8 @@ void AMDSCentralServer::processIntrospectionClientRequest(AMDSClientRequest *cli
 			QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroupManagers_.constBegin();
 			while (i != bufferGroupManagers_.constEnd()) {
 				AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
-				AMErrorMon::information(this, AMDS_SERVER_INFO_BUFFER_DEF, QString("%1 definition is %2 %3 %4 %5 %6 %7").arg(i.key()).arg(oneInfo.name()).arg(oneInfo.description()).arg(oneInfo.units()).arg(oneInfo.size().toString()).arg(oneInfo.isFlattenEnabled()?"true":"false").arg(oneInfo.flattenMethod()));
+				if(AMDSRunTimeSupport::debugAtLevel(2))
+					AMErrorMon::information(this, AMDS_SERVER_INFO_BUFFER_DEF, QString("%1 definition is %2 %3 %4 %5 %6 %7").arg(i.key()).arg(oneInfo.name()).arg(oneInfo.description()).arg(oneInfo.units()).arg(oneInfo.size().toString()).arg(oneInfo.isFlattenEnabled()?"true":"false").arg(oneInfo.flattenMethod()));
 				clientIntrospectionRequest->appendBufferGroupInfo(oneInfo);
 				++i;
 			}
@@ -134,7 +144,8 @@ void AMDSCentralServer::processClientDataRequest(AMDSClientRequest *clientReques
 				if (threadedBufferGroup) {
 					threadedBufferGroup->forwardClientRequest(continuousBufferDataRequest);
 				} else {
-					AMErrorMon::alert(this, AMDS_SERVER_ALT_INVALID_REQUEST, QString("Invalid client data request with buffer name: %1").arg(continuousBufferDataRequest->bufferName()));
+					if(AMDSRunTimeSupport::debugAtLevel(1))
+						AMErrorMon::alert(this, AMDS_SERVER_ALT_INVALID_REQUEST, QString("Invalid client data request with buffer name: %1").arg(continuousBufferDataRequest->bufferName()));
 					emit clientRequestProcessed(continuousBufferDataRequest);
 				}
 			}
@@ -146,14 +157,16 @@ void AMDSCentralServer::processClientDataRequest(AMDSClientRequest *clientReques
 			} else {
 				errorMessage = QString("ERROR: %1 - Invalid client data request with buffer name: %2").arg(AMDS_SERVER_ALT_INVALID_REQUEST).arg(clientDataRequest->bufferName());
 				clientDataRequest->setErrorMessage(errorMessage);
-				AMErrorMon::alert(this, AMDS_SERVER_ALT_INVALID_REQUEST, errorMessage);
+				if(AMDSRunTimeSupport::debugAtLevel(1))
+					AMErrorMon::alert(this, AMDS_SERVER_ALT_INVALID_REQUEST, errorMessage);
 				emit clientRequestProcessed(clientDataRequest);
 			}
 		}
 	} else {
 		errorMessage = QString("ERROR: %1 - The message (%2) is not a client data request.").arg(AMDS_SERVER_ALT_INVALID_REQUEST).arg(clientRequest->socketKey());
 		clientRequest->setErrorMessage(errorMessage);
-		AMErrorMon::alert(this, AMDS_SERVER_ALT_INVALID_REQUEST, errorMessage);
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_SERVER_ALT_INVALID_REQUEST, errorMessage);
 		emit clientRequestProcessed(clientRequest);
 	}
 }

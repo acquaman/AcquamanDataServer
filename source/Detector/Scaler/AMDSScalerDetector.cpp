@@ -12,6 +12,7 @@
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSScalerDetector::AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent)
     : QObject(parent)
@@ -108,7 +109,7 @@ void AMDSScalerDetector::onScansInABufferControlValueChanged(double newValue)
 
 void AMDSScalerDetector::onContinuousScanControlValueChanged(double newValue)
 {
-	if (newValue != AMDSScalerDetector::Continuous) {
+	if ((newValue != AMDSScalerDetector::Continuous) && AMDSRunTimeSupport::debugAtLevel(1) ) {
 		AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Normal scan mode.").arg(scalerName()));
 	}
 }
