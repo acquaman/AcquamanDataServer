@@ -237,7 +237,7 @@ void AmptekSDD123Server::sendRequestDatagram(const AmptekSDD123Packet &packet, i
 {
 	if(socketLocallyBusy_){
 		if(AMDSRunTimeSupport::debugAtLevel(0))
-			AMErrorMon::error(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "\nPACKET QUEUE IS BUSY (send request datagram)");
+			AMErrorMon::error(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, QString("\nPACKET QUEUE IS BUSY (send request datagram) on detector %1").arg(configurationMap_->detectorAddress().toString()));
 		packetQueue_.append(packet);
 	} else {
 		socketLocallyBusy_ = true;
@@ -257,7 +257,7 @@ void AmptekSDD123Server::sendSyncDatagram(const AmptekSDD123Packet &packet, int 
 {
 	if(socketLocallyBusy_){
 		if(AMDSRunTimeSupport::debugAtLevel(0))
-			AMErrorMon::error(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "PACKET QUEUE IS BUSY (send sync datagram)");
+			AMErrorMon::error(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, QString("PACKET QUEUE IS BUSY (send sync datagram) on detector").arg(configurationMap_->detectorAddress().toString()));
 		packetQueue_.append(packet);
 	}
 	else{
@@ -276,7 +276,7 @@ void AmptekSDD123Server::fakeSendDatagram(const AmptekSDD123Packet &packet, int 
 {
 	if(socketLocallyBusy_){
 		if(AMDSRunTimeSupport::debugAtLevel(0))
-			AMErrorMon::error(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "PACKET QUEUE IS BUSY (fake send datagram)");
+			AMErrorMon::error(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, QString("PACKET QUEUE IS BUSY (fake send datagram)").arg(configurationMap_->detectorAddress().toString()));
 		packetQueue_.append(packet);
 	}
 	else{
