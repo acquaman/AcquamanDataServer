@@ -8,13 +8,13 @@ namespace AMDSRunTimeSupport {
 	extern quint8 debugLevel_;
 
 	/// Returns the current debug level
-	quint8 debugLevel() const;
+	quint8 debugLevel();
 
 	/// Sets the debug level
 	void setDebugLevel(quint8 debugLevel);
 
 	/// Returns true if the requested level is less than or equal to the current level. So, you can pass in the relative level of your information (higher number is a higher level of debugging information) and get a bool as to whether you should print or not
-	bool debugAtLevel(quint8 requestedLevel) const;
+	bool debugAtLevel(quint8 requestedLevel);
 }
 
 #endif // AMDSRUNTIMESUPPORT_H
