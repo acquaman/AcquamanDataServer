@@ -79,7 +79,7 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 	scansInABufferControl_->move(defaultScansInABuffer_);
 	totalNumberOfScansControl_->move(defaultTotalNumberOfScans_);
 
-	continuousScanControl_->move(AMDSScalerDetector::Continuous); // switch to continuous mode
+//	continuousScanControl_->move(AMDSScalerDetector::Continuous); // switch to continuous mode
 }
 
 void AMDSScalerDetector::onAllControlsTimedOut()
@@ -129,7 +129,11 @@ void AMDSScalerDetector::initializePVControls()
 
 	AMSinglePVControl *channelStatusControl;
 	foreach (quint8 channelId, enabledChannelIds()) {
-		QString scalerChannelPVName = QString("%1%2:enable").arg(scalerBasePVName()).arg(channelId);
+		QString scalerChannelPVName;
+		if(channelId < 10)
+			scalerChannelPVName = QString("%1%2%3:enable").arg(scalerBasePVName()).arg(0).arg(channelId);
+		else
+			scalerChannelPVName = QString("%1%2:enable").arg(scalerBasePVName()).arg(channelId);
 		channelStatusControl = new AMSinglePVControl(scalerChannelPVName, scalerChannelPVName, this);
 
 		channelStatusControlSet_->addControl(channelStatusControl);

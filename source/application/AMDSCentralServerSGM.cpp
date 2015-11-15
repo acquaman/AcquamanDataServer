@@ -55,7 +55,8 @@ void AMDSCentralServerSGM::initializeConfiguration()
 	amptekConfigurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 243", "amptek:sdd5", QHostAddress("192.168.0.243"), QHostAddress("192.168.0.143"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
 
 	// initialize the detector manager for SGM scaler
-	QList<quint8> enabledChannelIds = QList<quint8>() << 10 << 11 << 12 << 13 << 14 << 15;
+//	QList<quint8> enabledChannelIds = QList<quint8>() << 10 << 11 << 12 << 13 << 14 << 15;
+	QList<quint8> enabledChannelIds = QList<quint8>() << 0 << 1 << 2 << 3 << 6 << 7 << 8 << 9 << 10 << 11 << 14 << 15;
 	scalerConfigurationMap_ = new AMDSScalerConfigurationMap("Scaler (BL1611-ID-1)", "BL1611-ID-1:mcs", AMDSDataTypeDefinitions::Signed32, enabledChannelIds);
 }
 
