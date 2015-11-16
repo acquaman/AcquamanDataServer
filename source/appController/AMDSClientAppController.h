@@ -46,9 +46,6 @@ public:
 	/// helper function to return the list of socketKeys of active connection by a give host server
 	QStringList getActiveSocketKeysByServer(const QString &serverIdentifier);
 
-	/// open a new network session
-	void openNetworkSession();
-
 	/// request to establish a connection to a specific hostName and the portNumber
 	void connectToServer(const AMDSServerConfiguration &serverConfiguration);
 	/// request to establish a connection to a specific hostName and the portNumber
@@ -87,6 +84,9 @@ signals:
 	void requestDataReady(AMDSClientRequest*);
 
 public slots:
+	/// open a new network session
+	void openNetworkSession();
+
 	/// slot to handle socket error signal from the server
 	void onAMDSServerError(AMDSServer* server, int errorCode, const QString &socketKey, const QString &errorMessage);
 

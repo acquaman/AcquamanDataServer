@@ -60,10 +60,12 @@ AMDSDataHolder* AMDSDwellSpectralDataHolder::operator +(AMDSDataHolder &dataHold
 			AMDSDwellStatusData newStatusData = dwellStatusData() + addInputDataHolder->dwellStatusData();
 			addTargetDataHolder->setDwellStatusData(newStatusData);
 		} else {
-			AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The type (%1) of addition dataHolder is NOT a DwellSpectralDataHolder.").arg(dataHolder.metaObject()->className()));
+			if(AMDSRunTimeSupport::debugAtLevel(1))
+				AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The type (%1) of addition dataHolder is NOT a DwellSpectralDataHolder.").arg(dataHolder.metaObject()->className()));
 		}
 	} else {
-		AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The type (%1) of addition dataHolder is NOT a DwellSpectralDataHolder.").arg(dataHolder.metaObject()->className()));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The type (%1) of addition dataHolder is NOT a DwellSpectralDataHolder.").arg(dataHolder.metaObject()->className()));
 	}
 
 	return addTargetDataHolder;
@@ -78,7 +80,8 @@ AMDSDataHolder* AMDSDwellSpectralDataHolder::operator /(quint32 divisor)
 		AMDSDwellStatusData newStatusData = dwellStatusData() / divisor;
 		divisionTargetDataHolder->setDwellStatusData(newStatusData);
 	} else {
-		AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The type (%1) of division dataHolder is NOT a DwellSpectralDataHolder.").arg(divisionTargetDataHolder->metaObject()->className()));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The type (%1) of division dataHolder is NOT a DwellSpectralDataHolder.").arg(divisionTargetDataHolder->metaObject()->className()));
 	}
 
 	return divisionTargetDataHolder;
@@ -104,7 +107,8 @@ void AMDSDwellSpectralDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 		AMDSLightWeightSpectralDataHolder::cloneData(sourceSpectrualDataHolder);
 		setDwellStatusData(sourceSpectrualDataHolder->dwellStatusData());
 	} else {
-		AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The type (%1) of source dataHolder is NOT a DwellSpectralDataHolder.").arg(sourceDataHolder->metaObject()->className()));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The type (%1) of source dataHolder is NOT a DwellSpectralDataHolder.").arg(sourceDataHolder->metaObject()->className()));
 	}
 }
 

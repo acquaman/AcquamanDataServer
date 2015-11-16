@@ -12,6 +12,7 @@
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "DataElement/AMDSCommandManager.h"
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSClientUi::AMDSClientUi(QWidget *parent) :
     QDialog(parent)
@@ -184,7 +185,7 @@ void AMDSClientUi::onNetworkSessionOpening()
 void AMDSClientUi::onNetworkSessionOpened()
 {
 	statusLabel_->setText("This examples requires that you run the Acquaman Data Server example as well.");
-	enableRequestDataButton();
+//	enableRequestDataButton();
 }
 
 void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
@@ -398,7 +399,7 @@ void AMDSClientUi::sendClientRequest()
 		break;
 	case AMDSClientRequestDefinitions::Continuous:
 		clientAppController->requestClientData(hostName, portNumber, selectedBufferNames, value1.toInt(), includeStatus, enableFlattening, continuousSocket);
-		if (continuousSocket.length() > 0) {
+		if ((continuousSocket.length() > 0) && AMDSRunTimeSupport::debugAtLevel(2)) {
 			AMErrorMon::information(this, AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE, QString("Hand shake message: %1").arg(continuousSocket));
 		}
 		break;
@@ -407,7 +408,8 @@ void AMDSClientUi::sendClientRequest()
 		break;
 
 	default:
-		AMErrorMon::alert(this, AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE, QString("Invalide client request type: %1").arg(clientRequestType));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE, QString("Invalide client request type: %1").arg(clientRequestType));
 	}
 }
 

@@ -57,7 +57,8 @@ HEADERS *= \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h  \
-	source/util/AMDSMetaObjectSupport.h
+	source/util/AMDSMetaObjectSupport.h \
+	source/util/AMDSRunTimeSupport.h
 
 SOURCES *= \
 	source/appController/AMDSAppController.cpp \
@@ -92,4 +93,7 @@ SOURCES *= \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
-	source/util/AMDSMetaObjectSupport.cpp
+	source/util/AMDSMetaObjectSupport.cpp \
+	source/util/AMDSRunTimeSupport.cpp
+
+

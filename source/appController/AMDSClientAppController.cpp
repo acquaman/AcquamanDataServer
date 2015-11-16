@@ -16,12 +16,15 @@
 #include "Connection/AMDSClientTCPSocket.h"
 #include "Connection/AMDSServer.h"
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSClientAppController *AMDSClientAppController::clientAppController()
 {
 	if (!appController_) {
 		appController_ = new AMDSClientAppController();
-		((AMDSClientAppController *)appController_)->openNetworkSession();
+
+		AMDSClientAppController *asClientAppController = qobject_cast<AMDSClientAppController *>(appController_);
+		QTimer::singleShot(0, asClientAppController, SLOT(openNetworkSession()));
 	}
 
 	return qobject_cast<AMDSClientAppController *>(appController_);
@@ -106,6 +109,9 @@ void AMDSClientAppController::openNetworkSession()
 
 			emit networkSessionOpening();
 			networkSession_->open();
+		}
+		else{
+			emit networkSessionOpened();
 		}
 	}
 }
@@ -261,7 +267,8 @@ bool AMDSClientAppController::requestClientData(const QString &hostName, quint16
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
 		if (bufferNames.length() == 0 && handShakeSocketKey.length() == 0) {
-			AMErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG, QString("Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
+			if(AMDSRunTimeSupport::debugAtLevel(1))
+				AMErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG, QString("Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
 			return false;
 		}
 
@@ -318,7 +325,8 @@ void AMDSClientAppController::onAMDSServerError(AMDSServer* server, int errorCod
 
 void AMDSClientAppController::onNetworkSessionOpened()
 {
-	AMErrorMon::information(this, AMDS_CLIENT_INFO_NETWORK_SESSION_STARTED, "Network session has been opened");
+	if(AMDSRunTimeSupport::debugAtLevel(2))
+		AMErrorMon::information(this, AMDS_CLIENT_INFO_NETWORK_SESSION_STARTED, "Network session has been opened");
 
 	// Save the used configuration
 	QNetworkConfiguration config = networkSession_->configuration();
@@ -354,7 +362,7 @@ AMDSClientTCPSocket * AMDSClientAppController::establishSocketConnection(const Q
 AMDSClientRequest *AMDSClientAppController::instantiateClientRequest(AMDSClientRequestDefinitions::RequestType clientRequestType)
 {
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
-	if (!clientRequest) {
+	if (!clientRequest && AMDSRunTimeSupport::debugAtLevel(1)) {
 		AMErrorMon::alert(this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
 		return 0;
 	}

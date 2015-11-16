@@ -17,6 +17,7 @@
 #include "Detector/AMDSDetectorServer.h"
 
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 #include "Detector/Amptek/SGM/AmptekCommandManagerSGM.h"
 #include "Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.h"
@@ -61,9 +62,9 @@ void AMDSCentralServerSGM::initializeConfiguration()
 	// Commented out PV and IP details for actual beamline ampteks, so can test on some detectors without interfering with beamline operations
 //	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 239", "amptek:sdd1", QHostAddress("192.168.0.239"), QHostAddress("192.168.0.139"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
 	amptekConfigurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 240", "amptek:sdd2", QHostAddress("192.168.0.240"), QHostAddress("192.168.0.140"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 241", "amptek:sdd3", QHostAddress("192.168.0.241"), QHostAddress("192.168.0.141"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 242", "amptek:sdd4", QHostAddress("192.168.0.242"), QHostAddress("192.168.0.142"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
-//	configurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 243", "amptek:sdd5", QHostAddress("192.168.0.243"), QHostAddress("192.168.0.143"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+	amptekConfigurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 241", "amptek:sdd3", QHostAddress("192.168.0.241"), QHostAddress("192.168.0.141"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+	amptekConfigurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 242", "amptek:sdd4", QHostAddress("192.168.0.242"), QHostAddress("192.168.0.142"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
+	amptekConfigurationMaps_.append(new AmptekSDD123ConfigurationMap("Amptek SDD 243", "amptek:sdd5", QHostAddress("192.168.0.243"), QHostAddress("192.168.0.143"), 12004, QHostAddress("192.168.10.104"), AMDSDataTypeDefinitions::Double, 1024, this));
 
 	// initialize the detector manager for SGM scaler
 	QList<quint8> enabledChannelIds = QList<quint8>() << 10 << 11 << 12 << 13 << 14 << 15;
@@ -190,7 +191,8 @@ void AMDSCentralServerSGM::onClearHistrogramData(const QString &detectorName)
 	if (bufferGroup) {
 		bufferGroup->clearBufferGroup();
 	} else {
-		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -200,7 +202,8 @@ void AMDSCentralServerSGM::onClearDwellHistrogramData(const QString &detectorNam
 	if (bufferGroup) {
 		bufferGroup->clearBufferGroup();
 	} else {
-		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -210,7 +213,8 @@ void AMDSCentralServerSGM::onNewHistrogramReceived(const QString &detectorName, 
 	if (bufferGroup) {
 		bufferGroup->append(dataHolder);
 	} else {
-		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -220,7 +224,8 @@ void AMDSCentralServerSGM::onNewDwellHistrogramReceived(const QString &detectorN
 	if (bufferGroup) {
 		bufferGroup->append(dataHolder, elapsedTime);
 	} else {
-		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -230,7 +235,8 @@ void AMDSCentralServerSGM::onDwellFinishedUpdate(const QString &detectorName, do
 	if (bufferGroup) {
 		bufferGroup->finishDwellDataUpdate(elapsedTime);
 	} else {
-		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -240,7 +246,8 @@ void AMDSCentralServerSGM::onNewScalerScanDataReceivedd(const AMDSDataHolderList
 	if (bufferGroup) {
 		bufferGroup->append(scalerScanCountsDataHolder);
 	} else {
-		AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
+		if(AMDSRunTimeSupport::debugAtLevel(1))
+			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
 	}
 
 }

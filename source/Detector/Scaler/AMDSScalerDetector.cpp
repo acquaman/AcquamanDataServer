@@ -12,6 +12,7 @@
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 
 #include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 /// ==================== implementation of AMDSScalerDetectorManager ============================
 AMDSScalerDetectorManager::AMDSScalerDetectorManager(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent)
