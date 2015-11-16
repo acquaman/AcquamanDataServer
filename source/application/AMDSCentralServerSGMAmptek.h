@@ -16,13 +16,13 @@ class AMDSDetectorServerManager;
 
 #define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
 
-class AMDSCentralServerSGM : public AMDSCentralServer
+class AMDSCentralServerSGMAmptek : public AMDSCentralServer
 {
 	Q_OBJECT
 public:
 	/// Constructor: to initialize the TCP Data server thread and the timers for buffer groups
-	AMDSCentralServerSGM(QObject *parent = 0);
-	~AMDSCentralServerSGM();
+	AMDSCentralServerSGMAmptek(QObject *parent = 0);
+	~AMDSCentralServerSGMAmptek();
 
 signals:
 	/// signal to indicate that the server (at index) switched to configuration state
@@ -47,9 +47,6 @@ protected slots:
 
 	/// slot to handle dwell data update finished request  for a given buffer (detector)
 	void onDwellFinishedUpdate(const QString &detectorName, double elapsedTime);
-
-	/// slot to handle new scaler data request to add the data to buffergroup
-	void onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder);
 
 protected:
 	/// function to initialize the system configurations
@@ -79,13 +76,6 @@ protected:
 
 	/// the AmptekDetector group, which will manange and hold the Amptek data and manage the communications with the PVs
 	AmptekSDD123DetectorGroupSGM *amptekDetectorGroup_;
-
-	/// the scaler detector configruation map
-	AMDSScalerConfigurationMap *scalerConfigurationMap_;
-	/// the Scaler detector manager
-	AMDSScalerDetectorManager *scalerDetectorManager_;
-	/// the scaler server manager
-	AMDSDetectorServerManager *scalerDetectorServerManager_;
 };
 
 #endif // AMDSCENTRALSERVERSGM_H

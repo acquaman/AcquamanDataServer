@@ -8,6 +8,7 @@
 
 class AMDSScalerConfigurationMap;
 class AMDSScalerDetectorManager;
+class AMDSDetectorServerManager;
 
 #define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
 
@@ -43,16 +44,20 @@ protected:
 	/// function to initialize the detector manager
 	virtual void initializeDetectorManager();
 	/// function to initialize the data server to update the buffer groups
-	virtual void initializeAndStartDataServer();
+	virtual void initializeAndStartDetectorServer();
 	/// function to finalize the initialization
 	virtual void wrappingUpInitialization();
+
+	/// helper function to fill the configuration commands for the given bufferName
+	void fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest);
 
 protected:
 	/// the scaler detector configruation map
 	AMDSScalerConfigurationMap *scalerConfigurationMap_;
-
 	/// the Scaler detector manager
 	AMDSScalerDetectorManager *scalerDetectorManager_;
+	/// the scaler server manager
+	AMDSDetectorServerManager *scalerDetectorServerManager_;
 };
 
 #endif // AMDSCENTRALSERVERSGM_H
