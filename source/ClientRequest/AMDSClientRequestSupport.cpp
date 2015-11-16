@@ -77,7 +77,8 @@ namespace AMDSClientRequestSupport{
 			return 0;
 
 		if(registeredClasses_.contains(clientRequestType)){
-			AMDSClientRequest *clientRequest = qobject_cast<AMDSClientRequest*>(registeredClasses_.value(clientRequestType).clientRequestMetaObject()->newInstance());
+			const QMetaObject *clientRequestMetaObject = registeredClasses_.value(clientRequestType).clientRequestMetaObject();
+			AMDSClientRequest *clientRequest = qobject_cast<AMDSClientRequest*>(clientRequestMetaObject->newInstance());
 			if(clientRequest)
 				return clientRequest;
 		}

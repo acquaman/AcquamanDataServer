@@ -20,6 +20,26 @@ AMDSClientConfigurationRequest::~AMDSClientConfigurationRequest()
 	configurationCommands_.clear();
 }
 
+QString AMDSClientConfigurationRequest::toString() const
+{
+	QString messageData = QString("Data of Coonfiguration message (%1):").arg(socketKey());
+
+	if (configurationCommandDefs_.size() > 0)
+		messageData = messageData + "\nAvailable configuration commands:";
+	foreach (AMDSCommand commandDef, configurationCommandDefs_) {
+		messageData = QString("%1\n	%2").arg(messageData).arg(commandDef.toString());
+	}
+
+	if (configurationCommandDefs_.size() > 0)
+		messageData = messageData + "\nAvailable configuration requests:";
+	for (int index = 0, size = configurationCommands_.size(); index < size; index++) {
+		QString command = configurationCommands_.key(index);
+		messageData = QString("%1 \n	command (%2) : value (%3)").arg(messageData).arg(command).arg(configurationCommands_.value(command).toString());
+	}
+
+	return messageData;
+}
+
 void AMDSClientConfigurationRequest::appendCommand(const QString &command, const QVariant &value)
 {
 	configurationCommands_.insert(command, value);
@@ -50,7 +70,7 @@ int AMDSClientConfigurationRequest::writeToDataStream(QDataStream *dataStream)
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE;
 
-	for (int index = 0; index < configurationCommands_.size(); index++) {
+	for (int index = 0, size = configurationCommands_.size(); index < size; index++) {
 		QString command = configurationCommands_.key(index);
 		*dataStream << command;
 		if(dataStream->status() != QDataStream::Ok)

@@ -11,9 +11,12 @@ class AMDSClientConfigurationRequest : public AMDSClientRequest
 {
 	Q_OBJECT
 public:
-	explicit AMDSClientConfigurationRequest(QObject *parent = 0);
+	Q_INVOKABLE explicit AMDSClientConfigurationRequest(QObject *parent = 0);
 	explicit AMDSClientConfigurationRequest(const QString &bufferName, const QString &socketKey, const QString &errorMessage, AMDSClientRequest::ResponseType responseType, const QDateTime &localTime, QObject *parent = 0);
 	virtual ~AMDSClientConfigurationRequest();
+
+	/// return a data string of the message
+	virtual QString toString() const;
 
 	/// add a new command value pair
 	void appendCommand(const QString &command, const QVariant &value);
@@ -29,6 +32,7 @@ public:
 	inline QMap<QString, QVariant> configurationCommands() const { return configurationCommands_; }
 	/// returns the configuration command definitions
 	inline QList<AMDSCommand> configurationCommandDefs() const { return configurationCommandDefs_; }
+
 
 protected:
 	/// Writes this AMDSClientConfigurationRequest to an QDataStream, returns 0 if no errors are encountered

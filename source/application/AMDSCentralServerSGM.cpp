@@ -157,12 +157,12 @@ void AMDSCentralServerSGM::wrappingUpInitialization()
 	AMDSScalerDetectorServer *scalerServer = qobject_cast<AMDSScalerDetectorServer *>(scalerDetectorServerManager_->detectorServer());
 	if (scalerServer) {
 		// when we start/restart dwelling, we need to clear the exiting buffer since the existing data might NOT match the current configuration
-		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), this, SLOT(onDetectorServerStartDwelling()));
+		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), this, SLOT(onDetectorServerStartDwelling(QString)));
 
 		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerGoingToStartDwelling()));
 		connect(scalerServer, SIGNAL(serverChangedToConfigurationState(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerStopDwelling()));
-		connect(scalerServer, SIGNAL(enableChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onEnableChannel(int)));
-		connect(scalerServer, SIGNAL(disableChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onDisableChannel(int)));
+		connect(scalerServer, SIGNAL(enableScalerChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onEnableChannel(int)));
+		connect(scalerServer, SIGNAL(disableScalerChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onDisableChannel(int)));
 	}
 }
 

@@ -1,9 +1,9 @@
 #include <QApplication>
 
-#include "source/ui/AMDSClientUi.h"
-#include "source/ClientRequest/AMDSClientRequestSupport.h"
-#include "source/DataElement/AMDSEventDataSupport.h"
-#include "source/DataHolder/AMDSDataHolderSupport.h"
+#include "ui/AMDSClientUi.h"
+#include "ClientRequest/AMDSClientRequestSupport.h"
+#include "DataElement/AMDSEventDataSupport.h"
+#include "DataHolder/AMDSDataHolderSupport.h"
 
 void initializeRegisteredClasses() {
 	AMDSClientRequestSupport::registerClientRequestClass();
