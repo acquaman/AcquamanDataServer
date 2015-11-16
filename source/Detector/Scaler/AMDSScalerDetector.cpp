@@ -63,12 +63,12 @@ AMDSScalerDetector::~AMDSScalerDetector()
 
 void AMDSScalerDetector::onServerGoingToStartDwelling()
 {
-	continuousScanControl_->move(AMDSScalerDetector::Continuous); // switch to continuous mode
+	scanControl_->move(AMDSScalerDetector::Dwelling); // switch to dwelling mode
 }
 
 void AMDSScalerDetector::onServerStopDwelling()
 {
-	continuousScanControl_->move(AMDSScalerDetector::Normal); // switch to normal mode
+	scanControl_->move(AMDSScalerDetector::Normal); // switch to normal mode
 }
 
 void AMDSScalerDetector::onEnableChannel(int channelId)
@@ -125,9 +125,9 @@ void AMDSScalerDetector::onChannelControlValueChanged(double value)
 	}
 }
 
-void AMDSScalerDetector::onContinuousScanControlValueChanged(double newValue)
+void AMDSScalerDetector::onScanControlValueChanged(double newValue)
 {
-	if (newValue != AMDSScalerDetector::Continuous) {
+	if ((int)newValue != AMDSScalerDetector::Dwelling) {
 		AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Normal scan mode.").arg(scalerName()));
 	} else {
 		AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Continuous scan mode.").arg(scalerName()));
@@ -167,10 +167,6 @@ void AMDSScalerDetector::onFetchScanBuffer()
 	if (!connected_)
 		return;
 
-	// not in dwelling mode, we should NOT update the data
-	if (!continuousScanControl_->withinTolerance(AMDSScalerDetector::Continuous))
-		return;
-
 	AMDSDataHolderList scanBufferDataHolderList;
 
 	int channelCount = enabledChannelCount();
@@ -199,8 +195,7 @@ void AMDSScalerDetector::initializePVControls()
 	configuredChannelControlSet_.clear();
 	pvControlSet_ = new AMControlSet(this);
 
-	statusControl_ = new AMSinglePVControl(scalerName() + "_scanStatus", scalerBasePVName()+":startScan", this);
-	continuousScanControl_ = new AMSinglePVControl(scalerName()+ "_continuousScan", scalerBasePVName()+":continuous", this);
+	scanControl_ = new AMSinglePVControl(scalerName() + "_scanStatus", scalerBasePVName()+":startScan", this);
 	dwellTimeControl_ = new AMSinglePVControl(scalerName() + "_dwellTime", scalerBasePVName()+":delay", this);
 	scansInABufferControl_ = new AMSinglePVControl(scalerName() + "_numberScans", scalerBasePVName()+":nscan", this);
 	totalNumberOfScansControl_ = new AMSinglePVControl(scalerName() + "_totalNumberScans", scalerBasePVName()+":scanCount", this);
@@ -218,8 +213,7 @@ void AMDSScalerDetector::initializePVControls()
 		connect(channelControl, SIGNAL(valueChanged(double)), this, SLOT(onChannelControlValueChanged(double)));
 	}
 
-	pvControlSet_->addControl(statusControl_);
-	pvControlSet_->addControl(continuousScanControl_);
+	pvControlSet_->addControl(scanControl_);
 	pvControlSet_->addControl(dwellTimeControl_);
 	pvControlSet_->addControl(scansInABufferControl_);
 	pvControlSet_->addControl(totalNumberOfScansControl_);
@@ -228,7 +222,8 @@ void AMDSScalerDetector::initializePVControls()
 	connect(pvControlSet_, SIGNAL(connected(bool)), this, SLOT(onAllControlsConnected(bool)));
 	connect(pvControlSet_, SIGNAL(controlSetTimedOut()), this, SLOT(onAllControlsTimedOut()));
 
-	connect(continuousScanControl_, SIGNAL(valueChanged(double)), this, SLOT(onContinuousScanControlValueChanged(double)));
+
+	connect(scanControl_, SIGNAL(valueChanged(double)), this, SLOT(onScanControlValueChanged(double)));
 	connect(dwellTimeControl_, SIGNAL(valueChanged(double)), this, SLOT(onDwellTimeControlValueChanged(double)));
 	connect(scansInABufferControl_, SIGNAL(valueChanged(double)), this, SLOT(onScansInABufferControlValueChanged(double)));
 	connect(totalNumberOfScansControl_, SIGNAL(valueChanged(double)), this, SLOT(onTotalNumberOfScansControlValueChanged(double)));

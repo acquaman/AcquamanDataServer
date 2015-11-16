@@ -21,10 +21,8 @@ void AMDSScalerDetectorServer::onConfigurationRequestReceived(AMDSClientRequest 
 	if (configureRequest) {
 		bool startDwellAfterConfiguration = false;
 
-		QMap<QString, QVariant> commands = configureRequest->configurationCommands();
-		for (int index = 0; index < commands.size(); index++) {
-			QString command = commands.keys().at(index);
-			QVariant commandValue = commands.values(command);
+		foreach (QString command, configureRequest->configurationCommands().keys()) {
+			QString commandValue = configureRequest->configurationCommands().value(command);
 
 			// perform the configuration
 			int commandId = AMDSScalerCommandManager::scalerCommandManager()->commandId(command);
@@ -40,7 +38,7 @@ void AMDSScalerDetectorServer::onConfigurationRequestReceived(AMDSClientRequest 
 	}
 }
 
-void AMDSScalerDetectorServer::performConfiguration(int commandId, QVariant value)
+void AMDSScalerDetectorServer::performConfiguration(int commandId, QString value)
 {
 	switch (commandId) {
 	case AMDSScalerCommandManager::RequestEnableChannel:

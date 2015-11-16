@@ -38,7 +38,7 @@ class AMDSScalerDetector : public QObject
 
 	enum ScanStatus {
 		Normal = 0,
-		Continuous = 1
+		Dwelling = 1
 	};
 
 	enum ScalerChannelStatus {
@@ -82,8 +82,8 @@ protected slots:
 	/// slot to handle the value changed singale for channel controls
 	void onChannelControlValueChanged(double);
 
-	/// slot to update the # of continuous scans
-	void onContinuousScanControlValueChanged(double);
+	/// slot to response to the value change of scan control
+	void onScanControlValueChanged(double);
 	/// slot to update the timer for dwell time
 	void onDwellTimeControlValueChanged(double);
 	/// slot to update the # of scans in a buffer
@@ -109,10 +109,8 @@ protected:
 	/// the set of PV controls for channel control, to enable/disable the channel
 	QMap<int, AMSinglePVControl*> configuredChannelControlSet_;
 
-	/// the PV control to access to the scaler status Control (scanning / stopped )
-	AMSinglePVControl *statusControl_;
-	/// the PV control to access to the scan mode Control (continuous or normal)
-	AMSinglePVControl *continuousScanControl_;
+	/// the PV control to access to the scaler scan Control (scanning / stopped )
+	AMSinglePVControl *scanControl_;
 	/// the PV control to access to the dwellTimeControl
 	AMSinglePVControl *dwellTimeControl_;
 	/// the PV control to access to the number of scans in a single buffer Control

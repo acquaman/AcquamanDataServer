@@ -133,6 +133,8 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 	setWindowTitle(tr("AMDS Client Example"));
 	portLineEdit_->setFocus();
 
+	connect(bufferNameListView_->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onBufferNameSelectChanged()));
+
 	/// ==== initialize the app controller ==============
 	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
 	connect(clientAppController, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
@@ -323,8 +325,6 @@ void AMDSClientUi::onRequestTypeChanged(int requestType)
 		displayWidget(count1Edit_, true);
 		break;
 	}
-
-	connect(bufferNameListView_->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onBufferNameSelectChanged()));
 }
 
 void AMDSClientUi::onBufferNameSelectChanged()

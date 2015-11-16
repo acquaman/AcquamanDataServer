@@ -32,6 +32,7 @@ QString AMDSCommandManager::commandFromHex(const QString &hexString) const{
 }
 
 /// ===================== implementation of AMDSCommand ==========================
+
 AMDSCommand AMDSCommand::decodeAndInstantiateAMDSCommand(QDataStream *dataStream)
 {
 	AMDSCommand commandDef;
