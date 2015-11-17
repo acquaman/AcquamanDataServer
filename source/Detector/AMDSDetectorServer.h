@@ -59,7 +59,7 @@ public slots:
 	/// the slot to perform the configuration request
 	virtual void onConfigurationRequestReceived(AMDSClientRequest *configurationRequest);
 	/// helper function to change the working mode fo the detector
-	void setDetectorServerMode(AMDSDwellDetector::DwellScanStatus detectorMode);
+	void setDetectorServerMode(int detectorMode);
 
 protected:
 	/// the name of the detector

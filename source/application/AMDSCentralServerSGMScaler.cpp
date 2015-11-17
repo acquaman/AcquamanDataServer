@@ -32,9 +32,11 @@ AMDSCentralServerSGMScaler::~AMDSCentralServerSGMScaler()
 
 void AMDSCentralServerSGMScaler::initializeConfiguration()
 {
-	// initialize the detector manager for SGM scaler
-	QList<quint8> enabledChannelIds = QList<quint8>() << 10 << 11 << 12 << 13 << 14 << 15;
-	scalerConfigurationMap_ = new AMDSScalerConfigurationMap("Scaler (BL1611-ID-1)", "BL1611-ID-1:mcs", AMDSDataTypeDefinitions::Signed32, enabledChannelIds);
+	// initialize the detector manager for SGM scaler, with the list of configured channel Ids
+	QList<quint8> configuredChannelIds = QList<quint8>();
+	for (int i =0; i < 16; i++)
+		configuredChannelIds << i;
+	scalerConfigurationMap_ = new AMDSScalerConfigurationMap("Scaler (BL1611-ID-1)", "BL1611-ID-1:mcs", AMDSDataTypeDefinitions::Signed32, configuredChannelIds);
 }
 
 void AMDSCentralServerSGMScaler::initializeBufferGroup()

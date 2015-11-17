@@ -1,7 +1,5 @@
 #include "AMDSScalerDetector.h"
 
-#include <QDebug>
-
 #include "beamline/AMPVControl.h"
 #include "beamline/AMControlSet.h"
 
@@ -86,7 +84,7 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 		connected_ = connected;
 
 	if (!connected_) {
-		AMErrorMon::alert(this, 0, "PV control is NOT connected.");
+		AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_PV_NOT_CONNECTED, "PV control is NOT connected.");
 		return;
 	}
 
@@ -105,7 +103,7 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 void AMDSScalerDetector::onAllControlsTimedOut()
 {
 	connected_ = false;
-	AMErrorMon::alert(this, 0, "PV control is NOT connected.");
+	AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_PV_NOT_CONNECTED, "PV control is NOT connected.");
 }
 
 void AMDSScalerDetector::onChannelControlValueChanged(double value)
@@ -129,9 +127,9 @@ void AMDSScalerDetector::onScanControlValueChanged(double newValue)
 		emit detectorScanModeChanged(currentScanMode_);
 
 		if (currentScanMode_ == AMDSDwellDetector::Dwelling) {
-			AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Dwelling/Continuous scan mode.").arg(scalerName()));
+			AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_SWITCH_TO_DWELLING, QString("Scaler %1 switched to Dwelling/Continuous scan mode.").arg(scalerName()));
 		} else {
-			AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Normal scan mode.").arg(scalerName()));
+			AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_SWITCH_TO_CONFIGURATION, QString("Scaler %1 switched to Configuration/Normal scan mode.").arg(scalerName()));
 		}
 	}
 }
@@ -140,7 +138,7 @@ void AMDSScalerDetector::onDwellTimeControlValueChanged(double newValue)
 {
 	int newDwellControlValue = (int)newValue;
 	if (dwellTime_ != newDwellControlValue) {
-		AMErrorMon::alert(this, 0, QString("Scaler %1 dwell time changed from %2ms to %3ms.").arg(scalerName()).arg(dwellTime_).arg(newDwellControlValue));
+		AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_DWELL_TIME_CHANGED, QString("Scaler %1 dwell time changed from %2ms to %3ms.").arg(scalerName()).arg(dwellTime_).arg(newDwellControlValue));
 
 		dwellTime_ = newDwellControlValue;
 	}
@@ -149,7 +147,7 @@ void AMDSScalerDetector::onDwellTimeControlValueChanged(double newValue)
 void AMDSScalerDetector::onScansInABufferControlValueChanged(double newValue)
 {
 	if (scansInABuffer_ != newValue) {
-		AMErrorMon::alert(this, 0, QString("Scaler %1 # scans in a buffer changed from %2 to %3.").arg(scalerName()).arg(scansInABuffer_).arg(newValue));
+		AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_SCAN_IN_BUFFER_CHANGED, QString("Scaler %1 # scans in a buffer changed from %2 to %3.").arg(scalerName()).arg(scansInABuffer_).arg(newValue));
 
 		scansInABuffer_ = (int)newValue;
 	}
@@ -158,7 +156,7 @@ void AMDSScalerDetector::onScansInABufferControlValueChanged(double newValue)
 void AMDSScalerDetector::onTotalNumberOfScansControlValueChanged(double newValue)
 {
 	if (totalNumberOfScans_ != newValue) {
-		AMErrorMon::alert(this, 0, QString("Scaler %1 total # scans changed from %2 to %3.").arg(scalerName()).arg(totalNumberOfScans_).arg(newValue));
+		AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_TOTAL_NUM_SCANS, QString("Scaler %1 total # scans changed from %2 to %3.").arg(scalerName()).arg(totalNumberOfScans_).arg(newValue));
 
 		totalNumberOfScans_ = (int)newValue;
 	}
@@ -250,7 +248,9 @@ void AMDSScalerDetector::configureChannelControl(bool enable, int channelId)
 		if (channelPVControl) {
 			channelPVControl->move(targetValue);
 		} else {
-			AMErrorMon::alert(this, 0, QString("Failed to move channel %1 for scaler %2, which might NOT be configured for AMDS.").arg(channelId).arg(scalerName()));
+			AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_FAILED_TO_CONFIG_CHANNEL, QString("Failed to move channel %1 for scaler %2, which might NOT be configured for AMDS.").arg(channelId).arg(scalerName()));
 		}
+	} else {
+		AMErrorMon::alert(this, AMDS_SCALER_DETECTOR_ALT_FAILED_TO_CONFIG_CHANNEL, QString("Failed to move channel %1 for scaler %2, which might NOT be configured for AMDS or already moved.").arg(channelId).arg(scalerName()));
 	}
 }
