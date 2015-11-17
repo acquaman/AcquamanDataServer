@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QThread>
 
+#include "Detector/AMDSDwellDetector.h"
+
 class AMDSClientRequest;
 class AMDSDetectorServer;
 
@@ -32,44 +34,39 @@ protected:
 class AMDSDetectorServer : public QObject
 {
     Q_OBJECT
-public:
-	enum DetectorMode {
-		Dwell = 0,
-		Configuration
-	};
 
+public:
 	explicit AMDSDetectorServer(const QString &detectorName, QObject *parent = 0);
 	~AMDSDetectorServer();
-
-	/// helper function to change the working mode fo the detector
-	void setDetectorMode(AMDSDetectorServer::DetectorMode detectorMode);
 
 	/// returns the name of the detector
 	inline QString detectorName() const { return detectorName_; }
 	/// returns whether the detector is working in dwell mode
-	inline bool isDwelling() { return detectorMode_ == AMDSDetectorServer::Dwell; }
+	inline bool isDwelling() { return detectorMode_ == AMDSDwellDetector::Dwelling; }
 
 signals:
 	/// signal to indicate that the client request is been processed
 	void clientRequestProcessed(AMDSClientRequest*);
 
 	/// signal to indicate that the detector server switched to configuration state
-	void serverChangedToConfigurationState(const QString &detectorName);
+	void serverChangedToConfigurationMode(const QString &detectorName);
 	/// signal to indicate that the detector server switched to Dwell state
-	void serverChangedToDwellState(const QString &detectorName);
+	void serverChangedToDwellMode(const QString &detectorName);
 	/// signal to indicate that the detector server is going to switch to dwell state
 	void serverGoingToStartDwelling(const QString &detectorName);
 
 public slots:
-	/// the function to perform the configuration request
+	/// the slot to perform the configuration request
 	virtual void onConfigurationRequestReceived(AMDSClientRequest *configurationRequest);
+	/// helper function to change the working mode fo the detector
+	void setDetectorServerMode(AMDSDwellDetector::DwellScanStatus detectorMode);
 
 protected:
 	/// the name of the detector
 	QString detectorName_;
 
 	/// the mode of the dector
-	AMDSDetectorServer::DetectorMode detectorMode_;
+	AMDSDwellDetector::DwellScanStatus detectorMode_;
 };
 
 #endif // AMDSDETECTORSERVER_H

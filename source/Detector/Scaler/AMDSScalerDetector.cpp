@@ -39,12 +39,10 @@ AMDSScalerDetectorManager::~AMDSScalerDetectorManager()
 
 /// ==================== implementation of AMDSScalerDetector ============================
 AMDSScalerDetector::AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent)
-    : QObject(parent)
+	: AMDSDwellDetector(parent)
 {
 	scalerConfiguration_ = scalerConfiguration;
 
-	initialized_ = false;
-	connected_ = false;
 	defaultDwellTime_ = 1; // default 1ms
 	dwellTime_ = 1;
 	defaultScansInABuffer_ = 1000;
@@ -68,7 +66,7 @@ void AMDSScalerDetector::onServerGoingToStartDwelling()
 
 void AMDSScalerDetector::onServerStopDwelling()
 {
-	scanControl_->move(AMDSScalerDetector::Normal); // switch to normal mode
+	scanControl_->move(AMDSScalerDetector::Configuration); // switch to normal mode
 }
 
 void AMDSScalerDetector::onEnableChannel(int channelId)
@@ -94,6 +92,7 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 
 	// to initialize the list of enabled/disabled channel ids
 	if (!initialized_) {
+		onScanControlValueChanged(scanControl_->value());
 		onChannelControlValueChanged(0);
 		onDwellTimeControlValueChanged(dwellTimeControl_->value());
 		onScansInABufferControlValueChanged(scansInABufferControl_->value());
@@ -101,8 +100,6 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 
 		initialized_ = true;
 	}
-
-//	continuousScanControl_->move(AMDSScalerDetector::Continuous); // switch to continuous mode
 }
 
 void AMDSScalerDetector::onAllControlsTimedOut()
@@ -127,10 +124,15 @@ void AMDSScalerDetector::onChannelControlValueChanged(double value)
 
 void AMDSScalerDetector::onScanControlValueChanged(double newValue)
 {
-	if ((int)newValue != AMDSScalerDetector::Dwelling) {
-		AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Normal scan mode.").arg(scalerName()));
-	} else {
-		AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Continuous scan mode.").arg(scalerName()));
+	if ((int)newValue != currentScanMode_) {
+		currentScanMode_ = (int)newValue == 0 ? AMDSDwellDetector::Configuration : AMDSDwellDetector::Dwelling;
+		emit detectorScanModeChanged(currentScanMode_);
+
+		if (currentScanMode_ == AMDSDwellDetector::Dwelling) {
+			AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Dwelling/Continuous scan mode.").arg(scalerName()));
+		} else {
+			AMErrorMon::alert(this, 0, QString("Scaler %1 switched to Normal scan mode.").arg(scalerName()));
+		}
 	}
 }
 
@@ -204,7 +206,8 @@ void AMDSScalerDetector::initializePVControls()
 
 	AMSinglePVControl *channelControl;
 	foreach (quint8 channelId, scalerConfiguration_->configuredChannels()) {
-		QString scalerChannelPVName = QString("%1%2:enable").arg(scalerBasePVName()).arg(channelId);
+		QString channelIdTemplate = channelId < 10 ? "0%1" : "%1"; // when channel id is 1 ~ 9, the PV is "0" + channelId
+		QString scalerChannelPVName = QString("%1%2:enable").arg(scalerBasePVName()).arg(channelIdTemplate.arg(channelId));
 		channelControl = new AMSinglePVControl(scalerChannelPVName, scalerChannelPVName, this);
 
 		configuredChannelControlSet_.insert(channelId, channelControl);

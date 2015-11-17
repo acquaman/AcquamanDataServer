@@ -3,10 +3,10 @@
 
 #include <QObject>
 #include <QMap>
-#include <QTimer>
 #include <QThread>
 
 #include "DataHolder/AMDSDataHolder.h"
+#include "Detector/AMDSDwellDetector.h"
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 
 class AMControlSet;
@@ -32,14 +32,9 @@ protected:
 	AMDSScalerDetector *scalerDetector_;
 };
 
-class AMDSScalerDetector : public QObject
+class AMDSScalerDetector : public AMDSDwellDetector
 {
 	Q_OBJECT
-
-	enum ScanStatus {
-		Normal = 0,
-		Dwelling = 1
-	};
 
 	enum ScalerChannelStatus {
 		Disabled = 0,
@@ -122,11 +117,6 @@ protected:
 	AMWaveformBinningSinglePVControl *scanBufferControl_;
 
 
-	/// running status
-	/// flag to indicate whether all PVs are initialized
-	bool initialized_;
-	/// flag to indicate whether all PVs are connected
-	bool connected_;
 	/// the dwell time to read the scaler buffer (in ms, default 1ms)
 	int defaultDwellTime_;
 	int dwellTime_;
@@ -136,9 +126,6 @@ protected:
 	/// the total number of scans (default 0)
 	int defaultTotalNumberOfScans_;
 	int totalNumberOfScans_;
-
-	/// the timer to fetch the scaler scan data
-	QTimer* scalerScanTimer_;
 };
 
 #endif // AMDSSCALERDETECTOR_H
