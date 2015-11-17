@@ -50,6 +50,9 @@ public:
 	inline bool isDwelling() { return detectorMode_ == AMDSDetectorServer::Dwell; }
 
 signals:
+	/// signal to indicate that the client request is been processed
+	void clientRequestProcessed(AMDSClientRequest*);
+
 	/// signal to indicate that the detector server switched to configuration state
 	void serverChangedToConfigurationState(const QString &detectorName);
 	/// signal to indicate that the detector server switched to Dwell state

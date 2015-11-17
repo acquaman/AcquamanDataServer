@@ -57,24 +57,40 @@ AMDSCommand::AMDSCommand(int commandId, const QString &hex, const QString &comma
 
 bool AMDSCommand::writeToDataStream(QDataStream *dataStream)
 {
+	// we only need to read/write commandId and command string for the AMDSCommand
 	*dataStream << commandId();
-	*dataStream << hex();
+//	*dataStream << hex();
 	*dataStream << command();
-	*dataStream << timeout();
-	*dataStream << retries();
-	*dataStream << responseHexes();
+//	*dataStream << timeout();
+//	*dataStream << retries();
+//	*dataStream << responseHexes();
 
 	return true;
 }
 
 bool AMDSCommand::readFromDataStream(QDataStream *dataStream)
 {
-	*dataStream >> commandId_;
-	*dataStream >> hex_;
-	*dataStream >> command_;
-	*dataStream >> timeout_;
-	*dataStream >> retries_;
-	*dataStream >> responseHexes_;
+	// we only need to read/write commandId and command string for the AMDSCommand
+	int readCommandId;
+//	QString readHex;
+	QString readCommand;
+//	int readTimeout;
+//	int readRetries;
+//	QStringList readResponseHexes;
+
+	*dataStream >> readCommandId;
+//	*dataStream >> readHex;
+	*dataStream >> readCommand;
+//	*dataStream >> readTimeout;
+//	*dataStream >> readRetries;
+//	*dataStream >> readResponseHexes;
+
+	commandId_ =readCommandId;
+//	hex_ = readHex;
+	command_ = readCommand;
+//	timeout_ = readTimeout;
+//	retries_ = readRetries;
+//	responseHexes_ = readResponseHexes;
 
 	return true;
 }

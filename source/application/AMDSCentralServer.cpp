@@ -150,12 +150,11 @@ void AMDSCentralServer::processConfigurationClientRequest(AMDSClientRequest *cli
 	if (clientConfigurationRequest->configurationCommands().size() == 0) {
 		//request the list of available commands
 		fillConfigurationCommandForClientRequest(bufferGroup, clientConfigurationRequest);
+		clientConfigurationRequest->setErrorMessage(errorMessage);
+		emit clientRequestProcessed(clientConfigurationRequest);
 	} else {
-		emit scalerConfigurationRequestReceived(clientRequest);
+		emit scalerConfigurationRequestReceived(clientConfigurationRequest);
 	}
-
-	clientConfigurationRequest->setErrorMessage(errorMessage);
-	emit clientRequestProcessed(clientConfigurationRequest);
 }
 
 void AMDSCentralServer::processClientDataRequest(AMDSClientRequest *clientRequest)

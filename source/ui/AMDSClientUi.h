@@ -2,6 +2,7 @@
 #define AMDSCLIENTUI_H
 
 #include <QDialog>
+#include <QMap>
 
 class QDialogButtonBox;
 class QLabel;
@@ -108,7 +109,7 @@ private:
 	QComboBox* activeContinuousConnectionComboBox_;
 	QTextEdit* resultsEdit_;
 
-	QList<AMDSCommand> currentConfigurationCommandDefs_;
+	QMap<QString, AMDSCommand> currentConfigurationCommandDefs_;
 };
 
 #endif // AMDSCLIENTUI_H

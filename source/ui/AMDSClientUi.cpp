@@ -133,7 +133,7 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 	setWindowTitle(tr("AMDS Client Example"));
 	portLineEdit_->setFocus();
 
-	connect(bufferNameListView_->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onBufferNameSelectChanged()));
+//	connect(bufferNameListView_->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onBufferNameSelectChanged()));
 
 	/// ==== initialize the app controller ==============
 	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
@@ -237,7 +237,8 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 		{
 			AMDSClientConfigurationRequest *configurationRequest = qobject_cast<AMDSClientConfigurationRequest*>(clientRequest);
 			if (configurationRequest){
-				resetConfigurationCommands(configurationRequest->configurationCommandDefs());
+				if (configurationRequest->configurationCommandDefs().size() > 0)
+					resetConfigurationCommands(configurationRequest->configurationCommandDefs());
 			}
 		}
 		break;
@@ -404,7 +405,10 @@ void AMDSClientUi::sendClientRequest()
 		}
 		break;
 	case AMDSClientRequestDefinitions::Configuration:
-		clientAppController->requestClientData(hostName, portNumber, bufferName, configurationCommand, value1);
+		{
+			int commandId = currentConfigurationCommandDefs_.value(configurationCommand).commandId();
+			clientAppController->requestClientData(hostName, portNumber, bufferName, commandId, value1);
+		}
 		break;
 
 	default:
@@ -439,8 +443,8 @@ void AMDSClientUi::resetConfigurationCommands(QList<AMDSCommand> commandDefs)
 {
 	onBufferNameSelectChanged();
 
-	currentConfigurationCommandDefs_.append(commandDefs);
 	foreach(AMDSCommand commandDef, commandDefs) {
+		currentConfigurationCommandDefs_.insert(commandDef.command(), commandDef);
 		requestCommandComboBox_->addItem(commandDef.command());
 	}
 }

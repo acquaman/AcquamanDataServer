@@ -32,16 +32,17 @@ QString AMDSClientConfigurationRequest::toString() const
 
 	if (configurationCommandDefs_.size() > 0)
 		messageData = messageData + "\nAvailable configuration requests:";
-	foreach(QString command, configurationCommands_.keys()) {
-		messageData = QString("%1 \n	command (%2) : value (%3)").arg(messageData).arg(command).arg(configurationCommands_.value(command));
+	foreach(int commandId, configurationCommands_.keys()) {
+		foreach(QString command, configurationCommands_.values(commandId))
+		messageData = QString("%1 \n	command (%2) : value (%3)").arg(messageData).arg(commandId).arg(command);
 	}
 
 	return messageData;
 }
 
-void AMDSClientConfigurationRequest::appendCommand(const QString &command, const QString &value)
+void AMDSClientConfigurationRequest::appendCommand(int commandId, const QString &value)
 {
-	configurationCommands_.insert(command, value);
+	configurationCommands_.insert(commandId, value);
 }
 
 int AMDSClientConfigurationRequest::writeToDataStream(QDataStream *dataStream)
@@ -69,14 +70,17 @@ int AMDSClientConfigurationRequest::writeToDataStream(QDataStream *dataStream)
 	if(dataStream->status() != QDataStream::Ok)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE;
 
-	foreach(QString command, configurationCommands_.keys()) {
-		*dataStream << command;
-		if(dataStream->status() != QDataStream::Ok)
-			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
+	foreach (int commandId, configurationCommands_.keys()) {
+		// it's a multi-map
+		foreach (QString value, configurationCommands_.values(commandId)) {
+			*dataStream << commandId;
+			if(dataStream->status() != QDataStream::Ok)
+				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
 
-		*dataStream << configurationCommands_.value(command);
-		if(dataStream->status() != QDataStream::Ok)
-			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
+			*dataStream << value;
+			if(dataStream->status() != QDataStream::Ok)
+				return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
+		}
 	}
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
@@ -116,10 +120,10 @@ int AMDSClientConfigurationRequest::readFromDataStream(QDataStream *dataStream)
 		return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE;
 
 	configurationCommands_.clear();
-	QString command;
+	int commandId;
 	QString commandValue;
 	for (int index = 0; index < configurationCommandSize; index++) {
-		*dataStream >> command;
+		*dataStream >> commandId;
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
 
@@ -127,7 +131,7 @@ int AMDSClientConfigurationRequest::readFromDataStream(QDataStream *dataStream)
 		if(dataStream->status() != QDataStream::Ok)
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND;
 
-		appendCommand(command, commandValue);
+		appendCommand(commandId, commandValue);
 	}
 
 	// set the local variables

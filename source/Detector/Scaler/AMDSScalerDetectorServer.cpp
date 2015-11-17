@@ -21,21 +21,22 @@ void AMDSScalerDetectorServer::onConfigurationRequestReceived(AMDSClientRequest 
 	if (configureRequest) {
 		bool startDwellAfterConfiguration = false;
 
-		foreach (QString command, configureRequest->configurationCommands().keys()) {
-			QString commandValue = configureRequest->configurationCommands().value(command);
-
-			// perform the configuration
-			int commandId = AMDSScalerCommandManager::scalerCommandManager()->commandId(command);
-			if (commandId == AMDSCommandManager::RequestStartDwell)
-				startDwellAfterConfiguration = true;
-			else
-				performConfiguration(commandId, commandValue);
+		foreach (int commandId, configureRequest->configurationCommands().keys()) {
+			foreach(QString commandValue, configureRequest->configurationCommands().values(commandId)) {
+				// perform the configuration
+				if (commandId == AMDSCommandManager::RequestStartDwell)
+					startDwellAfterConfiguration = true;
+				else
+					performConfiguration(commandId, commandValue);
+			}
 		}
 
 		if (startDwellAfterConfiguration) {
 			emit serverGoingToStartDwelling(detectorName());
 		}
 	}
+
+	emit clientRequestProcessed(clientRequest);
 }
 
 void AMDSScalerDetectorServer::performConfiguration(int commandId, QString value)

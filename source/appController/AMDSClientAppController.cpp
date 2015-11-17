@@ -288,7 +288,7 @@ bool AMDSClientAppController::requestClientData(const QString &hostName, quint16
 	return false;
 }
 
-bool AMDSClientAppController::requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QString &command, const QString &value)
+bool AMDSClientAppController::requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, int commandId, const QString &value)
 {
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
@@ -298,8 +298,8 @@ bool AMDSClientAppController::requestClientData(const QString &hostName, quint16
 			if(clientConfigurationRequest){
 				clientConfigurationRequest->setBufferName(bufferName);
 
-				if (command.length() != 0) { // this is the command to ask for the list of configuration command for this buffergroup
-					clientConfigurationRequest->appendCommand(command, value);
+				if (commandId > 0) { // this is the command to ask for the list of configuration command for this buffergroup
+					clientConfigurationRequest->appendCommand(commandId, value);
 				}
 				clientTCPSocket->sendClientRequest(clientConfigurationRequest);
 

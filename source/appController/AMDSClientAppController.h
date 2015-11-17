@@ -68,7 +68,7 @@ public:
 	/// request data from server for Continuous
 	bool requestClientData(const QString &hostName, quint16 portNumber, const QStringList &bufferNames, quint64 updateInterval, bool includeStatus=false, bool enableFlattening=false, QString handShakeSocketKey="");
 	/// request data from server for Configuration
-	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QString &command, const QString &value);
+	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, int commandId, const QString &value);
 
 signals:
 	/// signal to indicate that the manager object is opening a network session

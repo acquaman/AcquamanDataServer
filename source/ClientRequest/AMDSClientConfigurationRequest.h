@@ -2,7 +2,7 @@
 #define AMDSCLIENTCONFIGURATIONREQUEST_H
 
 #include <QDataStream>
-#include <QMap>
+#include <QMultiMap>
 
 #include "ClientRequest/AMDSClientRequest.h"
 #include "DataElement/AMDSCommandManager.h"
@@ -19,7 +19,7 @@ public:
 	virtual QString toString() const;
 
 	/// add a new command value pair
-	void appendCommand(const QString &command, const QString &value);
+	void appendCommand(int commandId, const QString &value);
 	/// add a new command definition
 	inline void appendCommandDef(const AMDSCommand &commandDef) { configurationCommandDefs_.append(commandDef); }
 
@@ -29,7 +29,7 @@ public:
 	/// returns the bufferName
 	inline QString bufferName() const { return bufferName_; }
 	/// returns the configuration commands
-	inline QMap<QString, QString> configurationCommands() const { return configurationCommands_; }
+	inline QMultiMap<int, QString> configurationCommands() const { return configurationCommands_; }
 	/// returns the configuration command definitions
 	inline QList<AMDSCommand> configurationCommandDefs() const { return configurationCommandDefs_; }
 
@@ -45,7 +45,7 @@ protected:
 	QString bufferName_;
 
 	/// the list of the <commandId, value> pair
-	QMap<QString, QString> configurationCommands_;
+	QMultiMap<int, QString> configurationCommands_;
 
 	/// the list of available configuration command definitions
 	QList<AMDSCommand> configurationCommandDefs_;
