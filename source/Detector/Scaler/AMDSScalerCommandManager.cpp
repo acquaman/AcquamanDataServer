@@ -38,8 +38,9 @@ void AMDSScalerCommandManager::initiateAMDSCommands()
 	//Request types
 //	QStringList tempResponses = QStringList() << "Request Status Packet Response" << "NormalErrors";
 	commands_.append( AMDSCommand(RequestStartDwell,  "0200", "Start Dwell",  7, 3, QStringList() << "0200"));
-	commands_.append( AMDSCommand(RequestEnableChannel,  "0201", "Enable Scaler Channel",  7, 3, QStringList() << "0201"));
-	commands_.append( AMDSCommand(RequestDisableChannel, "0202", "Disable Scaler Channel", 7, 3, QStringList() << "0202"));
+	commands_.append( AMDSCommand(RequestStopDwell,  "0201", "Stop Dwell",  7, 3, QStringList() << "0201"));
+	commands_.append( AMDSCommand(RequestEnableChannel,  "0251", "Enable Scaler Channel",  7, 3, QStringList() << "0251"));
+	commands_.append( AMDSCommand(RequestDisableChannel, "0252", "Disable Scaler Channel", 7, 3, QStringList() << "0252"));
 
 	for (int i = 0; i < commands_.count(); i++) {
 		commandHash_[commands_.at(i).commandId()] = commands_.at(i);

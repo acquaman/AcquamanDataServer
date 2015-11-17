@@ -6,7 +6,7 @@
 class AMDSScalerCommandManager : public AMDSCommandManager
 {
 public:
-	enum ScalerCommandDef {
+	enum ScalerSConfigurationCommands {
 		// request type
 		RequestEnableChannel = CustomizedScalerCommand + 1,
 		RequestDisableChannel

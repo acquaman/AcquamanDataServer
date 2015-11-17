@@ -12,12 +12,10 @@ class AMDSCommandManager: public QObject
 {
 	Q_OBJECT
 public:
-	enum AMDSCommandDef{
-		// acknowledge type
-		AcknowledgeOk = 0,
-
+	enum AMDSConfigurationCommands{
 		// request type
-		RequestStartDwell,
+		RequestStartDwell = 1,
+		RequestStopDwell,
 
 		// customized Scaler commands
 		CustomizedScalerCommand = 1000,

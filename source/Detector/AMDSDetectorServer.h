@@ -52,14 +52,14 @@ signals:
 	void serverChangedToConfigurationMode(const QString &detectorName);
 	/// signal to indicate that the detector server switched to Dwell state
 	void serverChangedToDwellMode(const QString &detectorName);
-	/// signal to indicate that the detector server is going to switch to dwell state
+	/// signal to indicate that the detector server is going to switch to dwelling state
 	void serverGoingToStartDwelling(const QString &detectorName);
 
 public slots:
 	/// the slot to perform the configuration request
 	virtual void onConfigurationRequestReceived(AMDSClientRequest *configurationRequest);
 	/// helper function to change the working mode fo the detector
-	void setDetectorServerMode(int detectorMode);
+	void setDetectorServerMode(AMDSDwellDetector::DwellScanStatus detectorMode);
 
 protected:
 	/// the name of the detector
