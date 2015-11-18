@@ -1,6 +1,5 @@
 #include "AMDSClientContinuousDataRequest.h"
 
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AMDSClientContinuousDataRequest::AMDSClientContinuousDataRequest(QObject *parent) :
@@ -88,8 +87,8 @@ bool AMDSClientContinuousDataRequest::isExpired()
 	QDateTime nowDateTime = QDateTime::currentDateTimeUtc();
 	quint64 timeSpanInSecond =  nowDateTime.toTime_t() - lastHandShakingTime().toTime_t();
 
-	if ( (timeSpanInSecond > 60) && AMDSRunTimeSupport::debugAtLevel(2))
-		AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_EXPIRED, QString("%1::isExpired(): clientKey %2 --- lastHandShake: %3 vs. now: %4")
+	if ( (timeSpanInSecond > 60))
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_EXPIRED, QString("%1::isExpired(): clientKey %2 --- lastHandShake: %3 vs. now: %4")
 							.arg(metaObject()->className()).arg(socketKey()).arg(lastHandShakingTime().toString()).arg(nowDateTime.toString()));
 
 	return timeSpanInSecond > 60;
@@ -110,13 +109,11 @@ bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 	bool messageExpired = isExpired();
 	if (messageExpired) {
 		setErrorMessage(QString("(msg %1) continuous update expired!").arg(socketKey()));
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_EXPIRED, errorMessage());
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_EXPIRED, errorMessage());
 
 		emit clientRequestTaskAccomplished(this);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(2))
-			AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE, QString("(msg %1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE, QString("(msg %1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
 		continuousDataRequestTimer_.singleShot(updateInterval(), this, SLOT(onDataRequestTimerTimeout()));
 	}
 
@@ -135,8 +132,7 @@ void AMDSClientContinuousDataRequest::handShaking(AMDSClientContinuousDataReques
 
 	QStringList handShakeBufferNames = handShakingMessage->bufferNames();
 	if (handShakeBufferNames.size() == 0) {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): deregistered by request.").arg(socketKey()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): deregistered by request.").arg(socketKey()));
 		emit clientRequestTaskAccomplished(this);
 	} else {
 		foreach (QString bufferName, bufferNames()) {
@@ -148,14 +144,12 @@ void AMDSClientContinuousDataRequest::handShaking(AMDSClientContinuousDataReques
 
 				bufferNameList_.removeAt(bufferNameList_.indexOf(bufferName));
 
-				if(AMDSRunTimeSupport::debugAtLevel(1))
-					AMErrorMon::alert(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): buffer (%2) is no longer traced.").arg(socketKey()).arg(bufferName));
+				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): buffer (%2) is no longer traced.").arg(socketKey()).arg(bufferName));
 			}
 		}
 
 		if (bufferDataRequestList_.size() == 0) {
-			if(AMDSRunTimeSupport::debugAtLevel(1))
-				AMErrorMon::alert(this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): force-deregistered by request since no more active interested buffer.").arg(socketKey()));
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE_DEREGISTER, QString("(msg %1): force-deregistered by request since no more active interested buffer.").arg(socketKey()));
 			emit clientRequestTaskAccomplished(this);
 		}
 	}

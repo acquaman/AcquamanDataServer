@@ -3,7 +3,6 @@
 
 #include "DataHolder/AMDSGenericFlatArrayDataHolder.h"
 #include "DataElement/AMDSDwellStatusData.h"
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 class AMDSLightWeightSpectralDataHolder : public AMDSLightWeightGenericFlatArrayDataHolder

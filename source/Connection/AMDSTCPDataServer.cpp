@@ -7,7 +7,6 @@
 #include "ClientRequest/AMDSClientStatisticsRequest.h"
 #include "ClientRequest/AMDSClientContinuousDataRequest.h"
 
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AMDSTCPDataServer::AMDSTCPDataServer(QObject *parent) :
@@ -47,16 +46,16 @@ AMDSTCPDataServer::~AMDSTCPDataServer()
 
 void AMDSTCPDataServer::displayClients()
 {
-	if(clientSockets_.isEmpty() && AMDSRunTimeSupport::debugAtLevel(2))
-		AMErrorMon::information(this, AMDS_SERVER_INFO_NO_CONNECTED_CLIENT, "No clients connected");
+	if(clientSockets_.isEmpty())
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_NO_CONNECTED_CLIENT, "No clients connected");
 	else
 	{
 		QStringList keys =  clientSockets_.keys();
 		for (int iClientKey = 0; iClientKey < keys.count(); ++iClientKey)
 		{
 			QTcpSocket* currentSocket = clientSockets_.value(keys.at(iClientKey));
-			if(currentSocket && AMDSRunTimeSupport::debugAtLevel(1))
-				AMErrorMon::alert(this, AMDS_SERVER_ALT_ALIVE_CONNECTION, QString("Alive connection: %1:%2").arg(currentSocket->peerAddress().toString()).arg(currentSocket->peerPort()));
+			if(currentSocket)
+				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_ALIVE_CONNECTION, QString("Alive connection: %1:%2").arg(currentSocket->peerAddress().toString()).arg(currentSocket->peerPort()));
 		}
 	}
 
@@ -64,12 +63,11 @@ void AMDSTCPDataServer::displayClients()
 
 void AMDSTCPDataServer::displayDetails()
 {
-	if(!server_->isListening() && AMDSRunTimeSupport::debugAtLevel(1))
-		AMErrorMon::alert(this, AMDS_SERVER_ALT_SERVER_IS_NOT_ALIVE, QString("Server is failing to listen: %1").arg(server_->errorString()));
+	if(!server_->isListening())
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_SERVER_IS_NOT_ALIVE, QString("Server is failing to listen: %1").arg(server_->errorString()));
 	else
 	{
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Server is listening on %1 (%2:%3)").arg(interfaceName_).arg(server_->serverAddress().toString()).arg(server_->serverPort()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Server is listening on %1 (%2:%3)").arg(interfaceName_).arg(server_->serverAddress().toString()).arg(server_->serverPort()));
 	}
 }
 
@@ -127,8 +125,7 @@ void AMDSTCPDataServer::stop()
 	if(session_)
 		session_->close();
 
-	if(AMDSRunTimeSupport::debugAtLevel(2))
-		AMErrorMon::information(this, AMDS_SERVER_INFO_SERVER_STOPPED, "AMDS TCP Data Server stopped");
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_SERVER_STOPPED, "AMDS TCP Data Server stopped");
 }
 
 void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedRequest)
@@ -208,8 +205,7 @@ void AMDSTCPDataServer::sessionOpened()
 
 	QList<QNetworkAddressEntry> associatedIPV4Addresses;
 	for(int x = 0, size = associatedAddresses.count(); x < size; x++){
-		if(AMDSRunTimeSupport::debugAtLevel(2))
-			AMErrorMon::information(this, AMDS_SERVER_INFO_ACTIVE_SESSION, QString("At %1 %2 %3").arg(x).arg(associatedAddresses.at(x).ip().toString()).arg(associatedAddresses.at(x).ip().toIPv4Address()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_ACTIVE_SESSION, QString("At %1 %2 %3").arg(x).arg(associatedAddresses.at(x).ip().toString()).arg(associatedAddresses.at(x).ip().toIPv4Address()));
 		if(associatedAddresses.at(x).ip().toIPv4Address()) {
 			associatedIPV4Addresses.append(associatedAddresses.at(x));
 		}
@@ -222,12 +218,11 @@ void AMDSTCPDataServer::sessionOpened()
 	connect(server_, SIGNAL(newConnection()), this, SLOT(onNewClientConnected()));
 	if(!server_->listen(address, port_))
 	{
-		emit error(AMErrorReport::Serious, AMDS_SERVER_ERR_FAIL_TO_START_TCP_DATA_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
+		emit error(AMDSRunTimeSupport::Error, AMDS_SERVER_ERR_FAIL_TO_START_TCP_DATA_SERVER, QString("Unable to start server: %1").arg(server_->errorString()));
 		return;
 	}
 
-	if(AMDSRunTimeSupport::debugAtLevel(2))
-		AMErrorMon::information(this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Listening on %1:%2").arg(server_->serverAddress().toString()).arg(server_->serverPort()));
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Listening on %1:%2").arg(server_->serverAddress().toString()).arg(server_->serverPort()));
 }
 
 
@@ -238,8 +233,7 @@ void AMDSTCPDataServer::onNewClientConnected()
 	if(clientSocket)
 	{
 		QString socketDescription = QString("%1:%2").arg(clientSocket->peerAddress().toString()).arg(clientSocket->peerPort());
-		if(AMDSRunTimeSupport::debugAtLevel(2))
-			AMErrorMon::information(this, AMDS_SERVER_INFO_SERVER_NEW_CONNECTION_ESTABLISHED, QString("Connection with %1 established").arg(socketDescription));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_SERVER_NEW_CONNECTION_ESTABLISHED, QString("Connection with %1 established").arg(socketDescription));
 		clientSockets_.insert(socketDescription, clientSocket);
 
 		clientDisconnectSignalMapper_->setMapping(clientSocket, socketDescription);
@@ -256,8 +250,7 @@ void AMDSTCPDataServer::onClientDisconnect(const QString &clientKey)
 		return;
 
 	clientSockets_.remove(clientKey);
-	if(AMDSRunTimeSupport::debugAtLevel(2))
-		AMErrorMon::information(this, AMDS_SERVER_INFO_SERVER_CONNECTION_DISCONNECTED, QString("Disconnection from %1").arg(clientKey));
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_SERVER_CONNECTION_DISCONNECTED, QString("Disconnection from %1").arg(clientKey));
 
 	clientDisconnectSignalMapper_->removeMappings(socketToDisconnect);
 	clientRequestSignalMapper_->removeMappings(socketToDisconnect);
@@ -350,12 +343,10 @@ void AMDSTCPDataServer::onClientContinuousRequestReceived(AMDSClientRequest *cli
 			QString socketKey = clientContinuousDataRequest->handShakeSocketKey();
 			AMDSClientContinuousDataRequest *activeContinuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest*>(activeContinuousDataRequestList_.value(socketKey));
 			if (activeContinuousDataRequest) {
-				if(AMDSRunTimeSupport::debugAtLevel(2))
-					AMErrorMon::information(this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG, QString("Hand shaking with message (%1)").arg(socketKey));
+				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG, QString("Hand shaking with message (%1)").arg(socketKey));
 				activeContinuousDataRequest->handShaking(clientContinuousDataRequest);
 			} else {
-				if(AMDSRunTimeSupport::debugAtLevel(1))
-					AMErrorMon::alert(this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG_CONNECTION_NOT_FOUND, QString("Didn't find hand shaking message (%1)").arg(socketKey));
+				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG_CONNECTION_NOT_FOUND, QString("Didn't find hand shaking message (%1)").arg(socketKey));
 			}
 
 			onClientRequestTaskAccomplished(clientContinuousDataRequest);
