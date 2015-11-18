@@ -88,7 +88,7 @@ public slots:
 	void openNetworkSession();
 
 	/// slot to handle socket error signal from the server
-	void onAMDSServerError(AMDSServer* server, int errorCode, const QString &socketKey, const QString &errorMessage);
+	void onAMDSServerError(const QString &serverIdentifier, int errorCode, const QString &socketKey, const QString &errorMessage);
 
 protected:
 	/// make the constructor protected for SINGLETON usage
@@ -97,6 +97,8 @@ protected:
 private slots:
 	/// slot to handle the signal of network session opened
 	void onNetworkSessionOpened();
+	/// slot to handle the new client request received message from a given server
+	void onRequestDataReady(const QString &serverIdentifier, AMDSClientRequest* clientRequest);
 
 private:
 	/// establish TCP socket connection to a specific hostName and the portNumber
