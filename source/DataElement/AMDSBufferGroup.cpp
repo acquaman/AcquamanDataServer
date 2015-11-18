@@ -8,7 +8,6 @@
 
 #include "DataHolder/AMDSSpectralDataHolder.h"
 
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, bool enableCumulative, QObject *parent) :
@@ -97,8 +96,7 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
 //			emit continuousStatusDataUpdate(cumulativeStatusData, count());
 //			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
 		} else {
-			if(AMDSRunTimeSupport::debugAtLevel(1))
-				AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
 		}
 	}
 }
@@ -115,8 +113,7 @@ void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
 			emit dwellFinishedStatusDataUpdate(cumulativeStatusData, count());
 			emit dwellFinishedAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedTime);
 		} else {
-			if(AMDSRunTimeSupport::debugAtLevel(1))
-				AMErrorMon::alert(this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
 		}
 	}
 }
@@ -179,8 +176,7 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 bool AMDSBufferGroup::flattenData(QList<AMDSDataHolder *> *dataArray)
 {
 	if (!bufferGroupInfo_.isFlattenEnabled() || bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::NoFlatten) {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN, QString("The given buffergroup (%1) doesn't enable flatten feature or the flatten method is %2.").arg(bufferGroupInfo_.name()).arg(bufferGroupInfo_.flattenMethod()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_BUFFER_GROUP_DISABLE_FLATTEN, QString("The given buffergroup (%1) doesn't enable flatten feature or the flatten method is %2.").arg(bufferGroupInfo_.name()).arg(bufferGroupInfo_.flattenMethod()));
 		return false;
 	}
 

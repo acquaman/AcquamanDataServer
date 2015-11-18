@@ -16,7 +16,6 @@
 #include "Detector/Scaler/AMDSScalerDetectorServer.h"
 #include "Detector/AMDSDetectorServer.h"
 
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 #include "Detector/Amptek/SGM/AmptekCommandManagerSGM.h"
@@ -143,8 +142,7 @@ void AMDSCentralServerSGMAmptek::onClearHistrogramData(const QString &detectorNa
 	if (bufferGroup) {
 		bufferGroup->clearBufferGroup();
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -154,8 +152,7 @@ void AMDSCentralServerSGMAmptek::onClearDwellHistrogramData(const QString &detec
 	if (bufferGroup) {
 		bufferGroup->clearBufferGroup();
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -165,8 +162,7 @@ void AMDSCentralServerSGMAmptek::onNewHistrogramReceived(const QString &detector
 	if (bufferGroup) {
 		bufferGroup->append(dataHolder);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -176,8 +172,7 @@ void AMDSCentralServerSGMAmptek::onNewDwellHistrogramReceived(const QString &det
 	if (bufferGroup) {
 		bufferGroup->append(dataHolder, elapsedTime);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
@@ -187,7 +182,6 @@ void AMDSCentralServerSGMAmptek::onDwellFinishedUpdate(const QString &detectorNa
 	if (bufferGroup) {
 		bufferGroup->finishDwellDataUpdate(elapsedTime);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }

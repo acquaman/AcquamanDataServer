@@ -11,7 +11,6 @@
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 #include "Detector/Scaler/AMDSScalerDetector.h"
 #include "Detector/Scaler/AMDSScalerDetectorServer.h"
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AMDSCentralServerSGMScaler::AMDSCentralServerSGMScaler(QObject *parent) :
@@ -110,8 +109,7 @@ void AMDSCentralServerSGMScaler::onNewScalerScanDataReceivedd(const AMDSDataHold
 	if (bufferGroup) {
 		bufferGroup->append(scalerScanCountsDataHolder);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
 	}
 
 }
