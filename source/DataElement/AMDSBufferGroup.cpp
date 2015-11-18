@@ -62,6 +62,14 @@ void AMDSBufferGroup::clear()
 	}
 }
 
+void AMDSBufferGroup::append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime)
+{
+	QWriteLocker writeLock(&lock_);
+	foreach (AMDSDataHolder *dataHolder, dataHolderList) {
+		append(dataHolder, elapsedDwellTime);
+	}
+}
+
 void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
 {
 	QWriteLocker writeLock(&lock_);

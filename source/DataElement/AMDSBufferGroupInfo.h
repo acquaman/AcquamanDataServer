@@ -76,8 +76,6 @@ public:
 	inline void setAxes(const QList<AMDSAxisInfo> &axes) { axes_ = axes; }
 	/// Set how the bufferGroup should be flattened
 	inline void setFlattenMethod(DataFlattenMethod method) { flattenMethod_ = method; }
-	/// Set the ConfigurationCommandManager for this bufferGroup
-	inline void setConfigurationCommandManager(AMDSCommandManager *commandManager) { configurationCommandManager_ = commandManager; }
 
 	/// If the bufferGrou name is "Invalid", there should be no Data
 	inline bool includeData() const { return name_ != "Invalid"; }
@@ -96,9 +94,6 @@ protected:
 
 	/// the axes of the bufferGroupInfo
 	QList<AMDSAxisInfo> axes_;
-
-	/// the configuration command manager of this bufferGroup, if it is NULL, there is no configuration support for this buffergroup
-	AMDSCommandManager *configurationCommandManager_;
 };
 
 AMDSnDIndex AMDSBufferGroupInfo::size() const {

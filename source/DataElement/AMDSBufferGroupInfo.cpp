@@ -1,7 +1,5 @@
 #include "AMDSBufferGroupInfo.h"
 
-#include "DataElement/AMDSCommandManager.h"
-
 AMDSBufferGroupInfo::AMDSBufferGroupInfo(const QString &name, const QString &description, const QString &units, AMDSDataTypeDefinitions::DataType dataType, const DataFlattenMethod flattenMethod, const QList<AMDSAxisInfo> &axes)
 {
 	setName(name);

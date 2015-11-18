@@ -41,9 +41,7 @@ QString AMDSThreadedBufferGroup::bufferGroupName() const
 void AMDSThreadedBufferGroup::append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime)
 {
 	QWriteLocker writeLock(&lock_);
-	foreach (AMDSDataHolder *dataHolder, dataHolderList) {
-		bufferGroup_->append(dataHolder, elapsedDwellTime);
-	}
+	bufferGroup_->append(dataHolderList, elapsedDwellTime);
 }
 
 void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, bool elapsedDwellTime)

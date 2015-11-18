@@ -20,7 +20,7 @@ public:
 	AMDSBufferGroupInfo bufferGroupInfo() const;
 	/// returns the bufferGroup name
 	QString bufferGroupName() const;
-	/// appends a data to the bufferGroup
+	/// appends a list of dataHolder to the bufferGroup
 	void append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime=0);
 	/// appends a data to the bufferGroup
 	void append(AMDSDataHolder *value, bool elapsedDwellTime=0);

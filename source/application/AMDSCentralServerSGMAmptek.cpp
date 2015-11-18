@@ -71,7 +71,6 @@ void AMDSCentralServerSGMAmptek::initializeBufferGroup()
 		amptekBufferGroupAxes << AMDSAxisInfo("Energy", amptekConfiguration->spectrumCountSize(), "Energy Axis", "eV");
 
 		AMDSBufferGroupInfo amptekBufferGroupInfo(amptekConfiguration->detectorName(), amptekConfiguration->localAddress().toString(), "Counts", amptekConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, amptekBufferGroupAxes);
-		amptekBufferGroupInfo.setConfigurationCommandManager(AmptekCommandManagerSGM::amptekCommandManager());
 
 		AMDSThreadedBufferGroup *amptekThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_, false);
 		connect(amptekThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));

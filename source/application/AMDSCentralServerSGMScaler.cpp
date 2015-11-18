@@ -108,9 +108,7 @@ void AMDSCentralServerSGMScaler::onNewScalerScanDataReceivedd(const AMDSDataHold
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
 	if (bufferGroup) {
-		foreach (AMDSDataHolder *scalerDataHolder, scalerScanCountsDataHolder) {
-			bufferGroup->append(scalerDataHolder);
-		}
+		bufferGroup->append(scalerScanCountsDataHolder);
 	} else {
 		if(AMDSRunTimeSupport::debugAtLevel(1))
 			AMErrorMon::alert(this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
