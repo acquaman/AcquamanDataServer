@@ -1,6 +1,5 @@
 #include "AmptekEventDefinitions.h"
 
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 /// =============== implementation of AmptekConfigurationData ================

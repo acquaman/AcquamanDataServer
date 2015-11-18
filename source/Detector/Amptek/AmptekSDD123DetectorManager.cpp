@@ -283,8 +283,7 @@ void AmptekSDD123DetectorManager::postDwellRequestEvent()
 		dwellRequestEvent->dwellMode_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, dwellRequestEvent);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 
@@ -294,8 +293,7 @@ void AmptekSDD123DetectorManager::postConfigurationInitiateRequestEvent(){
 		configurationInitiateRequestEvent->configurationMode_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationInitiateRequestEvent);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 void AmptekSDD123DetectorManager::postConfigurationRequestEvent()
@@ -305,8 +303,7 @@ void AmptekSDD123DetectorManager::postConfigurationRequestEvent()
 		configurationRequestEvent->allParametersRequest_ = true;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationRequestEvent);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 }
 
@@ -319,8 +316,7 @@ void AmptekSDD123DetectorManager::postConfigurationSetEvent()
 		configurationSetEvent->configurationCommands_ = configurationCommands;
 		QCoreApplication::postEvent(requestEventReceiver_, configurationSetEvent);
 	} else {
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, DETECTOR_MANAGER_ALERT_EVENT_RECEIVER_NO_INITIALIZED, "The requestEventReceiver of AmptekSDD123DetectorManager is NOT initialized.");
 	}
 
 }

@@ -2,7 +2,6 @@
 
 #include "appController/AMDSAppController.h"
 #include "ClientRequest/AMDSClientRequestSupport.h"
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AMDSClientRequest* AMDSClientRequest::decodeAndInstantiateClientRequest(QDataStream *dataStream)
@@ -32,8 +31,7 @@ AMDSClientRequest* AMDSClientRequest::decodeAndInstantiateClientRequest(QDataStr
 		clientRequest = 0;
 
 		QString errMessage = AMDSClientRequestDefinitions::errorMessage(parseResult, AMDSClientRequestDefinitions::Read, clientRequestType);
-		if(AMDSRunTimeSupport::debugAtLevel(2))
-			AMErrorMon::information(0, parseResult, QString("AMDSClientRequest::Failed to parse clientRequest. Error: %1").arg(errMessage));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, 0, parseResult, QString("AMDSClientRequest::Failed to parse clientRequest. Error: %1").arg(errMessage));
 	}
 
 	return clientRequest;
@@ -44,8 +42,7 @@ bool AMDSClientRequest::encodeAndwriteClientRequest(QDataStream *dataStream, AMD
 	int result = clientRequest->writeToDataStream(dataStream);
 	if ( result != AMDS_CLIENTREQUEST_SUCCESS ) {
 		QString errorMsg = AMDSClientRequestDefinitions::errorMessage(result, AMDSClientRequestDefinitions::Write, clientRequest->requestType());
-		if(AMDSRunTimeSupport::debugAtLevel(0))
-			AMErrorMon::error(0, result, errorMsg);
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, 0, result, errorMsg);
 
 		return false;
 	}
@@ -94,8 +91,7 @@ bool AMDSClientRequest::isDataClientRequest() {
 
 void AMDSClientRequest::printData()
 {
-	if(AMDSRunTimeSupport::debugAtLevel(2))
-		AMErrorMon::information(this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
 }
 
 int AMDSClientRequest::calculateTimeDelta() const

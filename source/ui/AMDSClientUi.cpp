@@ -11,7 +11,6 @@
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "DataElement/AMDSCommandManager.h"
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AMDSClientUi::AMDSClientUi(QWidget *parent) :
@@ -400,8 +399,8 @@ void AMDSClientUi::sendClientRequest()
 		break;
 	case AMDSClientRequestDefinitions::Continuous:
 		clientAppController->requestClientData(hostName, portNumber, selectedBufferNames, value1.toInt(), includeStatus, enableFlattening, continuousSocket);
-		if ((continuousSocket.length() > 0) && AMDSRunTimeSupport::debugAtLevel(2)) {
-			AMErrorMon::information(this, AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE, QString("Hand shake message: %1").arg(continuousSocket));
+		if ((continuousSocket.length() > 0) ) {
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE, QString("Hand shake message: %1").arg(continuousSocket));
 		}
 		break;
 	case AMDSClientRequestDefinitions::Configuration:
@@ -412,8 +411,7 @@ void AMDSClientUi::sendClientRequest()
 		break;
 
 	default:
-		if(AMDSRunTimeSupport::debugAtLevel(1))
-			AMErrorMon::alert(this, AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE, QString("Invalide client request type: %1").arg(clientRequestType));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE, QString("Invalide client request type: %1").arg(clientRequestType));
 	}
 }
 
