@@ -29,9 +29,9 @@ public:
 	AMDSBufferGroupInfo& operator=(const AMDSBufferGroupInfo& other);
 
 	/// Writes this AMDSBufferGroupInfo to a DataStream, returns true if no errors are encountered
-	bool writeToDataStream(QDataStream *dataStream, bool withCommands = false);
+	bool writeToDataStream(QDataStream *dataStream);
 	/// Reads this AMDSBufferGroupInfo from the DataStream, returns true if no errors are encountered
-	bool readFromDataStream(QDataStream *dataStream, bool withCommands = false);
+	bool readFromDataStream(QDataStream *dataStream);
 
 	/// convert the buffer group to a string
 	QString toString() const;

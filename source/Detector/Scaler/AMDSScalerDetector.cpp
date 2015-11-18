@@ -204,7 +204,7 @@ void AMDSScalerDetector::initializePVControls()
 
 	AMSinglePVControl *channelControl;
 	foreach (quint8 channelId, scalerConfiguration_->configuredChannels()) {
-		QString channelIdTemplate = channelId < 10 ? "0%1" : "%1"; // when channel id is 1 ~ 9, the PV is "0" + channelId
+		QString channelIdTemplate = channelId < 10 ? "0%1" : "%1"; // when channel id is 0 ~ 9, the PV is "0" + channelId
 		QString scalerChannelPVName = QString("%1%2:enable").arg(scalerBasePVName()).arg(channelIdTemplate.arg(channelId));
 		channelControl = new AMSinglePVControl(scalerChannelPVName, scalerChannelPVName, this);
 

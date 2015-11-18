@@ -28,7 +28,7 @@ AMDSBufferGroupInfo& AMDSBufferGroupInfo::operator=(const AMDSBufferGroupInfo& o
 	return *this;
 }
 
-bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream, bool withCommands)
+bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream)
 {
 	*dataStream << name();
 	*dataStream << description();
@@ -41,14 +41,10 @@ bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream, bool withCo
 		axisInfo.writeToDataStream(dataStream);
 	}
 
-	if (withCommands && configurationCommandManager_) {
-//		configurationCommandManager_->writeToDataStream(dataStream);
-	}
-
 	return true;
 }
 
-bool AMDSBufferGroupInfo::readFromDataStream(QDataStream *dataStream, bool withCommands)
+bool AMDSBufferGroupInfo::readFromDataStream(QDataStream *dataStream)
 {
 	QString name;
 	QString description;
@@ -80,11 +76,6 @@ bool AMDSBufferGroupInfo::readFromDataStream(QDataStream *dataStream, bool withC
 		if(oneAxisInfo.name() == "Invalid")
 			return false;
 		axes.append(oneAxisInfo);
-	}
-
-	// read the commands
-	if (withCommands) {
-
 	}
 
 	setName(name);

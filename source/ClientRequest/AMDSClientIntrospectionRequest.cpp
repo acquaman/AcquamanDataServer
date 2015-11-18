@@ -67,7 +67,7 @@ int AMDSClientIntrospectionRequest::writeToDataStream(QDataStream *dataStream)
 
 	for(int x = 0, size = bufferGroupInfos_.count(); x < size; x++) {
 		AMDSBufferGroupInfo bufferGroupInfo = bufferGroupInfos_.at(x);
-		bufferGroupInfo.writeToDataStream(dataStream, true);
+		bufferGroupInfo.writeToDataStream(dataStream);
 	}
 
 	return AMDS_CLIENTREQUEST_SUCCESS;
@@ -92,7 +92,7 @@ int AMDSClientIntrospectionRequest::readFromDataStream(QDataStream *dataStream)
 
 	for(int x = 0, size = readBufferGroupInfosCount; x < size; x++){
 		AMDSBufferGroupInfo oneBufferGroupInfo("Invalid");
-		oneBufferGroupInfo.readFromDataStream(dataStream, true);
+		oneBufferGroupInfo.readFromDataStream(dataStream);
 		if(oneBufferGroupInfo.name() == "Invalid")
 			return AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_GROUP_INFO;
 		readBufferGroupInfos.append(oneBufferGroupInfo);
