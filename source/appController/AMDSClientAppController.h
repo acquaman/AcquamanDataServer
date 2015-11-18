@@ -5,6 +5,7 @@
 #include <QHash>
 #include <QDateTime>
 #include <QTcpSocket>
+#include <QFile>
 
 class QNetworkSession;
 
@@ -39,8 +40,11 @@ public:
 	/// helper function to check whether the network session is openned or not
 	bool isSessionOpen();
 
+	/// set the path where the client data request will be written to
+	inline void setFilePath(const QString filePath) { filePath_ = filePath; }
 	/// helper function to return the server by given identifier
 	inline AMDSServer *getServerByServerIdentifier(const QString &serverIdentifier) { return activeServers_.value(serverIdentifier, 0);}
+
 	/// helper function to return the list of buffers defined by a give host server
 	QStringList getBufferNamesByServer(const QString &serverIdentifier);
 	/// helper function to return the list of socketKeys of active connection by a give host server
@@ -52,6 +56,7 @@ public:
 	void connectToServer(const QString &hostName, quint16 portNumber);
 	/// request disconnection with a given server identifier
 	void disconnectWithServer(const QString &serverIdentifier);
+
 
 	/// request data from server for Statistics
 	bool requestClientData(const QString &hostName, quint16 portNumber);
@@ -103,8 +108,13 @@ private slots:
 private:
 	/// establish TCP socket connection to a specific hostName and the portNumber
 	AMDSClientTCPSocket * establishSocketConnection(const QString &hostName, quint16 portNumber);
+
 	/// helper function to instantiate client request based on the request type
 	AMDSClientRequest *instantiateClientRequest(AMDSClientRequestDefinitions::RequestType clientRequestType);
+
+	/// helper function to generate the file name of the current client request
+	/// the target file name will be like "{filePath_}/{fileTimeStamp_}_{serverIdentifier}_{bufferName}.dat"
+	QString targetFileNameInFullPath(const QString &serverIdentifier, const QString &bufferName) const;
 
 private:
 	/// the pointer of network session
@@ -112,6 +122,14 @@ private:
 
 	/// the hash table of active servers
 	QHash<QString, AMDSServer *> activeServers_;
+
+	/// the path where the clientDataRequest will be written to
+	QString filePath_;
+	/// the timeStamp we are going to used to identifier this current run
+	/// the client data request of one Acquaman run will be written to the same file
+	QString fileTimeStamp_;
+	/// the mapping of fileName vs, QFile
+	QHash<QString, QFile*> dataRequestFiles_;
 };
 
 #endif // AMDSCLIENTAPPCONTROLLER_H

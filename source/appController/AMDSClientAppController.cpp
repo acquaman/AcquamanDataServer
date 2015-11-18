@@ -33,10 +33,27 @@ AMDSClientAppController::AMDSClientAppController(QObject *parent) :
 	AMDSAppController(AMDSAppController::Client, parent)
 {
 	networkSession_ = 0;
+
+	filePath_ = "";
+	fileTimeStamp_ = QDateTime::currentDateTimeUtc().toString("yyyyMMddThhmmsszz");
 }
 
 AMDSClientAppController::~AMDSClientAppController()
 {
+	// close the dataFile and release the resource
+	foreach (QString key, dataRequestFiles_.keys()) {
+		QFile *dataFile = dataRequestFiles_.value(key);
+		if (dataFile) {
+			if (dataFile->isOpen()) {
+				dataFile->close();
+			}
+
+			dataFile->deleteLater();
+		}
+
+		dataRequestFiles_.remove(key);
+	}
+
 	// release the resouces of the AMDSServers
 	foreach (QString key, activeServers_.keys()) {
 		AMDSServer *server = activeServers_.value(key);
@@ -345,6 +362,37 @@ void AMDSClientAppController::onRequestDataReady(const QString &serverIdentifier
 {
 	if (clientRequest->isDataClientRequest()) {
 		// write the clientDataRequest data to a binary file
+		if (filePath_.length() == 0) {
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, "");
+		} else {
+			AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest *>(clientRequest);
+			if (clientDataRequest) {
+				QString dataFileName = targetFileNameInFullPath(serverIdentifier, clientDataRequest->bufferName());
+				QFile *targetDataFile = dataRequestFiles_.value(dataFileName);
+				if (!targetDataFile) {
+					QFileInfo dataFileInfo(dataFileName);
+					if(dataFileInfo.exists()) {
+						AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, QString("AMDS client data request target file %1 exists.").arg(dataFileName));
+					} else {
+						QFile *newDataFile = new QFile(dataFileInfo.filePath());
+						if(newDataFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
+							dataRequestFiles_.insert(dataFileName, newDataFile);
+
+							targetDataFile = newDataFile;
+						} else {
+							AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, QString("AMDS client data request Failed to open target file %1 for writing.").arg(dataFileName));
+							newDataFile->close();
+							newDataFile->deleteLater();
+						}
+					}
+				}
+
+				if (targetDataFile) {
+					QDataStream dataStream(targetDataFile);
+					AMDSClientRequest::encodeAndwriteClientRequest(&dataStream, clientDataRequest);
+				}
+			}
+		}
 	}
 
 	emit requestDataReady(clientRequest);
@@ -375,4 +423,10 @@ AMDSClientRequest *AMDSClientAppController::instantiateClientRequest(AMDSClientR
 
 	clientRequest->setClientLocalTime(QDateTime::currentDateTimeUtc());
 	return clientRequest;
+}
+
+/// the target file name will be like "{filePath_}/{fileTimeStamp_}_{serverIdentifier}_{bufferName}.dat"
+QString AMDSClientAppController::targetFileNameInFullPath(const QString &serverIdentifier, const QString &bufferName) const
+{
+	return QString("{%1}/{%2}_{%3}_{%4}.dat").arg(filePath_).arg(fileTimeStamp_).arg(serverIdentifier).arg(bufferName);
 }
