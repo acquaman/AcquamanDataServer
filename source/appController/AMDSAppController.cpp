@@ -23,5 +23,7 @@ void AMDSAppController::releaseAppController()
 AMDSAppController::AMDSAppController(AMDSAppController::AMDSAppType appType, QObject *parent)
 	:QObject(parent)
 {
+	AMDSRunTimeSupport::setDebugLevel(AMDSRunTimeSupport::Alert);
+
 	appType_ = appType;
 }

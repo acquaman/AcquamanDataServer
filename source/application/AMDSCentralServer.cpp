@@ -20,13 +20,14 @@
 AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 	QObject(parent)
 {
+	// initialize the app controller
+	AMDSServerAppController::serverAppController();
+
 	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_START_SERVER_APP, "Starting Acquaman Data Server application ...");
 
 	qRegisterMetaType<AMDSDwellStatusData>();
 	qRegisterMetaType<AMDSDataHolderList>();
 
-	// initialize the app controller
-	AMDSServerAppController::serverAppController();
 
 	maxBufferSize_ = 1000*60*60*10;
 }
