@@ -81,7 +81,7 @@ void AMDSCentralServerSGMScaler::wrappingUpInitialization()
 		connect(scalerServer, SIGNAL(enableScalerChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onEnableChannel(int)));
 		connect(scalerServer, SIGNAL(disableScalerChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onDisableChannel(int)));
 
-		connect(scalerDetectorManager_->scalerDetector(), SIGNAL(detectorScanModeChanged(int)), scalerServer, SLOT(setDetectorServerMode(int)));
+		connect(scalerDetectorManager_->scalerDetector(), SIGNAL(detectorScanModeChanged(int)), scalerServer, SLOT(onDetectorServerModeChanged(int)));
 	}
 }
 
@@ -109,7 +109,6 @@ void AMDSCentralServerSGMScaler::onNewScalerScanDataReceivedd(const AMDSDataHold
 	if (bufferGroup) {
 		bufferGroup->append(scalerScanCountsDataHolder);
 	} else {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
 	}
-
 }
