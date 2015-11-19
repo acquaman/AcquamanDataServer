@@ -130,6 +130,8 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		break;
 	case AMDSClientRequestDefinitions::Statistics:
 		break;
+	case AMDSClientRequestDefinitions::Configuration:
+		break;
 	case AMDSClientRequestDefinitions::StartTimePlusCount: {
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);
 		if(clientStartTimePlusCountDataRequest) {

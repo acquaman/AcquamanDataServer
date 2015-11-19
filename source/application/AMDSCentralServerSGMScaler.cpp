@@ -65,7 +65,7 @@ void AMDSCentralServerSGMScaler::initializeAndStartDetectorServer()
 	scalerDetectorServerManager_ = new AMDSDetectorServerManager(scalerDetectorServer);
 
 	connect(scalerDetectorServerManager_->detectorServer(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)));
-	connect(this, SIGNAL(scalerConfigurationRequestReceived(AMDSClientRequest*)), scalerDetectorServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
+	connect(this, SIGNAL(configurationRequestReceived(AMDSClientRequest*)), scalerDetectorServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
 }
 
 void AMDSCentralServerSGMScaler::wrappingUpInitialization()

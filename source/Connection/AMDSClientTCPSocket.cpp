@@ -98,6 +98,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
 	case AMDSClientRequestDefinitions::Continuous:
+	case AMDSClientRequestDefinitions::Configuration:
 			if (clientRequest->validateResponse()) {
 				socketKey_ = clientRequest->socketKey();
 //				clientRequest->printData();
@@ -105,7 +106,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 			break;
 
 	default:
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_VALIDATE_RESPONSE_NOT_IMPLEMENTED, QString("The validateResponse() function is NOT implemented (or called) for %1").arg(clientRequest->requestType()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_VALIDATE_RESPONSE_NOT_IMPLEMENTED, QString("The validateResponse() function is NOT implemented (or called) for message type %1").arg(clientRequest->requestType()));
 		break;
 	}
 
