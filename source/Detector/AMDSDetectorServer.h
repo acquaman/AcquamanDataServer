@@ -42,7 +42,7 @@ public:
 	/// returns the name of the detector
 	inline QString detectorName() const { return detectorName_; }
 	/// returns whether the detector is working in dwell mode
-	inline bool isDwelling() { return detectorMode_ == AMDSDwellDetector::Dwelling; }
+	inline bool isDwelling() const { return detectorMode_ == AMDSDwellDetector::Dwelling; }
 
 signals:
 	/// signal to indicate that the client request is been processed

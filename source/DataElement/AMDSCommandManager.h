@@ -67,7 +67,7 @@ public:
 	static bool encodeAndwriteAMDSCommand(QDataStream *dataStream, AMDSCommand command);
 
 	/// the definition of an AMDS command
-	AMDSCommand(const int commandId=-1, const QString &hex = "", const QString &command = "", int timeout = -1, int retries = 0, QStringList responseHexes = QStringList());
+	AMDSCommand(const int commandId=-1, const QString &hex = "", const QString &command = "", int timeout = -1, int retries = 0, const QStringList &responseHexes = QStringList());
 
 	/// returns a string of the command
 	QString toString() const;

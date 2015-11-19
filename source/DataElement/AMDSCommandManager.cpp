@@ -45,7 +45,7 @@ bool AMDSCommand::encodeAndwriteAMDSCommand(QDataStream *dataStream, AMDSCommand
 	return command.writeToDataStream(dataStream);
 }
 
-AMDSCommand::AMDSCommand(int commandId, const QString &hex, const QString &command, int timeout, int retries, QStringList responseHexes)
+AMDSCommand::AMDSCommand(int commandId, const QString &hex, const QString &command, int timeout, int retries, const QStringList &responseHexes)
 {
 	commandId_= commandId;
 	hex_ = hex;

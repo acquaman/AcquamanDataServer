@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
 
 	bool startServer = AMDSMain_Common::parseArgument("AcquamanDataServerSGMScaler", args, &interfaceType, &port);
 	if (startServer) {
-		AMDSRunTimeSupport::setDebugLevel(AMDSRunTimeSupport::All);
 		AMDSMain_Common::initializeAppSettings(interfaceType, port);
 		AMDSMain_Common::initializeRegisteredClasses();
 

@@ -92,7 +92,7 @@ void AMDSDwellSpectralDataHolder::clear()
 	setDwellStatusData(newStatusData);
 }
 
-QString AMDSDwellSpectralDataHolder::toString()
+QString AMDSDwellSpectralDataHolder::toString() const
 {
 	return QString("%1 \n	%2").arg(AMDSLightWeightSpectralDataHolder::toString()).arg(dwellStatusData_.toString());
 }

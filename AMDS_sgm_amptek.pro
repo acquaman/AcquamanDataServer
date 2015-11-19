@@ -44,7 +44,7 @@ INCLUDEPATH += $$PATH_TO_MPLOT
 include ( compositCommon/AcquamanMPlot.pri )
 include ( compositCommon/AMDSCommon.pri )
 
-TARGET = AcquamanDataServerSGM
+TARGET = AcquamanDataServerSGMAmptek
 
 HEADERS *= \
 	source/application/AMDSCentralServer.h \
