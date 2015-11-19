@@ -49,6 +49,8 @@ void AMDSDetectorServer::onConfigurationRequestReceived(AMDSClientRequest *confi
 	setDetectorServerMode(AMDSDwellDetector::Configuration);
 }
 
+
+
 void AMDSDetectorServer::setDetectorServerMode(AMDSDwellDetector::DwellScanStatus detectorMode)
 {
 	if (detectorMode_ != detectorMode) {
@@ -59,4 +61,10 @@ void AMDSDetectorServer::setDetectorServerMode(AMDSDwellDetector::DwellScanStatu
 			emit serverChangedToDwellMode(detectorName());
 		}
 	}
+}
+
+void AMDSDetectorServer::setDetectorServerMode(int detectorMode)
+{
+	AMDSDwellDetector::DwellScanStatus asDwellDetector = AMDSDwellDetector::DwellScanStatus(detectorMode);
+	setDetectorServerMode(detectorMode);
 }

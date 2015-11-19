@@ -75,7 +75,7 @@ public:
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes) = 0;
 
 	/// pure virtual functions to get the eventTime and event time related comparation operations
-	virtual QDateTime eventTime() = 0;
+	virtual QDateTime eventTime() const = 0;
 	virtual bool operator <(const QDateTime &rhs) = 0;
 	virtual bool operator >(const QDateTime &rhs) = 0;
 	virtual bool operator ==(const QDateTime &rhs) = 0;
@@ -120,7 +120,7 @@ public:
 	inline AMDSEventData * eventData() { return eventData_; }
 
 	/// implement the event time and related comparison functions
-	virtual QDateTime eventTime() { return eventData()->eventTime(); }
+	virtual QDateTime eventTime() const { return eventData()->eventTime(); }
 	virtual bool operator <(const QDateTime &rhs) { return eventData()->eventTime() < rhs; }
 	virtual bool operator >(const QDateTime &rhs) { return eventData()->eventTime() > rhs; }
 	virtual bool operator ==(const QDateTime &rhs) { return eventData()->eventTime() == rhs; }
@@ -179,7 +179,7 @@ public:
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
 	/// implement the eventTime() function and related comparison operators
-	virtual QDateTime eventTime() { return eventData()->eventTime(); }
+	virtual QDateTime eventTime() const { return eventData()->eventTime(); }
 	virtual bool operator <(const QDateTime &rhs) { return lightWeightDataHolder_->operator <(rhs); }
 	virtual bool operator >(const QDateTime &rhs) { return lightWeightDataHolder_->operator >(rhs); }
 	virtual bool operator ==(const QDateTime &rhs) { return lightWeightDataHolder_->operator ==(rhs); }

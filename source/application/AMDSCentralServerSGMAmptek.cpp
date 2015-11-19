@@ -24,7 +24,7 @@
 AMDSCentralServerSGMAmptek::AMDSCentralServerSGMAmptek(QObject *parent) :
 	AMDSCentralServer(parent)
 {
-	maxBufferSize_ = 20 * 60 * 1000; // 20 minuntes data recording
+	maxBufferSize_ = 20 * 60 * 20; // 20 minuntes data recording --> 20 minutes * 60 seconds/minute * 20 polls/second (it's polling at 50ms)
 
 	initializeConfiguration();
 }
