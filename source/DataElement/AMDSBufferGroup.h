@@ -39,6 +39,8 @@ public:
 	int count() const;
 	/// Clears the buffer of all its members, and frees their resources
 	void clear();
+	/// appends a list of dataHolder to the bufferGroup
+	void append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime=0);
 	/// Adds a new AMDSDataHolder pointer to the end of the buffer. The buffer group takes ownership
 	/// of the passed AMDSDataHolder, becoming responsible for its destruction
 	void append(AMDSDataHolder* value, bool elapsedDwellTime=0);
@@ -76,6 +78,8 @@ signals:
 	void dwellFinishedAllDataUpdate(AMDSDataHolder *accumlatedDataHolder, AMDSDwellStatusData statusData, int count, double elapsedTime);
 
 protected:
+	/// calculate the delta between the client time and the server time i(in ms)
+	int calculateTimeDelta(AMDSClientRequest *clientRequest);
 	/// Flatten the data based on the given flatten method, return True if no error happened
 	bool flattenData(QList<AMDSDataHolder *> *dataArray);
 	/// Fills the data to the clientRequest

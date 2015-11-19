@@ -2,6 +2,7 @@
 #define AMDSCLIENTUI_H
 
 #include <QDialog>
+#include <QMap>
 
 class QDialogButtonBox;
 class QLabel;
@@ -9,12 +10,17 @@ class QLineEdit;
 class QPushButton;
 class QNetworkSession;
 class QDateTimeEdit;
-class QTextEdit;
 class QComboBox;
+class QTextEdit;
+class QGridLayout;
+class QFormLayout;
 class QListView;
 class QSpinBox;
+class QWidget;
 class QCheckBox;
+class QItemSelection;
 
+class AMDSCommand;
 class AMDSClientAppController;
 class AMDSClientRequest;
 
@@ -48,15 +54,22 @@ private slots:
 	/// slot to handle the switch signal among connected servers (to refresh the buffer names and the active connections with that server)
 	void onActiveServerChanged(const QString &serverIdentifier);
 	/// slot to handle the switch singal among request types (to change the selection mode of the buffer names: multi selection or signal selection)
-	void onRequestTypeChanged(const QString &requestType);
+	void onRequestTypeChanged(int);
+	/// slot to handle the signal when the selected buffer names is changed
+	void onBufferNameSelectChanged();
 	/// slot to check whether we should enable the button to send client request
 	void enableRequestDataButton();
 	/// slot to send client request to the server
 	void sendClientRequest();
 
 private:
+	/// hide/show a widge in the formlayout
+	void displayWidget(QWidget *widget, bool show=true);
+
 	/// slot to reset the buffer list view
 	void resetBufferListView(const QStringList &bufferNames);
+	/// slot to update the configuration command combobox
+	void resetConfigurationCommands(QList<AMDSCommand> commandDefs);
 	/// slot to reset the acitve continuous connection combox
 	void resetActiveContinuousConnection(const QString &serverIdentifier="");
 
@@ -79,7 +92,10 @@ private:
 	QDialogButtonBox *buttonBox_;
 
 	/// ==== message compose section ====
+	QGridLayout *mainLayout_ ;
+	QFormLayout *formLayout_;
 	QComboBox* requestTypeComboBox_;
+	QComboBox* requestCommandComboBox_;
 	QListView *bufferNameListView_;
 
 	QDateTimeEdit* time1Edit_;
@@ -93,8 +109,7 @@ private:
 	QComboBox* activeContinuousConnectionComboBox_;
 	QTextEdit* resultsEdit_;
 
-	/// the handler of the clientAppController
-	AMDSClientAppController *clientAppController_;
+	QMap<QString, AMDSCommand> currentConfigurationCommandDefs_;
 };
 
 #endif // AMDSCLIENTUI_H

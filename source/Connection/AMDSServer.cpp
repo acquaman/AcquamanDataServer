@@ -38,19 +38,28 @@ AMDSClientTCPSocket * AMDSServer::establishSocketConnection()
 
 void AMDSServer::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSClientRequest *clientRequest)
 {
-	if (clientRequest->isContinuousMessage()) {
+	switch (clientRequest->requestType()) {
+	case AMDSClientRequestDefinitions::Continuous:
 		activeTCPSockets_.insert(clientRequest->socketKey(), clientTCPSocket);
-	} else {
-		if (clientRequest->isIntrospectionMessage()) {
+		break;
+
+	case AMDSClientRequestDefinitions::Introspection:
+		{
 			AMDSClientIntrospectionRequest *introspectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
 			if (introspectionRequest && introspectionRequest->checkAllBuffer() ) {
 				QStringList bufferNames = introspectionRequest->getAllBufferNames();
 				setBufferNames(bufferNames);
 			}
-		}
 
+			// the connection is done, the socket should be released
+			removeTCPSocket(clientTCPSocket);
+		}
+		break;
+
+	default:
 		// the connection is done, the socket should be released
 		removeTCPSocket(clientTCPSocket);
+		break;
 	}
 
 	emit requestDataReady(clientRequest);

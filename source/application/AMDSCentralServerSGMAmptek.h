@@ -4,19 +4,25 @@
 #include <QObject>
 
 #include "application/AMDSCentralServer.h"
+#include "DataHolder/AMDSDataHolder.h"
 
 class AmptekSDD123ConfigurationMap;
 class AmptekSDD123ThreadedDataServerGroup;
 class AmptekSDD123DetectorGroupSGM;
-class AMDSDataHolder;
 
-class AMDSCentralServerSGM : public AMDSCentralServer
+class AMDSScalerConfigurationMap;
+class AMDSScalerDetectorManager;
+class AMDSDetectorServerManager;
+
+#define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
+
+class AMDSCentralServerSGMAmptek : public AMDSCentralServer
 {
 	Q_OBJECT
 public:
 	/// Constructor: to initialize the TCP Data server thread and the timers for buffer groups
-	AMDSCentralServerSGM(QObject *parent = 0);
-	~AMDSCentralServerSGM();
+	AMDSCentralServerSGMAmptek(QObject *parent = 0);
+	~AMDSCentralServerSGMAmptek();
 
 signals:
 	/// signal to indicate that the server (at index) switched to configuration state
@@ -43,12 +49,19 @@ protected slots:
 	void onDwellFinishedUpdate(const QString &detectorName, double elapsedTime);
 
 protected:
+	/// function to initialize the system configurations
+	void initializeConfiguration();
 	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
 	virtual void initializeBufferGroup();
+	/// function to initialize the detector manager
+	virtual void initializeDetectorManager();
 	/// function to initialize the data server to update the buffer groups
-	virtual void initializeAndStartDataServer();
+	virtual void initializeAndStartDetectorServer();
 	/// function to finalize the initialization
 	virtual void wrappingUpInitialization();
+
+	/// helper function to fill the configuration commands for the given bufferName
+	void fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest);
 
 protected:
 	/// the list of configuration map of SGM amptek

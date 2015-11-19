@@ -3,6 +3,7 @@
 
 #include <QVector>
 #include <QString>
+#include <QMetaType>
 
 #include "DataElement/AMDSDataTypeDefinitions.h"
 
@@ -16,6 +17,18 @@ public:
 	virtual AMDSFlatArray operator +(AMDSFlatArray &dataFlatArray);
 	/// define the Division operation of AMDSFlatArray: the value of the given handler will be divided by the given divisior
 	virtual AMDSFlatArray operator /(quint32 divisor);
+
+	/// set the values of the data with the given vector
+	bool setValues(const QVector<quint8> &values) ;
+	bool setValues(const QVector<qint8> &values) ;
+	bool setValues(const QVector<quint16> &values) ;
+	bool setValues(const QVector<qint16> &values) ;
+	bool setValues(const QVector<quint32> &values) ;
+	bool setValues(const QVector<qint32> &values) ;
+	bool setValues(const QVector<quint64> &values) ;
+	bool setValues(const QVector<qint64> &values) ;
+	bool setValues(const QVector<float> &values) ;
+	bool setValues(const QVector<double> &values) ;
 
 	/// set the value of the data at a specific index
 	bool setValue(int index, qint8   value) ;
@@ -42,7 +55,7 @@ public:
 	inline const QVector<double>& constVectorDouble() const { return vectorDouble_; }
 
 	/// returns the size of the DataArray
-	quint32 size() const;
+	int size() const;
 	/// clear the dataArray and reset the size to 0
 	void clear();
 	/// clear the dataArray and reset the array to the given type/size
@@ -58,7 +71,7 @@ public:
 	/// clear the target array and copy the data array of the current dataset to the target array
 	bool resetTargetArrayAndReplaceData(AMDSFlatArray *targetArray) const;
 	/// print all the data in the FlatArray to a QString
-	QString printData() const;
+	QString toString() const;
 
 	/// returns the current type of data
 	inline AMDSDataTypeDefinitions::DataType dataType() const { return dataType_; }
@@ -96,5 +109,9 @@ protected:
 	QVector<double> vectorDouble_;
 };
 
+typedef QList<AMDSFlatArray> AMDSFlatArrayList;
+
+Q_DECLARE_METATYPE(AMDSFlatArray);
+Q_DECLARE_METATYPE(AMDSFlatArrayList);
 
 #endif // AMDSFLATARRAY_H

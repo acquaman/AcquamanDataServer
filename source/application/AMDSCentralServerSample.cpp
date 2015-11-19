@@ -75,6 +75,11 @@ void AMDSCentralServerSample::initializeBufferGroup()
 	}
 }
 
+void AMDSCentralServerSample::initializeDetectorManager()
+{
+
+}
+
 void AMDSCentralServerSample::initializeAndStartDataServer()
 {
 	fiftyMillisecondTimer_ = new QTimer(this);

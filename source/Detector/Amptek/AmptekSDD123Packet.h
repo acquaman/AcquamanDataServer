@@ -43,7 +43,7 @@ public:
 	QByteArray statusByteArray() const;
 
 	/// retuns the AmptekCommand
-	inline AmptekCommand amptekCommand() const { return amptekCommand_; }
+	inline AMDSCommand amptekCommand() const { return amptekCommand_; }
 	/// returns the command Id
 	inline int commandId() const { return amptekCommand_.commandId(); }
 	/// returns the command hex codes
@@ -99,7 +99,7 @@ protected:
 
 protected:
 	/// the amptekCommand definition
-	AmptekCommand amptekCommand_;
+	AMDSCommand amptekCommand_;
 
 	/// the data string of the data packet
 	QString dataString_;

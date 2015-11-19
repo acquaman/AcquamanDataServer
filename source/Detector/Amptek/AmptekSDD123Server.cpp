@@ -5,7 +5,7 @@
 #include <QDebug>
 
 #include "AmptekEventDefinitions.h"
-#include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 /* Notes on how to convert back and forth
 QString dataString = "4d4341433d3f3b";
@@ -51,7 +51,7 @@ AmptekSDD123Server::AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurati
 		udpDetectorSocket_ = new QUdpSocket(this);
 		bool boundUDP = udpDetectorSocket_->bind(configurationMap_->localAddress(), 10001, QUdpSocket::ShareAddress);
 		if (!boundUDP)
-			AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_FAILED_TO_BOUND_UDP, QString("Amptek Server failed to bound to the detector via %1:%2").arg(configurationMap_->localAddress().toString()).arg(10001));
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMPTEK_SERVER_ALERT_FAILED_TO_BOUND_UDP, QString("Amptek Server failed to bound to the detector via %1:%2").arg(configurationMap_->localAddress().toString()).arg(10001));
 
 		connect(udpDetectorSocket_, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 		connect(this, SIGNAL(responsePacketReady()), this, SLOT(onResponsePacketReady()));
@@ -75,14 +75,14 @@ AmptekSDD123Server::~AmptekSDD123Server()
 
 QList<double> AmptekSDD123Server::droppedPacketStatistics() const
 {
-	QDateTime last30Seconds = QDateTime::currentDateTime().addSecs(-30);
+	QDateTime last30Seconds = QDateTime::currentDateTimeUtc().addSecs(-30);
 	QList<double> retVal;
 	retVal << droppedPackets_.totalOccurances() << droppedPackets_.totalRate() << droppedPackets_.occurancesSince(last30Seconds) << droppedPackets_.rateSince(last30Seconds);
 	return retVal;
 }
 
 QList<double> AmptekSDD123Server::unrequestedPacketStatistics() const{
-	QDateTime last30Seconds = QDateTime::currentDateTime().addSecs(-30);
+	QDateTime last30Seconds = QDateTime::currentDateTimeUtc().addSecs(-30);
 	QList<double> retVal;
 	retVal << unrequestedPackets_.totalOccurances() << unrequestedPackets_.totalRate()<< unrequestedPackets_.occurancesSince(last30Seconds) << unrequestedPackets_.rateSince(last30Seconds);
 	return retVal;
@@ -140,7 +140,7 @@ void AmptekSDD123Server::requestDataPacket(AmptekCommandManagerSGM::AmptekComman
 		requestSpectrumTime_->restart();
 	}
 
-	AmptekSDD123Packet requestStatusPacket(packetIDCounter_, AmptekCommandManagerSGM::sddCommands()->amptekCommand(command).hex(), dataStringHex);
+	AmptekSDD123Packet requestStatusPacket(packetIDCounter_, AmptekCommandManagerSGM::amptekCommandManager()->amdsCommand(command).hex(), dataStringHex);
 	packetIDCounter_++;
 
 	if (sendFakeRequest) {
@@ -235,7 +235,7 @@ void AmptekSDD123Server::setConfirmationPacketReceiver(QObject *confirmationPack
 void AmptekSDD123Server::sendRequestDatagram(const AmptekSDD123Packet &packet, int overrideTimeout)
 {
 	if(socketLocallyBusy_){
-		AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "\nPACKET QUEUE IS BUSY (send request datagram)");
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "\nPACKET QUEUE IS BUSY (send request datagram)");
 		packetQueue_.append(packet);
 	} else {
 		socketLocallyBusy_ = true;
@@ -254,7 +254,7 @@ void AmptekSDD123Server::sendRequestDatagram(const AmptekSDD123Packet &packet, i
 void AmptekSDD123Server::sendSyncDatagram(const AmptekSDD123Packet &packet, int overrideTimeout)
 {
 	if(socketLocallyBusy_){
-		AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "PACKET QUEUE IS BUSY (send sync datagram)");
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "PACKET QUEUE IS BUSY (send sync datagram)");
 		packetQueue_.append(packet);
 	}
 	else{
@@ -272,7 +272,7 @@ void AmptekSDD123Server::sendSyncDatagram(const AmptekSDD123Packet &packet, int 
 void AmptekSDD123Server::fakeSendDatagram(const AmptekSDD123Packet &packet, int overrideTimeout)
 {
 	if(socketLocallyBusy_){
-		AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "PACKET QUEUE IS BUSY (fake send datagram)");
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMPTEK_SERVER_ALERT_PACKET_QUEUE_BUSY, "PACKET QUEUE IS BUSY (fake send datagram)");
 		packetQueue_.append(packet);
 	}
 	else{
@@ -338,7 +338,7 @@ void AmptekSDD123Server::onResponsePacketReady()
 	AmptekSDD123Packet responsePacket(currentRequestPacket_.packetID(), totalResponseDatagram_);
 
 	if (!responsePacket.isValid()) {
-		AMErrorMon::error(this, AMPTEK_SERVER_ERR_INVALID_PACKET_DATA, QString("The datagram of reponse packet is invalid (error %1)").arg(responsePacket.lastError()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMPTEK_SERVER_ERR_INVALID_PACKET_DATA, QString("The datagram of reponse packet is invalid (error %1)").arg(responsePacket.lastError()));
 	}
 
 	processLocalStoredPacket(responsePacket);
@@ -409,7 +409,7 @@ void AmptekSDD123Server::processLocalStoredPacket(const AmptekSDD123Packet &resp
 
 	if(timedOutPackets_.count() > 0){
 		for(int x = 0; x < timedOutPackets_.count(); x++){
-			AMErrorMon::information(this, AMPTEK_SERVER_INFO_PACKET_QUEUE_BUSY, QString("Timed Out Packet: %1 %2").arg(timedOutPackets_.at(x).command()).arg(QString(QByteArray::fromHex(timedOutPackets_.at(x).dataString().toAscii()))));
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMPTEK_SERVER_INFO_PACKET_QUEUE_BUSY, QString("Timed Out Packet: %1 %2").arg(timedOutPackets_.at(x).command()).arg(QString(QByteArray::fromHex(timedOutPackets_.at(x).dataString().toAscii()))));
 		}
 
 		AmptekSDD123Packet headPacket(-1, QString("NONE"));
@@ -428,7 +428,7 @@ void AmptekSDD123Server::processLocalStoredPacket(const AmptekSDD123Packet &resp
 				if(headPacket.command() == currentRequestPacket_.command() && responsePacket.dataString() == currentSyncPacket_.dataString())
 					rerequestRequired = true;
 
-				droppedPackets_.appendPacket(QDateTime::currentDateTime(), headPacket);
+				droppedPackets_.appendPacket(QDateTime::currentDateTimeUtc(), headPacket);
 				emit dropPacketDetected();
 			}
 		}
@@ -444,7 +444,7 @@ void AmptekSDD123Server::processLocalStoredPacket(const AmptekSDD123Packet &resp
 			AmptekSDD123Packet emptyPacket(-1, QString("NONE"));
 			currentSyncPacket_ = emptyPacket;
 		} else {
-			unrequestedPackets_.appendPacket(QDateTime::currentDateTime(), responsePacket);
+			unrequestedPackets_.appendPacket(QDateTime::currentDateTimeUtc(), responsePacket);
 			emit unrequestedPacketDetected();
 		}
 	}
@@ -504,7 +504,7 @@ void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(const QByteArray &s
 
 		QCoreApplication::postEvent(spectrumPacketReceiver_, responseEvent);
 	} else {
-		AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum packet receiver"));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum packet receiver"));
 	}
 }
 
@@ -521,7 +521,7 @@ void AmptekSDD123Server::postConfigurationReadbackResponse(const QString &ASCIIC
 
 			QCoreApplication::postEvent(spectrumPacketReceiver_, configurationReadbackEvent);
 		} else {
-			AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum packet receiver"));
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum packet receiver"));
 		}
 	}
 
@@ -541,7 +541,7 @@ void AmptekSDD123Server::processLastRequestPacket(const AmptekSDD123Packet &last
 			configurationConfirmationEvent->confirmConfigurationMode_ = true;
 			QCoreApplication::postEvent(confirmationPacketReceiver_, configurationConfirmationEvent);
 		} else {
-			AMErrorMon::alert(this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum confirmation packet receiver"));
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum confirmation packet receiver"));
 		}
 	}
 }

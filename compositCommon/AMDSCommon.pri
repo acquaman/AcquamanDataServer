@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core network gui sql
+QT       *= core network gui sql
 
-CONFIG   += console
+CONFIG   *= console
 CONFIG   -= app_bundle
 
 DESTDIR = build
@@ -21,12 +21,15 @@ QMAKE_CXXFLAGS *= -Wextra -g
 
 HEADERS *= \
 	source/AMDSMainCommon.h \
+	source/appController/AMDSAppController.h \
+	source/appController/AMDSServerAppController.h \
 	source/ClientRequest/AMDSClientRequest.h \
 	source/ClientRequest/AMDSClientRequestSupport.h \
 	source/ClientRequest/AMDSClientRequestDefinitions.h \
 	source/ClientRequest/AMDSClientDataRequest.h \
 	source/ClientRequest/AMDSClientIntrospectionRequest.h \
 	source/ClientRequest/AMDSClientStatisticsRequest.h \
+	source/ClientRequest/AMDSClientConfigurationRequest.h \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
@@ -47,20 +50,26 @@ HEADERS *= \
 	source/DataElement/AMDSBufferGroupInfo.h \
 	source/DataElement/AMDSThreadedBufferGroup.h \
 	source/DataElement/AMDSDwellStatusData.h \
+	source/DataElement/AMDSCommandManager.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h  \
-	source/util/AMDSMetaObjectSupport.h
+	source/Detector/AMDSDwellDetector.h \
+	source/util/AMDSMetaObjectSupport.h \
+	source/util/AMDSRunTimeSupport.h
 
 SOURCES *= \
+	source/appController/AMDSAppController.cpp \
+	source/appController/AMDSServerAppController.cpp \
 	source/ClientRequest/AMDSClientRequest.cpp \
 	source/ClientRequest/AMDSClientRequestSupport.cpp \
 	source/ClientRequest/AMDSClientDataRequest.cpp \
 	source/ClientRequest/AMDSClientIntrospectionRequest.cpp \
 	source/ClientRequest/AMDSClientStatisticsRequest.cpp \
+	source/ClientRequest/AMDSClientConfigurationRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
@@ -78,12 +87,12 @@ SOURCES *= \
 	source/DataElement/AMDSBufferGroup.cpp \
 	source/DataElement/AMDSThreadedBufferGroup.cpp \
 	source/DataElement/AMDSDwellStatusData.cpp \
+	source/DataElement/AMDSCommandManager.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
 	source/DataHolder/AMDSScalarDataHolder.cpp \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
-	source/util/AMDSMetaObjectSupport.cpp
-
-
+	source/util/AMDSMetaObjectSupport.cpp \
+	source/util/AMDSRunTimeSupport.cpp

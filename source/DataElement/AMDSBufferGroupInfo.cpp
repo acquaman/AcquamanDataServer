@@ -32,6 +32,7 @@ bool AMDSBufferGroupInfo::writeToDataStream(QDataStream *dataStream)
 	*dataStream << description();
 	*dataStream << units();
 	*dataStream << ((quint8)flattenMethod());
+
 	*dataStream <<((quint8)(axes().count()));
 	for(int x = 0, size = axes().count(); x < size; x++) {
 		AMDSAxisInfo axisInfo = axes().at(x);

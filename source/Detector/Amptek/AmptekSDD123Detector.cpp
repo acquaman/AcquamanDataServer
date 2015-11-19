@@ -3,7 +3,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-#include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, int bufferSize, QObject *parent)
 	:QObject(parent)
@@ -65,8 +65,6 @@ AmptekSDD123Detector::AmptekSDD123Detector(const QString &name, const QString &b
 	pc5Preamp8p5VInitialized_ = false;
 
 	deviceID_ = -1;
-
-	connect(this, SIGNAL(postSpectrumPacketEventReceived(QStringList)), this, SLOT(onPostSpectrumPacketEventReceived(QStringList)));
 }
 
 AmptekSDD123Detector::~AmptekSDD123Detector()
@@ -111,7 +109,7 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 
 		QCoreApplication::postEvent(spectrumReceiver_, spectrumEvent);
 	} else {
-		AMErrorMon::alert(this, AMPTEK_ALERT_NO_SPECTRUM_EVENT_RECEIVER, QString("No spectrum receiver"));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMPTEK_ALERT_NO_SPECTRUM_EVENT_RECEIVER, QString("No spectrum receiver"));
 	}
 }
 
@@ -125,13 +123,13 @@ void AmptekSDD123Detector::onConfigurationReadbackEventReceived(AmptekConfigurat
 
 		QCoreApplication::postEvent(spectrumReceiver_, configurationValuesEvent);
 	} else {
-		AMErrorMon::alert(this, AMPTEK_ALERT_NO_SPECTRUM_EVENT_RECEIVER, QString("No spectrum receiver"));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMPTEK_ALERT_NO_SPECTRUM_EVENT_RECEIVER, QString("No spectrum receiver"));
 	}
 }
 
 AMDSFlatArray *AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrumData, int numChannels){
 	if (numChannels != bufferSize()) {
-		AMErrorMon::alert(this, AMPTEK_ALERT_CHANNEL_NUMBER_UNMATCH, QString("Spectrum channel number (%1) doesn't match with the expected buffer size (%2)").arg(numChannels).arg(bufferSize()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMPTEK_ALERT_CHANNEL_NUMBER_UNMATCH, QString("Spectrum channel number (%1) doesn't match with the expected buffer size (%2)").arg(numChannels).arg(bufferSize()));
 	}
 
 	AMDSFlatArray *spectrumArray = new AMDSFlatArray(dataType(), bufferSize());

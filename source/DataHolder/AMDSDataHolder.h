@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDataStream>
+#include <QMetaType>
 
 #include "DataElement/AMDSDataTypeDefinitions.h"
 #include "DataElement/AMDSAxisInfo.h"
@@ -68,13 +69,13 @@ public:
 	/// pure virtual function to copy the data of inputArray to local instance
 	virtual void setData(AMDSFlatArray *inputArray) = 0;
 	/// pure virtual function to return the data in the dataholder
-	virtual QString printData() = 0;
+	virtual QString toString() const = 0;
 
 	/// pure virtual function to set the Axes information
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes) = 0;
 
 	/// pure virtual functions to get the eventTime and event time related comparation operations
-	virtual QDateTime eventTime() = 0;
+	virtual QDateTime eventTime() const = 0;
 	virtual bool operator <(const QDateTime &rhs) = 0;
 	virtual bool operator >(const QDateTime &rhs) = 0;
 	virtual bool operator ==(const QDateTime &rhs) = 0;
@@ -119,7 +120,7 @@ public:
 	inline AMDSEventData * eventData() { return eventData_; }
 
 	/// implement the event time and related comparison functions
-	virtual QDateTime eventTime() { return eventData()->eventTime(); }
+	virtual QDateTime eventTime() const { return eventData()->eventTime(); }
 	virtual bool operator <(const QDateTime &rhs) { return eventData()->eventTime() < rhs; }
 	virtual bool operator >(const QDateTime &rhs) { return eventData()->eventTime() > rhs; }
 	virtual bool operator ==(const QDateTime &rhs) { return eventData()->eventTime() == rhs; }
@@ -173,12 +174,12 @@ public:
 	/// implement the setData() function to copy the data of inputArray to local instance
 	virtual void setData(AMDSFlatArray *inputValues) { return lightWeightDataHolder_->setData(inputValues); }
 	/// implement the function to return the data string
-	virtual QString printData() { return lightWeightDataHolder_->printData(); }
+	virtual QString toString() const { return lightWeightDataHolder_->toString(); }
 	/// implement the setAxes() function to set the axes information of the instance
 	virtual inline bool setAxes(const QList<AMDSAxisInfo> &axes);
 
 	/// implement the eventTime() function and related comparison operators
-	virtual QDateTime eventTime() { return eventData()->eventTime(); }
+	virtual QDateTime eventTime() const { return eventData()->eventTime(); }
 	virtual bool operator <(const QDateTime &rhs) { return lightWeightDataHolder_->operator <(rhs); }
 	virtual bool operator >(const QDateTime &rhs) { return lightWeightDataHolder_->operator >(rhs); }
 	virtual bool operator ==(const QDateTime &rhs) { return lightWeightDataHolder_->operator ==(rhs); }
@@ -243,5 +244,9 @@ bool AMDSFullDataHolder::setAxes(const QList<AMDSAxisInfo> &axes){
 	axes_ = axes;
 	return true;
 }
+
+typedef QList<AMDSDataHolder *> AMDSDataHolderList;
+
+Q_DECLARE_METATYPE(AMDSDataHolderList);
 
 #endif // AMDSDATAHOLDER_H

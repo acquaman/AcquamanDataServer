@@ -10,7 +10,7 @@ class AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest : public AMDSClient
 	Q_OBJECT
 public:
 	Q_INVOKABLE explicit AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest(QObject *parent = 0);
-	explicit AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 countBefore, quint64 countAfter, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
+	explicit AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest(ResponseType responseType, const QDateTime &localDateTime, const QString &socketKey, const QString &bufferName, bool includeStatusData, bool flattenResultData, const QDateTime &startTime, quint64 countBefore, quint64 countAfter, const AMDSBufferGroupInfo &bufferGroupInfo, QObject *parent = 0);
 	virtual ~AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest();
 
 	/// Copy constructor
@@ -19,7 +19,7 @@ public:
 	AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest& operator =(const AMDSClientMiddleTimePlusCountBeforeAndAfterDataRequest &other);
 
 	/// Returns the middle time for the data request
-	inline QDateTime middleTime() const { return middleTime_; }
+	inline QDateTime middleTime() const { return middleTime_.addMSecs(timeDelta()); }
 	/// Returns the countBefore for the data request
 	inline quint64 countBefore() const { return countBefore_; }
 	/// Returns the countAfter for the data request

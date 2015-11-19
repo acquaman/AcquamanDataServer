@@ -5,11 +5,13 @@
 #include <QDateTimeEdit>
 #include <QDialog>
 
-#include "source/appController/AMDSClientAppController.h"
-#include "source/Connection/AMDSServer.h"
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
-#include "util/AMErrorMonitor.h"
+#include "appController/AMDSClientAppController.h"
+#include "Connection/AMDSServer.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "ClientRequest/AMDSClientConfigurationRequest.h"
+#include "DataElement/AMDSCommandManager.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSClientUi::AMDSClientUi(QWidget *parent) :
     QDialog(parent)
@@ -62,10 +64,11 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 	requestTypeComboBox_->addItem("Start Time to End Time");
 	requestTypeComboBox_->addItem("Middle Time + Count Before to Count After");
 	requestTypeComboBox_->addItem("Continuous");
+	requestTypeComboBox_->addItem("Configuration");
 	requestTypeComboBox_->setCurrentIndex(0);
 
 	const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(requestTypeComboBox_->model());
-	for(int x = 1; x < 7; x++){
+	for(int x = 1; x < AMDSClientRequestDefinitions::InvalidRequest; x++){
 		QStandardItem* item = model->item(x);
 		item->setFlags(item->flags() & ~(Qt::ItemIsSelectable|Qt::ItemIsEnabled));
 		// visually disable by greying out - works only if combobox has been painted already and palette returns the wanted color
@@ -73,12 +76,13 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 	}
 
 	bufferNameListView_ = new QListView();
+	bufferNameListView_->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	QStringList bufferNames("All");
 	resetBufferListView(bufferNames);
 
-	time1Edit_ = new QDateTimeEdit(QDateTime::currentDateTime());
+	time1Edit_ = new QDateTimeEdit(QDateTime::currentDateTimeUtc());
 	time1Edit_->setDisplayFormat("HH:mm:ss.zzz");
-	time2Edit_ = new QDateTimeEdit(QDateTime::currentDateTime());
+	time2Edit_ = new QDateTimeEdit(QDateTime::currentDateTimeUtc());
 	time2Edit_->setDisplayFormat("HH:mm:ss.zzz");
 	count1Edit_ = new QLineEdit();
 	count2Edit_ = new QLineEdit();
@@ -91,61 +95,66 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 
 	resultsEdit_ = new QTextEdit();
 
-	connect(requestTypeComboBox_, SIGNAL(currentIndexChanged(QString)), this, SLOT(onRequestTypeChanged(QString)));
+	connect(requestTypeComboBox_, SIGNAL(currentIndexChanged(int)), this, SLOT(onRequestTypeChanged(int)));
 
 
 //	amptekIndex = new QSpinBox();
 
+	requestCommandComboBox_ = new QComboBox;
 
 	/// ==== layout the components ====
-	QGridLayout *mainLayout = new QGridLayout;
-	mainLayout->addWidget(hostLabel_, 0, 0);
-	mainLayout->addWidget(hostLineEdit_, 0, 1);
-	mainLayout->addWidget(portLabel_, 1, 0);
-	mainLayout->addWidget(portLineEdit_, 1, 1);
-	mainLayout->addWidget(new QLabel("Active Servers"), 2, 0);
-	mainLayout->addWidget(activeServerComboBox_, 2, 1);
-	mainLayout->addWidget(statusLabel_, 3, 0, 1, 2);
-	mainLayout->addWidget(buttonBox_, 4, 0, 1, 2);
+	mainLayout_ = new QGridLayout;
+	mainLayout_->addWidget(hostLabel_, 0, 0);
+	mainLayout_->addWidget(hostLineEdit_, 0, 1);
+	mainLayout_->addWidget(portLabel_, 1, 0);
+	mainLayout_->addWidget(portLineEdit_, 1, 1);
+	mainLayout_->addWidget(new QLabel("Active Servers"), 2, 0);
+	mainLayout_->addWidget(activeServerComboBox_, 2, 1);
+	mainLayout_->addWidget(statusLabel_, 3, 0, 1, 2);
+	mainLayout_->addWidget(buttonBox_, 4, 0, 1, 2);
 
-	QFormLayout *formLayout = new QFormLayout();
-	formLayout->addRow("Request Type", requestTypeComboBox_);
-	formLayout->addRow("Buffer", bufferNameListView_);
-	formLayout->addRow("Time1", time1Edit_);
-	formLayout->addRow("Time2", time2Edit_);
-	formLayout->addRow("Count1", count1Edit_);
-	formLayout->addRow("Count2", count2Edit_);
-	formLayout->addRow("Include Status", includeStatusDataCheckbox_);
-	formLayout->addRow("Enable Flattening", enableFlattenDataCheckbox_);
-	mainLayout->addLayout(formLayout, 5, 0, 1, 2);
-	formLayout->addRow("Active continuous connection", activeContinuousConnectionComboBox_);
-	mainLayout->addWidget(resultsEdit_, 6, 0, 1, 2);
-	setLayout(mainLayout);
+	formLayout_ = new QFormLayout();
+	formLayout_->addRow("Request Type", requestTypeComboBox_);
+	formLayout_->addRow("Buffer", bufferNameListView_);
+	formLayout_->addRow("Request Command", requestCommandComboBox_);
+	formLayout_->addRow("Time1", time1Edit_);
+	formLayout_->addRow("Time2", time2Edit_);
+	formLayout_->addRow("Count1", count1Edit_);
+	formLayout_->addRow("Count2", count2Edit_);
+	formLayout_->addRow("Include Status", includeStatusDataCheckbox_);
+	formLayout_->addRow("Enable Flattening", enableFlattenDataCheckbox_);
+	formLayout_->addRow("Active continuous connection", activeContinuousConnectionComboBox_);
+
+	mainLayout_->addLayout(formLayout_, 5, 0, 1, 2);
+	mainLayout_->addWidget(resultsEdit_, 6, 0, 1, 2);
+	setLayout(mainLayout_);
 
 	setWindowTitle(tr("AMDS Client Example"));
 	portLineEdit_->setFocus();
 
-	/// ==== initialize the app controller ==============
-	clientAppController_ = new AMDSClientAppController();
-	connect(clientAppController_, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
-	connect(clientAppController_, SIGNAL(networkSessionOpened()), this, SLOT(onNetworkSessionOpened()));
-	connect(clientAppController_, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
-	connect(clientAppController_, SIGNAL(serverError(int,bool,QString,QString)), this, SLOT(onServerError(int,bool,QString,QString)));
-	connect(clientAppController_, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
+//	connect(bufferNameListView_->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(onBufferNameSelectChanged()));
 
-	clientAppController_->openNetworkSession();
+	/// ==== initialize the app controller ==============
+	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
+	connect(clientAppController, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
+	connect(clientAppController, SIGNAL(networkSessionOpened()), this, SLOT(onNetworkSessionOpened()));
+	connect(clientAppController, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
+	connect(clientAppController, SIGNAL(serverError(int,bool,QString,QString)), this, SLOT(onServerError(int,bool,QString,QString)));
+	connect(clientAppController, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
+
+	onRequestTypeChanged(0);
 }
 
 AMDSClientUi::~AMDSClientUi()
 {
-	disconnect(clientAppController_, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
-	disconnect(clientAppController_, SIGNAL(networkSessionOpened()), this, SLOT(onNetworkSessionOpened()));
-	disconnect(clientAppController_, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
-	disconnect(clientAppController_, SIGNAL(serverError(int,bool,QString,QString)), this, SLOT(onServerError(int,bool,QString,QString)));
-	disconnect(clientAppController_, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
+	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
+	disconnect(clientAppController, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
+	disconnect(clientAppController, SIGNAL(networkSessionOpened()), this, SLOT(onNetworkSessionOpened()));
+	disconnect(clientAppController, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
+	disconnect(clientAppController, SIGNAL(serverError(int,bool,QString,QString)), this, SLOT(onServerError(int,bool,QString,QString)));
+	disconnect(clientAppController, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
 
-	clientAppController_->deleteLater();
-	clientAppController_ = 0;
+	AMDSClientAppController::releaseAppController();
 
 	QAbstractItemModel *currentListModel = bufferNameListView_->model();
 	if (currentListModel)
@@ -157,14 +166,14 @@ void AMDSClientUi::connectToServer()
 	QString hostName = hostLineEdit_->text();
 	quint16 portNumber = portLineEdit_->text().toInt();
 
-	clientAppController_->connectToServer(hostName, portNumber);
+	AMDSClientAppController::clientAppController()->connectToServer(hostName, portNumber);
 }
 
 void AMDSClientUi::disconnectWithServer()
 {
 	QString serverIdentifier = activeServerComboBox_->currentText();
 	if (serverIdentifier.length() > 0)
-		clientAppController_->disconnectWithServer(serverIdentifier);
+		AMDSClientAppController::clientAppController()->disconnectWithServer(serverIdentifier);
 }
 
 /// ============= SLOTs to handle AMDSClientAppController signals =========
@@ -177,7 +186,7 @@ void AMDSClientUi::onNetworkSessionOpening()
 void AMDSClientUi::onNetworkSessionOpened()
 {
 	statusLabel_->setText("This examples requires that you run the Acquaman Data Server example as well.");
-	enableRequestDataButton();
+//	enableRequestDataButton();
 }
 
 void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
@@ -188,17 +197,20 @@ void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
 
 	activeServerComboBox_->setCurrentIndex(activeServerComboBox_->findText(serverIdentifier));
 
-	QStringList bufferNames = clientAppController_->getBufferNamesByServer(serverIdentifier);
+	QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(serverIdentifier);
 	resetBufferListView(bufferNames);
 	resetActiveContinuousConnection(serverIdentifier);
 }
 
 void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 {
-	if (clientRequest->isContinuousMessage()) {
+	switch (clientRequest->requestType()) {
+	case AMDSClientRequestDefinitions::Continuous:
 		resetActiveContinuousConnection(activeServerComboBox_->currentText());
-	} else {
-		if (clientRequest->isIntrospectionMessage()) {
+		break;
+
+	case AMDSClientRequestDefinitions::Introspection:
+		{
 			AMDSClientIntrospectionRequest *introspectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
 			if (introspectionRequest){
 				if (introspectionRequest->readReady()){
@@ -212,11 +224,25 @@ void AMDSClientUi::onRequestDataReady(AMDSClientRequest* clientRequest)
 				}
 
 				if (introspectionRequest->checkAllBuffer() ){
-					QStringList bufferNames = clientAppController_->getBufferNamesByServer(activeServerComboBox_->currentText());
+					QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(activeServerComboBox_->currentText());
 					resetBufferListView(bufferNames);
 				}
 			}
 		}
+
+		break;
+
+	case AMDSClientRequestDefinitions::Configuration:
+		{
+			AMDSClientConfigurationRequest *configurationRequest = qobject_cast<AMDSClientConfigurationRequest*>(clientRequest);
+			if (configurationRequest){
+				if (configurationRequest->configurationCommandDefs().size() > 0)
+					resetConfigurationCommands(configurationRequest->configurationCommandDefs());
+			}
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -237,33 +263,88 @@ void AMDSClientUi::onServerError(int errorCode, bool removeServer, const QString
 /// ============= SLOTS to handle UI component signals ===============
 void AMDSClientUi::onActiveServerChanged(const QString &serverIdentifier)
 {
-	QStringList bufferNames = clientAppController_->getBufferNamesByServer(serverIdentifier);
+	QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(serverIdentifier);
 	resetBufferListView(bufferNames);
 
 	resetActiveContinuousConnection(serverIdentifier);
 }
 
-void AMDSClientUi::onRequestTypeChanged(const QString &requestType)
+void AMDSClientUi::onRequestTypeChanged(int requestType)
 {
-	if (requestType == "Continuous") {
-		bufferNameListView_->setSelectionMode(QAbstractItemView::MultiSelection);
-	} else {
-		bufferNameListView_->setSelectionMode(QAbstractItemView::SingleSelection);
+	displayWidget(requestCommandComboBox_, false);
+	displayWidget(time1Edit_, false);
+	displayWidget(time2Edit_, false);
+	displayWidget(count1Edit_, false);
+	displayWidget(count2Edit_, false);
+	displayWidget(includeStatusDataCheckbox_, false);
+	displayWidget(enableFlattenDataCheckbox_, false);
+	displayWidget(activeContinuousConnectionComboBox_, false);
 
-		if (bufferNameListView_->selectionModel()->selectedIndexes().count() > 1)
-			bufferNameListView_->clearSelection();
+	bufferNameListView_->setSelectionMode(QAbstractItemView::SingleSelection);
+	if (bufferNameListView_->selectionModel()->selectedIndexes().count() > 1)
+		bufferNameListView_->clearSelection();
+
+	switch(requestType) {
+	case AMDSClientRequestDefinitions::Introspection:
+	case AMDSClientRequestDefinitions::Statistics:
+		break;
+	case AMDSClientRequestDefinitions::StartTimePlusCount:
+		displayWidget(time1Edit_, true);
+		displayWidget(count1Edit_, true);
+		displayWidget(includeStatusDataCheckbox_, true);
+		displayWidget(enableFlattenDataCheckbox_, true);
+		break;
+	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
+		displayWidget(count1Edit_, true);
+		displayWidget(count2Edit_, true);
+		displayWidget(includeStatusDataCheckbox_, true);
+		displayWidget(enableFlattenDataCheckbox_, true);
+		break;
+	case AMDSClientRequestDefinitions::StartTimeToEndTime:
+		displayWidget(time1Edit_, true);
+		displayWidget(time2Edit_, true);
+		displayWidget(includeStatusDataCheckbox_, true);
+		displayWidget(enableFlattenDataCheckbox_, true);
+		break;
+	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
+		displayWidget(time1Edit_, true);
+		displayWidget(count1Edit_, true);
+		displayWidget(count2Edit_, true);
+		displayWidget(includeStatusDataCheckbox_, true);
+		displayWidget(enableFlattenDataCheckbox_, true);
+		break;
+	case AMDSClientRequestDefinitions::Continuous:
+		displayWidget(count1Edit_, true);
+		displayWidget(includeStatusDataCheckbox_, true);
+		displayWidget(enableFlattenDataCheckbox_, true);
+		displayWidget(activeContinuousConnectionComboBox_, true);
+
+		bufferNameListView_->setSelectionMode(QAbstractItemView::MultiSelection);
+		break;
+	case AMDSClientRequestDefinitions::Configuration :
+		displayWidget(requestCommandComboBox_, true);
+		displayWidget(count1Edit_, true);
+		break;
 	}
+}
+
+void AMDSClientUi::onBufferNameSelectChanged()
+{
+	requestCommandComboBox_->clear();
+	requestCommandComboBox_->addItem("");
+
+	currentConfigurationCommandDefs_.clear();
 }
 
 void AMDSClientUi::enableRequestDataButton()
 {
-	requestDataButton_->setEnabled(clientAppController_->isSessionOpen() &&
+	requestDataButton_->setEnabled(AMDSClientAppController::clientAppController()->isSessionOpen() &&
 								 !activeServerComboBox_->currentText().isEmpty());
 }
 
 void AMDSClientUi::sendClientRequest()
 {
-	AMDSServer * server = clientAppController_->getServerByServerIdentifier(activeServerComboBox_->currentText());
+	AMDSServer * server = AMDSClientAppController::clientAppController()->getServerByServerIdentifier(activeServerComboBox_->currentText());
 	if (!server) {
 		QMessageBox::information( this, "AMDS Client Example", "Didn't select any active server!");
 		return;
@@ -279,6 +360,7 @@ void AMDSClientUi::sendClientRequest()
 	quint16 portNumber = server->portNumber();
 	quint8 requestTypeId = (quint8)requestTypeComboBox_->currentIndex();
 	QString bufferName = selectedBufferNames.value(0);
+	QString configurationCommand = requestCommandComboBox_->currentText();
 	QDateTime time1 = time1Edit_->dateTime();
 	QDateTime time2 = time2Edit_->dateTime();
 	QString value1 = count1Edit_->text();
@@ -296,33 +378,52 @@ void AMDSClientUi::sendClientRequest()
 		return;
 	}
 
+	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
 	switch(clientRequestType) {
 	case AMDSClientRequestDefinitions::Introspection:
-		clientAppController_->requestClientData(hostName, portNumber, bufferName);
+		clientAppController->requestClientData(hostName, portNumber, bufferName);
 		break;
 	case AMDSClientRequestDefinitions::Statistics:
-		clientAppController_->requestClientData(hostName, portNumber);
+		clientAppController->requestClientData(hostName, portNumber);
 		break;
 	case AMDSClientRequestDefinitions::StartTimePlusCount:
-		clientAppController_->requestClientData(hostName, portNumber, bufferName, time1, value1.toInt(), includeStatus, enableFlattening);
+		clientAppController->requestClientData(hostName, portNumber, bufferName, time1, value1.toInt(), includeStatus, enableFlattening);
 		break;
 	case AMDSClientRequestDefinitions::RelativeCountPlusCount:
-		clientAppController_->requestClientData(hostName, portNumber, bufferName, value1.toInt(), value2.toInt(), includeStatus, enableFlattening);
+		clientAppController->requestClientData(hostName, portNumber, bufferName, value1.toInt(), value2.toInt(), includeStatus, enableFlattening);
 		break;
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
-		clientAppController_->requestClientData(hostName, portNumber, bufferName, time1, time2, includeStatus, enableFlattening);
+		clientAppController->requestClientData(hostName, portNumber, bufferName, time1, time2, includeStatus, enableFlattening);
 		break;
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
-		clientAppController_->requestClientData(hostName, portNumber, bufferName, time1, value1.toInt(), value2.toInt(), includeStatus, enableFlattening);
+		clientAppController->requestClientData(hostName, portNumber, bufferName, time1, value1.toInt(), value2.toInt(), includeStatus, enableFlattening);
 		break;
 	case AMDSClientRequestDefinitions::Continuous:
-		clientAppController_->requestClientData(hostName, portNumber, selectedBufferNames, value1.toInt(), includeStatus, enableFlattening, continuousSocket);
-		if (continuousSocket.length() > 0) {
-			AMErrorMon::information(this, AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE, QString("Hand shake message: %1").arg(continuousSocket));
+		clientAppController->requestClientData(hostName, portNumber, selectedBufferNames, value1.toInt(), includeStatus, enableFlattening, continuousSocket);
+		if ((continuousSocket.length() > 0) ) {
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE, QString("Hand shake message: %1").arg(continuousSocket));
 		}
 		break;
+	case AMDSClientRequestDefinitions::Configuration:
+		{
+			int commandId = currentConfigurationCommandDefs_.value(configurationCommand).commandId();
+			clientAppController->requestClientData(hostName, portNumber, bufferName, commandId, value1);
+		}
+		break;
+
 	default:
-		AMErrorMon::alert(this, AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE, QString("Invalide client request type: %1").arg(clientRequestType));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE, QString("Invalide client request type: %1").arg(clientRequestType));
+	}
+}
+
+void AMDSClientUi::displayWidget(QWidget *widget, bool show)
+{
+	if (show) {
+		widget->show();
+		formLayout_->labelForField(widget)->show();
+	} else {
+		widget->hide();
+		formLayout_->labelForField(widget)->hide();
 	}
 }
 
@@ -337,9 +438,19 @@ void AMDSClientUi::resetBufferListView(const QStringList &bufferNames)
 	bufferNameListView_->setModel(bufferNamesModel);
 }
 
+void AMDSClientUi::resetConfigurationCommands(QList<AMDSCommand> commandDefs)
+{
+	onBufferNameSelectChanged();
+
+	foreach(AMDSCommand commandDef, commandDefs) {
+		currentConfigurationCommandDefs_.insert(commandDef.command(), commandDef);
+		requestCommandComboBox_->addItem(commandDef.command());
+	}
+}
+
 void AMDSClientUi::resetActiveContinuousConnection(const QString &serverIdentifier)
 {
-	QStringList activeContinuousClientRequestKeys = clientAppController_->getActiveSocketKeysByServer(serverIdentifier);
+	QStringList activeContinuousClientRequestKeys = AMDSClientAppController::clientAppController()->getActiveSocketKeysByServer(serverIdentifier);
 
 	bool updateActiveContiuousConnectionComboBox = false;
 	if (activeContinuousClientRequestKeys.length() == activeContinuousConnectionComboBox_->count()) {

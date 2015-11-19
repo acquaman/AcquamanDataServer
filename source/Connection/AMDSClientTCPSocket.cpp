@@ -3,7 +3,7 @@
 #include <QDataStream>
 
 #include "ClientRequest/AMDSClientRequest.h"
-#include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AMDSClientTCPSocket::AMDSClientTCPSocket(const QString host, const quint16 port, QObject *parent)
 	:QObject(parent)
@@ -98,14 +98,15 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:
 	case AMDSClientRequestDefinitions::MiddleTimePlusCountBeforeAndAfter:
 	case AMDSClientRequestDefinitions::Continuous:
+	case AMDSClientRequestDefinitions::Configuration:
 			if (clientRequest->validateResponse()) {
 				socketKey_ = clientRequest->socketKey();
-				clientRequest->printData();
+//				clientRequest->printData();
 			}
 			break;
 
 	default:
-		AMErrorMon::alert(this, AMDS_SERVER_ALT_VALIDATE_RESPONSE_NOT_IMPLEMENTED, QString("The validateResponse() function is NOT implemented (or called) for %1").arg(clientRequest->requestType()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_VALIDATE_RESPONSE_NOT_IMPLEMENTED, QString("The validateResponse() function is NOT implemented (or called) for message type %1").arg(clientRequest->requestType()));
 		break;
 	}
 
@@ -131,6 +132,6 @@ void AMDSClientTCPSocket::sendData(AMDSClientRequest *clientRequest)
 	outDataStream << (quint16)(block.size() - sizeof(quint16));
 	tcpSocket_->write(block);
 
-	AMErrorMon::information(this, AMDS_SERVER_INFO_SOCKET_SEND_DATA, QString("Send %1 data to server.").arg(block.size() - sizeof(quint16)));
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_SOCKET_SEND_DATA, QString("Send %1 data to server.").arg(block.size() - sizeof(quint16)));
 }
 

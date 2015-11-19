@@ -1,4 +1,4 @@
-#include "source/DataElement/AMDSnDIndex.h"
+#include "DataElement/AMDSnDIndex.h"
 
 #include <QStringList>
 

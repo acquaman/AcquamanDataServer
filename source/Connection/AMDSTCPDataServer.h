@@ -11,7 +11,7 @@
 #include <QNetworkConfigurationManager>
 #include <QSettings>
 
-#include "source/Connection/AMDSPacketStats.h"
+#include "Connection/AMDSPacketStats.h"
 
 class QTimer;
 class AMDSClientRequest;

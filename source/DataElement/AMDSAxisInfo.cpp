@@ -1,4 +1,4 @@
-#include "source/DataElement/AMDSAxisInfo.h"
+#include "DataElement/AMDSAxisInfo.h"
 
 AMDSAxisInfo::AMDSAxisInfo(const QString &name, quint32 size, const QString &description, const QString &units, bool isUniform)
 {

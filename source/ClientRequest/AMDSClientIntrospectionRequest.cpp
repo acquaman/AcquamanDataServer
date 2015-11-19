@@ -8,8 +8,8 @@ AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(QObject *parent) 
 	setBufferName("Invalid");
 }
 
-AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(ResponseType responseType, const QString &socketKey, const QString &bufferName, QObject *parent) :
-	AMDSClientRequest(socketKey, QString(), AMDSClientRequestDefinitions::Introspection, responseType, parent)
+AMDSClientIntrospectionRequest::AMDSClientIntrospectionRequest(ResponseType responseType, const QDateTime &localDateTime, const QString &socketKey, const QString &bufferName, QObject *parent) :
+	AMDSClientRequest(socketKey, QString(), AMDSClientRequestDefinitions::Introspection, responseType, localDateTime, parent)
 {
 	setBufferName(bufferName);
 }

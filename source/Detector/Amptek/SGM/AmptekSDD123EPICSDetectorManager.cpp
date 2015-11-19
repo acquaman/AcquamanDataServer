@@ -5,7 +5,7 @@
 
 #include "DataElement/AMDSDwellStatusData.h"
 #include "DataHolder/AMDSDataHolder.h"
-#include "util/AMErrorMonitor.h"
+#include "util/AMDSRunTimeSupport.h"
 
 AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent)
 	:AmptekSDD123DetectorManager(amptekConfiguration, parent)
@@ -270,7 +270,7 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDS
 	if (spectrumData.dataType() == AMDSDataTypeDefinitions::Double)
 		spectrumControl_->setValues(spectrumData.constVectorDouble());
 	else
-		AMErrorMon::alert(this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The dataType of the data array (%1) is NOT expected Double type.").arg(spectrumData.dataType()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The dataType of the data array (%1) is NOT expected Double type.").arg(spectrumData.dataType()));
 
 	/**/
 	if(!fastCountsControl_->withinTolerance(statusData.fastCounts()))
