@@ -171,8 +171,9 @@ void AMDSScalerDetector::onFetchScanBuffer()
 	AMDSDataHolderList scanBufferDataHolderList;
 
 	int channelCount = enabledChannelCount();
-	QVector<int> countBuffer(channelCount * scansInABuffer_ + 1); // need one extra buffer for the # of channels
-	scanBufferControl_->values(channelCount, countBuffer.data());
+	int bufferSize = channelCount * scansInABuffer_ + 1;
+	QVector<int> countBuffer(bufferSize); // need one extra buffer for the # of channels
+	scanBufferControl_->values(bufferSize, countBuffer.data());
 
 	// put the counts array to the FlatArrayList
 	for (int scanIndex=0; scanIndex < scansInABuffer_; scanIndex++) {

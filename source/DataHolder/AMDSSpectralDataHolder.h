@@ -47,7 +47,7 @@ public:
 	/// reimplement the function to clear the data of the instance
 	virtual void clear();
 	/// implement the function to return the data string
-	virtual QString toString();
+	virtual QString toString() const;
 
 	/// function to copy the value of source instance to the current instance
 	virtual void cloneData(AMDSDataHolder *dataHolder);

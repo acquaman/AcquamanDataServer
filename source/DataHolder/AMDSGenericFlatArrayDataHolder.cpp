@@ -43,7 +43,7 @@ AMDSDataHolder* AMDSLightWeightGenericFlatArrayDataHolder::operator /(const quin
 	return targetDataHolder;
 }
 
-QString AMDSLightWeightGenericFlatArrayDataHolder::toString()
+QString AMDSLightWeightGenericFlatArrayDataHolder::toString() const
 {
 	return QString("%1 : %2").arg(eventTime().toString()).arg(valueFlatArray_.toString());
 }
