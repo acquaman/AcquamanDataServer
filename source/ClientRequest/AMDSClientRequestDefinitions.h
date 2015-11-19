@@ -42,6 +42,11 @@ namespace AMDSClientRequestDefinitions {
 	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_HANDSHAKE_SOCKET_KEY 20748
 	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAMES 20749
 
+	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_DEF_SIZE 20750
+	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_DEF 20751
+	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE 20752
+	#define AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND 20753
+
 	#define AMDS_CLIENTREQUEST_INFO_HANDLE_CLIENT_REQUEST 20790
 	#define AMDS_CLIENTREQUEST_INFO_REQUEST_DATA 20791
 	#define AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_EXPIRED 20792
@@ -62,7 +67,8 @@ namespace AMDSClientRequestDefinitions {
 		StartTimeToEndTime = 4,
 		MiddleTimePlusCountBeforeAndAfter = 5,
 		Continuous = 6,
-		InvalidRequest = 7 // NOTE: this must be the last item of the RequestType definition
+		Configuration = 7,
+		InvalidRequest = 8 // NOTE: this must be the last item of the RequestType definition
 	};
 
 	inline static QString errorMessage(int errorCode, OperationType operType, RequestType msgType) {
@@ -167,6 +173,18 @@ namespace AMDSClientRequestDefinitions {
 			break;
 		case AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_BUFFER_NAMES:
 			fieldName = "BufferNames";
+			break;
+		case AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_DEF_SIZE:
+			fieldName = "ConfigurationCommandDefSize";
+			break;
+		case AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_DEF:
+			fieldName = "ConfigurationCommandDef";
+			break;
+		case AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND_SIZE:
+			fieldName = "ConfigurationCommandSize";
+			break;
+		case AMDS_CLIENTREQUEST_FAIL_TO_HANDLE_CONFIGURATION_COMMAND:
+			fieldName = "ConfigurationCommand";
 			break;
 		default:
 			fieldName = "Unknown";

@@ -44,14 +44,13 @@ INCLUDEPATH += $$PATH_TO_MPLOT
 include ( compositCommon/AcquamanMPlot.pri )
 include ( compositCommon/AMDSCommon.pri )
 
-TARGET = AcquamanDataServerSGM
+TARGET = AcquamanDataServerSGMAmptek
 
 HEADERS *= \
 	source/application/AMDSCentralServer.h \
 	source/application/AMDSCentralServerSGMAmptek.h \
 	source/Detector/Amptek/AmptekEventDefinitions.h \
 	source/Detector/Amptek/AmptekSDD123ConfigurationMap.h \
-	source/Detector/Amptek/AmptekCommandManager.h \
 	source/Detector/Amptek/AmptekSDD123Packet.h \
 	source/Detector/Amptek/AmptekSDD123Server.h \
 	source/Detector/Amptek/AmptekSDD123ServerGroup.h \
@@ -67,7 +66,6 @@ SOURCES *= \
 	source/application/AMDSCentralServerSGMAmptek.cpp \
 	source/Detector/Amptek/AmptekEventDefinitions.cpp \
 	source/Detector/Amptek/AmptekSDD123ConfigurationMap.cpp \
-	source/Detector/Amptek/AmptekCommandManager.cpp \
 	source/Detector/Amptek/AmptekSDD123Packet.cpp \
 	source/Detector/Amptek/AmptekSDD123Server.cpp \
 	source/Detector/Amptek/AmptekSDD123ServerGroup.cpp \
@@ -76,6 +74,3 @@ SOURCES *= \
 	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.cpp \
 	source/Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.cpp \
 	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.cpp
-
-
-

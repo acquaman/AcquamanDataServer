@@ -29,6 +29,7 @@ HEADERS *= \
 	source/ClientRequest/AMDSClientDataRequest.h \
 	source/ClientRequest/AMDSClientIntrospectionRequest.h \
 	source/ClientRequest/AMDSClientStatisticsRequest.h \
+	source/ClientRequest/AMDSClientConfigurationRequest.h \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.h \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h \
@@ -49,12 +50,14 @@ HEADERS *= \
 	source/DataElement/AMDSBufferGroupInfo.h \
 	source/DataElement/AMDSThreadedBufferGroup.h \
 	source/DataElement/AMDSDwellStatusData.h \
+	source/DataElement/AMDSCommandManager.h \
 	source/DataHolder/AMDSDataHolder.h \
 	source/DataHolder/AMDSDataHolderSupport.h \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.h \
 	source/DataHolder/AMDSScalarDataHolder.h \
 	source/DataHolder/AMDSSpectralDataHolder.h \
 	source/DataHolder/AMDSImageDataHolder.h  \
+	source/Detector/AMDSDwellDetector.h \
 	source/util/AMDSMetaObjectSupport.h \
 	source/util/AMDSRunTimeSupport.h
 
@@ -66,6 +69,7 @@ SOURCES *= \
 	source/ClientRequest/AMDSClientDataRequest.cpp \
 	source/ClientRequest/AMDSClientIntrospectionRequest.cpp \
 	source/ClientRequest/AMDSClientStatisticsRequest.cpp \
+	source/ClientRequest/AMDSClientConfigurationRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimePlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientRelativeCountPlusCountDataRequest.cpp \
 	source/ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.cpp \
@@ -83,6 +87,7 @@ SOURCES *= \
 	source/DataElement/AMDSBufferGroup.cpp \
 	source/DataElement/AMDSThreadedBufferGroup.cpp \
 	source/DataElement/AMDSDwellStatusData.cpp \
+	source/DataElement/AMDSCommandManager.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
 	source/DataHolder/AMDSDataHolderSupport.cpp \
 	source/DataHolder/AMDSGenericFlatArrayDataHolder.cpp \
@@ -91,5 +96,3 @@ SOURCES *= \
 	source/DataHolder/AMDSImageDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp \
 	source/util/AMDSRunTimeSupport.cpp
-
-

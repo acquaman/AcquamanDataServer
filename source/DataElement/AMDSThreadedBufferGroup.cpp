@@ -3,7 +3,6 @@
 #include "DataElement/AMDSBufferGroup.h"
 #include "DataHolder/AMDSSpectralDataHolder.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
-#include "util/AMErrorMonitor.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
@@ -38,13 +37,19 @@ QString AMDSThreadedBufferGroup::bufferGroupName() const
 	return bufferGroupInfo().name();
 }
 
+void AMDSThreadedBufferGroup::append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime)
+{
+	QWriteLocker writeLock(&lock_);
+	bufferGroup_->append(dataHolderList, elapsedDwellTime);
+}
+
 void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, bool elapsedDwellTime)
 {
 	QWriteLocker writeLock(&lock_);
 	bufferGroup_->append(value, elapsedDwellTime);
 }
 
-void AMDSThreadedBufferGroup::clear() {
+void AMDSThreadedBufferGroup::clearBufferGroup() {
 	QWriteLocker writeLock(&lock_);
 
 	if (bufferGroup_)

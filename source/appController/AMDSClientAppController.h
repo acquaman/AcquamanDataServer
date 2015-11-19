@@ -25,6 +25,7 @@ class AMDSClientRequest;
 #define AMDS_CLIENT_ERR_SERVER_DISCONNECTED 10301
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG 10302
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG 10303
+#define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONFIGURATION_MSG 10304
 
 class AMDSClientAppController : public AMDSAppController
 {
@@ -66,6 +67,8 @@ public:
 	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, const QDateTime &middleTime, quint64 countBefore, quint64 countAfter, bool includeStatus=false, bool enableFlattening=false);
 	/// request data from server for Continuous
 	bool requestClientData(const QString &hostName, quint16 portNumber, const QStringList &bufferNames, quint64 updateInterval, bool includeStatus=false, bool enableFlattening=false, QString handShakeSocketKey="");
+	/// request data from server for Configuration
+	bool requestClientData(const QString &hostName, quint16 portNumber, const QString &bufferName, int commandId, const QString &value);
 
 signals:
 	/// signal to indicate that the manager object is opening a network session

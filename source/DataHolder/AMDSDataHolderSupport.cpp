@@ -1,10 +1,10 @@
 #include "AMDSDataHolderSupport.h"
 
-#include "source/DataHolder/AMDSDataHolder.h"
-#include "source/DataHolder/AMDSScalarDataHolder.h"
-#include "source/DataHolder/AMDSSpectralDataHolder.h"
+#include "DataHolder/AMDSDataHolder.h"
+#include "DataHolder/AMDSScalarDataHolder.h"
+#include "DataHolder/AMDSSpectralDataHolder.h"
 
-#include "source/util/AMDSMetaObjectSupport.h"
+#include "util/AMDSMetaObjectSupport.h"
 
 AMDSDataHolderObjectInfo::AMDSDataHolderObjectInfo()
 {

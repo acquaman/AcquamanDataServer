@@ -31,14 +31,10 @@ public:
 	/// Overload of the assignment operator. Performs a deep copy. DOES NOT MAINTAIN QOBJECT PARENTAGE.
 	AMDSClientRequest& operator=(const AMDSClientRequest& other);
 
-	/// returns whether this is an instrospection message
-	inline bool isInstrospectionMessage() { return requestType() == AMDSClientRequestDefinitions::Introspection; }
 	/// returns whether this is a statistics message
 	inline bool isStatisticsMessage() { return requestType() == AMDSClientRequestDefinitions::Statistics; }
-	/// returns whether this is a data client data request
+	/// returns whether this is a data client request
 	bool isDataClientRequest();
-	/// returns whether this is an introspection message
-	inline bool isIntrospectionMessage() { return requestType() == AMDSClientRequestDefinitions::Introspection;}
 	/// returns whether this is a continuous message
 	inline bool isContinuousMessage() { return requestType() == AMDSClientRequestDefinitions::Continuous;}
 

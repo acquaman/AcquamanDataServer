@@ -688,7 +688,7 @@ void AMDSFlatArray::resizeType(AMDSDataTypeDefinitions::DataType dataType, quint
 	}
 }
 
-QString AMDSFlatArray::printData() const{
+QString AMDSFlatArray::toString() const{
 	QString retVal;
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:

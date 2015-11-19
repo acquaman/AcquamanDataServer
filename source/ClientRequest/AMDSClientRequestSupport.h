@@ -3,7 +3,7 @@
 
 #include <QHash>
 
-#include "source/ClientRequest/AMDSClientRequestDefinitions.h"
+#include "ClientRequest/AMDSClientRequestDefinitions.h"
 
 class AMDSClientRequest;
 
