@@ -43,3 +43,7 @@ SOURCES *= \
 	source/Detector/Amptek/SGM/AmptekCommandManagerSGM.cpp \
 	source/Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.cpp \
 	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.cpp
+
+OTHER_FILES *= \
+        db/AmptekSDD.db
+
