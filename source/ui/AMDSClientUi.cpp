@@ -317,6 +317,7 @@ void AMDSClientUi::onRequestTypeChanged(int requestType)
 		displayWidget(count1Edit_, true);
 		displayWidget(includeStatusDataCheckbox_, true);
 		displayWidget(enableFlattenDataCheckbox_, true);
+		displayWidget(activeContinuousConnectionComboBox_, true);
 
 		bufferNameListView_->setSelectionMode(QAbstractItemView::MultiSelection);
 		break;

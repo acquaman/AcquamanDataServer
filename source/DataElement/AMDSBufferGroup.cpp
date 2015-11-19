@@ -63,7 +63,7 @@ void AMDSBufferGroup::clear()
 
 void AMDSBufferGroup::append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime)
 {
-	QWriteLocker writeLock(&lock_);
+	//!!! IMPORTANT: don't put the write lock here ... ...
 	foreach (AMDSDataHolder *dataHolder, dataHolderList) {
 		append(dataHolder, elapsedDwellTime);
 	}
@@ -129,6 +129,8 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	case AMDSClientRequestDefinitions::Introspection:
 		break;
 	case AMDSClientRequestDefinitions::Statistics:
+		break;
+	case AMDSClientRequestDefinitions::Configuration:
 		break;
 	case AMDSClientRequestDefinitions::StartTimePlusCount: {
 		AMDSClientStartTimePlusCountDataRequest *clientStartTimePlusCountDataRequest = qobject_cast<AMDSClientStartTimePlusCountDataRequest*>(clientRequest);

@@ -222,7 +222,7 @@ void AMDSTCPDataServer::sessionOpened()
 		return;
 	}
 
-	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Listening on %1:%2").arg(server_->serverAddress().toString()).arg(server_->serverPort()));
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_SERVER_IS_ALIVE, QString("Listening on %1:%2").arg(server_->serverAddress().toString()).arg(server_->serverPort()));
 }
 
 
