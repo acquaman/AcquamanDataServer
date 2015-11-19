@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core network gui sql
+QT       *= core network gui sql
 
-CONFIG   += console
+CONFIG   *= console
 CONFIG   -= app_bundle
 
 DESTDIR = build

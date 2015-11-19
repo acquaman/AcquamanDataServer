@@ -1,0 +1,1594 @@
+record(ao, "amptek:sdd:all:spectrum:clear")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd:all:spectrum:start")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "amptek:sdd:all:spectrum:dwellTime")
+{
+	field(VAL, "-2")
+}
+
+record(mbbo, "amptek:sdd:all:spectrum:dwellState")
+{
+	field( ZRST, "Not Acquiring")
+	field( ZRVL, "0x00")
+	field( ONST, "Acquiring")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+record(ao, "amptek:sdd1:spectrum:start")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd1:spectrum:stop")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd1:spectrum:clear")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd1:spectrum:dwellTime")
+{
+	field(VAL, "1.0")
+	field(DRVL, "0.1")
+	field(DRVH, "120.0")
+}
+record(mbbo, "amptek:sdd1:spectrum:dwellMode")
+{
+	field(ZRST, "Single")
+	field(ZRVL, "0x00")
+	field(ONST, "Continuous")
+	field(ONVL, "0x01")
+}
+record(mbbo, "amptek:sdd1:spectrum:dwellState")
+{
+	field(ZRST, "Not Acquiring")
+	field(ZRVL, "0x00")
+	field(ONST, "Acquiring")
+	field(ONVL, "0x01")
+}
+record(waveform, "amptek:sdd1:spectrum")
+{
+#	field(DTYP, "$DTYP")
+	field(FTVL, "LONG")
+	field(NELM, "1024")
+}
+
+record(ao, "amptek:sdd1:spectrum:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:average:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:average:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:average:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:average:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:average:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:spectrum:elapsedTime")
+{
+	field(VAL, "0")
+}
+
+record(stringout, "amptek:sdd1:spectrum:startTime")
+{
+	field(VAL, "N/A")
+}
+
+record(stringout, "amptek:sdd1:spectrum:endTime")
+{
+	field(VAL, "N/A")
+}
+
+record(ao, "amptek:sdd1:spectrum:average:replyTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd1:parameters:temperature")
+{
+	field(VAL, "0")
+}
+
+record(mbbo, "amptek:sdd1:parameters:highVoltage")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd1:parameters:totalGain")
+{
+	field(VAL, "22")
+	field(DRVL, "0.75")
+	field(DRVH, "150")
+}
+
+record(mbbo, "amptek:sdd1:parameters:MCAChannelCount")
+{
+	field(ZRST, "256")
+	field(ZRVL, "0x00")
+	field(ONST, "512")
+	field(ONVL, "0x01")
+	field(TWST, "1024")
+	field(TWVL, "0x02")
+}
+
+record(mbbo, "amptek:sdd1:parameters:pileUpRejection")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd1:parameters:thermoelectricCooler")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "299")
+}
+
+record(ao, "amptek:sdd1:parameters:fastThreshold")
+{
+	field(VAL, "27")
+	field(DRVL, "0")
+	field(DRVH, "255")
+}
+
+record(ao, "amptek:sdd1:parameters:slowThreshold")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "24.9")
+}
+
+record(ao, "amptek:sdd1:parameters:peakingTime")
+{
+	field(VAL, "0")
+	field(DRVL, "0.2")
+	field(DRVH, "25.6")
+}
+
+record(mbbo, "amptek:sdd1:parameters:fastChannelPeakingTime")
+{
+	field(ZRST, "50")
+	field(ZRVL, "0x00")
+	field(ONST, "100")
+	field(ONVL, "0x01")
+	field(TWST, "400")
+	field(TWVL, "0x02")
+}
+
+record(ao, "amptek:sdd1:ROI:1:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:1:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:2:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:2:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:3:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:3:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:4:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:4:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:5:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:5:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:6:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:6:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:7:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:7:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:8:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd1:ROI:8:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(mbbo, "amptek:sdd1:spectrum:isAvailable")
+{
+	field( ZRST, "Not Available")
+	field( ZRVL, "0x00")
+	field( ONST, "Available")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "amptek:sdd1:spectrum:isRequested")
+{
+	field( ZRST, "Not Requested")
+	field( ZRVL, "0x00")
+	field( ONST, "Requested")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+record(ao, "amptek:sdd2:spectrum:start")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd2:spectrum:stop")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd2:spectrum:clear")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd2:spectrum:dwellTime")
+{
+	field(VAL, "1.0")
+	field(DRVL, "0.1")
+	field(DRVH, "120.0")
+}
+record(mbbo, "amptek:sdd2:spectrum:dwellMode")
+{
+	field(ZRST, "Single")
+	field(ZRVL, "0x00")
+	field(ONST, "Continuous")
+	field(ONVL, "0x01")
+}
+record(mbbo, "amptek:sdd2:spectrum:dwellState")
+{
+	field(ZRST, "Not Acquiring")
+	field(ZRVL, "0x00")
+	field(ONST, "Acquiring")
+	field(ONVL, "0x01")
+}
+record(waveform, "amptek:sdd2:spectrum")
+{
+#	field(DTYP, "$DTYP")
+	field(FTVL, "LONG")
+	field(NELM, "1024")
+}
+
+record(ao, "amptek:sdd2:spectrum:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:average:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:average:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:average:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:average:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:average:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:spectrum:elapsedTime")
+{
+	field(VAL, "0")
+}
+
+record(stringout, "amptek:sdd2:spectrum:startTime")
+{
+	field(VAL, "N/A")
+}
+
+record(stringout, "amptek:sdd2:spectrum:endTime")
+{
+	field(VAL, "N/A")
+}
+
+record(ao, "amptek:sdd2:spectrum:average:replyTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd2:parameters:temperature")
+{
+	field(VAL, "0")
+}
+
+record(mbbo, "amptek:sdd2:parameters:highVoltage")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd2:parameters:totalGain")
+{
+	field(VAL, "22")
+	field(DRVL, "0.75")
+	field(DRVH, "150")
+}
+
+record(mbbo, "amptek:sdd2:parameters:MCAChannelCount")
+{
+	field(ZRST, "256")
+	field(ZRVL, "0x00")
+	field(ONST, "512")
+	field(ONVL, "0x01")
+	field(TWST, "1024")
+	field(TWVL, "0x02")
+}
+
+record(mbbo, "amptek:sdd2:parameters:pileUpRejection")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd2:parameters:thermoelectricCooler")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "299")
+}
+
+record(ao, "amptek:sdd2:parameters:fastThreshold")
+{
+	field(VAL, "27")
+	field(DRVL, "0")
+	field(DRVH, "255")
+}
+
+record(ao, "amptek:sdd2:parameters:slowThreshold")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "24.9")
+}
+
+record(ao, "amptek:sdd2:parameters:peakingTime")
+{
+	field(VAL, "0")
+	field(DRVL, "0.2")
+	field(DRVH, "25.6")
+}
+
+record(mbbo, "amptek:sdd2:parameters:fastChannelPeakingTime")
+{
+	field(ZRST, "50")
+	field(ZRVL, "0x00")
+	field(ONST, "100")
+	field(ONVL, "0x01")
+	field(TWST, "400")
+	field(TWVL, "0x02")
+}
+
+record(ao, "amptek:sdd2:ROI:1:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:1:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:2:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:2:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:3:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:3:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:4:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:4:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:5:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:5:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:6:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:6:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:7:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:7:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:8:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd2:ROI:8:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(mbbo, "amptek:sdd2:spectrum:isAvailable")
+{
+	field( ZRST, "Not Available")
+	field( ZRVL, "0x00")
+	field( ONST, "Available")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "amptek:sdd2:spectrum:isRequested")
+{
+	field( ZRST, "Not Requested")
+	field( ZRVL, "0x00")
+	field( ONST, "Requested")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+record(ao, "amptek:sdd3:spectrum:start")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd3:spectrum:stop")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd3:spectrum:clear")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd3:spectrum:dwellTime")
+{
+	field(VAL, "1.0")
+	field(DRVL, "0.1")
+	field(DRVH, "120.0")
+}
+record(mbbo, "amptek:sdd3:spectrum:dwellMode")
+{
+	field(ZRST, "Single")
+	field(ZRVL, "0x00")
+	field(ONST, "Continuous")
+	field(ONVL, "0x01")
+}
+record(mbbo, "amptek:sdd3:spectrum:dwellState")
+{
+	field(ZRST, "Not Acquiring")
+	field(ZRVL, "0x00")
+	field(ONST, "Acquiring")
+	field(ONVL, "0x01")
+}
+record(waveform, "amptek:sdd3:spectrum")
+{
+#	field(DTYP, "$DTYP")
+	field(FTVL, "LONG")
+	field(NELM, "1024")
+}
+
+record(ao, "amptek:sdd3:spectrum:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:average:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:average:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:average:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:average:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:average:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:spectrum:elapsedTime")
+{
+	field(VAL, "0")
+}
+
+record(stringout, "amptek:sdd3:spectrum:startTime")
+{
+	field(VAL, "N/A")
+}
+
+record(stringout, "amptek:sdd3:spectrum:endTime")
+{
+	field(VAL, "N/A")
+}
+
+record(ao, "amptek:sdd3:spectrum:average:replyTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd3:parameters:temperature")
+{
+	field(VAL, "0")
+}
+
+record(mbbo, "amptek:sdd3:parameters:highVoltage")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd3:parameters:totalGain")
+{
+	field(VAL, "22")
+	field(DRVL, "0.75")
+	field(DRVH, "150")
+}
+
+record(mbbo, "amptek:sdd3:parameters:MCAChannelCount")
+{
+	field(ZRST, "256")
+	field(ZRVL, "0x00")
+	field(ONST, "512")
+	field(ONVL, "0x01")
+	field(TWST, "1024")
+	field(TWVL, "0x02")
+}
+
+record(mbbo, "amptek:sdd3:parameters:pileUpRejection")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd3:parameters:thermoelectricCooler")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "299")
+}
+
+record(ao, "amptek:sdd3:parameters:fastThreshold")
+{
+	field(VAL, "27")
+	field(DRVL, "0")
+	field(DRVH, "255")
+}
+
+record(ao, "amptek:sdd3:parameters:slowThreshold")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "24.9")
+}
+
+record(ao, "amptek:sdd3:parameters:peakingTime")
+{
+	field(VAL, "0")
+	field(DRVL, "0.2")
+	field(DRVH, "25.6")
+}
+
+record(mbbo, "amptek:sdd3:parameters:fastChannelPeakingTime")
+{
+	field(ZRST, "50")
+	field(ZRVL, "0x00")
+	field(ONST, "100")
+	field(ONVL, "0x01")
+	field(TWST, "400")
+	field(TWVL, "0x02")
+}
+
+record(ao, "amptek:sdd3:ROI:1:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:1:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:2:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:2:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:3:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:3:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:4:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:4:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:5:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:5:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:6:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:6:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:7:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:7:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:8:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd3:ROI:8:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(mbbo, "amptek:sdd3:spectrum:isAvailable")
+{
+	field( ZRST, "Not Available")
+	field( ZRVL, "0x00")
+	field( ONST, "Available")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "amptek:sdd3:spectrum:isRequested")
+{
+	field( ZRST, "Not Requested")
+	field( ZRVL, "0x00")
+	field( ONST, "Requested")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+record(ao, "amptek:sdd4:spectrum:start")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd4:spectrum:stop")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd4:spectrum:clear")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd4:spectrum:dwellTime")
+{
+	field(VAL, "1.0")
+	field(DRVL, "0.1")
+	field(DRVH, "120.0")
+}
+record(mbbo, "amptek:sdd4:spectrum:dwellMode")
+{
+	field(ZRST, "Single")
+	field(ZRVL, "0x00")
+	field(ONST, "Continuous")
+	field(ONVL, "0x01")
+}
+record(mbbo, "amptek:sdd4:spectrum:dwellState")
+{
+	field(ZRST, "Not Acquiring")
+	field(ZRVL, "0x00")
+	field(ONST, "Acquiring")
+	field(ONVL, "0x01")
+}
+record(waveform, "amptek:sdd4:spectrum")
+{
+#	field(DTYP, "$DTYP")
+	field(FTVL, "LONG")
+	field(NELM, "1024")
+}
+
+record(ao, "amptek:sdd4:spectrum:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:average:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:average:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:average:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:average:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:average:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:spectrum:elapsedTime")
+{
+	field(VAL, "0")
+}
+
+record(stringout, "amptek:sdd4:spectrum:startTime")
+{
+	field(VAL, "N/A")
+}
+
+record(stringout, "amptek:sdd4:spectrum:endTime")
+{
+	field(VAL, "N/A")
+}
+
+record(ao, "amptek:sdd4:spectrum:average:replyTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd4:parameters:temperature")
+{
+	field(VAL, "0")
+}
+
+record(mbbo, "amptek:sdd4:parameters:highVoltage")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd4:parameters:totalGain")
+{
+	field(VAL, "22")
+	field(DRVL, "0.75")
+	field(DRVH, "150")
+}
+
+record(mbbo, "amptek:sdd4:parameters:MCAChannelCount")
+{
+	field(ZRST, "256")
+	field(ZRVL, "0x00")
+	field(ONST, "512")
+	field(ONVL, "0x01")
+	field(TWST, "1024")
+	field(TWVL, "0x02")
+}
+
+record(mbbo, "amptek:sdd4:parameters:pileUpRejection")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd4:parameters:thermoelectricCooler")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "299")
+}
+
+record(ao, "amptek:sdd4:parameters:fastThreshold")
+{
+	field(VAL, "27")
+	field(DRVL, "0")
+	field(DRVH, "255")
+}
+
+record(ao, "amptek:sdd4:parameters:slowThreshold")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "24.9")
+}
+
+record(ao, "amptek:sdd4:parameters:peakingTime")
+{
+	field(VAL, "0")
+	field(DRVL, "0.2")
+	field(DRVH, "25.6")
+}
+
+record(mbbo, "amptek:sdd4:parameters:fastChannelPeakingTime")
+{
+	field(ZRST, "50")
+	field(ZRVL, "0x00")
+	field(ONST, "100")
+	field(ONVL, "0x01")
+	field(TWST, "400")
+	field(TWVL, "0x02")
+}
+
+record(ao, "amptek:sdd4:ROI:1:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:1:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:2:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:2:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:3:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:3:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:4:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:4:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:5:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:5:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:6:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:6:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:7:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:7:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:8:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd4:ROI:8:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(mbbo, "amptek:sdd4:spectrum:isAvailable")
+{
+	field( ZRST, "Not Available")
+	field( ZRVL, "0x00")
+	field( ONST, "Available")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "amptek:sdd4:spectrum:isRequested")
+{
+	field( ZRST, "Not Requested")
+	field( ZRVL, "0x00")
+	field( ONST, "Requested")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+record(ao, "amptek:sdd5:spectrum:start")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd5:spectrum:stop")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd5:spectrum:clear")
+{
+	field(VAL, "0")
+}
+record(ao, "amptek:sdd5:spectrum:dwellTime")
+{
+	field(VAL, "1.0")
+	field(DRVL, "0.1")
+	field(DRVH, "120.0")
+}
+record(mbbo, "amptek:sdd5:spectrum:dwellMode")
+{
+	field(ZRST, "Single")
+	field(ZRVL, "0x00")
+	field(ONST, "Continuous")
+	field(ONVL, "0x01")
+}
+record(mbbo, "amptek:sdd5:spectrum:dwellState")
+{
+	field(ZRST, "Not Acquiring")
+	field(ZRVL, "0x00")
+	field(ONST, "Acquiring")
+	field(ONVL, "0x01")
+}
+record(waveform, "amptek:sdd5:spectrum")
+{
+#	field(DTYP, "$DTYP")
+	field(FTVL, "LONG")
+	field(NELM, "1024")
+}
+
+record(ao, "amptek:sdd5:spectrum:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:average:fastCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:average:slowCounts")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:average:accumulationTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:average:liveTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:average:realTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:spectrum:elapsedTime")
+{
+	field(VAL, "0")
+}
+
+record(stringout, "amptek:sdd5:spectrum:startTime")
+{
+	field(VAL, "N/A")
+}
+
+record(stringout, "amptek:sdd5:spectrum:endTime")
+{
+	field(VAL, "N/A")
+}
+
+record(ao, "amptek:sdd5:spectrum:average:replyTime")
+{
+	field(VAL, "0")
+}
+
+record(ao, "amptek:sdd5:parameters:temperature")
+{
+	field(VAL, "0")
+}
+
+record(mbbo, "amptek:sdd5:parameters:highVoltage")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd5:parameters:totalGain")
+{
+	field(VAL, "22")
+	field(DRVL, "0.75")
+	field(DRVH, "150")
+}
+
+record(mbbo, "amptek:sdd5:parameters:MCAChannelCount")
+{
+	field(ZRST, "256")
+	field(ZRVL, "0x00")
+	field(ONST, "512")
+	field(ONVL, "0x01")
+	field(TWST, "1024")
+	field(TWVL, "0x02")
+}
+
+record(mbbo, "amptek:sdd5:parameters:pileUpRejection")
+{
+	field(ZRST, "Off")
+	field(ZRVL, "0x00")
+	field(ONST, "On")
+	field(ONVL, "0x01")
+}
+
+record(ao, "amptek:sdd5:parameters:thermoelectricCooler")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "299")
+}
+
+record(ao, "amptek:sdd5:parameters:fastThreshold")
+{
+	field(VAL, "27")
+	field(DRVL, "0")
+	field(DRVH, "255")
+}
+
+record(ao, "amptek:sdd5:parameters:slowThreshold")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "24.9")
+}
+
+record(ao, "amptek:sdd5:parameters:peakingTime")
+{
+	field(VAL, "0")
+	field(DRVL, "0.2")
+	field(DRVH, "25.6")
+}
+
+record(mbbo, "amptek:sdd5:parameters:fastChannelPeakingTime")
+{
+	field(ZRST, "50")
+	field(ZRVL, "0x00")
+	field(ONST, "100")
+	field(ONVL, "0x01")
+	field(TWST, "400")
+	field(TWVL, "0x02")
+}
+
+record(ao, "amptek:sdd5:ROI:1:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:1:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:2:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:2:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:3:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:3:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:4:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:4:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:5:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:5:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:6:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:6:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:7:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:7:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:8:lowChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(ao, "amptek:sdd5:ROI:8:highChannel")
+{
+	field(VAL, "0")
+	field(DRVL, "0")
+	field(DRVH, "1024")
+}
+
+record(mbbo, "amptek:sdd5:spectrum:isAvailable")
+{
+	field( ZRST, "Not Available")
+	field( ZRVL, "0x00")
+	field( ONST, "Available")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "amptek:sdd5:spectrum:isRequested")
+{
+	field( ZRST, "Not Requested")
+	field( ZRVL, "0x00")
+	field( ONST, "Requested")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
