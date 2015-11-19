@@ -28,6 +28,11 @@ class AMDSClientRequest;
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG 10303
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONFIGURATION_MSG 10304
 
+#define AMDS_CLIENT_ERR_WRITING_FILE 10305
+#define AMDS_CLIENT_ERR_TARGET_EXPORT_FILE_NOT_CONFIGURED 10306
+#define AMDS_CLIENT_ERR_TARGET_EXPORT_FILE_EXISTED 10307
+#define AMDS_CLIENT_ERR_FAILED_TO_OPEN_TARGET_EXPORT_FILE 10308
+
 class AMDSClientAppController : public AMDSAppController
 {
     Q_OBJECT
@@ -41,7 +46,8 @@ public:
 	bool isSessionOpen();
 
 	/// set the path where the client data request will be written to
-	inline void setFilePath(const QString filePath) { filePath_ = filePath; }
+	inline void setAMDSExportFilePath(const QString filePath) { currentExportedFilePath_ = filePath; }
+
 	/// helper function to return the server by given identifier
 	inline AMDSServer *getServerByServerIdentifier(const QString &serverIdentifier) { return activeServers_.value(serverIdentifier, 0);}
 
@@ -95,6 +101,11 @@ public slots:
 	/// slot to handle socket error signal from the server
 	void onAMDSServerError(const QString &serverIdentifier, int errorCode, const QString &socketKey, const QString &errorMessage);
 
+	/// slot to handle the signal to start a new scan
+	void onScanStarted();
+	/// slot to handle the signal to finish a scan
+	void onScanStopped();
+
 protected:
 	/// make the constructor protected for SINGLETON usage
 	explicit AMDSClientAppController(QObject *parent = 0);
@@ -103,7 +114,7 @@ private slots:
 	/// slot to handle the signal of network session opened
 	void onNetworkSessionOpened();
 	/// slot to handle the new client request received message from a given server
-	void onRequestDataReady(const QString &serverIdentifier, AMDSClientRequest* clientRequest);
+	void onRequestDataReady(AMDSClientRequest* clientRequest);
 
 private:
 	/// establish TCP socket connection to a specific hostName and the portNumber
@@ -111,10 +122,6 @@ private:
 
 	/// helper function to instantiate client request based on the request type
 	AMDSClientRequest *instantiateClientRequest(AMDSClientRequestDefinitions::RequestType clientRequestType);
-
-	/// helper function to generate the file name of the current client request
-	/// the target file name will be like "{filePath_}/{fileTimeStamp_}_{serverIdentifier}_{bufferName}.dat"
-	QString targetFileNameInFullPath(const QString &serverIdentifier, const QString &bufferName) const;
 
 private:
 	/// the pointer of network session
@@ -124,12 +131,9 @@ private:
 	QHash<QString, AMDSServer *> activeServers_;
 
 	/// the path where the clientDataRequest will be written to
-	QString filePath_;
-	/// the timeStamp we are going to used to identifier this current run
-	/// the client data request of one Acquaman run will be written to the same file
-	QString fileTimeStamp_;
-	/// the mapping of fileName vs, QFile
-	QHash<QString, QFile*> dataRequestFiles_;
+	QString currentExportedFilePath_;
+	/// the handler of the file, which we are going to write the data to
+	QFile* clientDataRequestFile_;
 };
 
 #endif // AMDSCLIENTAPPCONTROLLER_H

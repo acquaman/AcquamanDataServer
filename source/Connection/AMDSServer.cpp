@@ -62,7 +62,7 @@ void AMDSServer::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSCli
 		break;
 	}
 
-	emit requestDataReady(serverIdentifier(), clientRequest);
+	emit requestDataReady(clientRequest);
 }
 
 void AMDSServer::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketErrorCode)

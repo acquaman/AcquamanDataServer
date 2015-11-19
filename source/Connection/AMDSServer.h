@@ -38,7 +38,7 @@ signals:
 	/// signal to indicate that something wrong with the connection happened
 	void AMDSServerError(const QString &serverIdentifier, int errorCode, QString socketKey, QString errorMessage);
 	/// signal to indicate that the data is sent from server for read
-	void requestDataReady(const QString &serverIdentifier, AMDSClientRequest*);
+	void requestDataReady(AMDSClientRequest*);
 
 public slots:
 	/// slot to establish a new TCP socket connection
