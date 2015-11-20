@@ -50,7 +50,6 @@ void AMDSDetectorServer::onConfigurationRequestReceived(AMDSClientRequest *confi
 }
 
 
-
 void AMDSDetectorServer::setDetectorServerMode(AMDSDwellDetector::DwellScanStatus detectorMode)
 {
 	if (detectorMode_ != detectorMode) {
@@ -63,8 +62,8 @@ void AMDSDetectorServer::setDetectorServerMode(AMDSDwellDetector::DwellScanStatu
 	}
 }
 
-void AMDSDetectorServer::setDetectorServerMode(int detectorMode)
+void AMDSDetectorServer::onDetectorServerModeChanged(int detectorMode)
 {
 	AMDSDwellDetector::DwellScanStatus asDwellDetector = AMDSDwellDetector::DwellScanStatus(detectorMode);
-	setDetectorServerMode(detectorMode);
+	setDetectorServerMode(asDwellDetector);
 }

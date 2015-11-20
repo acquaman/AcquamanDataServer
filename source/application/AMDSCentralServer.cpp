@@ -144,7 +144,7 @@ void AMDSCentralServer::processConfigurationClientRequest(AMDSClientRequest *cli
 		clientConfigurationRequest->setErrorMessage(errorMessage);
 		emit clientRequestProcessed(clientConfigurationRequest);
 	} else {
-		emit scalerConfigurationRequestReceived(clientConfigurationRequest);
+		emit configurationRequestReceived(clientConfigurationRequest);
 	}
 }
 
