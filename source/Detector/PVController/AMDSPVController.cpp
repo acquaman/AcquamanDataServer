@@ -9,7 +9,7 @@
 #include "DataElement/AMDSDataTypeDefinitions.h"
 #include "DataElement/AMDSFlatArray.h"
 
-#include "Detector/AMDSPVConfigurationMap.h"
+#include "Detector/PVController/AMDSPVConfigurationMap.h"
 #include "util/AMDSRunTimeSupport.h"
 
 /// ==================== implementation of AMDSThreadedPVControllerManager ============================

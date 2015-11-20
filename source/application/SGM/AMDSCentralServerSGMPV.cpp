@@ -9,12 +9,9 @@
 #include "DataElement/AMDSThreadedBufferGroup.h"
 
 #include "Detector/AMDSDetectorServer.h"
-#include "Detector/AMDSPVConfigurationMap.h"
-#include "Detector/AMDSPVController.h"
+#include "Detector/PVController/AMDSPVConfigurationMap.h"
+#include "Detector/PVController/AMDSPVController.h"
 
-//#include "Detector/Scaler/AMDSScalerCommandManager.h"
-//#include "Detector/Scaler/AMDSScalerDetector.h"
-//#include "Detector/Scaler/AMDSScalerDetectorServer.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AMDSCentralServerSGMPV::AMDSCentralServerSGMPV(QObject *parent) :
