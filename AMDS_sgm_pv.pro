@@ -18,7 +18,8 @@ HEADERS *= \
 	source/application/AMDSCentralServer.h \
         source/application/SGM/AMDSCentralServerSGMPV.h \
         source/Detector/AMDSDetectorServer.h \
-    source/Detector/AMDSPVConfigurationMap.h
+    source/Detector/AMDSPVConfigurationMap.h \
+    source/Detector/AMDSPVController.h
 #	source/Detector/Scaler/AMDSScalerCommandManager.h \
 #	source/Detector/Scaler/AMDSScalerDetector.h \
 #	source/Detector/Scaler/AMDSScalerDetectorServer.h \
@@ -28,11 +29,14 @@ SOURCES *= \
         source/AMDSMainSGMPV.cpp \
 	source/application/AMDSCentralServer.cpp \
         source/application/SGM/AMDSCentralServerSGMPV.cpp \
-        source/Detector/AMDSDetectorServer.cpp
+        source/Detector/AMDSDetectorServer.cpp \
+    source/Detector/AMDSPVController.cpp
 #	source/Detector/Scaler/AMDSScalerCommandManager.cpp \
 #	source/Detector/Scaler/AMDSScalerDetector.cpp \
 #	source/Detector/Scaler/AMDSScalerDetectorServer.cpp \
 #	source/Detector/Scaler/AMDSScalerConfigurationMap.cpp
+
+
 
 
 

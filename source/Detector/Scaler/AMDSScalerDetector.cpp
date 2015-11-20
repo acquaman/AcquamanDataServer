@@ -1,7 +1,5 @@
 #include "AMDSScalerDetector.h"
 
-#include <QDebug>
-
 #include "beamline/AMPVControl.h"
 #include "beamline/AMControlSet.h"
 

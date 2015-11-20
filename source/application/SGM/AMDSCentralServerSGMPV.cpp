@@ -40,6 +40,8 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 {
 	// initialize the configurations of the PVs
 	QRegExp rx("(\\,|\\t)"); //RegEx for ',' or '\t'
+	int totalParameters = 6;
+
 	QFile configurationFile("./AMDSPVConfiguration.txt");
 
 	if (configurationFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -51,9 +53,9 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 			pvConfiguration = dataStream.readLine();
 
 			QStringList pvDefintions = pvConfiguration.split(rx);
-			if (pvDefintions.size() == 5) {
+			if (pvDefintions.size() == totalParameters) {
 				int dataType = pvDefintions.at(4).toInt();
-				AMDSPVConfigurationMap *pvConfiguration = new AMDSPVConfigurationMap(pvDefintions.at(0), pvDefintions.at(1), pvDefintions.at(2), pvDefintions.at(3), (AMDSDataTypeDefinitions::DataType)dataType);
+				AMDSPVConfigurationMap *pvConfiguration = new AMDSPVConfigurationMap(pvDefintions.at(0), pvDefintions.at(1), pvDefintions.at(2), pvDefintions.at(3), pvDefintions.at(4), (AMDSDataTypeDefinitions::DataType)dataType);
 				pvConfigurationMaps_.append(pvConfiguration);
 			} else {
 				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, QString("AMDS PV: the pv configuration is invalid. (%1)").arg(pvConfiguration));
@@ -66,15 +68,17 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 
 void AMDSCentralServerSGMPV::initializeBufferGroup()
 {
-//	// initialize bufferGroup for scaler
-//	QList<AMDSAxisInfo> scalerBufferGroupAxes;
-//	scalerBufferGroupAxes << AMDSAxisInfo("Channel", scalerConfigurationMap_->enabledChannels().count(), "Channel Axis", "");
-//	AMDSBufferGroupInfo scalerBufferGroupInfo(scalerConfigurationMap_->scalerName(), scalerConfigurationMap_->scalerName(), "Counts", scalerConfigurationMap_->dataType(), AMDSBufferGroupInfo::NoFlatten, scalerBufferGroupAxes);
+	// initialize bufferGroup for PV
+	foreach (AMDSPVConfigurationMap *pvConfiguration, pvConfigurationMaps_) {
+		QList<AMDSAxisInfo> pvBufferGroupAxes;
+		pvBufferGroupAxes << AMDSAxisInfo(pvConfiguration->pvName(), 1, pvConfiguration->pvDescription(), pvConfiguration->pvUnits());
+		AMDSBufferGroupInfo pvBufferGroupInfo(pvConfiguration->pvName(), pvConfiguration->pvDescription(), pvConfiguration->pvUnits(), pvConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, pvBufferGroupAxes);
 
-//	AMDSThreadedBufferGroup *scalerThreadedBufferGroup = new AMDSThreadedBufferGroup(scalerBufferGroupInfo, maxBufferSize_, false);
-//	connect(scalerThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+		AMDSThreadedBufferGroup *pvThreadedBufferGroup = new AMDSThreadedBufferGroup(pvBufferGroupInfo, maxBufferSize_, false);
+		connect(pvThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
-//	bufferGroupManagers_.insert(scalerThreadedBufferGroup->bufferGroupName(), scalerThreadedBufferGroup);
+		bufferGroupManagers_.insert(pvThreadedBufferGroup->bufferGroupName(), pvThreadedBufferGroup);
+	}
 }
 
 void AMDSCentralServerSGMPV::initializeDetectorManager()
