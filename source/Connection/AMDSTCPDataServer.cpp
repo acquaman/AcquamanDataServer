@@ -153,7 +153,7 @@ void AMDSTCPDataServer::onClientRequestProcessed(AMDSClientRequest *processedReq
 
 	AMDSClientDataRequest *processedClientDataRequest = qobject_cast<AMDSClientDataRequest*>(processedRequest);
 	if(processedClientDataRequest && processedClientDataRequest->validateResponse()) {
-		processedClientDataRequest->printData();
+//		processedClientDataRequest->printData();
 	}
 
 	if (!processedClientDataRequest || !processedClientDataRequest->isContinuousMessage()) {
