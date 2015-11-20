@@ -5,8 +5,7 @@
 #include <QHash>
 #include <QDateTime>
 #include <QTcpSocket>
-
-class QNetworkSession;
+#include <QNetworkSession>
 
 class AMDSServer;
 class AMDSClientTCPSocket;
@@ -18,6 +17,9 @@ class AMDSClientRequest;
 
 #define AMDS_CLIENT_INFO_HAND_SHAKE_MESSAGE 10100
 #define AMDS_CLIENT_INFO_NETWORK_SESSION_STARTED 10101
+#define AMDS_CLIENT_ERR_NETWORK_SESSION_CLOSED 10102
+#define AMDS_CLIENT_ERR_NETWORK_SESSION_INVALID_STATE 10103
+#define AMDS_CLIENT_ERR_NETWORK_SESSION_ERROR 10104
 
 #define AMDS_CLIENT_ERR_INVALID_MESSAGE_TYPE 10200
 
@@ -73,13 +75,16 @@ public:
 signals:
 	/// signal to indicate that the manager object is opening a network session
 	void networkSessionOpening();
-	/// signal to indicate that a network session is opened
-	void networkSessionOpened();
+
+	/// signal to indicate that the AMDS Client App Controller is ready for service
+	void AMDSClientControllerReady();
+	/// signal to indicate that the AMDS Client App Controller is in invalid state
+	void AMDSClientControllerError(const QString &errorMsg);
+	/// signal to indicate that there are server errors
+	void serverError(int errorCode, bool disconnectServer, const QString &hostIdentifier, const QString &errorMessage);
 
 	/// signal to indicate that a new server is connected
 	void newServerConnected(const QString &hostIdentifier);
-	/// signal to indicate that there are server errors
-	void serverError(int errorCode, bool disconnectServer, const QString &hostIdentifier, const QString &errorMessage);
 	/// signal to indicate that the data is sent from server for read
 	void requestDataReady(AMDSClientRequest*);
 
@@ -97,6 +102,12 @@ protected:
 private slots:
 	/// slot to handle the signal of network session opened
 	void onNetworkSessionOpened();
+	/// slot to handle the signal of network session closed
+	void onNetworkSessionClosed();
+	/// slot to handle the signal of network session state changed
+	void onNetworkSessionStateChanged(QNetworkSession::State);
+	/// slot to handle the signal of network session error
+	void onNetworkSessionError(QNetworkSession::SessionError);
 
 private:
 	/// establish TCP socket connection to a specific hostName and the portNumber

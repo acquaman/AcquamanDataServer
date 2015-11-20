@@ -105,12 +105,15 @@ void AMDSClientAppController::openNetworkSession()
 
 			networkSession_ = new QNetworkSession(config);
 			connect(networkSession_, SIGNAL(opened()), this, SLOT(onNetworkSessionOpened()));
+			connect(networkSession_, SIGNAL(closed()), this, SLOT(onNetworkSessionClosed()));
+			connect(networkSession_, SIGNAL(stateChanged(QNetworkSession::State)), this, SLOT(onNetworkSessionStateChanged(QNetworkSession::State)));
+			connect(networkSession_, SIGNAL(error(QNetworkSession::SessionError)), this, SLOT(onNetworkSessionError(QNetworkSession::SessionError)));
 
 			emit networkSessionOpening();
 			networkSession_->open();
 		}
 		else{
-			emit networkSessionOpened();
+			emit AMDSClientControllerReady();
 		}
 	}
 }
@@ -338,8 +341,36 @@ void AMDSClientAppController::onNetworkSessionOpened()
 	settings.setValue(QLatin1String("DefaultNetworkConfiguration"), id);
 	settings.endGroup();
 
-	emit networkSessionOpened();
+	emit AMDSClientControllerReady();
 }
+
+void AMDSClientAppController::onNetworkSessionClosed()
+{
+	emit AMDSClientControllerError("AMDSClientAppController: Network session is closed. Pls check the connection");
+}
+
+void AMDSClientAppController::onNetworkSessionStateChanged(QNetworkSession::State newState)
+{
+	switch(newState) {
+	case QNetworkSession::Connected:
+		emit AMDSClientControllerReady();
+		break;
+	case QNetworkSession::Disconnected:
+		emit AMDSClientControllerError("AMDSClientAppController: Network session is disconnected!");
+		break;
+	case QNetworkSession::NotAvailable:
+		emit AMDSClientControllerError("AMDSClientAppController: Network session is NOT available!");
+		break;
+	default:
+		break;
+	}
+}
+
+void AMDSClientAppController::onNetworkSessionError(QNetworkSession::SessionError errorCode)
+{
+	emit AMDSClientControllerError(QString("AMDSClientAppController: Network session failed with error code (%1)!").arg(errorCode));
+}
+
 
 AMDSClientTCPSocket * AMDSClientAppController::establishSocketConnection(const QString &hostName, quint16 portNumber)
 {
