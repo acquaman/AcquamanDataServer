@@ -3,7 +3,7 @@
 #include <QStringList>
 
 #include "AMDSMainCommon.h"
-#include "application/AMDSCentralServerSGMScaler.h"
+#include "application/SGM/AMDSCentralServerSGMScaler.h"
 #include "util/AMDSRunTimeSupport.h"
 
 int main(int argc, char *argv[])

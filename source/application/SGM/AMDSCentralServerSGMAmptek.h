@@ -1,5 +1,5 @@
-#ifndef AMDSCENTRALSERVERSGM_H
-#define AMDSCENTRALSERVERSGM_H
+#ifndef AMDSCENTRALSERVERSGMAMPTEK_H
+#define AMDSCENTRALSERVERSGMAMPTEK_H
 
 #include <QObject>
 
@@ -78,4 +78,4 @@ protected:
 	AmptekSDD123DetectorGroupSGM *amptekDetectorGroup_;
 };
 
-#endif // AMDSCENTRALSERVERSGM_H
+#endif // AMDSCENTRALSERVERSGMAMPTEK_H

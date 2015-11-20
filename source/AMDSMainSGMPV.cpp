@@ -3,7 +3,7 @@
 #include <QStringList>
 
 #include "AMDSMainCommon.h"
-#include "application/SGM/AMDSCentralServerSGMAmptek.h"
+#include "application/SGM/AMDSCentralServerSGMPV.h"
 #include "util/AMDSRunTimeSupport.h"
 
 int main(int argc, char *argv[])
@@ -14,12 +14,12 @@ int main(int argc, char *argv[])
 	QString interfaceType = "";
 	quint16 port = 28044;
 
-	bool startServer = AMDSMain_Common::parseArgument("AcquamanDataServerSGMAmptek", args, &interfaceType, &port);
+	bool startServer = AMDSMain_Common::parseArgument("AcquamanDataServerSGMPV", args, &interfaceType, &port);
 	if (startServer) {
 		AMDSMain_Common::initializeAppSettings(interfaceType, port);
 		AMDSMain_Common::initializeRegisteredClasses();
 
-		AMDSCentralServerSGMAmptek *dataServer = new AMDSCentralServerSGMAmptek();
+		AMDSCentralServerSGMPV *dataServer = new AMDSCentralServerSGMPV();
 		dataServer->initializeAndStartServices();
 		return app.exec();
 	}
