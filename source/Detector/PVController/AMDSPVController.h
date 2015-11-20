@@ -47,6 +47,10 @@ signals:
 	void newPVDataReceived(const QString &bufferName, AMDSDataHolder *newData);
 
 public slots:
+	/// slot to handle the signal to enable tracking a PV
+	void onEnablePVController(const QString &pvName);
+	/// slot to handle the signal to disable tracking a PV
+	void onDisablePVController(const QString &pvName);
 	/// slot to handle the signal to enable/disable tracking a PV
 	void onConfigurePVControl(bool enablePv, const QString &pvName);
 

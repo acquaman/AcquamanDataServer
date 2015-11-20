@@ -64,6 +64,16 @@ AMDSPVController::~AMDSPVController()
 	pvConfigurations_.clear();
 }
 
+void AMDSPVController::onEnablePVController(const QString &pvName)
+{
+	onConfigurePVControl(true, pvName);
+}
+
+void AMDSPVController::onDisablePVController(const QString &pvName)
+{
+	onConfigurePVControl(false, pvName);
+}
+
 void AMDSPVController::onConfigurePVControl(bool enablePv, const QString &pvName)
 {
 	AMDSPVConfigurationMap *pvConfiguration = pvConfigurations_.value(pvName);

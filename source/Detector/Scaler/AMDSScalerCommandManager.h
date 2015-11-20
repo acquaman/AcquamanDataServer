@@ -15,7 +15,7 @@ public:
 	/// the static function to get the object
 	static AMDSScalerCommandManager* scalerCommandManager();
 	/// the static function to release the object
-	static void releaseScalerCommands();
+	static void releaseScalerCommandManager();
 
 	~AMDSScalerCommandManager();
 

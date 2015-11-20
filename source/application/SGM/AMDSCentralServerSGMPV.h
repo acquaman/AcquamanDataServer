@@ -8,6 +8,7 @@
 
 class AMDSPVConfigurationMap;
 class AMDSPVControllerManager;
+class AMDSDetectorServerManager;
 
 #define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
 
@@ -45,11 +46,8 @@ protected:
 	QList<AMDSPVConfigurationMap*> pvConfigurationMaps_;
 	/// the pv controller manager
 	AMDSPVControllerManager *pvControllerManager_;
-
-//	/// the Scaler detector manager
-//	AMDSScalerDetectorManager *scalerDetectorManager_;
-//	/// the scaler server manager
-//	AMDSDetectorServerManager *scalerDetectorServerManager_;
+	/// the pv controller server manager
+	AMDSDetectorServerManager *pvControllerServerManager_;
 };
 
 #endif // AMDSCENTRALSERVERSGMPV_H

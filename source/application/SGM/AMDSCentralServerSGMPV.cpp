@@ -9,8 +9,10 @@
 #include "DataElement/AMDSThreadedBufferGroup.h"
 
 #include "Detector/AMDSDetectorServer.h"
+#include "Detector/PVController/AMDSPVCommandManager.h"
 #include "Detector/PVController/AMDSPVConfigurationMap.h"
 #include "Detector/PVController/AMDSPVController.h"
+#include "Detector/PVController/AMDSPVControllerServer.h"
 
 #include "util/AMDSRunTimeSupport.h"
 
@@ -30,9 +32,9 @@ AMDSCentralServerSGMPV::~AMDSCentralServerSGMPV()
 	pvConfigurationMaps_.clear();
 
 	pvControllerManager_->deleteLater();
+	pvControllerServerManager_->deleteLater();
 
-	//	scalerDetectorServerManager_->deleteLater();
-//	AMDSScalerCommandManager::releaseScalerCommands();
+	AMDSPVCommandManager::releasePVCommandManager();
 }
 
 void AMDSCentralServerSGMPV::initializeConfiguration()
@@ -90,39 +92,32 @@ void AMDSCentralServerSGMPV::initializeDetectorManager()
 
 void AMDSCentralServerSGMPV::initializeAndStartDetectorServer()
 {
-//	// initialize the scaler detector server
-//	AMDSScalerDetectorServer *scalerDetectorServer = new AMDSScalerDetectorServer(scalerConfigurationMap_->scalerName());
-//	scalerDetectorServerManager_ = new AMDSDetectorServerManager(scalerDetectorServer);
+	// initialize the pv controller server
+	AMDSPVControllerServer *pvControllerServer = new AMDSPVControllerServer("AMDSPV_SGM");
+	pvControllerServerManager_ = new AMDSDetectorServerManager(pvControllerServer);
 
-//	connect(scalerDetectorServerManager_->detectorServer(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)));
-//	connect(this, SIGNAL(configurationRequestReceived(AMDSClientRequest*)), scalerDetectorServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
+	connect(pvControllerServerManager_->detectorServer(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), this, SIGNAL(clientRequestProcessed(AMDSClientRequest*)));
+	connect(this, SIGNAL(configurationRequestReceived(AMDSClientRequest*)), pvControllerServerManager_->detectorServer(), SLOT(onConfigurationRequestReceived(AMDSClientRequest*)));
 }
 
 void AMDSCentralServerSGMPV::wrappingUpInitialization()
 {
-//	// connect scaler detector with the scaler detector server
-//	AMDSScalerDetectorServer *scalerServer = qobject_cast<AMDSScalerDetectorServer *>(scalerDetectorServerManager_->detectorServer());
-//	if (scalerServer) {
-//		// when we start/restart dwelling, we need to clear the exiting buffer since the existing data might NOT match the current configuration
-//		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), this, SLOT(onDetectorServerStartDwelling(QString)));
-
-//		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerGoingToStartDwelling()));
-//		connect(scalerServer, SIGNAL(serverChangedToConfigurationMode(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerStopDwelling()));
-//		connect(scalerServer, SIGNAL(enableScalerChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onEnableChannel(int)));
-//		connect(scalerServer, SIGNAL(disableScalerChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onDisableChannel(int)));
-
-//		connect(scalerDetectorManager_->scalerDetector(), SIGNAL(detectorScanModeChanged(int)), scalerServer, SLOT(onDetectorServerModeChanged(int)));
-//	}
+	// connect PV controller with the pv controller server
+	AMDSPVControllerServer *pvControllerServer = qobject_cast<AMDSPVControllerServer *>(pvControllerServerManager_->detectorServer());
+	if (pvControllerServer) {
+		connect(pvControllerServer, SIGNAL(enablePVController(QString)), pvControllerManager_->pvController(), SLOT(onEnablePVController(QString)));
+		connect(pvControllerServer, SIGNAL(disablePVController(QString)), pvControllerManager_->pvController(), SLOT(onDisablePVController(QString)));
+	}
 }
 
 void AMDSCentralServerSGMPV::fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest)
 {
-//	if (bufferName == scalerConfigurationMap_->scalerName()) {
-//		AMDSCommandManager *commandMananger = AMDSScalerCommandManager::scalerCommandManager();
-//		foreach(AMDSCommand commandDef, commandMananger->commands()) {
-//			clientRequest->appendCommandDef(commandDef);
-//		}
-//	}
+	Q_UNUSED(bufferName)
+
+	AMDSCommandManager *commandMananger = AMDSPVCommandManager::pvCommandManager();
+	foreach(AMDSCommand commandDef, commandMananger->commands()) {
+		clientRequest->appendCommandDef(commandDef);
+	}
 }
 
 void AMDSCentralServerSGMPV::onNewPVDataReceived(const QString &bufferName, AMDSDataHolder *newData)

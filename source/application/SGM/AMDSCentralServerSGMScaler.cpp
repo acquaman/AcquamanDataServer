@@ -26,7 +26,7 @@ AMDSCentralServerSGMScaler::~AMDSCentralServerSGMScaler()
 	scalerConfigurationMap_->deleteLater();
 	scalerDetectorManager_->deleteLater();
 	scalerDetectorServerManager_->deleteLater();
-	AMDSScalerCommandManager::releaseScalerCommands();
+	AMDSScalerCommandManager::releaseScalerCommandManager();
 }
 
 void AMDSCentralServerSGMScaler::initializeConfiguration()
