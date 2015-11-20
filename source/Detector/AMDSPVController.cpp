@@ -5,11 +5,15 @@
 #include "beamline/AMPVControl.h"
 #include "beamline/AMControlSet.h"
 
+#include "DataHolder/AMDSScalarDataHolder.h"
+#include "DataElement/AMDSDataTypeDefinitions.h"
+#include "DataElement/AMDSFlatArray.h"
+
 #include "Detector/AMDSPVConfigurationMap.h"
 #include "util/AMDSRunTimeSupport.h"
 
 /// ==================== implementation of AMDSThreadedPVControllerManager ============================
-AMDSThreadedPVControllerManager::AMDSThreadedPVControllerManager(QList<AMDSPVConfigurationMap *>pvConfigurations, QObject *parent)
+AMDSPVControllerManager::AMDSPVControllerManager(QList<AMDSPVConfigurationMap *>pvConfigurations, QObject *parent)
 	: QObject(parent)
 {
 	pvControllerThread_ = new QThread();
@@ -22,7 +26,7 @@ AMDSThreadedPVControllerManager::AMDSThreadedPVControllerManager(QList<AMDSPVCon
 	pvControllerThread_->start();
 }
 
-AMDSThreadedPVControllerManager::~AMDSThreadedPVControllerManager()
+AMDSPVControllerManager::~AMDSPVControllerManager()
 {
 	if (pvControllerThread_->isRunning())
 		pvControllerThread_->quit();
@@ -94,7 +98,12 @@ void AMDSPVController::onPVValueChanged(const QString &pvName)
 {
 	AMSinglePVControl *pvControl = pvControlSetByName_.value(pvName);
 	if (pvControl) {
-		emit newPVValue(pvName, pvControl->value());
+		AMDSPVConfigurationMap *pvConfiguration = pvConfigurations_.value(pvName);
+
+		AMDSLightWeightScalarDataHolder *pvDataHolder = new AMDSLightWeightScalarDataHolder(pvConfiguration->dataType());
+		pvDataHolder->setSingleValue(pvControl->value());
+
+		emit newPVDataReceived(pvName, pvDataHolder);
 	}
 }
 

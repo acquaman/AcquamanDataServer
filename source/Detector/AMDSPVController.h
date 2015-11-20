@@ -11,18 +11,19 @@ class AMControlSet;
 class AMControl;
 class AMSinglePVControl;
 
+class AMDSDataHolder;
 class AMDSPVConfigurationMap;
 class AMDSPVController;
 
 #define AMDS_PV_CONTROL_ERR_CONFIGURE_UNKNOWN_PV 50201
 #define AMDS_PV_CONTROL_ERR_ENABLED_PV_DISCONNECTED 50202
 
-class AMDSThreadedPVControllerManager : public QObject
+class AMDSPVControllerManager : public QObject
 {
 	Q_OBJECT
 public:
-	explicit AMDSThreadedPVControllerManager(QList<AMDSPVConfigurationMap *>pvConfigurations, QObject *parent = 0);
-	~AMDSThreadedPVControllerManager();
+	explicit AMDSPVControllerManager(QList<AMDSPVConfigurationMap *>pvConfigurations, QObject *parent = 0);
+	~AMDSPVControllerManager();
 
 	/// returns the instance of pv controller
 	inline AMDSPVController *pvController() const { return pvController_; }
@@ -43,7 +44,7 @@ public:
 
 signals:
 	/// signal to indicate there is new value for a pv control (buffergroup)
-	void newPVValue(const QString &bufferName, double value);
+	void newPVDataReceived(const QString &bufferName, AMDSDataHolder *newData);
 
 public slots:
 	/// slot to handle the signal to enable/disable tracking a PV

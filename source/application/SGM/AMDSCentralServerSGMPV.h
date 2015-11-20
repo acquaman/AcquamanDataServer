@@ -7,6 +7,8 @@
 #include "DataHolder/AMDSDataHolder.h"
 
 class AMDSPVConfigurationMap;
+class AMDSPVControllerManager;
+
 //class AMDSScalerDetectorManager;
 //class AMDSDetectorServerManager;
 
@@ -23,8 +25,8 @@ public:
 signals:
 
 protected slots:
-	/// slot to handle new scaler data request to add the data to buffergroup
-	void onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder);
+	/// slot to handle the new data of a given buffer group
+	void onNewPVDataReceived(const QString &bufferName, AMDSDataHolder *newData);
 
 protected:
 	/// function to initialize the system configurations
@@ -44,6 +46,9 @@ protected:
 protected:
 	/// the pv configruation map
 	QList<AMDSPVConfigurationMap*> pvConfigurationMaps_;
+	/// the pv controller manager
+	AMDSPVControllerManager *pvControllerManager_;
+
 //	/// the Scaler detector manager
 //	AMDSScalerDetectorManager *scalerDetectorManager_;
 //	/// the scaler server manager

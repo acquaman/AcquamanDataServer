@@ -7,8 +7,10 @@
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
+
 #include "Detector/AMDSDetectorServer.h"
 #include "Detector/AMDSPVConfigurationMap.h"
+#include "Detector/AMDSPVController.h"
 
 //#include "Detector/Scaler/AMDSScalerCommandManager.h"
 //#include "Detector/Scaler/AMDSScalerDetector.h"
@@ -30,9 +32,9 @@ AMDSCentralServerSGMPV::~AMDSCentralServerSGMPV()
 	}
 	pvConfigurationMaps_.clear();
 
-//	scalerConfigurationMap_->deleteLater();
-//	scalerDetectorManager_->deleteLater();
-//	scalerDetectorServerManager_->deleteLater();
+	pvControllerManager_->deleteLater();
+
+	//	scalerDetectorServerManager_->deleteLater();
 //	AMDSScalerCommandManager::releaseScalerCommands();
 }
 
@@ -83,9 +85,10 @@ void AMDSCentralServerSGMPV::initializeBufferGroup()
 
 void AMDSCentralServerSGMPV::initializeDetectorManager()
 {
-//	// initialize the detector manager for SGM scaler
-//	scalerDetectorManager_ = new AMDSScalerDetectorManager(scalerConfigurationMap_);
-//	connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(AMDSDataHolderList)), this, SLOT(onNewScalerScanDataReceivedd(AMDSDataHolderList)));
+	// initialize the pv controller manager for AMDS SGM PV
+	pvControllerManager_ = new AMDSPVControllerManager(pvConfigurationMaps_);
+
+	connect(pvControllerManager_->pvController(), SIGNAL(newPVDataReceived(QString, AMDSDataHolder*)), this, SLOT(onNewPVDataReceived(QString, AMDSDataHolder*)));
 }
 
 void AMDSCentralServerSGMPV::initializeAndStartDetectorServer()
@@ -125,12 +128,12 @@ void AMDSCentralServerSGMPV::fillConfigurationCommandForClientRequest(const QStr
 //	}
 }
 
-void AMDSCentralServerSGMPV::onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder)
+void AMDSCentralServerSGMPV::onNewPVDataReceived(const QString &bufferName, AMDSDataHolder *newData)
 {
-//	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
-//	if (bufferGroup) {
-//		bufferGroup->append(scalerScanCountsDataHolder);
-//	} else {
-//		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
-//	}
+	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(bufferName);
+	if (bufferGroup) {
+		bufferGroup->append(newData);
+	} else {
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(bufferName));
+	}
 }
