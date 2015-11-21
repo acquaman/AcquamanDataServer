@@ -52,7 +52,8 @@ public:
 	inline const QVector<qint64>& constVectorQint64() const { return vectorQint64_; }
 	inline const QVector<quint64>& constVectorQuint64() const { return vectorQuint64_; }
 	inline const QVector<float>& constVectorFloat() const { return vectorFloat_; }
-	const QVector<double> constVectorDouble() const;
+	inline const QVector<double>& constVectorDouble() const { return vectorDouble_; }
+	const QVector<double> asConstVectorDouble() const;
 
 	/// returns the size of the DataArray
 	int size() const;
