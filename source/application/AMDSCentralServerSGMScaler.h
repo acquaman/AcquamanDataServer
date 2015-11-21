@@ -36,6 +36,9 @@ protected slots:
 	/// slot to handle new scaler data request to add the data to buffergroup
 	void onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder);
 
+	void onScalerDetectorRequestFlattenedData(double seconds);
+	void onInternalRequestProcessed(AMDSClientRequest *clientRequest);
+
 protected:
 	/// function to initialize the system configurations
 	void initializeConfiguration();

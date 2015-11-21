@@ -95,9 +95,10 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
 //			emit continuousDataUpdate(specturalCumulativeDataHolder);
 //			emit continuousStatusDataUpdate(cumulativeStatusData, count());
 //			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
-		} else {
-			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
 		}
+//		} else {
+//			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder_->metaObject()->className()));
+//		}
 	}
 }
 
@@ -118,7 +119,8 @@ void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
 	}
 }
 
-void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
+#include <QDebug>
+void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest, bool internalRequest){
 	QReadLocker readLock(&lock_);
 
 	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest *>(clientRequest);
@@ -148,6 +150,8 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 	}
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:{
 		AMDSClientStartTimeToEndTimeDataRequest *clientStartTimeToEndTimeDataRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
+		qDebug() << "Handling a StartTimeToEndTime request with " << clientStartTimeToEndTimeDataRequest->startTime() << clientStartTimeToEndTimeDataRequest->endTime()
+			    << clientStartTimeToEndTimeDataRequest->bufferName();
 		if(clientStartTimeToEndTimeDataRequest) {
 			populateData(clientStartTimeToEndTimeDataRequest);
 		}
@@ -172,7 +176,10 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		break;
 	}
 
-	emit clientRequestProcessed(clientRequest);
+	if(internalRequest)
+		emit internalRequestProcessed(clientRequest);
+	else
+		emit clientRequestProcessed(clientRequest);
 }
 
 bool AMDSBufferGroup::flattenData(QList<AMDSDataHolder *> *dataArray)
@@ -285,6 +292,9 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimeToEndTimeDataRequest* clie
 
 	int startIndex = getDataIndexByDateTime(startTime);
 	int endIndex = getDataIndexByDateTime(endTime);
+
+	qDebug() << "StartIndex: " << startIndex;
+	qDebug() << "EndIndex: " << endIndex;
 
 	if(startIndex == -1) {
 		clientDataRequest->setErrorMessage(QString("Could not locate data for start time %1 (ReqType: 4)").arg(startTime.toString()));

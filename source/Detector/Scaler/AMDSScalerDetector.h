@@ -67,6 +67,8 @@ signals:
 	/// signal to indicate that we received new counts data
 	void newScalerScanDataReceived(const AMDSDataHolderList &scanCountsDataHolder);
 
+	void requestFlattenedData(double seconds);
+
 public slots:
 	/// slot to start dwelling
 	void onServerGoingToStartDwelling();
@@ -97,6 +99,11 @@ protected slots:
 	/// slot to fetch the channel data buffer from the scaler scan control
 	void onFetchScanBuffer();
 
+	/// Listen to changes on the trigger/dwell start PV
+	void onTriggerDwellInterfaceStartControlValueChanged(double value);
+	/// Listen to changes on the trigger/dwell dwell time PV
+	void onTriggerDwellInterfaceDwellTimeControlValueChanged(double value);
+
 protected:
 	/// helper function to initialize the PV controls of the scaler
 	void initializePVControls();
@@ -124,6 +131,15 @@ protected:
 
 	/// the pv control to access the channel scan array
 	AMWaveformBinningSinglePVControl *scanBufferControl_;
+
+	/// The start control for the new trigger/dwell interface
+	AMSinglePVControl *triggerDwellInterfaceStartControl_;
+	/// The dwell time control for the new trigger/dwell interface
+	AMSinglePVControl *triggerDwellInterfaceDwellTimeControl_;
+	/// The dwell status control for the new trigger/dwell interface
+	AMSinglePVControl *triggerDwellInterfaceDwellStateControl_;
+	/// The feedback controls for the channels of the new trigger/dwell interface
+	QMap<int, AMSinglePVControl*> triggerDwellInterfaceChannelFeedbackControls_;
 
 
 	/// the dwell time to read the scaler buffer (in ms, default 1ms)

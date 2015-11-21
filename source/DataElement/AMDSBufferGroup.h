@@ -55,11 +55,13 @@ public:
 public slots:
 	/// Slot which handles a request for data. The buffer group will attempt to populate the request
 	/// based on the instructions it includes. When the data request is ready the dataRequestReady signal is emitted
-	void processClientRequest(AMDSClientRequest *clientRequest);
+	void processClientRequest(AMDSClientRequest *clientRequest, bool internalRequest = false);
 
 signals:
 	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
 	void clientRequestProcessed(AMDSClientRequest *clientRequest);
+
+	void internalRequestProcessed(AMDSClientRequest *clientRequest);
 
 	/// signal to indicate that the new data added for conitunous monitor
 	void continuousDataUpdate(AMDSDataHolder *continuousDataHolder);
