@@ -91,7 +91,7 @@ bool AMDSClientRequest::isDataClientRequest() {
 
 void AMDSClientRequest::printData()
 {
-	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, toString());
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::DebugMsg, this, AMDS_CLIENTREQUEST_INFO_REQUEST_DATA, this);
 }
 
 int AMDSClientRequest::calculateTimeDelta() const
