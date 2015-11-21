@@ -399,6 +399,67 @@ bool AMDSFlatArray::setValue(int index, double  value)
 	return true;
 }
 
+const QVector<double> AMDSFlatArray::asConstVectorDouble() const
+{
+	QVector<double> targetVector;
+	switch(dataType_){
+	case AMDSDataTypeDefinitions::Signed8:
+		foreach(qint8 value, vectorQint8_) {
+			targetVector.append((double)value);
+		}
+		break;
+
+	case AMDSDataTypeDefinitions::Unsigned8:
+		foreach(quint8 value, vectorQuint8_) {
+			targetVector.append((double)value);
+		}
+		break;
+	case AMDSDataTypeDefinitions::Signed16:
+		foreach(qint16 value, vectorQint16_) {
+			targetVector.append((double)value);
+		}
+		break;
+	case AMDSDataTypeDefinitions::Unsigned16:
+		foreach(quint16 value, vectorQuint16_) {
+			targetVector.append((double)value);
+		}
+		break;
+	case AMDSDataTypeDefinitions::Signed32:
+		foreach(qint32 value, vectorQint32_) {
+			targetVector.append((double)value);
+		}
+		break;
+	case AMDSDataTypeDefinitions::Unsigned32:
+		foreach(quint32 value, vectorQuint32_) {
+			targetVector.append((double)value);
+		}
+		break;
+	case AMDSDataTypeDefinitions::Signed64:
+		foreach(qint64 value, vectorQint64_) {
+			targetVector.append((double)value);
+		}
+		break;
+	case AMDSDataTypeDefinitions::Unsigned64:
+		foreach(quint64 value, vectorQuint64_) {
+			targetVector.append((double)value);
+		}
+		break;
+	case AMDSDataTypeDefinitions::Float:
+		foreach(float value, vectorFloat_) {
+			targetVector.append((double)value);
+		}
+		break;
+	case AMDSDataTypeDefinitions::Double:
+		targetVector = vectorDouble_;
+		break;
+	case AMDSDataTypeDefinitions::InvalidType:
+	default:
+		break;
+	}
+
+	return targetVector;
+}
+
 int AMDSFlatArray::size() const{
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:
