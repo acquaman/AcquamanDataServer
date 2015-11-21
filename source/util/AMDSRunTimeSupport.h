@@ -4,6 +4,8 @@
 #include <QtGlobal>
 #include <QObject>
 
+class AMDSClientRequest;
+
 namespace AMDSRunTimeSupport {
 	enum DebugMsgType {
 		DebugMsg,
@@ -34,6 +36,8 @@ namespace AMDSRunTimeSupport {
 	/// Returns true if the requested level is less than or equal to the current level. So, you can pass in the relative level of your information (higher number is a higher level of debugging information) and get a bool as to whether you should print or not
 	bool debugAtLevel(DebugLevel requestedLevel);
 
+	/// write the debug message with an object which can toString()
+	void debugMessage(DebugMsgType type, const QObject *src, int code, const AMDSClientRequest *clientRequest);
 	/// write the debug message
 	void debugMessage(DebugMsgType type, const QObject *src = 0, int code = 0, const QString &desc = "");
 }
