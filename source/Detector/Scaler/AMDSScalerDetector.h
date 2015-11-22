@@ -152,6 +152,9 @@ protected:
 	/// The feedback controls for the channels of the new trigger/dwell interface
 	QMap<int, AMSinglePVControl*> triggerDwellInterfaceChannelFeedbackControls_;
 
+	/// The enable controls for the channels of the new trigger/dwell interface
+	QMap<int, AMSinglePVControl*> triggerDwellInterfaceChannelEnableControls_;
+
 
 	/// the dwell time to read the scaler buffer (in ms, default 1ms)
 	int defaultDwellTime_;

@@ -86,7 +86,8 @@ void AMDSScalerDetector::onDisableChannel(int channelId)
 
 void AMDSScalerDetector::setFlattenedData(const QVector<double> &data)
 {
-	triggerDwellInterfaceDwellStateControl_->move(0);
+	if(triggerDwellInterfaceStartControl_->withinTolerance(0.0))
+		triggerDwellInterfaceDwellStateControl_->move(0);
 
 	QMap<quint8, int> channelToIndexMap;
 	for(int x = 0, size = scalerConfiguration_->configuredChannels().count(); x < size; x++)
@@ -128,6 +129,13 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 		triggerDwellInterfaceStartControl_->move(0.0);
 		triggerDwellInterfaceDwellStateControl_->move(0.0);
 		triggerDwellInterfaceDwellModeControl_->move(0.0);
+
+		QMap<int, AMSinglePVControl*>::const_iterator i = triggerDwellInterfaceChannelEnableControls_.constBegin();
+		while(i != triggerDwellInterfaceChannelEnableControls_.constEnd()){
+			if(scalerConfiguration_->configuredChannels().contains(i.key()))
+				i.value()->move(1.0);
+			i++;
+		}
 
 		initialized_ = true;
 	}
@@ -240,6 +248,7 @@ void AMDSScalerDetector::onTriggerDwellInterfaceStartControlValueChanged(double 
 		else if(triggerDwellInterfaceStartControl_->withinTolerance(0.0) && triggerDwellInterfaceDwellModeControl_->withinTolerance(1.0) && triggerDwellTimer_->isActive()){
 			triggerDwellTimer_->stop();
 			triggerDwellInterfaceStartControl_->move(0);
+			triggerDwellInterfaceDwellStateControl_->move(0);
 		}
 	}
 }
@@ -294,13 +303,21 @@ void AMDSScalerDetector::initializePVControls()
 	pvControlSet_->addControl(triggerDwellInterfaceDwellStateControl_);
 	pvControlSet_->addControl(triggerDwellInterfaceDwellModeControl_);
 
+	AMSinglePVControl *channelFeedbackControl;
+	AMSinglePVControl *channelEnableControl;
 	for(int x = 0, size = 32; x < size; x++){
 		QString channelIdTemplate = x < 10 ? "0%1" : "%1"; // when channel id is 0 ~ 9, the PV is "0" + channelId
-		QString scalerChannelFeedbackName = QString("%1:%2:fbk").arg(triggerDwellName).arg(channelIdTemplate.arg(x));
-		channelControl = new AMSinglePVControl(scalerChannelFeedbackName, scalerChannelFeedbackName, this);
 
-		triggerDwellInterfaceChannelFeedbackControls_.insert(x, channelControl);
-		pvControlSet_->addControl(channelControl);
+		QString scalerChannelFeedbackName = QString("%1:%2:fbk").arg(triggerDwellName).arg(channelIdTemplate.arg(x));
+		channelFeedbackControl = new AMSinglePVControl(scalerChannelFeedbackName, scalerChannelFeedbackName, this, 0.5);
+		QString scalerChannelEnableName = QString("%1:%2:enable").arg(triggerDwellName).arg(channelIdTemplate.arg(x));
+		channelEnableControl = new AMSinglePVControl(scalerChannelEnableName, scalerChannelEnableName, this, 0.5);
+
+		triggerDwellInterfaceChannelFeedbackControls_.insert(x, channelFeedbackControl);
+		triggerDwellInterfaceChannelEnableControls_.insert(x, channelEnableControl);
+
+		pvControlSet_->addControl(channelFeedbackControl);
+		pvControlSet_->addControl(channelEnableControl);
 	}
 
 	pvControlSet_->addControl(scanControl_);
