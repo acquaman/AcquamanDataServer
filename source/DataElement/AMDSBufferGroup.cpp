@@ -119,7 +119,6 @@ void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
 	}
 }
 
-#include <QDebug>
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest, bool internalRequest){
 	QReadLocker readLock(&lock_);
 
@@ -150,8 +149,6 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest, boo
 	}
 	case AMDSClientRequestDefinitions::StartTimeToEndTime:{
 		AMDSClientStartTimeToEndTimeDataRequest *clientStartTimeToEndTimeDataRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
-		qDebug() << "Handling a StartTimeToEndTime request with " << clientStartTimeToEndTimeDataRequest->startTime() << clientStartTimeToEndTimeDataRequest->endTime()
-			    << clientStartTimeToEndTimeDataRequest->bufferName();
 		if(clientStartTimeToEndTimeDataRequest) {
 			populateData(clientStartTimeToEndTimeDataRequest);
 		}
@@ -292,9 +289,6 @@ void AMDSBufferGroup::populateData(AMDSClientStartTimeToEndTimeDataRequest* clie
 
 	int startIndex = getDataIndexByDateTime(startTime);
 	int endIndex = getDataIndexByDateTime(endTime);
-
-	qDebug() << "StartIndex: " << startIndex;
-	qDebug() << "EndIndex: " << endIndex;
 
 	if(startIndex == -1) {
 		clientDataRequest->setErrorMessage(QString("Could not locate data for start time %1 (ReqType: 4)").arg(startTime.toString()));
