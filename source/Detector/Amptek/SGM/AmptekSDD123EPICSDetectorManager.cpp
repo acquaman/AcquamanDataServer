@@ -267,10 +267,7 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDS
 	AMDSFlatArray spectrumData;
 	spectrum->data(&spectrumData);
 
-	if (spectrumData.dataType() == AMDSDataTypeDefinitions::Double)
-		spectrumControl_->setValues(spectrumData.constVectorDouble());
-	else
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_INVALID_DATA_TYPE, QString("The dataType of the data array (%1) is NOT expected Double type.").arg(spectrumData.dataType()));
+	spectrumControl_->setValues(spectrumData.asConstVectorDouble());
 
 	/**/
 	if(!fastCountsControl_->withinTolerance(statusData.fastCounts()))

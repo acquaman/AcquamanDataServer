@@ -1,0 +1,518 @@
+record(ao, "BL1611-ID-1:AMDS:scaler:start")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:dwellTime")
+{
+	field(VAL, "-2")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:dwellState")
+{
+	field( ZRST, "Not Acquiring")   
+	field( ZRVL, "0x00")
+	field( ONST, "Acquiring")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:dwellMode")
+{
+	field( ZRST, "Single Shot")
+	field( ZRVL, "0x00")
+	field( ONST, "Continuous")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:00:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:01:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:02:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:03:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:04:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:05:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:06:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:07:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:08:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:09:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:10:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:11:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+
+record(ao, "BL1611-ID-1:AMDS:scaler:12:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:13:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:14:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:15:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:16:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:17:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:18:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:19:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:20:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:21:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:22:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:23:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:24:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:25:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:26:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:27:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:28:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:29:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:30:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+record(ao, "BL1611-ID-1:AMDS:scaler:31:fbk")
+{
+	field(VAL, "0")
+	field(MDEL, "-1")
+}
+ 
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:00:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:01:enable")
+{
+	field( ZRST, "Disabled")     
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")  
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+} 
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:02:enable")
+{
+	field( ZRST, "Disabled")     
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")  
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:03:enable")
+{
+	field( ZRST, "Disabled")     
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")  
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:04:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:05:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:06:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:07:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:08:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:09:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:10:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:11:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:12:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:13:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:14:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:15:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:16:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:17:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:18:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:19:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:20:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:21:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:22:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:23:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:24:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:25:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:26:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:00:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:27:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:28:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:29:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:30:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}
+
+record(mbbo, "BL1611-ID-1:AMDS:scaler:31:enable")
+{
+	field( ZRST, "Disabled")
+	field( ZRVL, "0x00")
+	field( ONST, "Enabled")
+	field( ONVL, "0x01")
+	field( VAL, "0x00")
+}

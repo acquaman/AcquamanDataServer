@@ -144,7 +144,9 @@ AMDSFlatArray *AmptekSDD123Detector::readSpectrumData(const QByteArray &spectrum
 		spectrum.append(tmpData.toHex().toInt(&ok, 16));
 
 //		spectrumArray->setValue(index, tmpData.toHex().toInt(&ok, 16));
-		spectrumArray->setValue(index, spectrum.last());
+
+//		spectrumArray->setValue(index, spectrum.last());
+		spectrumArray->setValue(index, (quint16)(spectrum.last()));
 	}
 
 	//qDebug() << "Spectrum ready:\n " << spectrum;
