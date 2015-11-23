@@ -42,6 +42,7 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 	// initialize the configurations of the PVs
 	QRegExp rx("(\\,|\\t)"); //RegEx for ',' or '\t'
 	int totalParameters = 6;
+//	int dataTypeParamIndex = totalParameters - 1;
 
 	QFile configurationFile("./AMDSPVConfiguration.txt");
 
@@ -55,8 +56,15 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 
 			QStringList pvDefintions = pvConfiguration.split(rx);
 			if (pvDefintions.size() == totalParameters) {
-				int dataType = pvDefintions.at(4).toInt();
-				AMDSPVConfigurationMap *pvConfiguration = new AMDSPVConfigurationMap(pvDefintions.at(0), pvDefintions.at(1), pvDefintions.at(2), pvDefintions.at(3), pvDefintions.at(4), (AMDSDataTypeDefinitions::DataType)dataType);
+//				int dataType = pvDefintions.at(dataTypeParamIndex).toInt();
+				AMDSPVConfigurationMap *pvConfiguration = new AMDSPVConfigurationMap(pvDefintions.at(0).trimmed(), //enabled
+																					 pvDefintions.at(1).trimmed(), //name
+																					 pvDefintions.at(2).trimmed(), //description
+																					 pvDefintions.at(3).trimmed(), // epics PV
+																					 pvDefintions.at(4).trimmed(), // units
+																					 AMDSDataTypeDefinitions::Double // we will do double so far since the AMPVControll will always returns double
+//																					 (AMDSDataTypeDefinitions::DataType)dataType //dataType
+																					 );
 				pvConfigurationMaps_.append(pvConfiguration);
 			} else {
 				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, QString("AMDS PV: the pv configuration is invalid. (%1)").arg(pvConfiguration));

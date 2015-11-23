@@ -9,15 +9,15 @@ class AMDSPVConfigurationMap : public QObject
 {
     Q_OBJECT
 public:
-	explicit AMDSPVConfigurationMap(const QString &enabled, const QString &name, const QString &description, const QString &units, const QString &epicsPV, AMDSDataTypeDefinitions::DataType dataType, QObject *parent = 0)
+	explicit AMDSPVConfigurationMap(const QString &enabled, const QString &name, const QString &description, const QString &epicsPV, const QString &units, AMDSDataTypeDefinitions::DataType dataType, QObject *parent = 0)
 		:QObject(parent)
 	{
 		enabled_ = (enabled.toLower() == "true");
 
 		pvName_ = name;
 		pvDescription_ = description;
-		pvUnits_ = units;
 		epicsPV_ = epicsPV;
+		pvUnits_ = units;
 		dataType_ = dataType;
 	}
 
@@ -44,10 +44,10 @@ protected:
 	QString pvName_;
 	/// the description of the PV
 	QString pvDescription_;
-	/// the units of the PV
-	QString pvUnits_;
 	/// the epics PV of the PV
 	QString epicsPV_;
+	/// the units of the PV
+	QString pvUnits_;
 	/// the dataType of the PV
 	AMDSDataTypeDefinitions::DataType dataType_;
 };
