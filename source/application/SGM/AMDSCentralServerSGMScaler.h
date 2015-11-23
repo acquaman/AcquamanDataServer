@@ -10,8 +10,6 @@ class AMDSScalerConfigurationMap;
 class AMDSScalerDetectorManager;
 class AMDSDetectorServerManager;
 
-#define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
-
 class AMDSCentralServerSGMScaler : public AMDSCentralServer
 {
 	Q_OBJECT

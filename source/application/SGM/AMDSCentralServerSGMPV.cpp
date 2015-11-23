@@ -5,6 +5,7 @@
 
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientDataRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
 
@@ -26,7 +27,8 @@ AMDSCentralServerSGMPV::AMDSCentralServerSGMPV(QObject *parent) :
 
 AMDSCentralServerSGMPV::~AMDSCentralServerSGMPV()
 {
-	foreach(AMDSPVConfigurationMap *pvConfiguration, pvConfigurationMaps_) {
+	foreach(AMDSPVConfigurationMap *pvConfiguration, pvConfigurationMaps_.values()) {
+		pvConfigurationMaps_.remove(pvConfiguration->pvName());
 		pvConfiguration->deleteLater();
 	}
 	pvConfigurationMaps_.clear();
@@ -35,6 +37,16 @@ AMDSCentralServerSGMPV::~AMDSCentralServerSGMPV()
 	pvControllerServerManager_->deleteLater();
 
 	AMDSPVCommandManager::releasePVCommandManager();
+}
+
+void AMDSCentralServerSGMPV::onNewPVDataReceived(const QString &bufferName, AMDSDataHolder *newData)
+{
+	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(bufferName);
+	if (bufferGroup) {
+		bufferGroup->append(newData);
+	} else {
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(bufferName));
+	}
 }
 
 void AMDSCentralServerSGMPV::initializeConfiguration()
@@ -65,7 +77,7 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 																					 AMDSDataTypeDefinitions::Double // we will do double so far since the AMPVControll will always returns double
 //																					 (AMDSDataTypeDefinitions::DataType)dataType //dataType
 																					 );
-				pvConfigurationMaps_.append(pvConfiguration);
+				pvConfigurationMaps_.insert(pvConfiguration->pvName(), pvConfiguration);
 			} else {
 				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, QString("AMDS PV: the pv configuration is invalid. (%1)").arg(pvConfiguration));
 			}
@@ -78,7 +90,7 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 void AMDSCentralServerSGMPV::initializeBufferGroup()
 {
 	// initialize bufferGroup for PV
-	foreach (AMDSPVConfigurationMap *pvConfiguration, pvConfigurationMaps_) {
+	foreach (AMDSPVConfigurationMap *pvConfiguration, pvConfigurationMaps_.values()) {
 		QList<AMDSAxisInfo> pvBufferGroupAxes;
 		pvBufferGroupAxes << AMDSAxisInfo(pvConfiguration->pvName(), 1, pvConfiguration->pvDescription(), pvConfiguration->pvUnits());
 		AMDSBufferGroupInfo pvBufferGroupInfo(pvConfiguration->pvName(), pvConfiguration->pvDescription(), pvConfiguration->pvUnits(), pvConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, pvBufferGroupAxes);
@@ -128,12 +140,26 @@ void AMDSCentralServerSGMPV::fillConfigurationCommandForClientRequest(const QStr
 	}
 }
 
-void AMDSCentralServerSGMPV::onNewPVDataReceived(const QString &bufferName, AMDSDataHolder *newData)
+void AMDSCentralServerSGMPV::processClientDataRequest(AMDSClientRequest *clientRequest)
 {
-	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(bufferName);
-	if (bufferGroup) {
-		bufferGroup->append(newData);
+	QString bufferName = "";
+	bool continueProcessDataRequest = false;
+	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
+	if(clientDataRequest){
+		bufferName = clientDataRequest->bufferName();
+		AMDSPVConfigurationMap *pvConfiguration = pvConfigurationMaps_.value(bufferName);
+		if (pvConfiguration && pvConfiguration->enabled()) {
+			continueProcessDataRequest = true;
+		}
+	}
+
+	if (continueProcessDataRequest) {
+		AMDSCentralServer::processClientDataRequest(clientRequest);
 	} else {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(bufferName));
+		QString errorMessage = QString("ERROR: %1 - Request data from a disabled bufferGroup (%2) or invalid data request type (%3).").arg(AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME).arg(bufferName).arg(clientRequest->requestType());
+		clientRequest->setErrorMessage(errorMessage);
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME, errorMessage);
+		emit clientRequestProcessed(clientRequest);
 	}
 }
+

@@ -10,7 +10,7 @@ class AMDSPVConfigurationMap;
 class AMDSPVControllerManager;
 class AMDSDetectorServerManager;
 
-#define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
+#define AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME 30102
 
 class AMDSCentralServerSGMPV : public AMDSCentralServer
 {
@@ -39,11 +39,13 @@ protected:
 	virtual void wrappingUpInitialization();
 
 	/// helper function to fill the configuration commands for the given bufferName
-	void fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest);
+	virtual void fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest);
+	/// function to process the client data request from the TCP Data server
+	virtual void processClientDataRequest(AMDSClientRequest *clientRequest);
 
 protected:
 	/// the pv configruation map
-	QList<AMDSPVConfigurationMap*> pvConfigurationMaps_;
+	QMap<QString, AMDSPVConfigurationMap*> pvConfigurationMaps_;
 	/// the pv controller manager
 	AMDSPVControllerManager *pvControllerManager_;
 	/// the pv controller server manager

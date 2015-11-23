@@ -13,7 +13,7 @@
 #include "util/AMDSRunTimeSupport.h"
 
 /// ==================== implementation of AMDSThreadedPVControllerManager ============================
-AMDSPVControllerManager::AMDSPVControllerManager(QList<AMDSPVConfigurationMap *>pvConfigurations, QObject *parent)
+AMDSPVControllerManager::AMDSPVControllerManager(QMap<QString, AMDSPVConfigurationMap *>pvConfigurations, QObject *parent)
 	: QObject(parent)
 {
 	pvControllerThread_ = new QThread();
@@ -36,14 +36,12 @@ AMDSPVControllerManager::~AMDSPVControllerManager()
 }
 
 /// ==================== implementation of AMDSPVController ============================
-AMDSPVController::AMDSPVController(QList<AMDSPVConfigurationMap *>pvConfigurations, QObject *parent)
+AMDSPVController::AMDSPVController(QMap<QString, AMDSPVConfigurationMap *>pvConfigurations, QObject *parent)
 	: AMDSDwellDetector(parent)
 {
 	pvSignalMapper_ = new QSignalMapper(this);
 
-	foreach(AMDSPVConfigurationMap *pvConfiguration, pvConfigurations) {
-		pvConfigurations_.insert(pvConfiguration->pvName(), pvConfiguration);
-	}
+	pvConfigurations_ = pvConfigurations;
 
 	initializePVControls();
 	connect(pvSignalMapper_, SIGNAL(mapped(const QString &)), this, SLOT(onPVValueChanged(const QString &)));
@@ -60,8 +58,6 @@ AMDSPVController::~AMDSPVController()
 
 	pvControlSet_->clear();
 	pvControlSet_->deleteLater();
-
-	pvConfigurations_.clear();
 }
 
 void AMDSPVController::onEnablePVController(const QString &pvName)

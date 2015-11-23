@@ -22,7 +22,7 @@ class AMDSPVControllerManager : public QObject
 {
 	Q_OBJECT
 public:
-	explicit AMDSPVControllerManager(QList<AMDSPVConfigurationMap *>pvConfigurations, QObject *parent = 0);
+	explicit AMDSPVControllerManager(QMap<QString, AMDSPVConfigurationMap *>pvConfigurations, QObject *parent = 0);
 	~AMDSPVControllerManager();
 
 	/// returns the instance of pv controller
@@ -39,7 +39,7 @@ class AMDSPVController : public AMDSDwellDetector
 {
     Q_OBJECT
 public:
-	explicit AMDSPVController(QList<AMDSPVConfigurationMap *>pvConfigurations, QObject *parent = 0);
+	explicit AMDSPVController(QMap<QString, AMDSPVConfigurationMap *>pvConfigurations, QObject *parent = 0);
 	~AMDSPVController();
 
 signals:
