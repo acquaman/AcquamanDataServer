@@ -61,6 +61,7 @@ signals:
 	/// Signal which indicates that a request for data has been processed and is ready to be sent back to the client
 	void clientRequestProcessed(AMDSClientRequest *clientRequest);
 
+	/// Handles clientRequests that have been requested internally and don't need to be routed out of the server (flattening request for trigger/dwell)
 	void internalRequestProcessed(AMDSClientRequest *clientRequest);
 
 	/// signal to indicate that the new data added for conitunous monitor

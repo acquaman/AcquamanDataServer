@@ -1,6 +1,5 @@
 #include "AMDSScalerDetector.h"
 
-#include <QDebug>
 #include <QTimer>
 
 #include "beamline/AMPVControl.h"
@@ -45,8 +44,6 @@ AMDSScalerDetector::AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfigu
 
 	defaultDwellTime_ = 1; // default 1ms
 	dwellTime_ = 1;
-//	defaultScansInABuffer_ = 1000;
-//	scansInABuffer_ = 1000;
 	defaultScansInABuffer_ = 100;
 	scansInABuffer_ = 100;
 	defaultTotalNumberOfScans_ = 0;
@@ -255,8 +252,9 @@ void AMDSScalerDetector::onTriggerDwellInterfaceStartControlValueChanged(double 
 
 void AMDSScalerDetector::onTriggerDwellInterfaceDwellTimeControlValueChanged(double value)
 {
-	if(connected_)
-		qDebug() << "Heard the trigger/dwell dwell time go to " << value;
+	if(connected_){
+		// Do nothing right now
+	}
 }
 
 void AMDSScalerDetector::onTriggerDwellTimerTimeout()

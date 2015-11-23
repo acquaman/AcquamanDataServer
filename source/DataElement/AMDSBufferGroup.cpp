@@ -173,6 +173,7 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest, boo
 		break;
 	}
 
+	// Handle the trigger/dwell flattening request differently than usual requests
 	if(internalRequest)
 		emit internalRequestProcessed(clientRequest);
 	else

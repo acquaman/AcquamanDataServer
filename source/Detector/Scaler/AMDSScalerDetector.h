@@ -69,6 +69,7 @@ signals:
 	/// signal to indicate that we received new counts data
 	void newScalerScanDataReceived(const AMDSDataHolderList &scanCountsDataHolder);
 
+	/// Signal to request flattened data from the central server
 	void requestFlattenedData(double seconds);
 
 public slots:
