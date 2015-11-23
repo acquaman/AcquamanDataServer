@@ -35,4 +35,5 @@ SOURCES *= \
 
 
 
-
+OTHER_FILES *= \
+	AMDSScaler.db
