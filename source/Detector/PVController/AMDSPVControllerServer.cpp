@@ -22,7 +22,7 @@ void AMDSPVControllerServer::onConfigurationRequestReceived(AMDSClientRequest *c
 		foreach (int commandId, configureRequest->configurationCommands().keys()) {
 			foreach(QString commandValue, configureRequest->configurationCommands().values(commandId)) {
 				// perform the configuration
-				performConfiguration(commandId, commandValue);
+				performConfiguration(commandId, configureRequest->bufferName(), commandValue);
 			}
 		}
 	}
@@ -30,14 +30,16 @@ void AMDSPVControllerServer::onConfigurationRequestReceived(AMDSClientRequest *c
 	emit clientRequestProcessed(clientRequest);
 }
 
-void AMDSPVControllerServer::performConfiguration(int commandId, const QString &value)
+void AMDSPVControllerServer::performConfiguration(int commandId, const QString &bufferName, const QString &value)
 {
+	Q_UNUSED(value)
+
 	switch (commandId) {
 	case AMDSPVCommandManager::RequestEnablePV:
-		emit enablePVController(value);
+		emit enablePVController(bufferName);
 		break;
 	case AMDSPVCommandManager::RequestDisablePV:
-		emit disablePVController(value);
+		emit disablePVController(bufferName);
 		break;
 	}
 }

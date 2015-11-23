@@ -67,8 +67,6 @@ QStringList AMDSClientAppController::getBufferNamesByServer(const QString &serve
 		bufferNames = server->bufferNames();
 	}
 
-	bufferNames.insert(0, "All");
-
 	return bufferNames;
 }
 

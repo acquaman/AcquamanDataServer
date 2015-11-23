@@ -22,7 +22,7 @@ public slots:
 
 protected:
 	/// helper function to make the configuration to the PV Controllers
-	void performConfiguration(int commandId, const QString &value);
+	void performConfiguration(int commandId, const QString &bufferName, const QString &value);
 };
 
 #endif // AMDSPVCONTROLLERSERVER_H
