@@ -6,11 +6,6 @@ PATH_TO_SOURCE = $$PWD/source
 PATH_TO_ACQUAMAN = $$PROJECT_ROOT/acquaman/source
 PATH_TO_MPLOT = $$PROJECT_ROOT/MPlot/src
 
-USERNAME = $$system(whoami)
-contains(USERNAME, liux0) {
-	HOME_FOLDER = "/home/liux0"
-}
-
 INCLUDEPATH *= $$PATH_TO_SOURCE
 INCLUDEPATH *= $$PATH_TO_ACQUAMAN
 INCLUDEPATH *= $$PATH_TO_MPLOT

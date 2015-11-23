@@ -16,18 +16,18 @@ TARGET = AcquamanDataServerSGMPV
 
 HEADERS *= \
 	source/application/AMDSCentralServer.h \
-        source/application/SGM/AMDSCentralServerSGMPV.h \
-        source/Detector/AMDSDetectorServer.h \
-        source/Detector/PVController/AMDSPVConfigurationMap.h \
-        source/Detector/PVController/AMDSPVCommandManager.h \
-        source/Detector/PVController/AMDSPVControllerServer.h \
-        source/Detector/PVController/AMDSPVController.h
+	source/application/SGM/AMDSCentralServerSGMPV.h \
+	source/Detector/AMDSDetectorServer.h \
+	source/Detector/PVController/AMDSPVConfigurationMap.h \
+	source/Detector/PVController/AMDSPVCommandManager.h \
+	source/Detector/PVController/AMDSPVControllerServer.h \
+	source/Detector/PVController/AMDSPVController.h
 
 SOURCES *= \
-        source/AMDSMainSGMPV.cpp \
+	source/AMDSMainSGMPV.cpp \
 	source/application/AMDSCentralServer.cpp \
-        source/application/SGM/AMDSCentralServerSGMPV.cpp \
-        source/Detector/AMDSDetectorServer.cpp \
-        source/Detector/PVController/AMDSPVCommandManager.cpp \
-        source/Detector/PVController/AMDSPVControllerServer.cpp \
-        source/Detector/PVController/AMDSPVController.cpp
+	source/application/SGM/AMDSCentralServerSGMPV.cpp \
+	source/Detector/AMDSDetectorServer.cpp \
+	source/Detector/PVController/AMDSPVCommandManager.cpp \
+	source/Detector/PVController/AMDSPVControllerServer.cpp \
+	source/Detector/PVController/AMDSPVController.cpp
