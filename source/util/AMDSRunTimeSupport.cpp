@@ -1,5 +1,6 @@
 #include "AMDSRunTimeSupport.h"
 
+#include "ClientRequest/AMDSClientRequest.h"
 #include "util/AMErrorMonitor.h"
 
 namespace AMDSRunTimeSupport{
@@ -18,6 +19,30 @@ namespace AMDSRunTimeSupport{
 		if(requestedLevel <= debugLevel_)
 			return true;
 		return false;
+	}
+
+	void debugMessage(DebugMsgType type, const QObject *src, int code, const AMDSClientRequest *clientRequest) {
+		DebugLevel debugLevel = AMDSRunTimeSupport::None;
+		switch (type) {
+		case DebugMsg:
+			debugLevel = AMDSRunTimeSupport::Debug;
+			break;
+		case InformationMsg:
+			debugLevel = AMDSRunTimeSupport::Information;
+			break;
+		case AlertMsg:
+			debugLevel = AMDSRunTimeSupport::Alert;
+			break;
+		case ErrorMsg:
+			debugLevel = AMDSRunTimeSupport::Error;
+			break;
+		default:
+			break;
+		}
+
+		if (debugAtLevel(debugLevel)) {
+			debugMessage(type, src, code, clientRequest->toString());
+		}
 	}
 
 	void debugMessage(DebugMsgType type, const QObject *src, int code, const QString &desc) {
