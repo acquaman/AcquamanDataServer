@@ -466,6 +466,6 @@ void AMDSClientUi::resetActiveContinuousConnection(const QString &serverIdentifi
 
 	if (updateActiveContiuousConnectionComboBox) {
 		activeContinuousConnectionComboBox_->clear();
-		activeContinuousConnectionComboBox_->addItems(activeContinuousClientRequestKeys);
+		activeContinuousConnectionComboBox_->addItems(QStringList() << "" << activeContinuousClientRequestKeys);
 	}
 }

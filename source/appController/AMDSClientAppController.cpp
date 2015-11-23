@@ -79,7 +79,6 @@ QStringList AMDSClientAppController::getActiveSocketKeysByServer(const QString &
 		activeSocketKeys = server->activeTCPSocketKeys();
 	}
 
-	activeSocketKeys.insert(0, "");
 	return activeSocketKeys;
 }
 
