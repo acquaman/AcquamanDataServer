@@ -31,3 +31,6 @@ SOURCES *= \
 	source/Detector/PVController/AMDSPVCommandManager.cpp \
 	source/Detector/PVController/AMDSPVControllerServer.cpp \
 	source/Detector/PVController/AMDSPVController.cpp
+
+OTHER_FILES *= \
+	db/AmptekSDD.db

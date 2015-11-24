@@ -1,5 +1,7 @@
 #include "AMDSClientAppController.h"
 
+#include <QtNetwork>
+
 #include "ClientRequest/AMDSClientIntrospectionRequest.h"
 #include "ClientRequest/AMDSClientRequestSupport.h"
 #include "ClientRequest/AMDSClientRequest.h"
@@ -150,7 +152,7 @@ void AMDSClientAppController::disconnectWithServer(const QString &serverIdentifi
 {
 	AMDSServer * server = getServerByServerIdentifier(serverIdentifier);
 	if (server) {
-		disconnect(server, SIGNAL(requestDataReady(QString, AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
+		disconnect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
 		disconnect(server, SIGNAL(AMDSServerError(QString,int,QString,QString)), this, SLOT(onAMDSServerError(QString,int,QString,QString)));
 
 		activeServers_.remove(serverIdentifier);
