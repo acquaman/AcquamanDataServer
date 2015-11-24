@@ -67,8 +67,6 @@ QStringList AMDSClientAppController::getBufferNamesByServer(const QString &serve
 		bufferNames = server->bufferNames();
 	}
 
-	bufferNames.insert(0, "All");
-
 	return bufferNames;
 }
 
@@ -81,7 +79,6 @@ QStringList AMDSClientAppController::getActiveSocketKeysByServer(const QString &
 		activeSocketKeys = server->activeTCPSocketKeys();
 	}
 
-	activeSocketKeys.insert(0, "");
 	return activeSocketKeys;
 }
 
