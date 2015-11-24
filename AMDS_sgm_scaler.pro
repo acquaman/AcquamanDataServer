@@ -33,3 +33,11 @@ SOURCES *= \
 	source/Detector/Scaler/AMDSScalerDetector.cpp \
 	source/Detector/Scaler/AMDSScalerDetectorServer.cpp \
 	source/Detector/Scaler/AMDSScalerConfigurationMap.cpp
+<<<<<<< HEAD
+=======
+
+
+
+OTHER_FILES *= \
+	AMDSScaler.db
+>>>>>>> master
