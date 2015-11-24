@@ -77,7 +77,7 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 
 	bufferNameListView_ = new QListView();
 	bufferNameListView_->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	QStringList bufferNames("All");
+	QStringList bufferNames;
 	resetBufferListView(bufferNames);
 
 	time1Edit_ = new QDateTimeEdit(QDateTime::currentDateTimeUtc());
@@ -198,7 +198,7 @@ void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
 	activeServerComboBox_->setCurrentIndex(activeServerComboBox_->findText(serverIdentifier));
 
 	QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(serverIdentifier);
-	resetBufferListView(QStringList() << "All" << bufferNames);
+	resetBufferListView(bufferNames);
 	resetActiveContinuousConnection(serverIdentifier);
 }
 
@@ -264,7 +264,7 @@ void AMDSClientUi::onServerError(int errorCode, bool removeServer, const QString
 void AMDSClientUi::onActiveServerChanged(const QString &serverIdentifier)
 {
 	QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(serverIdentifier);
-	resetBufferListView(QStringList() << "All" << bufferNames);
+	resetBufferListView(bufferNames);
 
 	resetActiveContinuousConnection(serverIdentifier);
 }
@@ -434,7 +434,7 @@ void AMDSClientUi::resetBufferListView(const QStringList &bufferNames)
 		currentListModel->deleteLater();
 
 	QStringListModel *bufferNamesModel = new QStringListModel();
-	bufferNamesModel->setStringList(bufferNames);
+	bufferNamesModel->setStringList(QStringList() << "All" << bufferNames);
 	bufferNameListView_->setModel(bufferNamesModel);
 }
 
@@ -453,10 +453,10 @@ void AMDSClientUi::resetActiveContinuousConnection(const QString &serverIdentifi
 	QStringList activeContinuousClientRequestKeys = AMDSClientAppController::clientAppController()->getActiveSocketKeysByServer(serverIdentifier);
 
 	bool updateActiveContiuousConnectionComboBox = false;
-	if (activeContinuousClientRequestKeys.length() == activeContinuousConnectionComboBox_->count()) {
+	if (activeContinuousClientRequestKeys.length() == activeContinuousConnectionComboBox_->count() - 1) {
 		for (int i = 0; (i < activeContinuousConnectionComboBox_->count()) && (!updateActiveContiuousConnectionComboBox); i++) {
 			QString itemText = activeContinuousConnectionComboBox_->itemText(i);
-			if (!activeContinuousClientRequestKeys.contains(itemText)) {
+			if (itemText.trimmed().length() > 0 && !activeContinuousClientRequestKeys.contains(itemText)) {
 				updateActiveContiuousConnectionComboBox = true;
 			}
 		}
