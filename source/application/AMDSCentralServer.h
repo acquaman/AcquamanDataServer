@@ -15,6 +15,7 @@ class AMDSClientConfigurationRequest;
 #define AMDS_SERVER_INFO_START_BUFFER_TIMER 20101
 #define AMDS_SERVER_INFO_BUFFER_DEF 20102
 #define AMDS_SERVER_ALT_INVALID_REQUEST 20103
+#define AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME 20104
 
 class AMDSCentralServer : public QObject
 {
@@ -61,7 +62,7 @@ protected:
 	/// function to process the configuration client request from the TCP Data server
 	void processConfigurationClientRequest(AMDSClientRequest *clientRequest);
 	/// function to process the client data request from the TCP Data server
-	void processClientDataRequest(AMDSClientRequest *clientRequest);
+	virtual void processClientDataRequest(AMDSClientRequest *clientRequest);
 
 
 protected:

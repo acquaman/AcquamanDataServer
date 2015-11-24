@@ -29,7 +29,7 @@ AMDSCentralServerSGMScaler::~AMDSCentralServerSGMScaler()
 	scalerConfigurationMap_->deleteLater();
 	scalerDetectorManager_->deleteLater();
 	scalerDetectorServerManager_->deleteLater();
-	AMDSScalerCommandManager::releaseScalerCommands();
+	AMDSScalerCommandManager::releaseScalerCommandManager();
 }
 
 void AMDSCentralServerSGMScaler::initializeConfiguration()
@@ -131,7 +131,7 @@ void AMDSCentralServerSGMScaler::onNewScalerScanDataReceivedd(const AMDSDataHold
 			bufferGroup->bufferGroup()->processClientRequest(localRequest, true);
 		}
 	} else {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));
 	}
 }
 

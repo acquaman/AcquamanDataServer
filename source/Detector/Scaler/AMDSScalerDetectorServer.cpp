@@ -39,7 +39,7 @@ void AMDSScalerDetectorServer::onConfigurationRequestReceived(AMDSClientRequest 
 	emit clientRequestProcessed(clientRequest);
 }
 
-void AMDSScalerDetectorServer::performConfiguration(int commandId, QString value)
+void AMDSScalerDetectorServer::performConfiguration(int commandId, const QString &value)
 {
 	switch (commandId) {
 	case AMDSScalerCommandManager::RequestStopDwell:
