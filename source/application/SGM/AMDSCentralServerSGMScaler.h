@@ -1,5 +1,5 @@
-#ifndef AMDSCENTRALSERVERSGM_H
-#define AMDSCENTRALSERVERSGM_H
+#ifndef AMDSCENTRALSERVERSGMSCALER_H
+#define AMDSCENTRALSERVERSGMSCALER_H
 
 #include <QObject>
 
@@ -9,8 +9,6 @@
 class AMDSScalerConfigurationMap;
 class AMDSScalerDetectorManager;
 class AMDSDetectorServerManager;
-
-#define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
 
 class AMDSCentralServerSGMScaler : public AMDSCentralServer
 {
@@ -36,6 +34,11 @@ protected slots:
 	/// slot to handle new scaler data request to add the data to buffergroup
 	void onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder);
 
+	/// Called when the scaler requests flattened data. Sets the latches for internalRequestActive_ and dwellSecondsRequested
+	void onScalerDetectorRequestFlattenedData(double seconds);
+	/// Handles the internal requests that are processed and send data back to detector
+	void onInternalRequestProcessed(AMDSClientRequest *clientRequest);
+
 protected:
 	/// function to initialize the system configurations
 	void initializeConfiguration();
@@ -58,6 +61,11 @@ protected:
 	AMDSScalerDetectorManager *scalerDetectorManager_;
 	/// the scaler server manager
 	AMDSDetectorServerManager *scalerDetectorServerManager_;
+
+	/// Latches that we have an internal request in processing and handles it differently
+	bool internalRequestActive_;
+	/// Latches the flattening time in seconds
+	double dwellSecondsRequested_;
 };
 
-#endif // AMDSCENTRALSERVERSGM_H
+#endif // AMDSCENTRALSERVERSGMSCALER_H

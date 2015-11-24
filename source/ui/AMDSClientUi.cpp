@@ -137,7 +137,7 @@ AMDSClientUi::AMDSClientUi(QWidget *parent) :
 	/// ==== initialize the app controller ==============
 	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
 	connect(clientAppController, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
-	connect(clientAppController, SIGNAL(networkSessionOpened()), this, SLOT(onNetworkSessionOpened()));
+	connect(clientAppController, SIGNAL(AMDSClientControllerConnected()), this, SLOT(onAMDSClientControllerConnected()));
 	connect(clientAppController, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
 	connect(clientAppController, SIGNAL(serverError(int,bool,QString,QString)), this, SLOT(onServerError(int,bool,QString,QString)));
 	connect(clientAppController, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
@@ -149,7 +149,7 @@ AMDSClientUi::~AMDSClientUi()
 {
 	AMDSClientAppController *clientAppController = AMDSClientAppController::clientAppController();
 	disconnect(clientAppController, SIGNAL(networkSessionOpening()), this, SLOT(onNetworkSessionOpening()));
-	disconnect(clientAppController, SIGNAL(networkSessionOpened()), this, SLOT(onNetworkSessionOpened()));
+	disconnect(clientAppController, SIGNAL(AMDSClientControllerConnected()), this, SLOT(onAMDSClientControllerConnected()));
 	disconnect(clientAppController, SIGNAL(newServerConnected(QString)), this, SLOT(onNewServerConnected(QString)));
 	disconnect(clientAppController, SIGNAL(serverError(int,bool,QString,QString)), this, SLOT(onServerError(int,bool,QString,QString)));
 	disconnect(clientAppController, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
@@ -183,7 +183,7 @@ void AMDSClientUi::onNetworkSessionOpening()
 	statusLabel_->setText("Opening network session.");
 }
 
-void AMDSClientUi::onNetworkSessionOpened()
+void AMDSClientUi::onAMDSClientControllerConnected()
 {
 	statusLabel_->setText("This examples requires that you run the Acquaman Data Server example as well.");
 //	enableRequestDataButton();
@@ -198,7 +198,7 @@ void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
 	activeServerComboBox_->setCurrentIndex(activeServerComboBox_->findText(serverIdentifier));
 
 	QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(serverIdentifier);
-	resetBufferListView(bufferNames);
+	resetBufferListView(QStringList() << "All" << bufferNames);
 	resetActiveContinuousConnection(serverIdentifier);
 }
 
@@ -264,7 +264,7 @@ void AMDSClientUi::onServerError(int errorCode, bool removeServer, const QString
 void AMDSClientUi::onActiveServerChanged(const QString &serverIdentifier)
 {
 	QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(serverIdentifier);
-	resetBufferListView(bufferNames);
+	resetBufferListView(QStringList() << "All" << bufferNames);
 
 	resetActiveContinuousConnection(serverIdentifier);
 }
@@ -466,6 +466,6 @@ void AMDSClientUi::resetActiveContinuousConnection(const QString &serverIdentifi
 
 	if (updateActiveContiuousConnectionComboBox) {
 		activeContinuousConnectionComboBox_->clear();
-		activeContinuousConnectionComboBox_->addItems(activeContinuousClientRequestKeys);
+		activeContinuousConnectionComboBox_->addItems(QStringList() << "" << activeContinuousClientRequestKeys);
 	}
 }

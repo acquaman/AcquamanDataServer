@@ -1,5 +1,5 @@
-#ifndef AMDSCENTRALSERVERSGM_H
-#define AMDSCENTRALSERVERSGM_H
+#ifndef AMDSCENTRALSERVERSGMAMPTEK_H
+#define AMDSCENTRALSERVERSGMAMPTEK_H
 
 #include <QObject>
 
@@ -13,8 +13,6 @@ class AmptekSDD123DetectorGroupSGM;
 class AMDSScalerConfigurationMap;
 class AMDSScalerDetectorManager;
 class AMDSDetectorServerManager;
-
-#define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
 
 class AMDSCentralServerSGMAmptek : public AMDSCentralServer
 {
@@ -78,4 +76,4 @@ protected:
 	AmptekSDD123DetectorGroupSGM *amptekDetectorGroup_;
 };
 
-#endif // AMDSCENTRALSERVERSGM_H
+#endif // AMDSCENTRALSERVERSGMAMPTEK_H
