@@ -718,6 +718,9 @@ bool AMDSFlatArray::resetTargetArrayAndReplaceData(AMDSFlatArray *targetArray) c
 }
 
 void AMDSFlatArray::resizeType(AMDSDataTypeDefinitions::DataType dataType, quint32 size){
+	if( (dataType_ == dataType) && (size == this->size()) )
+		return;
+
 	dataType_ = dataType;
 
 	switch(dataType_){

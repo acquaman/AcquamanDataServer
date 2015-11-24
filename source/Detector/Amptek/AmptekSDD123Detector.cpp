@@ -104,7 +104,7 @@ void AmptekSDD123Detector::onSpectrumPacketEventReceived(AmptekSpectrumPacketEve
 
 		AmptekSpectrumEvent *spectrumEvent = new AmptekSpectrumEvent();
 		spectrumEvent->detectorSourceName_ = name();
-		spectrumEvent->spectrum_ = *spectrumArray;
+		spectrumEvent->spectrum_ = spectrumArray;
 		spectrumEvent->statusData_ = statusData;
 
 		QCoreApplication::postEvent(spectrumReceiver_, spectrumEvent);
