@@ -45,4 +45,5 @@ SOURCES *= \
 	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.cpp
 
 OTHER_FILES *= \
-	db/AMDSPVConfiguration.txt
+	db/AmptekSDD.db
+

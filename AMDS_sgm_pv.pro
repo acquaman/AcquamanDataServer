@@ -33,4 +33,4 @@ SOURCES *= \
 	source/Detector/PVController/AMDSPVController.cpp
 
 OTHER_FILES *= \
-	db/AmptekSDD.db
+	db/AMDSPVConfiguration.txt
