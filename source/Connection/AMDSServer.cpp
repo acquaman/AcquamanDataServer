@@ -84,7 +84,7 @@ void AMDSServer::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSo
 	}
 
 	removeTCPSocket(clientTCPSocket);
-	emit AMDSServerError(this, socketErrorCode, clientTCPSocket->socketKey(), errorString);
+	emit AMDSServerError(serverIdentifier(), socketErrorCode, clientTCPSocket->socketKey(), errorString);
 }
 
 void AMDSServer::removeTCPSocket(AMDSClientTCPSocket *clientTCPSocket)
