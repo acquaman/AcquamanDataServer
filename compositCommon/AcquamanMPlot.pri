@@ -2,9 +2,9 @@
 
 macx {
 		# EPICS Dependencies:
-		EPICS_INCLUDE_DIRS = $$HOME_FOLDER/$$PATH_TO_ACQUAMAN_WORKSPACE/acquaman/contrib/epics/base/include \
-								$$HOME_FOLDER/$$PATH_TO_ACQUAMAN_WORKSPACE/acquaman/contrib/epics/base/include/os/Darwin
-		EPICS_LIB_DIR = $$HOME_FOLDER/$$PATH_TO_ACQUAMAN_WORKSPACE/acquaman/contrib/epics/base/lib/darwin-x86
+		EPICS_INCLUDE_DIRS = $$PROJECT_ROOT/acquaman/contrib/epics/base/include \
+					$$PROJECT_ROOT/acquaman/contrib/epics/base/include/os/Darwin
+		EPICS_LIB_DIR = $$PROJECT_ROOT/acquaman/contrib/epics/base/lib/darwin-x86
 } else {
 # EPICS Dependencies:
 	EPICS_INCLUDE_DIRS = /home/epics/src/R3.14.12/base/include \
