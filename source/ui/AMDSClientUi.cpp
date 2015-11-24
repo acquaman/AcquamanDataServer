@@ -198,7 +198,7 @@ void AMDSClientUi::onNewServerConnected(const QString &serverIdentifier)
 	activeServerComboBox_->setCurrentIndex(activeServerComboBox_->findText(serverIdentifier));
 
 	QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(serverIdentifier);
-	resetBufferListView(bufferNames);
+	resetBufferListView(QStringList() << "All" << bufferNames);
 	resetActiveContinuousConnection(serverIdentifier);
 }
 
@@ -264,7 +264,7 @@ void AMDSClientUi::onServerError(int errorCode, bool removeServer, const QString
 void AMDSClientUi::onActiveServerChanged(const QString &serverIdentifier)
 {
 	QStringList bufferNames = AMDSClientAppController::clientAppController()->getBufferNamesByServer(serverIdentifier);
-	resetBufferListView(bufferNames);
+	resetBufferListView(QStringList() << "All" << bufferNames);
 
 	resetActiveContinuousConnection(serverIdentifier);
 }
@@ -466,6 +466,6 @@ void AMDSClientUi::resetActiveContinuousConnection(const QString &serverIdentifi
 
 	if (updateActiveContiuousConnectionComboBox) {
 		activeContinuousConnectionComboBox_->clear();
-		activeContinuousConnectionComboBox_->addItems(activeContinuousClientRequestKeys);
+		activeContinuousConnectionComboBox_->addItems(QStringList() << "" << activeContinuousClientRequestKeys);
 	}
 }

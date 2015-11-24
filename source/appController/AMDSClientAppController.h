@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QTcpSocket>
 #include <QNetworkSession>
+#include <QFile>
 
 class AMDSServer;
 class AMDSClientTCPSocket;
@@ -29,6 +30,11 @@ class AMDSClientRequest;
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG 10303
 #define AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONFIGURATION_MSG 10304
 
+#define AMDS_CLIENT_ERR_WRITING_FILE 10305
+#define AMDS_CLIENT_ERR_TARGET_EXPORT_FILE_NOT_CONFIGURED 10306
+#define AMDS_CLIENT_ERR_TARGET_EXPORT_FILE_EXISTED 10307
+#define AMDS_CLIENT_ERR_FAILED_TO_OPEN_TARGET_EXPORT_FILE 10308
+
 class AMDSClientAppController : public AMDSAppController
 {
     Q_OBJECT
@@ -41,8 +47,12 @@ public:
 	/// helper function to check whether the network session is openned or not
 	bool isSessionOpen();
 
+	/// set the path where the client data request will be written to
+	inline void setAMDSExportFilePath(const QString filePath) { currentExportedFilePath_ = filePath; }
+
 	/// helper function to return the server by given identifier
 	inline AMDSServer *getServerByServerIdentifier(const QString &serverIdentifier) { return activeServers_.value(serverIdentifier, 0);}
+
 	/// helper function to return the list of buffers defined by a give host server
 	QStringList getBufferNamesByServer(const QString &serverIdentifier);
 	/// helper function to return the list of socketKeys of active connection by a give host server
@@ -54,6 +64,7 @@ public:
 	void connectToServer(const QString &hostName, quint16 portNumber);
 	/// request disconnection with a given server identifier
 	void disconnectWithServer(const QString &serverIdentifier);
+
 
 	/// request data from server for Statistics
 	bool requestClientData(const QString &hostName, quint16 portNumber);
@@ -93,7 +104,12 @@ public slots:
 	void openNetworkSession();
 
 	/// slot to handle socket error signal from the server
-	void onAMDSServerError(AMDSServer* server, int errorCode, const QString &socketKey, const QString &errorMessage);
+	void onAMDSServerError(const QString &serverIdentifier, int errorCode, const QString &socketKey, const QString &errorMessage);
+
+	/// slot to handle the signal to start a new scan
+	void onScanStarted();
+	/// slot to handle the signal to finish a scan
+	void onScanStopped();
 
 protected:
 	/// make the constructor protected for SINGLETON usage
@@ -108,10 +124,13 @@ private slots:
 	void onNetworkSessionStateChanged(QNetworkSession::State);
 	/// slot to handle the signal of network session error
 	void onNetworkSessionError(QNetworkSession::SessionError);
+	/// slot to handle the new client request received message from a given server
+	void onRequestDataReady(AMDSClientRequest* clientRequest);
 
 private:
 	/// establish TCP socket connection to a specific hostName and the portNumber
 	AMDSClientTCPSocket * establishSocketConnection(const QString &hostName, quint16 portNumber);
+
 	/// helper function to instantiate client request based on the request type
 	AMDSClientRequest *instantiateClientRequest(AMDSClientRequestDefinitions::RequestType clientRequestType);
 
@@ -121,6 +140,11 @@ private:
 
 	/// the hash table of active servers
 	QHash<QString, AMDSServer *> activeServers_;
+
+	/// the path where the clientDataRequest will be written to
+	QString currentExportedFilePath_;
+	/// the handler of the file, which we are going to write the data to
+	QFile* clientDataRequestFile_;
 };
 
 #endif // AMDSCLIENTAPPCONTROLLER_H

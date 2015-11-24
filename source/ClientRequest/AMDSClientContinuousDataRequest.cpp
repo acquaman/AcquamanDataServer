@@ -113,7 +113,6 @@ bool AMDSClientContinuousDataRequest::startContinuousRequestTimer()
 
 		emit clientRequestTaskAccomplished(this);
 	} else {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_CLIENTREQUEST_INFO_CONTINUOUS_MSG_HAND_SHAKE, QString("(msg %1) update interval: %2!").arg(socketKey()).arg(updateInterval()));
 		continuousDataRequestTimer_.singleShot(updateInterval(), this, SLOT(onDataRequestTimerTimeout()));
 	}
 

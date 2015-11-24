@@ -1,0 +1,5 @@
+enabled, name, description, epics pv, units, dataType(0-qint8 1-quint8 2-qint16 3-quint16 4-qint32 5-quint32 6-qint64 7-quint64 8-float 9-double)
+True, Energy, Energy PV, AM1611-4-I10:energy, ev, 9
+True, ScalerChannel0, Channel 0 of Scaler, BL1611-ID-1:mcs00:fbk, count, 9
+False, ScalerChannel1, Channel 1 of Scaler, BL1611-ID-1:mcs01:fbk, count, 9
+True, ScalerChannel2, Channel 2 of Scaler, BL1611-ID-1:mcs02:fbk, count, 9

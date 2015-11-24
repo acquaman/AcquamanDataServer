@@ -399,6 +399,76 @@ bool AMDSFlatArray::setValue(int index, double  value)
 	return true;
 }
 
+const QVector<double> AMDSFlatArray::asConstVectorDouble() const
+{
+	QVector<double> targetVector;
+	switch(dataType_){
+	case AMDSDataTypeDefinitions::Signed8:
+		targetVector = QVector<double>(vectorQint8_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQint8_.at(i));
+		}
+		break;
+
+	case AMDSDataTypeDefinitions::Unsigned8:
+		targetVector = QVector<double>(vectorQuint8_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQuint8_.at(i));
+		}
+		break;
+	case AMDSDataTypeDefinitions::Signed16:
+		targetVector = QVector<double>(vectorQint16_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQint16_.at(i));
+		}
+		break;
+	case AMDSDataTypeDefinitions::Unsigned16:
+		targetVector = QVector<double>(vectorQuint16_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQuint16_.at(i));
+		}
+		break;
+	case AMDSDataTypeDefinitions::Signed32:
+		targetVector = QVector<double>(vectorQint32_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQint32_.at(i));
+		}
+		break;
+	case AMDSDataTypeDefinitions::Unsigned32:
+		targetVector = QVector<double>(vectorQuint32_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQuint32_.at(i));
+		}
+		break;
+	case AMDSDataTypeDefinitions::Signed64:
+		targetVector = QVector<double>(vectorQint64_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQint64_.at(i));
+		}
+		break;
+	case AMDSDataTypeDefinitions::Unsigned64:
+		targetVector = QVector<double>(vectorQuint64_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQuint64_.at(i));
+		}
+		break;
+	case AMDSDataTypeDefinitions::Float:
+		targetVector = QVector<double>(vectorFloat_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorFloat_.at(i));
+		}
+		break;
+	case AMDSDataTypeDefinitions::Double:
+		targetVector = vectorDouble_;
+		break;
+	case AMDSDataTypeDefinitions::InvalidType:
+	default:
+		break;
+	}
+
+	return targetVector;
+}
+
 int AMDSFlatArray::size() const{
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:
