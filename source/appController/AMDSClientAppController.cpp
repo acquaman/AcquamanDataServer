@@ -118,7 +118,7 @@ void AMDSClientAppController::openNetworkSession()
 			networkSession_->open();
 		}
 		else{
-			emit AMDSClientControllerReady();
+			emit AMDSClientControllerConnected();
 		}
 	}
 }
@@ -386,22 +386,22 @@ void AMDSClientAppController::onNetworkSessionOpened()
 	settings.setValue(QLatin1String("DefaultNetworkConfiguration"), id);
 	settings.endGroup();
 
-	emit AMDSClientControllerReady();
+	emit AMDSClientControllerConnected();
 }
 
 void AMDSClientAppController::onNetworkSessionClosed()
 {
-	emit AMDSClientControllerError("AMDSClientAppController: Network session is closed. Pls check the connection");
+	emit AMDSClientControllerNetworkSessionClosed("AMDSClientAppController: Network session is closed. Pls check the connection");
 }
 
 void AMDSClientAppController::onNetworkSessionStateChanged(QNetworkSession::State newState)
 {
 	switch(newState) {
 	case QNetworkSession::Connected:
-		emit AMDSClientControllerReady();
+		emit AMDSClientControllerConnected();
 		break;
 	case QNetworkSession::Disconnected:
-		emit AMDSClientControllerError("AMDSClientAppController: Network session is disconnected!");
+		emit AMDSClientControllerDisconnected();
 		break;
 	case QNetworkSession::NotAvailable:
 		emit AMDSClientControllerError("AMDSClientAppController: Network session is NOT available!");

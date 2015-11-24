@@ -88,7 +88,11 @@ signals:
 	void networkSessionOpening();
 
 	/// signal to indicate that the AMDS Client App Controller is ready for service
-	void AMDSClientControllerReady();
+	void AMDSClientControllerConnected();
+	/// signal to indicate that the AMDS Client App Controller is disconnected
+	void AMDSClientControllerDisconnected();
+	/// signal to indicate that the AMDS Client App Controller network session is closed
+	void AMDSClientControllerNetworkSessionClosed(const QString &errorMsg);
 	/// signal to indicate that the AMDS Client App Controller is in invalid state
 	void AMDSClientControllerError(const QString &errorMsg);
 	/// signal to indicate that there are server errors
