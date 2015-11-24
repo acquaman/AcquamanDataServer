@@ -75,8 +75,6 @@ QStringList AMDSClientAppController::getBufferNamesByServer(const QString &serve
 		bufferNames = server->bufferNames();
 	}
 
-	bufferNames.insert(0, "All");
-
 	return bufferNames;
 }
 
@@ -149,7 +147,7 @@ void AMDSClientAppController::disconnectWithServer(const QString &serverIdentifi
 {
 	AMDSServer * server = getServerByServerIdentifier(serverIdentifier);
 	if (server) {
-		disconnect(server, SIGNAL(requestDataReady(QString, AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
+		disconnect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
 		disconnect(server, SIGNAL(AMDSServerError(QString,int,QString,QString)), this, SLOT(onAMDSServerError(QString,int,QString,QString)));
 
 		activeServers_.remove(serverIdentifier);
