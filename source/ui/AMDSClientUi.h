@@ -41,7 +41,7 @@ private slots:
 	/// slot to handle the signal of networkSessionOpening
 	void onNetworkSessionOpening();
 	/// slot to handle the signal of networkSessionOpened
-	void onNetworkSessionOpened();
+	void onAMDSClientControllerConnected();
 
 	/// slot to handle the signal of newServerConnected (add the serverIdentifier to the combox and update the ui displays -- buffernames and active connections)
 	void onNewServerConnected(const QString &serverIdentifier);

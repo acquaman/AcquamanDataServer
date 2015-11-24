@@ -65,21 +65,22 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 		while (!pvConfiguration.isNull())
 		{
 			pvConfiguration = dataStream.readLine();
-
-			QStringList pvDefintions = pvConfiguration.split(rx);
-			if (pvDefintions.size() == totalParameters) {
-//				int dataType = pvDefintions.at(dataTypeParamIndex).toInt();
-				AMDSPVConfigurationMap *pvConfiguration = new AMDSPVConfigurationMap(pvDefintions.at(0).trimmed(), //enabled
-																					 pvDefintions.at(1).trimmed(), //name
-																					 pvDefintions.at(2).trimmed(), //description
-																					 pvDefintions.at(3).trimmed(), // epics PV
-																					 pvDefintions.at(4).trimmed(), // units
-																					 AMDSDataTypeDefinitions::Double // we will do double so far since the AMPVControll will always returns double
-//																					 (AMDSDataTypeDefinitions::DataType)dataType //dataType
-																					 );
-				pvConfigurationMaps_.insert(pvConfiguration->pvName(), pvConfiguration);
-			} else {
-				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, QString("AMDS PV: the pv configuration is invalid. (%1)").arg(pvConfiguration));
+			if (!pvConfiguration.isNull()) {
+				QStringList pvDefintions = pvConfiguration.split(rx);
+				if (pvDefintions.size() == totalParameters) {
+	//				int dataType = pvDefintions.at(dataTypeParamIndex).toInt();
+					AMDSPVConfigurationMap *pvConfiguration = new AMDSPVConfigurationMap(pvDefintions.at(0).trimmed(), //enabled
+																						 pvDefintions.at(1).trimmed(), //name
+																						 pvDefintions.at(2).trimmed(), //description
+																						 pvDefintions.at(3).trimmed(), // epics PV
+																						 pvDefintions.at(4).trimmed(), // units
+																						 AMDSDataTypeDefinitions::Double // we will do double so far since the AMPVControll will always returns double
+	//																					 (AMDSDataTypeDefinitions::DataType)dataType //dataType
+																						 );
+					pvConfigurationMaps_.insert(pvConfiguration->pvName(), pvConfiguration);
+				} else {
+					AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, QString("AMDS PV: the pv configuration is invalid. (%1)").arg(pvConfiguration));
+				}
 			}
 		}
 
