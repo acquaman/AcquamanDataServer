@@ -67,8 +67,6 @@ QStringList AMDSClientAppController::getBufferNamesByServer(const QString &serve
 		bufferNames = server->bufferNames();
 	}
 
-	bufferNames.insert(0, "All");
-
 	return bufferNames;
 }
 
@@ -129,7 +127,7 @@ void AMDSClientAppController::connectToServer(const QString &hostName, quint16 p
 		activeServers_.insert(serverIdentifier, server);
 
 		connect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SIGNAL(requestDataReady(AMDSClientRequest*)));
-		connect(server, SIGNAL(AMDSServerError(AMDSServer*,int,QString,QString)), this, SLOT(onAMDSServerError(AMDSServer*,int,QString,QString)));
+		connect(server, SIGNAL(AMDSServerError(QString,int,QString,QString)), this, SLOT(onAMDSServerError(QString,int,QString,QString)));
 		emit newServerConnected(server->serverIdentifier());
 
 		// request the introspection data for all the buffers defined in this server
@@ -143,7 +141,7 @@ void AMDSClientAppController::disconnectWithServer(const QString &serverIdentifi
 	AMDSServer * server = getServerByServerIdentifier(serverIdentifier);
 	if (server) {
 		disconnect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SIGNAL(requestDataReady(AMDSClientRequest*)));
-		disconnect(server, SIGNAL(AMDSServerError(AMDSServer*,int,QString,QString)), this, SLOT(onAMDSServerError(AMDSServer*,int,QString,QString)));
+		disconnect(server, SIGNAL(AMDSServerError(QString,int,QString,QString)), this, SLOT(onAMDSServerError(QString,int,QString,QString)));
 
 		activeServers_.remove(serverIdentifier);
 		server->deleteLater();
@@ -309,16 +307,16 @@ bool AMDSClientAppController::requestClientData(const QString &hostName, quint16
 	return false;
 }
 
-void AMDSClientAppController::onAMDSServerError(AMDSServer* server, int errorCode, const QString &socketKey, const QString &errorMessage)
+void AMDSClientAppController::onAMDSServerError(const QString &serverIdentifier, int errorCode, const QString &socketKey, const QString &errorMessage)
 {
 	Q_UNUSED(socketKey)
 
 	bool disconnectServer = false;
 	if (errorCode != QAbstractSocket::RemoteHostClosedError) {
-		disconnectWithServer(server->serverIdentifier());
+		disconnectWithServer(serverIdentifier);
 		disconnectServer = true;
 	}
-	emit serverError(errorCode, disconnectServer, server->serverIdentifier(), errorMessage);
+	emit serverError(errorCode, disconnectServer, serverIdentifier, errorMessage);
 }
 
 void AMDSClientAppController::onNetworkSessionOpened()
