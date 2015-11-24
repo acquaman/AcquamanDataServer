@@ -33,9 +33,9 @@ public:
 	/// returns the units of the PV
 	inline QString pvUnits() const { return pvUnits_; }
 	/// returns the epics PV of the PV
-	inline QString epicsPV() { return epicsPV_; }
+	inline QString epicsPV() const { return epicsPV_; }
 	/// returns the dataType of the PV
-	inline AMDSDataTypeDefinitions::DataType dataType() { return dataType_; }
+	inline AMDSDataTypeDefinitions::DataType dataType() const { return dataType_; }
 
 protected:
 	/// whether this PV is enabled for tracking or not
