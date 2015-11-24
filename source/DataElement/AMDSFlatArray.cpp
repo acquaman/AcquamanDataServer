@@ -404,49 +404,58 @@ const QVector<double> AMDSFlatArray::asConstVectorDouble() const
 	QVector<double> targetVector;
 	switch(dataType_){
 	case AMDSDataTypeDefinitions::Signed8:
-		foreach(qint8 value, vectorQint8_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorQint8_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQint8_.at(i));
 		}
 		break;
 
 	case AMDSDataTypeDefinitions::Unsigned8:
-		foreach(quint8 value, vectorQuint8_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorQuint8_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQuint8_.at(i));
 		}
 		break;
 	case AMDSDataTypeDefinitions::Signed16:
-		foreach(qint16 value, vectorQint16_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorQint16_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQint16_.at(i));
 		}
 		break;
 	case AMDSDataTypeDefinitions::Unsigned16:
-		foreach(quint16 value, vectorQuint16_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorQuint16_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQuint16_.at(i));
 		}
 		break;
 	case AMDSDataTypeDefinitions::Signed32:
-		foreach(qint32 value, vectorQint32_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorQint32_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQint32_.at(i));
 		}
 		break;
 	case AMDSDataTypeDefinitions::Unsigned32:
-		foreach(quint32 value, vectorQuint32_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorQuint32_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQuint32_.at(i));
 		}
 		break;
 	case AMDSDataTypeDefinitions::Signed64:
-		foreach(qint64 value, vectorQint64_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorQint64_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQint64_.at(i));
 		}
 		break;
 	case AMDSDataTypeDefinitions::Unsigned64:
-		foreach(quint64 value, vectorQuint64_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorQuint64_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorQuint64_.at(i));
 		}
 		break;
 	case AMDSDataTypeDefinitions::Float:
-		foreach(float value, vectorFloat_) {
-			targetVector.append((double)value);
+		targetVector = QVector<double>(vectorFloat_.size());
+		for(int i=0, size = targetVector.size(); i < size; i++) {
+			targetVector[i] = double(vectorFloat_.at(i));
 		}
 		break;
 	case AMDSDataTypeDefinitions::Double:

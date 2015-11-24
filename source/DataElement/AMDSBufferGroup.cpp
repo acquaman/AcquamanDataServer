@@ -95,9 +95,10 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData, bool elapsedDwellTime)
 //			emit continuousDataUpdate(specturalCumulativeDataHolder);
 //			emit continuousStatusDataUpdate(cumulativeStatusData, count());
 //			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
-		} else {
-			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
 		}
+//		} else {
+//			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder_->metaObject()->className()));
+//		}
 	}
 }
 
@@ -118,7 +119,7 @@ void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
 	}
 }
 
-void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
+void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest, bool internalRequest){
 	QReadLocker readLock(&lock_);
 
 	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest *>(clientRequest);
@@ -172,7 +173,11 @@ void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest){
 		break;
 	}
 
-	emit clientRequestProcessed(clientRequest);
+	// Handle the trigger/dwell flattening request differently than usual requests
+	if(internalRequest)
+		emit internalRequestProcessed(clientRequest);
+	else
+		emit clientRequestProcessed(clientRequest);
 }
 
 bool AMDSBufferGroup::flattenData(QList<AMDSDataHolder *> *dataArray)

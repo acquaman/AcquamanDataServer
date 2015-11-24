@@ -22,7 +22,7 @@ public slots:
 
 protected:
 	/// helper function to make the configuration to the scaler detector
-	void performConfiguration(int commandId, QString value);
+	void performConfiguration(int commandId, const QString &value);
 };
 
 #endif // AMDSSCALERSERVER_H
