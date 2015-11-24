@@ -56,7 +56,7 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 	int totalParameters = 6;
 //	int dataTypeParamIndex = totalParameters - 1;
 
-	QFile configurationFile("./AMDSPVConfiguration.txt");
+	QFile configurationFile("../db/AMDSPVConfiguration.txt");
 
 	if (configurationFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		QTextStream dataStream(&configurationFile);
