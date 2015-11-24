@@ -17,10 +17,12 @@ public:
 		RequestStartDwell = 1,
 		RequestStopDwell,
 
-		// customized Scaler commands
+		// customized AMDS Scaler commands
 		CustomizedScalerCommand = 1000,
-		// customized Amptek commands
-		CustomizedAmptekCommand = 1100
+		// customized AMDS Amptek commands
+		CustomizedAmptekCommand = 1100,
+		// customized AMDS PV commands
+		CustomizedPVCommand = 1200
 	};
 
 	virtual ~AMDSCommandManager();

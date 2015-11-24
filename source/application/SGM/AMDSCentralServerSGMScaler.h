@@ -1,5 +1,5 @@
-#ifndef AMDSCENTRALSERVERSGM_H
-#define AMDSCENTRALSERVERSGM_H
+#ifndef AMDSCENTRALSERVERSGMSCALER_H
+#define AMDSCENTRALSERVERSGMSCALER_H
 
 #include <QObject>
 
@@ -9,8 +9,6 @@
 class AMDSScalerConfigurationMap;
 class AMDSScalerDetectorManager;
 class AMDSDetectorServerManager;
-
-#define AMDS_SGM_SERVER_ALT_INVALID_BUFFERGROUP_NAME 30101
 
 class AMDSCentralServerSGMScaler : public AMDSCentralServer
 {
@@ -70,4 +68,4 @@ protected:
 	double dwellSecondsRequested_;
 };
 
-#endif // AMDSCENTRALSERVERSGM_H
+#endif // AMDSCENTRALSERVERSGMSCALER_H
