@@ -33,18 +33,10 @@ AMDSClientAppController::AMDSClientAppController(QObject *parent) :
 	AMDSAppController(AMDSAppController::Client, parent)
 {
 	networkSession_ = 0;
-
-	setAMDSExportFilePath("");
-	clientDataRequestFile_ = 0;
 }
 
 AMDSClientAppController::~AMDSClientAppController()
 {
-	if (clientDataRequestFile_) {
-		clientDataRequestFile_->close();
-		clientDataRequestFile_->deleteLater();
-		clientDataRequestFile_ = 0;
-	}
 	// release the resouces of the AMDSServers
 	foreach (QString key, activeServers_.keys()) {
 		AMDSServer *server = activeServers_.value(key);
@@ -74,8 +66,6 @@ QStringList AMDSClientAppController::getBufferNamesByServer(const QString &serve
 	if (server) {
 		bufferNames = server->bufferNames();
 	}
-
-	bufferNames.insert(0, "All");
 
 	return bufferNames;
 }
@@ -136,7 +126,7 @@ void AMDSClientAppController::connectToServer(const QString &hostName, quint16 p
 		server = new AMDSServer(hostName, portNumber);
 		activeServers_.insert(serverIdentifier, server);
 
-		connect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
+		connect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SIGNAL(requestDataReady(AMDSClientRequest*)));
 		connect(server, SIGNAL(AMDSServerError(QString,int,QString,QString)), this, SLOT(onAMDSServerError(QString,int,QString,QString)));
 		emit newServerConnected(server->serverIdentifier());
 
@@ -150,7 +140,7 @@ void AMDSClientAppController::disconnectWithServer(const QString &serverIdentifi
 {
 	AMDSServer * server = getServerByServerIdentifier(serverIdentifier);
 	if (server) {
-		disconnect(server, SIGNAL(requestDataReady(QString, AMDSClientRequest*)), this, SLOT(onRequestDataReady(AMDSClientRequest*)));
+		disconnect(server, SIGNAL(requestDataReady(AMDSClientRequest*)), this, SIGNAL(requestDataReady(AMDSClientRequest*)));
 		disconnect(server, SIGNAL(AMDSServerError(QString,int,QString,QString)), this, SLOT(onAMDSServerError(QString,int,QString,QString)));
 
 		activeServers_.remove(serverIdentifier);
@@ -274,7 +264,7 @@ bool AMDSClientAppController::requestClientData(const QString &hostName, quint16
 	AMDSClientTCPSocket * clientTCPSocket = establishSocketConnection(hostName, portNumber);
 	if (clientTCPSocket) {
 		if (bufferNames.length() == 0 && handShakeSocketKey.length() == 0) {
-			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG, QString("Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
+			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CONTINUOUS_MSG, QString("Failed to parse continuousDataRequest without interested buffer name(s) and handShakeSocketKey"));
 			return false;
 		}
 
@@ -329,46 +319,6 @@ void AMDSClientAppController::onAMDSServerError(const QString &serverIdentifier,
 	emit serverError(errorCode, disconnectServer, serverIdentifier, errorMessage);
 }
 
-void AMDSClientAppController::onScanStarted()
-{
-	if (clientDataRequestFile_) {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_CLIENT_ERR_WRITING_FILE, QString("We are writing scan data to a file (%1) right now").arg(clientDataRequestFile_->fileName()));
-		clientDataRequestFile_->close();
-		clientDataRequestFile_->deleteLater();
-		clientDataRequestFile_ = 0;
-	}
-
-	if (currentExportedFilePath_.length() == 0) {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_CLIENT_ERR_TARGET_EXPORT_FILE_NOT_CONFIGURED, QString("AMDS: target file to export client data is not configured.").arg(clientDataRequestFile_->fileName()));
-		return;
-	}
-
-	QFileInfo dataFileInfo(currentExportedFilePath_);
-	if(dataFileInfo.exists()) {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_CLIENT_ERR_TARGET_EXPORT_FILE_EXISTED, QString("AMDS client data request target file %1 exists.").arg(currentExportedFilePath_));
-	} else {
-		QFile *newDataFile = new QFile(dataFileInfo.filePath());
-		if(newDataFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
-			clientDataRequestFile_ = newDataFile;
-		} else {
-			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_CLIENT_ERR_FAILED_TO_OPEN_TARGET_EXPORT_FILE, QString("AMDS client data request Failed to open target file %1 for writing.").arg(currentExportedFilePath_));
-			newDataFile->close();
-			newDataFile->deleteLater();
-		}
-	}
-}
-
-void AMDSClientAppController::onScanStopped()
-{
-	if (clientDataRequestFile_) {
-		clientDataRequestFile_->close();
-		clientDataRequestFile_->deleteLater();
-		clientDataRequestFile_ = 0;
-
-		setAMDSExportFilePath("");
-	}
-}
-
 void AMDSClientAppController::onNetworkSessionOpened()
 {
 	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_CLIENT_INFO_NETWORK_SESSION_STARTED, "Network session has been opened");
@@ -387,17 +337,6 @@ void AMDSClientAppController::onNetworkSessionOpened()
 	settings.endGroup();
 
 	emit networkSessionOpened();
-}
-
-void AMDSClientAppController::onRequestDataReady(AMDSClientRequest* clientRequest)
-{
-	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest *>(clientRequest);
-	if (clientDataRequest && clientDataRequestFile_) {
-		QDataStream dataStream(clientDataRequestFile_);
-		AMDSClientRequest::encodeAndwriteClientRequest(&dataStream, clientDataRequest);
-	}
-
-	emit requestDataReady(clientRequest);
 }
 
 AMDSClientTCPSocket * AMDSClientAppController::establishSocketConnection(const QString &hostName, quint16 portNumber)
@@ -419,7 +358,7 @@ AMDSClientRequest *AMDSClientAppController::instantiateClientRequest(AMDSClientR
 {
 	AMDSClientRequest *clientRequest = AMDSClientRequestSupport::instantiateClientRequestFromType(clientRequestType);
 	if (!clientRequest) {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_CLIENT_ERR_FAILED_TO_PARSE_CLIENT_MSG, QString("AMDSClientTCPSocket::Failed to parse clientRequest for type: %1").arg(clientRequestType));
 		return 0;
 	}
 

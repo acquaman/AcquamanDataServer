@@ -36,7 +36,7 @@ public:
 
 signals:
 	/// signal to indicate that something wrong with the connection happened
-	void AMDSServerError(const QString &serverIdentifier, int errorCode, QString socketKey, QString errorMessage);
+	void AMDSServerError(const QString &serverIdentifier, int errorCode, const QString &socketKey, const QString &errorMessage);
 	/// signal to indicate that the data is sent from server for read
 	void requestDataReady(AMDSClientRequest*);
 
