@@ -46,3 +46,4 @@ SOURCES *= \
 
 OTHER_FILES *= \
 	db/AmptekSDD.db
+
