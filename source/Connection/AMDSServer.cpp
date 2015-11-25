@@ -2,9 +2,10 @@
 
 #include <QtNetwork>
 
-#include "source/Connection/AMDSClientTCPSocket.h"
-#include "source/ClientRequest/AMDSClientRequest.h"
-#include "source/ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "Connection/AMDSClientTCPSocket.h"
+#include "ClientRequest/AMDSClientRequest.h"
+#include "ClientRequest/AMDSClientIntrospectionRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
 
 AMDSServer::AMDSServer(QString hostName, quint16 portNumber, QObject *parent) :
     QObject(parent)
@@ -38,9 +39,19 @@ AMDSClientTCPSocket * AMDSServer::establishSocketConnection()
 
 void AMDSServer::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSClientRequest *clientRequest)
 {
+	bool sendClientRequestDataReady = true;
+
 	switch (clientRequest->requestType()) {
 	case AMDSClientRequestDefinitions::Continuous:
-		activeTCPSockets_.insert(clientRequest->socketKey(), clientTCPSocket);
+		{
+			AMDSClientContinuousDataRequest *continuousRequest = qobject_cast<AMDSClientContinuousDataRequest*>(clientRequest);
+			if (continuousRequest && !continuousRequest->isHandShakingMessage()) {
+				activeTCPSockets_.insert(clientRequest->socketKey(), clientTCPSocket);
+			} else {
+				removeTCPSocket(clientTCPSocket);
+				sendClientRequestDataReady = false;
+			}
+		}
 		break;
 
 	case AMDSClientRequestDefinitions::Introspection:
@@ -62,7 +73,8 @@ void AMDSServer::onSocketDataReady(AMDSClientTCPSocket* clientTCPSocket, AMDSCli
 		break;
 	}
 
-	emit requestDataReady(clientRequest);
+	if (sendClientRequestDataReady)
+		emit requestDataReady(clientRequest);
 }
 
 void AMDSServer::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSocket::SocketError socketErrorCode)
@@ -90,8 +102,9 @@ void AMDSServer::onSocketError(AMDSClientTCPSocket *clientTCPSocket, QAbstractSo
 void AMDSServer::removeTCPSocket(AMDSClientTCPSocket *clientTCPSocket)
 {
 	// try to remove from the active socket list
-	if (activeTCPSockets_.contains(clientTCPSocket->socketKey()))
+	if (activeTCPSockets_.contains(clientTCPSocket->socketKey())) {
 		activeTCPSockets_.remove(clientTCPSocket->socketKey());
+	}
 
 	disconnect(clientTCPSocket, SIGNAL(newRequestDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)), this, SLOT(onSocketDataReady(AMDSClientTCPSocket*, AMDSClientRequest*)));
 	disconnect(clientTCPSocket, SIGNAL(socketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)), this, SLOT(onSocketError(AMDSClientTCPSocket*, QAbstractSocket::SocketError)));
