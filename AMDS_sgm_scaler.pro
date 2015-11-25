@@ -1,3 +1,4 @@
+
 HOME_FOLDER = $$system(echo $HOME)
 PROJECT_ROOT = $$PWD/..
 
@@ -16,7 +17,7 @@ TARGET = AcquamanDataServerSGMScaler
 
 HEADERS *= \
 	source/application/AMDSCentralServer.h \
-	source/application/AMDSCentralServerSGMScaler.h \
+	source/application/SGM/AMDSCentralServerSGMScaler.h \
 	source/Detector/AMDSDetectorServer.h \
 	source/Detector/Scaler/AMDSScalerCommandManager.h \
 	source/Detector/Scaler/AMDSScalerDetector.h \
@@ -26,13 +27,12 @@ HEADERS *= \
 SOURCES *= \
 	source/AMDSMainSGMScaler.cpp \
 	source/application/AMDSCentralServer.cpp \
-	source/application/AMDSCentralServerSGMScaler.cpp \
+	source/application/SGM/AMDSCentralServerSGMScaler.cpp \
 	source/Detector/AMDSDetectorServer.cpp \
 	source/Detector/Scaler/AMDSScalerCommandManager.cpp \
 	source/Detector/Scaler/AMDSScalerDetector.cpp \
 	source/Detector/Scaler/AMDSScalerDetectorServer.cpp \
 	source/Detector/Scaler/AMDSScalerConfigurationMap.cpp
 
-
-
-
+OTHER_FILES *= \
+	db/AMDSScaler.db

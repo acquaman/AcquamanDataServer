@@ -12,7 +12,7 @@ AMDSScalerCommandManager* AMDSScalerCommandManager::scalerCommandManager()
 	return instance_;
 }
 
-void AMDSScalerCommandManager::releaseScalerCommands()
+void AMDSScalerCommandManager::releaseScalerCommandManager()
 {
 	if (instance_) {
 		instance_->deleteLater();
