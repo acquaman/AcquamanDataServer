@@ -152,6 +152,10 @@ protected:
 	QByteArray totalResponseDatagram_;
 	/// the size of the total response datagram
 	int totalResponseDatagramSize_;
+	/// the number of bytes we've read so far for this response
+	int currentlyReadSize_;
+	/// the byte pattern that signifies the amptek packet header
+	QByteArray amptekHeaderBytes_;
 	/// flag to indicate whether the total response datagram is still on the way (more packets are expecting)
 	bool stillReceivingResponseDatagram_;
 //	/// flag to indicate that the response packet is ready
