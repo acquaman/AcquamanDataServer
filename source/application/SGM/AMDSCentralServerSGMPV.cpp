@@ -143,6 +143,7 @@ void AMDSCentralServerSGMPV::fillConfigurationCommandForClientRequest(const QStr
 
 void AMDSCentralServerSGMPV::processClientDataRequest(AMDSClientRequest *clientRequest)
 {
+	// make sure that we only continue AMDS PV data request when the PV is enabled
 	QString bufferName = "";
 	bool continueProcessDataRequest = false;
 	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
@@ -154,6 +155,7 @@ void AMDSCentralServerSGMPV::processClientDataRequest(AMDSClientRequest *clientR
 		}
 	}
 
+	// only when the PV is enabled, we will move forward
 	if (continueProcessDataRequest) {
 		AMDSCentralServer::processClientDataRequest(clientRequest);
 	} else {
