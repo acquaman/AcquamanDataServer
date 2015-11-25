@@ -58,22 +58,25 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 
 	QDataStream *inDataStream = 0;
 	if (!waitingMorePackages_) {
-		inDataStream= new QDataStream(tcpSocket_);
+		inDataStream = new QDataStream(tcpSocket_);
 		inDataStream->setVersion(QDataStream::Qt_4_0);
 		*inDataStream >> expectedBufferSize_;
 
 		if (tcpSocket_->bytesAvailable() < expectedBufferSize_) {
 			//more data package is expecting, we need to buffer the current ones
 			waitingMorePackages_ = true;
-			incomeDataBuffer_.clear();
 
-			readedBufferSize_ = tcpSocket_->bytesAvailable();
-			incomeDataBuffer_.append(tcpSocket_->readAll());
+			readedBufferSize_ = 0;
+			qint64 dataAvailable = tcpSocket_->bytesAvailable();
+			incomeDataBuffer_ = QByteArray(expectedBufferSize_, 0);
+			memcpy(incomeDataBuffer_.data(), tcpSocket_->readAll().constData(), dataAvailable*sizeof(char));
+			readedBufferSize_ += dataAvailable;
 		}
 	} else {
 		// more data package is coming
-		readedBufferSize_ += tcpSocket_->bytesAvailable();
-		incomeDataBuffer_.append(tcpSocket_->readAll());
+		qint64 dataAvailable = tcpSocket_->bytesAvailable();
+		memcpy(incomeDataBuffer_.data()+readedBufferSize_, tcpSocket_->readAll().constData(), dataAvailable*sizeof(char));
+		readedBufferSize_ += dataAvailable;
 
 		if (readedBufferSize_ == expectedBufferSize_) {
 			waitingMorePackages_ = false;
@@ -83,10 +86,14 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	}
 
 	// finish reading this message, waiting for the future data
-	if (waitingMorePackages_ || !inDataStream)
+	if (waitingMorePackages_ || !inDataStream){
+		if(inDataStream)
+			delete inDataStream;
 		return;
+	}
 
 	AMDSClientRequest *clientRequest = AMDSClientRequest::decodeAndInstantiateClientRequest(inDataStream);
+	delete inDataStream;
 	if (clientRequest == 0)
 		return;
 
