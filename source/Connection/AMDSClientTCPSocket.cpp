@@ -59,6 +59,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 		return;
 
 	bool onResponseBoundary = false; // there might be multiple request in the buffer, we will read them out one by one
+	// if this is the first chuck of the buffer, read the expected buffer size
 	if (!waitingMorePackages_) {
 		readedBufferSize_ = 0;
 
@@ -71,6 +72,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 		delete inDataStream;
 	}
 
+	// get the data size we are planning to read. if there are more data available, we are expecting some other Client request coming in the queue
 	qint64 dataAvailable = tcpSocket_->bytesAvailable();
 	qint64 dataToRead = expectedBufferSize_-readedBufferSize_;
 	if (dataAvailable > dataToRead) {
@@ -83,7 +85,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	readedBufferSize_ += dataToRead;
 
 	if (readedBufferSize_ == expectedBufferSize_) {
-		waitingMorePackages_ = false;
+		waitingMorePackages_ = false; // we finished reading the current client request
 	} else {
 		if (readedBufferSize_ < expectedBufferSize_) {
 			waitingMorePackages_ = true; // need to read more data
@@ -93,7 +95,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SERVER_ERR_SOCKET_READ_MORE_DATA_THAN_EXPECTED, QString("We read more data (%1) than expected (%2)").arg(readedBufferSize_).arg(expectedBufferSize_));
 		}
 
-		return;
+		return; // either waiting for more data package or we are done with reading
 	}
 
 	// finish reading the data, start to parse the data to dataRequest
@@ -115,7 +117,7 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 	case AMDSClientRequestDefinitions::Configuration:
 			if (clientRequest->validateResponse()) {
 				socketKey_ = clientRequest->socketKey();
-//				clientRequest->printData();
+				clientRequest->printData();
 			}
 			break;
 
