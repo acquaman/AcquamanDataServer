@@ -25,6 +25,10 @@ AmptekSDD123Server::AmptekSDD123Server(AmptekSDD123ConfigurationMap *configurati
 	serverName_ = serverName;
 	requestIntervalTimer_ = -1;
 
+	totalResponseDatagramSize_ = 0;
+	currentlyReadSize_ = 0;
+	amptekHeaderBytes_ = QByteArray::fromHex("f5fa");
+
 	if(configurationMap_){
 		stillReceivingResponseDatagram_ = false;
 		socketLocallyBusy_ = false;
@@ -293,6 +297,53 @@ void AmptekSDD123Server::processPendingDatagrams()
 	bool emitResponsePacketReady = false;
 
 	while(udpDetectorSocket_->hasPendingDatagrams()){
+		QByteArray datagram = QByteArray(udpDetectorSocket_->pendingDatagramSize(), 0);
+
+		QHostAddress *sourceAddress = new QHostAddress();
+		udpDetectorSocket_->readDatagram(datagram.data(), datagram.size(), sourceAddress);
+
+		// This is a small, singular packet
+		if(datagram.size() < 520 && datagram.mid(0,2) == amptekHeaderBytes_){
+			emitResponsePacketReady = true;
+
+			totalResponseDatagramSize_ = datagram.size();
+			totalResponseDatagram_ = QByteArray(totalResponseDatagramSize_, 0);
+			memcpy(totalResponseDatagram_.data(), datagram.constData(), totalResponseDatagramSize_*sizeof(char));
+			stillReceivingResponseDatagram_ = false;
+		}
+		// More data on a large response
+		else if(stillReceivingResponseDatagram_){
+			memcpy(totalResponseDatagram_.data()+currentlyReadSize_, datagram.constData(), datagram.size()*sizeof(char));
+			currentlyReadSize_ += datagram.size();
+
+			if(currentlyReadSize_ == totalResponseDatagramSize_){
+				emitResponsePacketReady = true;
+				stillReceivingResponseDatagram_ = false;
+			}
+		}
+		// The first part of a large response
+		else if(datagram.size() == 520 && datagram.mid(0,2) == amptekHeaderBytes_){
+			bool ok;
+			stillReceivingResponseDatagram_ = true;
+			totalResponseDatagramSize_ = datagram.mid(4,2).toHex().toInt(&ok, 16) + 8;//+8 for header, command, length, and checksum
+
+			totalResponseDatagram_ = QByteArray(totalResponseDatagramSize_, 0);
+			memcpy(totalResponseDatagram_.data(), datagram.constData(), datagram.size()*sizeof(char));
+			currentlyReadSize_ = datagram.size();
+		}
+		delete sourceAddress;
+	}
+
+	if(emitResponsePacketReady)
+		emit responsePacketReady();
+}
+
+/*
+void AmptekSDD123Server::processPendingDatagrams()
+{
+	bool emitResponsePacketReady = false;
+
+	while(udpDetectorSocket_->hasPendingDatagrams()){
 		QByteArray datagram;
 		bool ok;
 		datagram.resize(udpDetectorSocket_->pendingDatagramSize());
@@ -328,6 +379,7 @@ void AmptekSDD123Server::processPendingDatagrams()
 	if(emitResponsePacketReady)
 		emit responsePacketReady();
 }
+*/
 
 void AmptekSDD123Server::onResponsePacketReady()
 {

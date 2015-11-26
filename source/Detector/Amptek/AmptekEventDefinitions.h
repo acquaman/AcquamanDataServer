@@ -29,7 +29,7 @@ public:
 	AmptekSpectrumEvent() : QEvent( (QEvent::Type)AmptekEventDefinitions::SpectrumEvent) {}
 
 	QString detectorSourceName_;
-	AMDSFlatArray spectrum_;
+	AMDSFlatArray *spectrum_;
 	AMDSDwellStatusData statusData_;
 };
 
