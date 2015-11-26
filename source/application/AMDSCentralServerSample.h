@@ -26,9 +26,11 @@ protected:
 	/// function to initialize the detector manager
 	virtual void initializeDetectorManager();
 	/// function to initialize the data server to update the buffer groups
-	virtual void initializeAndStartDataServer();
+	virtual void initializeAndStartDetectorServer();
 	/// function to finalize the initialization
 	virtual void wrappingUpInitialization();
+	/// pure virtual function to fill the configuration commands for the given bufferName
+	virtual void fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest);
 
 protected:
 	quint64 simpleCounter_;
