@@ -80,7 +80,7 @@ void AMDSCentralServerSample::initializeDetectorManager()
 
 }
 
-void AMDSCentralServerSample::initializeAndStartDataServer()
+void AMDSCentralServerSample::initializeAndStartDetectorServer()
 {
 	fiftyMillisecondTimer_ = new QTimer(this);
 	hundredMillisecondTimer_ = new QTimer(this);
@@ -97,6 +97,11 @@ void AMDSCentralServerSample::initializeAndStartDataServer()
 }
 
 void AMDSCentralServerSample::wrappingUpInitialization()
+{
+
+}
+
+void AMDSCentralServerSample::fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest)
 {
 
 }
