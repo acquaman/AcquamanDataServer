@@ -211,7 +211,7 @@ void AmptekSDD123DetectorManager::setDetectorFastPeakingTime(AmptekSDD123Detecto
 }
 
 void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent){
-	AMDSFlatArray spectrumData = spectrumEvent->spectrum_;
+	AMDSFlatArray *spectrumData = spectrumEvent->spectrum_;
 	AMDSDwellStatusData statusData = spectrumEvent->statusData_;
 
 	if(setPresetDwellEndTimeOnNextEvent_){
@@ -236,8 +236,10 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 
 	// generate the spectrum data holder and notice the bufferGroup new data is ready
 	AMDSDwellSpectralDataHolder *oneHistogram = new AMDSDwellSpectralDataHolder(detector_->dataType(), detector_->bufferSize(), this);
-	oneHistogram->setData(&spectrumData);
+	oneHistogram->setData(spectrumData);
 	oneHistogram->setDwellStatusData(statusData);
+
+	delete spectrumData;
 
 	emit newHistrogramReceived(detectorName(), oneHistogram);
 

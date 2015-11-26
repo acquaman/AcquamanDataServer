@@ -128,6 +128,13 @@ void AmptekCommandManagerSGM::initiateAMDSCommands()
 	commands_.append( AMDSCommand(ResponseConfiguration,                 "8207", "Configuration Readback"));
 	commands_.append( AMDSCommand(ResponseCommTestEchoPacket,            "8f7f", "Comm test - Echo packet Response"));
 
+	// We have to add the acknowledge and repsonse commands to the list before we do the request. The internalCreateResponsesFromText depends on these.
+	int acknowledgeAndResponseCommands = commands_.count();
+	for (int i = 0; i < acknowledgeAndResponseCommands; i++) {
+		commandHash_[commands_.at(i).commandId()] = commands_.at(i);
+		commandHexMapping_.set(commands_.at(i).command(), commands_.at(i));
+	}
+
 	//Request types
 	QStringList tempResponses = QStringList() << "Request Status Packet Response" << "NormalErrors";
 	commands_.append( AMDSCommand(ReqeustStatusPacket, "0101", "Request Status Packet", 7, 3, internalCreateResponsesFromText(tempResponses)));
@@ -177,8 +184,8 @@ void AmptekCommandManagerSGM::initiateAMDSCommands()
 	tempResponses = QStringList() << "Comm test - Echo packet Response" << "NormalErrors";
 	commands_.append( AMDSCommand(RequestCommTestEchoPacket, "f17f", "Comm test - Echo packet", 7, 1, internalCreateResponsesFromText(tempResponses)));
 
-
-	for (int i = 0; i < commands_.count(); i++) {
+	// Start iterating from the end of the acknowledge/response set
+	for (int i = acknowledgeAndResponseCommands; i < commands_.count(); i++) {
 		commandHash_[commands_.at(i).commandId()] = commands_.at(i);
 		commandHexMapping_.set(commands_.at(i).command(), commands_.at(i));
 	}
