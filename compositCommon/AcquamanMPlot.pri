@@ -1,15 +1,25 @@
 
 
 macx {
-		# EPICS Dependencies:
-		EPICS_INCLUDE_DIRS = $$PATH_TO_ACQUAMAN/../contrib/epics/base/include \
-								$$PATH_TO_ACQUAMAN/../contrib/epics/base/include/os/Darwin
-		EPICS_LIB_DIR = $$PATH_TO_ACQUAMAN/../contrib/epics/base/lib/darwin-x86
+		USERNAME = $$system(whoami)
 
-		QMAKE_CXXFLAGS_X86_64 *= "-mmacosx-version-min=10.7"
+		contains(USERNAME, chevrid){
 
-		QMAKE_LFLAGS_DEBUG *= "-mmacosx-version-min=10.7"
-		QMAKE_LFLAGS_RELEASE *= "-mmacosx-version-min=10.7"
+			# EPICS Dependencies:
+			EPICS_INCLUDE_DIRS = $$PATH_TO_ACQUAMAN/../contrib/epics/base/include \
+									$$PATH_TO_ACQUAMAN/../contrib/epics/base/include/os/Darwin
+			EPICS_LIB_DIR = $$PATH_TO_ACQUAMAN/../contrib/epics/base/lib/darwin-x86
+
+			QMAKE_CXXFLAGS_X86_64 *= "-mmacosx-version-min=10.7"
+
+			QMAKE_LFLAGS_DEBUG *= "-mmacosx-version-min=10.7"
+			QMAKE_LFLAGS_RELEASE *= "-mmacosx-version-min=10.7"
+		} else {
+			# EPICS Dependencies:
+			EPICS_INCLUDE_DIRS = $$PROJECT_ROOT/acquaman/contrib/epics/base/include \
+						$$PROJECT_ROOT/acquaman/contrib/epics/base/include/os/Darwin
+			EPICS_LIB_DIR = $$PROJECT_ROOT/acquaman/contrib/epics/base/lib/darwin-x86
+		}
 } else {
 # EPICS Dependencies:
 	EPICS_INCLUDE_DIRS = /home/epics/src/R3.14.12/base/include \
