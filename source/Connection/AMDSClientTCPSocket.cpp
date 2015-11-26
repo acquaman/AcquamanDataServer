@@ -67,6 +67,8 @@ void AMDSClientTCPSocket::readClientRequestMessage()
 		*inDataStream >> expectedBufferSize_;
 
 		incomeDataBuffer_ = QByteArray(expectedBufferSize_, 0);
+
+		delete inDataStream;
 	}
 
 	qint64 dataAvailable = tcpSocket_->bytesAvailable();
