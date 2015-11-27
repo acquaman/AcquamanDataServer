@@ -6,6 +6,7 @@
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
+#include "ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
 
@@ -67,7 +68,7 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 			pvConfiguration = dataStream.readLine();
 			if (!pvConfiguration.isNull()) {
 				QStringList pvDefintions = pvConfiguration.split(rx);
-				if (pvDefintions.size() == totalParameters) {
+				if (pvDefintions.size() == totalParameters && pvDefintions.at(3).trimmed().length() > 0 ) {
 	//				int dataType = pvDefintions.at(dataTypeParamIndex).toInt();
 					AMDSPVConfigurationMap *pvConfiguration = new AMDSPVConfigurationMap(pvDefintions.at(0).trimmed(), //enabled
 																						 pvDefintions.at(1).trimmed(), //name
@@ -144,22 +145,44 @@ void AMDSCentralServerSGMPV::fillConfigurationCommandForClientRequest(const QStr
 void AMDSCentralServerSGMPV::processClientDataRequest(AMDSClientRequest *clientRequest)
 {
 	// make sure that we only continue AMDS PV data request when the PV is enabled
-	QString bufferName = "";
 	bool continueProcessDataRequest = false;
 	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest*>(clientRequest);
 	if(clientDataRequest){
-		bufferName = clientDataRequest->bufferName();
-		AMDSPVConfigurationMap *pvConfiguration = pvConfigurationMaps_.value(bufferName);
-		if (pvConfiguration && pvConfiguration->enabled()) {
-			continueProcessDataRequest = true;
+		if (clientDataRequest->isContinuousMessage()) {
+			AMDSClientContinuousDataRequest *continuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest *>(clientRequest);
+			QStringList bufferNames;
+			bufferNames.append(continuousDataRequest->bufferNames());
+			foreach (QString bufferName, bufferNames) {
+				AMDSPVConfigurationMap *pvConfiguration = pvConfigurationMaps_.value(bufferName);
+				if (!pvConfiguration || !pvConfiguration->enabled()) {
+					QString errorMessage = QString("ERROR: %1 - Request data from a disabled bufferGroup (%2).").arg(AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME).arg(bufferName);
+					AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME, errorMessage);
+
+					bufferNames.removeOne(bufferName);
+				}
+			}
+			if (bufferNames.length() > 0) {
+				continueProcessDataRequest = true;
+				continuousDataRequest->setBufferNames(bufferNames);
+			}
+		} else {
+			QString bufferName = clientDataRequest->bufferName();
+			AMDSPVConfigurationMap *pvConfiguration = pvConfigurationMaps_.value(bufferName);
+			if (pvConfiguration && pvConfiguration->enabled()) {
+				continueProcessDataRequest = true;
+			} else {
+				QString errorMessage = QString("ERROR: %1 - Request data from a disabled bufferGroup (%2).").arg(AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME).arg(bufferName);
+				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME, errorMessage);
+			}
 		}
+
 	}
 
 	// only when the PV is enabled, we will move forward
 	if (continueProcessDataRequest) {
 		AMDSCentralServer::processClientDataRequest(clientRequest);
 	} else {
-		QString errorMessage = QString("ERROR: %1 - Request data from a disabled bufferGroup (%2) or invalid data request type (%3).").arg(AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME).arg(bufferName).arg(clientRequest->requestType());
+		QString errorMessage = QString("ERROR: %1 - Request data from a disabled bufferGroup or invalid data request type (%2.").arg(AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME).arg(clientRequest->requestType());
 		clientRequest->setErrorMessage(errorMessage);
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SGM_SERVER_ALT_DISBLED_BUFFERGROUP_NAME, errorMessage);
 		emit clientRequestProcessed(clientRequest);
