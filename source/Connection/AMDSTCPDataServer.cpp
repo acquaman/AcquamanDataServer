@@ -349,7 +349,7 @@ void AMDSTCPDataServer::onClientContinuousRequestReceived(AMDSClientRequest *cli
 				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_INFO_SERVER_HAND_SHAKE_MSG_CONNECTION_NOT_FOUND, QString("Didn't find hand shaking message (%1)").arg(socketKey));
 			}
 
-			onClientRequestTaskAccomplished(clientContinuousDataRequest);
+			onClientRequestProcessed(clientRequest);
 		} else {
 			activeContinuousDataRequestList_.insert(clientContinuousDataRequest->socketKey(), clientContinuousDataRequest);
 			connect(clientContinuousDataRequest, SIGNAL(sendNewContinuousDataRequest(AMDSClientRequest*)), this, SIGNAL(clientRequestRead(AMDSClientRequest*)));
