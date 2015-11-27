@@ -150,8 +150,7 @@ void AMDSCentralServerSGMPV::processClientDataRequest(AMDSClientRequest *clientR
 	if(clientDataRequest){
 		if (clientDataRequest->isContinuousMessage()) {
 			AMDSClientContinuousDataRequest *continuousDataRequest = qobject_cast<AMDSClientContinuousDataRequest *>(clientRequest);
-			QStringList bufferNames;
-			bufferNames.append(continuousDataRequest->bufferNames());
+			QStringList bufferNames = continuousDataRequest->bufferNames();
 			foreach (QString bufferName, bufferNames) {
 				AMDSPVConfigurationMap *pvConfiguration = pvConfigurationMaps_.value(bufferName);
 				if (!pvConfiguration || !pvConfiguration->enabled()) {
