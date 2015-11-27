@@ -1,5 +1,72 @@
 enabled, name, description, epics pv, units, dataType(0-qint8 1-quint8 2-qint16 3-quint16 4-qint32 5-quint32 6-qint64 7-quint64 8-float 9-double)
-True, Energy, Energy PV, AM1611-4-I10:energy, ev, 9
-True, ScalerChannel0, Channel 0 of Scaler, BL1611-ID-1:mcs00:fbk, count, 9
-False, ScalerChannel1, Channel 1 of Scaler, BL1611-ID-1:mcs01:fbk, count, 9
-True, ScalerChannel2, Channel 2 of Scaler, BL1611-ID-1:mcs02:fbk, count, 9
+True, FrontEndShutter1, FrontEnd Shutter1, PSH1411-I00-01:state, , 9
+True, FrontEndValve1, FrontEnd Valve1, VVR1411-I00-01:state, , 9
+True, FrontEndFastValve, FrontEnd Fast Valve, VVF1411-I00-01:state, , 9
+True, FrontEndSafetyShutter, FrontEnd Safety Shutter, SSH1411-I00-01:state, , 9
+True, FrontEndShutter2, FrontEnd Shutter2, PSH1411-I00-02:state, , 9
+True, FrontEndValve3, FrontEnd Valve3, VVR1611-3-I00-01:state, , 9
+True, BeamlineFixedMask, Beamline Fixed Mask, VVR1611-3-I00-03:state, , 9
+True, BeamlinePGMm1, Beamline PGM m1, VVR1611-3-I20-01:state, , 9
+True, BeamlinePGMm2, Beamline PGM m2, VVR1611-3-I20-02:state, , 9
+True, BeamlineSGMm1, Beamline SGM m1, VVR1611-3-I10-01:state, , 9
+True, BeamlineSGMm2, Beamline SGM m2, VVR1611-3-I10-02:state, , 9
+True, BeamlineSGMm3, Beamline SGM m3, VVR1611-3-I10-03:state, , 9
+True, BeamlinePostm3, Beamline POST m3, VVR1611-3-I10-04:state, , 9
+True, BeamlineShutter, Beamline Shutter, PSH1611-3-I10-01:state, , 9
+True, BeamlineMonochromator, Beamline Monochromator, VVR1611-4-I10-01:state, , 9
+True, BeamlineStraight, Beamline Straight, VVR1611-4-I10-02:state, , 9
+True, BeamlinePreExitSlit, Beamline PreExitSlit, VVR1611-4-I10-03:state, , 9
+True, BeamlineSGMm4, Beamline SGM m4, VVR1611-4-I10-04:state, , 9
+True, BeamlineEndstationEa1, Beamline Endstation Ea1, VVR1611-4-I10-05:state, , 9
+True, BeamlineSGMm5, Beamline SGM m5, VVR1611-4-I10-06:state, , 9
+True, CCGPressureFrontEnd1, CCG Pressure Front End 1, CCG1411-I00-01:vac:p, Torr, 9
+True, CCGPressureFrontEnd2, CCG Pressure Front End 2, CCG1411-I00-02:vac:p, Torr, 9
+True, CCGPressureFrontEnd3, CCG Pressure Front End 3, CCG1611-3-I00-02:vac:p, Torr, 9
+True, CCGPressurePGMm1, CCG Pressure PGM m1, CCG1611-3-I00-03:vac:p, Torr, 9
+True, CCGPressurePGMm2, CCG Pressure PGM m2, CCG1611-3-I00-04:vac:p, Torr, 9
+True, CCGPressureSGMm1, CCG Pressure SGM m1, CCG1611-3-I10-01:vac:p, Torr, 9
+True, CCGPressureSGMm2, CCG Pressure SGM m2, CCG1611-3-I10-02:vac:p, Torr, 9
+True, CCGPressureSGMm3, CCG Pressure SGM m3, CCG1611-3-I10-03:vac:p, Torr, 9
+True, CCGPressureEntranceSlit, CCG Pressure Entrance Slit, CCG1611-3-I10-04:vac:p, Torr, 9
+True, CCGPressureMonochromator, CCG Pressure Monochromator, CCG1611-4-I10-01:vac:p, Torr, 9
+True, CCGPressureStraight1, CCG Pressure Straight1, CCG1611-4-I10-02:vac:p, Torr, 9
+True, CCGPressureExitSlit, CCG Pressure Exit Slit, CCG1611-4-I10-03:vac:p, Torr, 9
+True, CCGPressureSGMm4, CCG Pressure SGM m4, CCG1611-4-I10-04:vac:p, Torr, 9
+True, CCGPressureEndstationEa1.1, CCG Pressure Endstation ea1.1, CCG1611-4-I10-05:vac:p, Torr, 9
+True, CCGPressureEndstationEa1.2, CCG Pressure Endstation ea1.2, CCG1611-4-I10-06:vac:p, Torr, 9
+True, CCGPressureSGMm5, CCG Pressure SGM m5, CCG1611-4-I10-07:vac:p, Torr, 9
+True, CCGPressureDifferentialSection, CCG Pressure Differential Section, CCG1611-4-I10-08:vac:p, Torr, 9
+True, CCGPressureEndstationEa2, CCG Pressure Endstation ea2, CCG1611-4-I10-09:vac:p, Torr, 9
+True, TCGPressureSGMm1, TCG Pressure SGM m1, TCGC1611-414:pressure:fbk, , 9
+True, TCGPressureSGMm2, TCG Pressure SGM m2, TCGC1611-415:pressure:fbk, , 9
+True, TCGPressureSGMm3, TCG Pressure SGM m3, TCGC1611-416:pressure:fbk, , 9
+True, TCGPressureEntranceSlit, TCG Pressure Entrance Slit, TCGC1611-417:pressure:fbk, , 9
+True, TCGPressureMonochromator, TCG Pressure Monochromator, TCGC1611-418:pressure:fbk, , 9
+True, TCGPressureStraight1, TCG Pressure Straight1, TCGC1611-419:pressure:fbk, , 9
+True, TCGPressureExitSlit, TCG Pressure Exit Slit, TCGC1611-420:pressure:fbk, , 9
+True, TCGPressureSGMm4, TCG Pressure SGM m4, TCGC1611-421:pressure:fbk, , 9
+True, TCGPressureEndstationEa1.1, TCG Pressure Endstation ea1.1, TCGC1611-422:pressure:fbk, , 9
+True, TCGPressureEndstationEa1.2, TCG Pressure Endstation ea1.2, TCGC1611-423:pressure:fbk, , 9
+True, TCGPressureSGMm5, TCG Pressure SGM m5, TCGC1611-424:pressure:fbk, Torr, 9
+True, TCGPressureDifferentialSection, TCG Pressure Differential Section, TCGC1611-425:pressure:fbk, , 9
+True, TCGPressureEndstationEa2, TCG Pressure Endstation ea2, TCGC1611-426:pressure:fbk, , 9
+True, TemperatureFrontEnd, Temperature Front End, TM1611-3-I00-01a, C, 9
+True, TemperatureFixed Mask, Temperature Fixed Mask, TM1611-3-I00-02, C, 9
+True, TemperaturePGMM1Mask, Temperature PGM m1 Mask, TM1611-3-I20-01, C, 9
+True, TemperaturePGMM1, Temperature PGM m1, TM1611-3-I20-02, C, 9
+True, TemperatureVariableAperatureMask, Temperature Variable Aperature Mask, TM1611-3-I10-01, C, 9
+True, TemperatureSGMM1Mask, Temperature SGM m1 Mask, TM1611-3-I10-02, C, 9
+True, TemperatureSGMM1, Temperature SGM m1, TM1611-3-I10-03, C, 9
+True, StorageRingCurrent, Storage Ring Current, PCT1402-01:mA:fbk, mA, 9
+True, StorageRingLifetime, Storage Ring Lifetime, PCT1402-01:halfLife, h, 9
+True, Energy, Energy, AM1611-4-I10:energy:eV:fbk, eV, 9
+True, HexpodPrimaryPositionX, Hexpod primary position X, HXPD1611-4-I10-01:X:mm:fbk, mm, 9
+True, HexpodPrimaryPositionY, Hexpod primary position Y, HXPD1611-4-I10-01:Y:mm:fbk, mm, 9
+True, HexpodPrimaryPositionZ, Hexpod primary position Z, HXPD1611-4-I10-01:Z:mm:fbk, mm, 9
+True, HexpodPrimaryPositionU, Hexpod primary position U, HXPD1611-4-I10-01:U:deg:fbk, deg, 9
+True, HexpodPrimaryPositionV, Hexpod primary position V, HXPD1611-4-I10-01:V:deg:fbk, deg, 9
+True, HexpodPrimaryPositionW, Hexpod primary position W, HXPD1611-4-I10-01:W:deg:fbk, deg, 9
+True, GratingSelection, Grating Seleciton, AM1611-4-I10:energy:grating:translation:fbk, , 9
+True, UndulatorHarmonic, Undulator Harmonic, AM1611-4-I10:energy:undulator:harmonic:fbk, , 9
+True, EndstationPressure, Endstation Pressure, FRG1611-4-I10-01:pressure:fbk, Torr, 9
+True, EndstationLight, Endstation Light, ILC1611-4-I10-01, , 9
