@@ -40,10 +40,10 @@ public:
 	/// Clears the buffer of all its members, and frees their resources
 	void clear();
 	/// appends a list of dataHolder to the bufferGroup
-	void append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime=0);
+	void append(const AMDSDataHolderList &dataHolderList, double elapsedDwellTime=0);
 	/// Adds a new AMDSDataHolder pointer to the end of the buffer. The buffer group takes ownership
 	/// of the passed AMDSDataHolder, becoming responsible for its destruction
-	void append(AMDSDataHolder* value, bool elapsedDwellTime=0);
+	void append(AMDSDataHolder* value, double elapsedDwellTime=0);
 	/// finish dwell data update
 	void finishDwellDataUpdate(double elapsedTime=0);
 

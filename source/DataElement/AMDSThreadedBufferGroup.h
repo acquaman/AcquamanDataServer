@@ -21,9 +21,9 @@ public:
 	/// returns the bufferGroup name
 	QString bufferGroupName() const;
 	/// appends a list of dataHolder to the bufferGroup
-	void append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime=0);
+	void append(const AMDSDataHolderList &dataHolderList, double elapsedDwellTime=0);
 	/// appends a data to the bufferGroup
-	void append(AMDSDataHolder *value, bool elapsedDwellTime=0);
+	void append(AMDSDataHolder *value, double elapsedDwellTime=0);
 
 	/// returns the buffergroup
 	inline AMDSBufferGroup *bufferGroup() { return bufferGroup_; }
