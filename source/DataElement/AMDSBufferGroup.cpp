@@ -52,6 +52,7 @@ void AMDSBufferGroup::clear()
 
 	for(int iElement = 0, elementCount = dataHolders_.count(); iElement < elementCount; iElement++) {
 		dataHolders_[iElement]->deleteLater();
+		dataHolders_.setElementNull(iElement);
 	}
 	dataHolders_.clear();
 
@@ -114,7 +115,8 @@ void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
 			emit dwellFinishedStatusDataUpdate(cumulativeStatusData, count());
 			emit dwellFinishedAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedTime);
 		} else {
-			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
+			if (cumulativeDataHolder())
+				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
 		}
 	}
 }
