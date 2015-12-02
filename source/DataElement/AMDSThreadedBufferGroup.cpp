@@ -37,13 +37,13 @@ QString AMDSThreadedBufferGroup::bufferGroupName() const
 	return bufferGroupInfo().name();
 }
 
-void AMDSThreadedBufferGroup::append(const AMDSDataHolderList &dataHolderList, bool elapsedDwellTime)
+void AMDSThreadedBufferGroup::append(const AMDSDataHolderList &dataHolderList, double elapsedDwellTime)
 {
 	QWriteLocker writeLock(&lock_);
 	bufferGroup_->append(dataHolderList, elapsedDwellTime);
 }
 
-void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, bool elapsedDwellTime)
+void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, double elapsedDwellTime)
 {
 	QWriteLocker writeLock(&lock_);
 	bufferGroup_->append(value, elapsedDwellTime);
