@@ -17,7 +17,7 @@ class AMDSBuffer
 public:
 	/// Creates a AMDSBuffer to store maxSize number of elements
 	AMDSBuffer(int maxSize) :
-		elements_(maxSize),
+		elements_(maxSize, 0),
 		maxSize_(maxSize),
 		nextPosition_(0),
 		totalElementsAdded_(0)
@@ -74,6 +74,7 @@ public:
 		QWriteLocker writeLock(&lock);
 		totalElementsAdded_ = 0;
 		nextPosition_ = 0;
+		elements_.clear();
 	}
 
 	/// The number of items currently stored in the AMDSBuffer.
@@ -121,7 +122,7 @@ class AMDSBuffer<T*>
 public:
 	/// Creates a AMDSBuffer to store maxSize number of elements
 	AMDSBuffer(int maxSize) :
-		elements_(maxSize),
+		elements_(maxSize, 0),
 		maxSize_(maxSize),
 		nextPosition_(0),
 		totalElementsAdded_(0)
@@ -155,7 +156,13 @@ public:
 	const T* at(int index) const
 	{
 		QReadLocker readLock(&lock);
-		return (*this)[index];
+		return (*this)[convertIndex(index)];
+	}
+
+	void setElementNull(int index) {
+		QWriteLocker writeLock(&lock);
+
+		elements_[convertIndex(index)] = 0;
 	}
 
 	/// The maximum number of elements to be stored in the AMDSBuffer. Once this limit is reached
@@ -183,8 +190,10 @@ public:
 	/// Removes all items from the AMDSBuffer and, if it owns them, frees their memory
 	void clear() {
 		QWriteLocker writeLock(&lock);
+
 		totalElementsAdded_ = 0;
 		nextPosition_ = 0;
+		elements_.clear();
 	}
 
 	/// The number of items currently stored in the AMDSBuffer.

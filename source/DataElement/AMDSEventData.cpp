@@ -119,7 +119,7 @@ void AMDSFullEventData::cloneData(AMDSEventData *sourceEventData)
 		AMDSEventData *newEventData = AMDSEventDataSupport::instantiateEventDataFromInstance(sourceFullEventData->lightWeightEventData());
 		lightWeightEventData_ = qobject_cast<AMDSLightWeightEventData *>(newEventData);
 		if (lightWeightEventData_)
-			(*lightWeightEventData_) = (*sourceFullEventData->lightWeightEventData());
+			lightWeightEventData_->cloneData(sourceFullEventData->lightWeightEventData());
 
 		setEventType(sourceFullEventData->eventType());
 		setTimeScale(sourceFullEventData->timeScale());

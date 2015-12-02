@@ -542,8 +542,6 @@ void AmptekSDD123Server::processResponseFeedback(const AmptekSDD123Packet &respo
 
 void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(const QByteArray &spectrumByteArray, const QByteArray &statusByteArray, int channelCount)
 {
-	replySpectrumTime_->restart();
-
 	emit spectrumDataReady(spectrumByteArray, channelCount);
 	emit statusDataReady(statusByteArray);
 
@@ -558,6 +556,8 @@ void AmptekSDD123Server::postSpectrumPlusStatusReadyResponse(const QByteArray &s
 	} else {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMPTEK_SERVER_ALERT_SPECTRUM_EVENT_RECEIVER_UNDEFINED, QString("No spectrum packet receiver"));
 	}
+
+	replySpectrumTime_->restart();
 }
 
 void AmptekSDD123Server::postConfigurationReadbackResponse(const QString &ASCIICommands)

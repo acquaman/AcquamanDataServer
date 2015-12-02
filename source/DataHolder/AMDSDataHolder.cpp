@@ -101,7 +101,8 @@ void AMDSLightWeightDataHolder::cloneData(AMDSDataHolder *sourceDataHolder)
 			eventData_->deleteLater();
 
 		eventData_ = AMDSEventDataSupport::instantiateEventDataFromInstance(sourceLightWeightDataHolder->eventData());
-		(*eventData_) = *(sourceLightWeightDataHolder->eventData()); // copy the values of the eventData over
+		if (eventData_)
+			eventData_->cloneData(sourceLightWeightDataHolder->eventData()); // copy the values of the eventData over
 	}
 }
 

@@ -53,7 +53,8 @@ void AMDSLightWeightGenericFlatArrayDataHolder::cloneData(AMDSDataHolder *source
 	AMDSLightWeightDataHolder::cloneData(sourceDataHolder);
 
 	AMDSLightWeightGenericFlatArrayDataHolder *sourceLightWeightGenericFlatArrayDataHolder = qobject_cast<AMDSLightWeightGenericFlatArrayDataHolder *>(sourceDataHolder);
-	sourceLightWeightGenericFlatArrayDataHolder->dataArray().resetTargetArrayAndReplaceData(&valueFlatArray_);
+	if (sourceLightWeightGenericFlatArrayDataHolder)
+		sourceLightWeightGenericFlatArrayDataHolder->dataArray().resetTargetArrayAndReplaceData(&valueFlatArray_);
 }
 
 bool AMDSLightWeightGenericFlatArrayDataHolder::writeToDataStream(QDataStream *dataStream)
