@@ -251,7 +251,7 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 		AMDSDwellSpectralDataHolder *dwellHistogram = new AMDSDwellSpectralDataHolder(detector_->dataType(), detector_->bufferSize(), this);
 		dwellHistogram->setData(spectrumData);
 		dwellHistogram->setDwellStatusData(statusData);
-		emit newDwellHistrogramReceived(detectorName(), oneHistogram, elapsedTime);
+		emit newDwellHistrogramReceived(detectorName(), dwellHistogram, elapsedTime);
 	}
 
 	delete spectrumData;
