@@ -45,5 +45,13 @@ SOURCES *= \
 	source/Detector/Amptek/SGM/AmptekSDD123EPICSDetectorManager.cpp
 
 OTHER_FILES *= \
-	db/AmptekSDD.db
+	db/AmptekSDD.db \
+    runScripts/clsSGMAmptekDataServer \
+    runScripts/runSGMAmptekDataServer
+
+
+
+
+
+
 

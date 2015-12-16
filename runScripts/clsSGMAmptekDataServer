@@ -1,0 +1,22 @@
+# Linux rc script for the CLS SGM Amptek Data Server. Ensures that the amptek data server runs as a proc
+# server on IOC1611-406.
+#	See http://vsrv-wiki-01/wiki/Consistent_Layout_-_procServ for more information
+#
+# chkconfig: 345 90 10
+# description: CLS SGM Amptek Data Server
+#
+
+. /etc/rc.d/init.d/functions
+
+IOCNAME=IOC1611-406
+INSTALL_DIR=/iocApps/11ID_1_SGM_BL/$IOCNAME/
+TOP=/home/epics/src/R3.14.12/
+T_A=linux-x86_64
+# RUNCMD=
+# RUNAS=control
+RUNSCRIPT=runSGMAmptekDataServer
+DAEMON=SGMAmptekDataServer
+PORTNO=10000
+NETWORK="10.52.48/24"
+
+source /iocApps/Common/startup.include

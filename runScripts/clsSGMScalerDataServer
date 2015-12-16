@@ -1,0 +1,22 @@
+# Linux rc script for the CLS SGM Scaler Data Server. Ensures that the scaler data server runs as a proc
+# server on OPI1611-412.
+#	See http://vsrv-wiki-01/wiki/Consistent_Layout_-_procServ for more information
+#
+# chkconfig: 345 90 10
+# description: CLS SGM Amptek Data Server
+#
+
+. /etc/rc.d/init.d/functions
+
+IOCNAME=OPI1611-412
+INSTALL_DIR=/iocApps/11ID_1_SGM_BL/$IOCNAME/
+TOP=/home/epics/src/R3.14.12/
+T_A=linux-x86_64
+# RUNCMD=
+# RUNAS=control
+RUNSCRIPT=runSGMScalerDataServer
+DAEMON=SGMScalerDataServer
+PORTNO=10000
+NETWORK="10.52.48/24"
+
+source /iocApps/Common/startup.include
