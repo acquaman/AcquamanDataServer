@@ -32,16 +32,19 @@ AMDSTCPDataServer::AMDSTCPDataServer(QObject *parent) :
 	connect(hundredMillisecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onHundredMillisecondStatsTimerTimeout()));
 	connect(oneSecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onOneSecondStatsTimerTimeout()));
 	connect(tenSecondStatsTimer_, SIGNAL(timeout()), this, SLOT(onTenSecondStatsTimerTimeout()));
-
-	tenMillisecondStatsTimer_->start(10);
-	hundredMillisecondStatsTimer_->start(100);
-	oneSecondStatsTimer_->start(1000);
-	tenSecondStatsTimer_->start(10000);
 }
 
 AMDSTCPDataServer::~AMDSTCPDataServer()
 {
 	stop();
+}
+
+void AMDSTCPDataServer::onStartTimer()
+{
+	tenMillisecondStatsTimer_->start(10);
+	hundredMillisecondStatsTimer_->start(100);
+	oneSecondStatsTimer_->start(1000);
+	tenSecondStatsTimer_->start(10000);
 }
 
 void AMDSTCPDataServer::displayClients()
