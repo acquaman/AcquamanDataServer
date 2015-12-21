@@ -2,7 +2,7 @@
 
 #include <QDataStream>
 
-AMDSFlatArray::AMDSFlatArray(AMDSDataTypeDefinitions::DataType dataType, quint32 size)
+AMDSFlatArray::AMDSFlatArray(AMDSDataTypeDefinitions::DataType dataType, int size)
 {
 	resizeType(dataType, size);
 }
@@ -538,7 +538,7 @@ void AMDSFlatArray::clear(){
 	dataType_ = AMDSDataTypeDefinitions::InvalidType;
 }
 
-void AMDSFlatArray::clearAndReset(AMDSDataTypeDefinitions::DataType dataType, quint32 size){
+void AMDSFlatArray::clearAndReset(AMDSDataTypeDefinitions::DataType dataType, int size){
 	clear();
 	resizeType(dataType, size);
 }
@@ -717,7 +717,7 @@ bool AMDSFlatArray::resetTargetArrayAndReplaceData(AMDSFlatArray *targetArray) c
 	return copyDataToTargetArray(targetArray);
 }
 
-void AMDSFlatArray::resizeType(AMDSDataTypeDefinitions::DataType dataType, quint32 size){
+void AMDSFlatArray::resizeType(AMDSDataTypeDefinitions::DataType dataType, int size){
 	if( (dataType_ == dataType) && (size == this->size()) )
 		return;
 

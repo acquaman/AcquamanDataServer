@@ -12,6 +12,7 @@
 AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent) :
 	QObject(parent)
 {
+	count = 0;
 	requestEventReceiver_ = 0;
 
 	initialized_ = false;
@@ -22,7 +23,6 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	dwellMode_ = AmptekSDD123DetectorManager::PresetDwell;
 	dwellActive_ = false;
 	dwellTime_ = 2;
-	setPresetDwellEndTimeOnNextEvent_ = false;
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
 }
@@ -60,14 +60,17 @@ void AmptekSDD123DetectorManager::setRequestEventReceiver(QObject *requestEventR
 void AmptekSDD123DetectorManager::startDwell(){
 	setDwellActive(true);
 
-	if(dwellMode_ == AmptekSDD123DetectorManager::PresetDwell){
-		emit clearDwellHistrogramData(detectorName());
-		setPresetDwellEndTimeOnNextEvent_ = true;
+	if (isPresetDwell()) {
+		setDwellTimeOnNextEvent_ = true;
+	} else {
+		emit dwellStarted(detectorName());
 	}
 }
 
 void AmptekSDD123DetectorManager::stopDwell(){
 	setDwellActive(false);
+
+	emit dwellStopped(detectorName());
 }
 
 void AmptekSDD123DetectorManager::setDwellActive(bool dwellActive){
@@ -210,28 +213,29 @@ void AmptekSDD123DetectorManager::setDetectorFastPeakingTime(AmptekSDD123Detecto
 	postConfigurationInitiateRequestEvent();
 }
 
+#include <QDebug>
 void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent){
+	if (!initialized_) {
+		emit clearHistrogramData(detectorName());
+		initialized_ = true;
+	}
+
 	AMDSFlatArray *spectrumData = spectrumEvent->spectrum_;
 	AMDSDwellStatusData statusData = spectrumEvent->statusData_;
 
-	if(setPresetDwellEndTimeOnNextEvent_){
-		setPresetDwellEndTimeOnNextEvent_ = false;
-		presetDwellLocalStartTime_ = statusData.dwellStartTime();
-		presetDwellEndTime_ = statusData.dwellStartTime().addMSecs(dwellTime_*1000);
-	}
-	else if (dwellActive_ && isPresetDwell() && presetDwellLocalEndTime_.isValid()) {
-		if ( presetDwellLocalEndTime_ >= presetDwellEndTime_ ) { //dwellToBeDeactived
-			dwellActive_ = false;
+	if (isPresetDwell()) {
+		if (setDwellTimeOnNextEvent_) {
+			setDwellTimeOnNextEvent_ = false;
+			expectedDwellEndTime_ = statusData.dwellStartTime().addMSecs(dwellTime_ * 1000);
 
-			double elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
-			emit dwellFinishedUpdate(detectorName(), elapsedTime);
+			emit dwellStarted(detectorName());
 		}
-	}
 
-	if (!initialized_) {
-		emit clearHistrogramData(detectorName());
-		emit clearDwellHistrogramData(detectorName());
-		initialized_ = true;
+		if (dwellActive_ ) {
+			if (expectedDwellEndTime_.isValid() && expectedDwellEndTime_ <= statusData.dwellStartTime()) {
+				stopDwell();
+			}
+		}
 	}
 
 	// generate the spectrum data holder and notice the bufferGroup new data is ready
@@ -239,19 +243,14 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 	oneHistogram->setData(spectrumData);
 	oneHistogram->setDwellStatusData(statusData);
 
-	delete spectrumData;
-
+	count++;
+	if (count == 50) {
+		qDebug() << "==== AmptekSDD123DetectorManager::newHistrogramReceived " << QDateTime::currentDateTime();
+		count = 0;
+	}
 	emit newHistrogramReceived(detectorName(), oneHistogram);
 
-	if (dwellActive_) {
-		presetDwellLocalEndTime_ = statusData.dwellEndTime();
-
-		double elapsedTime = 0;
-		if (presetDwellLocalStartTime_.isValid())
-			elapsedTime = ((double)presetDwellLocalStartTime_.msecsTo(presetDwellLocalEndTime_))/1000;
-
-		emit newDwellHistrogramReceived(detectorName(), oneHistogram, elapsedTime);
-	}
+	delete spectrumData;
 }
 
 void AmptekSDD123DetectorManager::onConfigurationValuesEventReceived(AmptekConfigurationValuesEvent *configurationValueEvent){

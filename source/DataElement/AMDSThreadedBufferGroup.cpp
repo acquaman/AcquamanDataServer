@@ -5,12 +5,12 @@
 #include "ClientRequest/AMDSClientDataRequest.h"
 #include "util/AMDSRunTimeSupport.h"
 
-AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, bool enableCumulative, QObject *parent) :
+AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, QObject *parent) :
 	QObject(parent)
 {
 	bufferGroupThread_= new QThread();
 
-	bufferGroup_ = new AMDSBufferGroup(bufferGroupInfo, maxCountSize, enableCumulative);
+	bufferGroup_ = new AMDSBufferGroup(bufferGroupInfo, maxCountSize);
 	bufferGroup_->moveToThread(bufferGroupThread_);
 
 	connect(bufferGroupThread_, SIGNAL(started()), this, SLOT(onBufferGroupThreadStarted()));
@@ -37,16 +37,16 @@ QString AMDSThreadedBufferGroup::bufferGroupName() const
 	return bufferGroupInfo().name();
 }
 
-void AMDSThreadedBufferGroup::append(const AMDSDataHolderList &dataHolderList, double elapsedDwellTime)
+void AMDSThreadedBufferGroup::append(const AMDSDataHolderList &dataHolderList)
 {
 	QWriteLocker writeLock(&lock_);
-	bufferGroup_->append(dataHolderList, elapsedDwellTime);
+	bufferGroup_->append(dataHolderList);
 }
 
-void AMDSThreadedBufferGroup::append(AMDSDataHolder *value, double elapsedDwellTime)
+void AMDSThreadedBufferGroup::append(AMDSDataHolder *value)
 {
 	QWriteLocker writeLock(&lock_);
-	bufferGroup_->append(value, elapsedDwellTime);
+	bufferGroup_->append(value);
 }
 
 void AMDSThreadedBufferGroup::clearBufferGroup() {
@@ -55,12 +55,6 @@ void AMDSThreadedBufferGroup::clearBufferGroup() {
 	if (bufferGroup_)
 		bufferGroup_->clear();
 
-}
-
-void AMDSThreadedBufferGroup::finishDwellDataUpdate(double elapsedTime)
-{
-	QReadLocker readLock(&lock_);
-	bufferGroup_->finishDwellDataUpdate(elapsedTime);
 }
 
 void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){

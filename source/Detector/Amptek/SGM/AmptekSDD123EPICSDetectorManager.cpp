@@ -5,6 +5,7 @@
 
 #include "DataElement/AMDSDwellStatusData.h"
 #include "DataHolder/AMDSDataHolder.h"
+#include "DataHolder/AMDSSpectralDataHolder.h"
 #include "util/AMDSRunTimeSupport.h"
 
 AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent)
@@ -183,17 +184,18 @@ AmptekSDD123EPICSDetectorManager::~AmptekSDD123EPICSDetectorManager()
 {
 }
 
-void AmptekSDD123EPICSDetectorManager::onContinuousAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime)
+void AmptekSDD123EPICSDetectorManager::onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime)
 {
 	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){
 		lastEPICSSpectrumUpdateTime_ = QTime::currentTime();
-		dataHelper(spectrum, statusData, count, elapsedTime);
+		dataHelper(dwellSpectrum, count, elapsedTime);
 	}
 }
 
-void AmptekSDD123EPICSDetectorManager::onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime)
+void AmptekSDD123EPICSDetectorManager::onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime)
 {
-	dataHelper(spectrum, statusData, count, elapsedTime);
+	dataHelper(dwellSpectrum, count, elapsedTime);
+	dwellSpectrum->deleteLater(); // we need to release the memory, otherwise, there will be memory leak
 
 	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
 }
@@ -260,7 +262,7 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(const AmptekC
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime){
 	if(!connected_)
 		return;
 
@@ -269,50 +271,56 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, AMDS
 
 	spectrumControl_->setValues(spectrumData.asConstVectorDouble());
 
-	/**/
-	if(!fastCountsControl_->withinTolerance(statusData.fastCounts()))
-		fastCountsControl_->move(statusData.fastCounts());
-	if(!fastCountsAverageControl_->withinTolerance(statusData.fastCounts()/count))
-		fastCountsAverageControl_->move(statusData.fastCounts()/count);
-	if(!slowCountsControl_->withinTolerance(statusData.slowCounts()))
-		slowCountsControl_->move(statusData.slowCounts());
-	if(!slowCountsAverageControl_->withinTolerance(statusData.slowCounts()/count))
-		slowCountsAverageControl_->move(statusData.slowCounts()/count);
-	if(!accumulationTimeControl_->withinTolerance(statusData.accumulationTime()))
-		accumulationTimeControl_->move(statusData.accumulationTime());
-	if(!accumulationTimeAverageControl_->withinTolerance(statusData.accumulationTime()/count))
-		accumulationTimeAverageControl_->move(statusData.accumulationTime()/count);
-	if(!liveTimeControl_->withinTolerance(statusData.liveTime()))
-		liveTimeControl_->move(statusData.liveTime());
-	if(!liveTimeAverageControl_->withinTolerance(statusData.liveTime()/count))
-		liveTimeAverageControl_->move(statusData.liveTime()/count);
-	if(!realTimeControl_->withinTolerance(statusData.realTime()))
-		realTimeControl_->move(statusData.realTime());
-	if(!realTimeAverageControl_->withinTolerance(statusData.realTime()/count))
-		realTimeAverageControl_->move(statusData.realTime()/count);
-	if(!elapsedTimeControl_->withinTolerance(elapsedTime))
-		elapsedTimeControl_->move(elapsedTime);
-	if(startTimeControl_->readPV()->getString() != statusData.dwellStartTime().toString("hh:mm:ss.zzz"))
-		startTimeControl_->move(statusData.dwellStartTime().toString("hh:mm:ss.zzz"));
-	if(endTimeControl_->readPV()->getString() != statusData.dwellEndTime().toString("hh:mm:ss.zzz"))
-		endTimeControl_->move(statusData.dwellEndTime().toString("hh:mm:ss.zzz"));
+	AMDSDwellSpectralDataHolder * spectrumDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(spectrum);
+	if (spectrumDataHolder) {
+		AMDSDwellStatusData statusData = spectrumDataHolder->dwellStatusData();
 
-	int dwellReplyHours = statusData.dwellReplyTime().hour();
-	int dwellReplyMinutes = statusData.dwellReplyTime().minute();
-	int dwellReplySeconds = statusData.dwellReplyTime().second();
-	int dwellReplyMSecs = statusData.dwellReplyTime().msec();
-	int totalMSecs = dwellReplyMSecs + dwellReplySeconds*1000 + dwellReplyMinutes*1000*60 + dwellReplyHours*1000*60*60;
-	qDebug() << "totalMSecs is " << totalMSecs << " so average is " << totalMSecs/count;
-	if(!replyTimeAverageControl_->withinTolerance(totalMSecs/count))
-		replyTimeAverageControl_->move(totalMSecs/count);
-	if(!temperatureControl_->withinTolerance(statusData.detectorTemperature()/count))
-		temperatureControl_->move(statusData.detectorTemperature()/count);
-	/**/
+		/**/
+		if(!fastCountsControl_->withinTolerance(statusData.fastCounts()))
+			fastCountsControl_->move(statusData.fastCounts());
+		if(!fastCountsAverageControl_->withinTolerance(statusData.fastCounts()/count))
+			fastCountsAverageControl_->move(statusData.fastCounts()/count);
+		if(!slowCountsControl_->withinTolerance(statusData.slowCounts()))
+			slowCountsControl_->move(statusData.slowCounts());
+		if(!slowCountsAverageControl_->withinTolerance(statusData.slowCounts()/count))
+			slowCountsAverageControl_->move(statusData.slowCounts()/count);
+		if(!accumulationTimeControl_->withinTolerance(statusData.accumulationTime()))
+			accumulationTimeControl_->move(statusData.accumulationTime());
+		if(!accumulationTimeAverageControl_->withinTolerance(statusData.accumulationTime()/count))
+			accumulationTimeAverageControl_->move(statusData.accumulationTime()/count);
+		if(!liveTimeControl_->withinTolerance(statusData.liveTime()))
+			liveTimeControl_->move(statusData.liveTime());
+		if(!liveTimeAverageControl_->withinTolerance(statusData.liveTime()/count))
+			liveTimeAverageControl_->move(statusData.liveTime()/count);
+		if(!realTimeControl_->withinTolerance(statusData.realTime()))
+			realTimeControl_->move(statusData.realTime());
+		if(!realTimeAverageControl_->withinTolerance(statusData.realTime()/count))
+			realTimeAverageControl_->move(statusData.realTime()/count);
+		if(!elapsedTimeControl_->withinTolerance(elapsedTime))
+			elapsedTimeControl_->move(elapsedTime);
+		if(startTimeControl_->readPV()->getString() != statusData.dwellStartTime().toString("hh:mm:ss.zzz"))
+			startTimeControl_->move(statusData.dwellStartTime().toString("hh:mm:ss.zzz"));
+		if(endTimeControl_->readPV()->getString() != statusData.dwellEndTime().toString("hh:mm:ss.zzz"))
+			endTimeControl_->move(statusData.dwellEndTime().toString("hh:mm:ss.zzz"));
+
+		int dwellReplyHours = statusData.dwellReplyTime().hour();
+		int dwellReplyMinutes = statusData.dwellReplyTime().minute();
+		int dwellReplySeconds = statusData.dwellReplyTime().second();
+		int dwellReplyMSecs = statusData.dwellReplyTime().msec();
+		int totalMSecs = dwellReplyMSecs + dwellReplySeconds*1000 + dwellReplyMinutes*1000*60 + dwellReplyHours*1000*60*60;
+		qDebug() << "totalMSecs is " << totalMSecs << " so average is " << totalMSecs/count;
+		if(!replyTimeAverageControl_->withinTolerance(totalMSecs/count))
+			replyTimeAverageControl_->move(totalMSecs/count);
+		if(!temperatureControl_->withinTolerance(statusData.detectorTemperature()/count))
+			temperatureControl_->move(statusData.detectorTemperature()/count);
+		/**/
+	}
 }
-
+#include <QDebug>
 void AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange(double newValue){
 	Q_UNUSED(newValue)
 	if(startDwellControl_->withinTolerance(1)){
+		qDebug() << "==== AmptekSDD123EPICSDetectorManager:: start dwelling request";
 		startDwell();
 		startDwellControl_->move(0);
 		dwellStateControl_->move(1);
@@ -322,6 +330,7 @@ void AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange(double new
 void AmptekSDD123EPICSDetectorManager::onStopDwellControlValueChange(double newValue){
 	Q_UNUSED(newValue)
 	if(stopDwellControl_->withinTolerance(1)){
+		qDebug() << "==== AmptekSDD123EPICSDetectorManager:: stop dwelling request";
 		stopDwell();
 		stopDwellControl_->move(0);
 		dwellStateControl_->move(0);
@@ -331,7 +340,6 @@ void AmptekSDD123EPICSDetectorManager::onStopDwellControlValueChange(double newV
 void AmptekSDD123EPICSDetectorManager::onClearSpectrumControlValueChange(double newValue){
 	Q_UNUSED(newValue)
 	if(clearSpectrumControl_->withinTolerance(1)){
-		emit clearDwellHistrogramData(detectorName());
 		clearSpectrumControl_->move(0);
 	}
 }

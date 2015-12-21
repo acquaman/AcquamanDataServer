@@ -417,9 +417,10 @@ void AmptekSDD123Server::fakeSyncRequest(int timeout)
 
 void AmptekSDD123Server::requestDatagramTimeout()
 {
+	requestPacketTimer_->stop();
+
 	socketLocallyBusy_ = false;
 	disconnect(requestPacketTimer_, SIGNAL(timeout()), this, SLOT(requestDatagramTimeout()));
-	requestPacketTimer_->stop();
 	if(stillReceivingResponseDatagram_){
 		connect(requestPacketTimer_, SIGNAL(timeout()), this, SLOT(requestDatagramTimeout()));
 		requestPacketTimer_->start(currentRequestPacket_.timeout());

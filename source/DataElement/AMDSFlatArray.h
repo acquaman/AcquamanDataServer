@@ -10,7 +10,7 @@
 class AMDSFlatArray
 {
 public:
-	AMDSFlatArray(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::InvalidType, quint32 size = 0);
+	AMDSFlatArray(AMDSDataTypeDefinitions::DataType dataType = AMDSDataTypeDefinitions::InvalidType, int size = 0);
 	virtual ~AMDSFlatArray();
 
 	/// define the PLUS operation of AMDSFlatArray, which will plus the value of the two instances of AMDSFlatArray and return a new instance
@@ -60,7 +60,7 @@ public:
 	/// clear the dataArray and reset the size to 0
 	void clear();
 	/// clear the dataArray and reset the array to the given type/size
-	void clearAndReset(AMDSDataTypeDefinitions::DataType dataType, quint32 size);
+	void clearAndReset(AMDSDataTypeDefinitions::DataType dataType, int size);
 
 	/// read data from dataStream and write to the dataArray
 	bool readFromDataStream(QDataStream *dataStream);
@@ -79,7 +79,7 @@ public:
 
 protected:
 	/// helper function to resize the dataArray with given type and size
-	void resizeType(AMDSDataTypeDefinitions::DataType dataType, quint32 size);
+	void resizeType(AMDSDataTypeDefinitions::DataType dataType, int size);
 
 	/// returns the data Array
 	inline QVector<qint8>& vectorQint8() { return vectorQint8_; }

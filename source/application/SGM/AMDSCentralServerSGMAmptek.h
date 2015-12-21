@@ -36,15 +36,11 @@ protected slots:
 
 	/// slot to handle clear histrogramData request for a given buffer (detector)
 	void onClearHistrogramData(const QString &detectorName);
-	/// slot to handle clear dwell histrogramData request  for a given buffer (detector)
-	void onClearDwellHistrogramData(const QString &detectorName);
 	/// slot to handle new histrogramData request  for a given buffer (detector)
 	void onNewHistrogramReceived(const QString &detectorName, AMDSDataHolder *);
-	/// slot to handle new dwell histrogramData request  for a given buffer (detector)
-	void onNewDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder *, double elapsedTime);
 
-	/// slot to handle dwell data update finished request  for a given buffer (detector)
-	void onDwellFinishedUpdate(const QString &detectorName, double elapsedTime);
+	void onDwellStarted(const QString &detectorName);
+	void onDwellStopped(const QString &detectorName);
 
 protected:
 	/// function to initialize the system configurations
@@ -64,10 +60,6 @@ protected:
 protected:
 	/// the list of configuration map of SGM amptek
 	QList<AmptekSDD123ConfigurationMap*> amptekConfigurationMaps_;
-
-	/// the list of bufferGroupManagers for dwell data buffers
-	QMap<QString, AMDSThreadedBufferGroup*> dwellBufferGroupManagers_;
-
 
 	/// the threaded serverGroup to manage the AmptekServers, which will fetch the UDP data from the amptek host to grab the data
 	AmptekSDD123ThreadedDataServerGroup *amptekThreadedDataServerGroup_;

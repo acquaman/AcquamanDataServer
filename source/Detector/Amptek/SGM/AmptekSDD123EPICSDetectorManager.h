@@ -19,9 +19,9 @@ public:
 
 protected slots:
 	/// slot to handle continuous data update
-	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime) ;
+	virtual void onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) ;
 	/// slot to handle dwell finish data update
-	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime);
+	virtual void onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime);
 	/// slot to handle configuration value update signal
 	void onConfigurationValuesUpdate(const AmptekConfigurationData &configurationData);
 
@@ -63,7 +63,7 @@ protected slots:
 
 protected:
 	/// helper function to handle continuous spectrum data update
-	void dataHelper(AMDSDataHolder *spectrum, AMDSDwellStatusData statusData, int count, double elapsedTime);
+	void dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime);
 
 protected:
 	QTime lastEPICSSpectrumUpdateTime_;
