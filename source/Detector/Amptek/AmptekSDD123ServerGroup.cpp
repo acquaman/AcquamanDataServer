@@ -12,6 +12,7 @@ AmptekSDD123ThreadedDataServerGroup::AmptekSDD123ThreadedDataServerGroup(QList<A
 	amptekServerGroup_ = new AmptekSDD123ServerGroup(configurationMaps);
 	amptekServerGroup_->moveToThread(amptekServerGroupThread_);
 
+	connect(amptekServerGroupThread_, SIGNAL(started()), amptekServerGroup_, SLOT(onStartTimer()));
 	connect(amptekServerGroupThread_, SIGNAL(finished()), amptekServerGroup_, SLOT(deleteLater()));
 
 	connect(amptekServerGroup_, SIGNAL(serverChangedToConfigurationState(int)), this, SIGNAL(serverChangedToConfigurationState(int)));
@@ -69,8 +70,6 @@ AmptekSDD123ServerGroup::AmptekSDD123ServerGroup(QList<AmptekSDD123Configuration
 	connect(serverAboutToConfigurationStateMapper_, SIGNAL(mapped(int)), this, SLOT(onServerAboutToChangeToConfigurationState(int)));
 	connect(serverConfigurationStateMapper_, SIGNAL(mapped(int)), this, SLOT(onServerChangedToConfigurationState(int)));
 	connect(serverDwellStateMapper_, SIGNAL(mapped(int)), this, SLOT(onServerChangedToDwellState(int)));
-
-	QTimer::singleShot(1000, this, SLOT(initiateAllRequestSpectrum()));
 }
 
 AmptekSDD123ServerGroup::~AmptekSDD123ServerGroup()
@@ -100,6 +99,11 @@ AmptekSDD123ServerGroup::~AmptekSDD123ServerGroup()
 AmptekSDD123Server* AmptekSDD123ServerGroup::serverAt(int index) const
 {
 	return servers_.at(index);
+}
+
+void AmptekSDD123ServerGroup::onStartTimer()
+{
+	QTimer::singleShot(1000, this, SLOT(initiateAllRequestSpectrum()));
 }
 
 void AmptekSDD123ServerGroup::setServerState(int index, AmptekSDD123ServerGroup::ServerState serverState){

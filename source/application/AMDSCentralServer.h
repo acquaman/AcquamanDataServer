@@ -4,8 +4,6 @@
 #include <QObject>
 #include <QMap>
 
-class QTimer;
-
 class AMDSThreadedBufferGroup;
 class AMDSThreadedTCPDataServer;
 class AMDSClientRequest;
