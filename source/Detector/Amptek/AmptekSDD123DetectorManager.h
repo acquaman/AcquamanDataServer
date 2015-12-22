@@ -142,7 +142,6 @@ protected:
 	/// the QEvent receiver
 	QObject *requestEventReceiver_;
 
-	int count;
 	/// flag to indicate whether the data is initialized or not (whether the coming package is the first package)
 	bool initialized_;
 	/// the default dwell time

@@ -194,13 +194,14 @@ void AmptekSDD123EPICSDetectorManager::onContinuousDwellDataUpdate(AMDSDataHolde
 
 void AmptekSDD123EPICSDetectorManager::onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime)
 {
+	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
+
 	dataHelper(dwellSpectrum, count, elapsedTime);
 	dwellSpectrum->deleteLater(); // we need to release the memory, otherwise, there will be memory leak
-
-	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
 }
 
 void AmptekSDD123EPICSDetectorManager::onSpectrumControlValueChanged(){
+
 	disconnect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
 
 	dwellStateControl_->move(0);
@@ -316,24 +317,24 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, int 
 		/**/
 	}
 }
-#include <QDebug>
+
 void AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange(double newValue){
 	Q_UNUSED(newValue)
 	if(startDwellControl_->withinTolerance(1)){
-		qDebug() << "==== AmptekSDD123EPICSDetectorManager:: start dwelling request";
-		startDwell();
 		startDwellControl_->move(0);
 		dwellStateControl_->move(1);
+
+		startDwell();
 	}
 }
 
 void AmptekSDD123EPICSDetectorManager::onStopDwellControlValueChange(double newValue){
 	Q_UNUSED(newValue)
 	if(stopDwellControl_->withinTolerance(1)){
-		qDebug() << "==== AmptekSDD123EPICSDetectorManager:: stop dwelling request";
-		stopDwell();
 		stopDwellControl_->move(0);
 		dwellStateControl_->move(0);
+
+		stopDwell();
 	}
 }
 
@@ -345,7 +346,6 @@ void AmptekSDD123EPICSDetectorManager::onClearSpectrumControlValueChange(double 
 }
 
 void AmptekSDD123EPICSDetectorManager::onDwellTimeControlValueChange(double newValue){
-	qDebug() << "Got a value changed on dwellTime control as " << newValue;
 	if(!dwellTimeControl_->withinTolerance(dwellTime()))
 		setDwellTime((int)newValue);
 }

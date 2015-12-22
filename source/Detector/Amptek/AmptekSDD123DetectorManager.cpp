@@ -8,11 +8,9 @@
 
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 
-
 AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent) :
 	QObject(parent)
 {
-	count = 0;
 	requestEventReceiver_ = 0;
 
 	initialized_ = false;
@@ -243,11 +241,6 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 	oneHistogram->setData(spectrumData);
 	oneHistogram->setDwellStatusData(statusData);
 
-	count++;
-	if (count == 50) {
-		qDebug() << "==== AmptekSDD123DetectorManager::newHistrogramReceived " << QDateTime::currentDateTime();
-		count = 0;
-	}
 	emit newHistrogramReceived(detectorName(), oneHistogram);
 
 	delete spectrumData;
