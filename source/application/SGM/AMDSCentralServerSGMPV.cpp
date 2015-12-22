@@ -1,6 +1,5 @@
 #include "AMDSCentralServerSGMPV.h"
 
-#include <QTimer>
 #include <QFile>
 
 #include "Connection/AMDSThreadedTCPDataServer.h"

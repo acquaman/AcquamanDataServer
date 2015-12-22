@@ -1,7 +1,5 @@
 #include "AMDSCentralServerSGMScaler.h"
 
-#include <QTimer>
-
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"

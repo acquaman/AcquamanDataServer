@@ -4,7 +4,7 @@ AMDSCommandManager::~AMDSCommandManager()
 {
 	commands_.clear();
 	commandHash_.clear();
-	commandHexMapping_.clear();
+//	commandHexMapping_.clear();
 }
 
 AMDSCommand AMDSCommandManager::amdsCommand(int commandID) const {

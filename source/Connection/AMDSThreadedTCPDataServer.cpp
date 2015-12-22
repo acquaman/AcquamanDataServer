@@ -14,6 +14,7 @@ AMDSThreadedTCPDataServer::AMDSThreadedTCPDataServer(QObject *parent) :
 	server_->moveToThread(thread_);
 
 	connect(thread_, SIGNAL(started()), this, SLOT(onThreadStarted()));
+	connect(thread_, SIGNAL(started()), server_, SLOT(onStartTimer()));
 	connect(thread_, SIGNAL(finished()), server_, SLOT(deleteLater()));
 
 	connect(this, SIGNAL(startServer(QString,quint16)), server_, SLOT(start(QString,quint16)));

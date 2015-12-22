@@ -1,7 +1,6 @@
 #include "AMDSCentralServer.h"
 
 #include <QtCore/QCoreApplication>
-#include <QTimer>
 
 #include "appController/AMDSServerAppController.h"
 #include "Connection/AMDSThreadedTCPDataServer.h"
