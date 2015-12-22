@@ -231,12 +231,14 @@ void AMDSScalerDetector::onFetchScanBuffer()
 
 void AMDSScalerDetector::onTriggerDwellInterfaceStartControlValueChanged(double value)
 {
+	Q_UNUSED(value)
+
 	if(connected_){
 
 		if(triggerDwellInterfaceStartControl_->withinTolerance(1.0)){
 			double seconds = triggerDwellInterfaceDwellTimeControl_->value();
 			if(seconds > 0 && seconds < 100){
-				int asMsecs = seconds*1000;
+				int asMsecs = (int)(seconds*1000);
 				triggerDwellTimer_->setInterval(asMsecs);
 				triggerDwellInterfaceDwellStateControl_->move(1.0);
 				triggerDwellTimer_->start();
@@ -252,6 +254,8 @@ void AMDSScalerDetector::onTriggerDwellInterfaceStartControlValueChanged(double 
 
 void AMDSScalerDetector::onTriggerDwellInterfaceDwellTimeControlValueChanged(double value)
 {
+	Q_UNUSED(value)
+
 	if(connected_){
 		// Do nothing right now
 	}
