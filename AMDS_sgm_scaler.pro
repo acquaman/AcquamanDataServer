@@ -35,4 +35,12 @@ SOURCES *= \
 	source/Detector/Scaler/AMDSScalerConfigurationMap.cpp
 
 OTHER_FILES *= \
-	db/AMDSScaler.db
+	db/AMDSScaler.db \
+    runScripts/clsSGMScalerDataServer \
+    runScripts/runSGMScalerDataServer
+
+
+
+
+
+
