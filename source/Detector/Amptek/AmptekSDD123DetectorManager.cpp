@@ -1,6 +1,7 @@
 #include "AmptekSDD123DetectorManager.h"
 
 #include <QCoreApplication>
+#include <QTimer>
 
 #include "DataElement/AMDSFlatArray.h"
 #include "DataElement/AMDSDwellStatusData.h"
@@ -23,6 +24,9 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	dwellTime_ = 2;
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
+
+	triggerDwellTimer_ = new QTimer();
+	connect(triggerDwellTimer_, SIGNAL(timeout()), this, SLOT(onTriggerDwellTimerTimeout()));
 }
 
 AmptekSDD123DetectorManager::~AmptekSDD123DetectorManager()

@@ -111,7 +111,7 @@ void AMDSBufferGroup::onDwellStopped()
 
 		emit finalDwellDataUpdate(dwellDataHolder, dwellDataCount_, dwellStartTime_.elapsed());
 	} else {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_BUFFER_GROUP_ALREADY_DWELL_STOPPED, "Received dwellStop signal when already in dwell stop mode.");
+//		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_BUFFER_GROUP_ALREADY_DWELL_STOPPED, "Received dwellStop signal when already in dwell stop mode.");
 	}
 }
 

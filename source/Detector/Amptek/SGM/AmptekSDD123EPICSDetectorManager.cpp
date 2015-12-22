@@ -184,6 +184,19 @@ AmptekSDD123EPICSDetectorManager::~AmptekSDD123EPICSDetectorManager()
 {
 }
 
+void AmptekSDD123EPICSDetectorManager::setFlattenedData(AMDSDataHolder *dataHolder)
+{
+//	qDebug() << "Got some flattened data as " << data;
+
+	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
+
+	double elapsedTime = dwellTimeControl_->value();
+	double count = elapsedTime*1000/50;
+	dataHelper(dataHolder, count, elapsedTime);
+
+	dataHolder->deleteLater();
+}
+
 void AmptekSDD123EPICSDetectorManager::onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime)
 {
 	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){
@@ -194,10 +207,10 @@ void AmptekSDD123EPICSDetectorManager::onContinuousDwellDataUpdate(AMDSDataHolde
 
 void AmptekSDD123EPICSDetectorManager::onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime)
 {
-	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
+//	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
 
-	dataHelper(dwellSpectrum, count, elapsedTime);
-	dwellSpectrum->deleteLater(); // we need to release the memory, otherwise, there will be memory leak
+//	dataHelper(dwellSpectrum, count, elapsedTime);
+//	dwellSpectrum->deleteLater(); // we need to release the memory, otherwise, there will be memory leak
 }
 
 void AmptekSDD123EPICSDetectorManager::onSpectrumControlValueChanged(){
@@ -264,8 +277,6 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(const AmptekC
 }
 
 void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime){
-	if(!connected_)
-		return;
 
 	AMDSFlatArray spectrumData;
 	spectrum->data(&spectrumData);
@@ -322,9 +333,18 @@ void AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange(double new
 	Q_UNUSED(newValue)
 	if(startDwellControl_->withinTolerance(1)){
 		startDwellControl_->move(0);
-		dwellStateControl_->move(1);
 
-		startDwell();
+		qDebug() << "Dwell start changed to 1.0";
+		double seconds = dwellTimeControl_->value();
+		if(seconds > 0 && seconds < 100){
+			qDebug() << "And dwell time within range";
+			int asMSecs = seconds*1000;
+			triggerDwellTimer_->setInterval(asMSecs);
+			dwellStateControl_->move(1);
+			triggerDwellTimer_->start();
+		}
+
+//		startDwell();
 	}
 }
 
@@ -649,4 +669,12 @@ void AmptekSDD123EPICSDetectorManager::onAllControlsTimedOut(){
 	connected_ = false;
 	if(isAvailableControl_->isConnected())
 		isAvailableControl_->move(0);
+}
+
+void AmptekSDD123EPICSDetectorManager::onTriggerDwellTimerTimeout(){
+	qDebug() << "Trigger Dwell Timer Timed Out";
+	if(dwellMode_ == AmptekSDD123DetectorManager::PresetDwell)
+		triggerDwellTimer_->stop();
+
+	emit requestFlattenedData(detectorName(), dwellTimeControl_->value());
 }

@@ -17,6 +17,10 @@ public:
 	AmptekSDD123EPICSDetectorManager(AmptekSDD123ConfigurationMap *amptekConfiguration, QObject *parent = 0);
 	~AmptekSDD123EPICSDetectorManager();
 
+public slots:
+	/// Called to set the flattened data once the request has been processed
+	virtual void setFlattenedData(AMDSDataHolder *dataHolder);
+
 protected slots:
 	/// slot to handle continuous data update
 	virtual void onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) ;
@@ -60,6 +64,9 @@ protected slots:
 
 	void onAllControlsConnected(bool connected);
 	void onAllControlsTimedOut();
+
+	/// Called to actually request the flattened data from the server by emitting the signal
+	virtual void onTriggerDwellTimerTimeout();
 
 protected:
 	/// helper function to handle continuous spectrum data update

@@ -42,6 +42,11 @@ protected slots:
 	void onDwellStarted(const QString &detectorName);
 	void onDwellStopped(const QString &detectorName);
 
+	/// Called when the scaler requests flattened data. Sets the latches for internalRequestActive_ and dwellSecondsRequested
+	void onAmptekDetectorRequestFlattenedData(const QString &detectorName, double seconds);
+	/// Handles the internal requests that are processed and send data back to detector
+	void onInternalRequestProcessed(AMDSClientRequest *clientRequest);
+
 protected:
 	/// function to initialize the system configurations
 	void initializeConfiguration();
@@ -66,6 +71,9 @@ protected:
 
 	/// the AmptekDetector group, which will manange and hold the Amptek data and manage the communications with the PVs
 	AmptekSDD123DetectorGroupSGM *amptekDetectorGroup_;
+
+	/// Latches the flattening time in seconds
+	QMap<QString, double> dwellSecondsRequestedForDetector_;
 };
 
 #endif // AMDSCENTRALSERVERSGMAMPTEK_H

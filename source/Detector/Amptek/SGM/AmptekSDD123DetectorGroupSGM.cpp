@@ -27,3 +27,10 @@ QList<AmptekSDD123DetectorManager*> AmptekSDD123DetectorGroupSGM::detectorManage
 {
 	return detectorManagers_.values();
 }
+
+AmptekSDD123DetectorManager* AmptekSDD123DetectorGroupSGM::detectorManager(const QString &detectorName) const
+{
+	if(detectorManagers_.contains(detectorName))
+		return detectorManagers_.value(detectorName);
+	return 0;
+}
