@@ -211,7 +211,6 @@ void AmptekSDD123DetectorManager::setDetectorFastPeakingTime(AmptekSDD123Detecto
 	postConfigurationInitiateRequestEvent();
 }
 
-#include <QDebug>
 void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent){
 	if (!initialized_) {
 		emit clearHistrogramData(detectorName());
