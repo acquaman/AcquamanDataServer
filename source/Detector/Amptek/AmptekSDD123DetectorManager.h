@@ -77,12 +77,12 @@ public slots:
 	void setRequestEventReceiver(QObject *requestEventReceiver);
 
 	/// function to start dwell
-	void startDwell();
+//	void startDwell();
 	/// function to stop dwell
-	void stopDwell();
+//	void stopDwell();
 
 	/// function to active dwell
-	void setDwellActive(bool dwellActive);
+//	void setDwellActive(bool dwellActive);
 	/// function to set Dwell Time
 	void setDwellTime(int dwellTime);
 	/// function to set dwell mode
@@ -161,11 +161,11 @@ protected:
 	AmptekSDD123DetectorManager::DwellMode dwellMode_;
 
 	/// flat to indicate whether we need to start to track dwelling
-	bool setDwellTimeOnNextEvent_;
+//	bool setDwellTimeOnNextEvent_;
 	/// flag to indicate whether dwell is actived or not
-	bool dwellActive_;
+//	bool dwellActive_;
 	/// the expected time to end the preset dwell
-	QTime expectedDwellEndTime_;
+//	QTime expectedDwellEndTime_;
 
 	/// the configuration data received via configuration value event
 	AmptekConfigurationData configurationData_;

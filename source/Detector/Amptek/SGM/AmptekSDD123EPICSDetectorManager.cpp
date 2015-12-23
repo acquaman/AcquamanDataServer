@@ -354,7 +354,7 @@ void AmptekSDD123EPICSDetectorManager::onStopDwellControlValueChange(double newV
 		stopDwellControl_->move(0);
 		dwellStateControl_->move(0);
 
-		stopDwell();
+//		stopDwell();
 	}
 }
 
