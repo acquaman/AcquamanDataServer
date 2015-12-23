@@ -13,7 +13,7 @@ class AMDSThreadedBufferGroup : public QObject
 {
 	Q_OBJECT
 public:
-	AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, bool enableCumulative = false, QObject *parent = 0);
+	AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, QObject *parent = 0);
 	~AMDSThreadedBufferGroup();
 
 	/// returns the bufferGroupInfo of the bufferGroupManager
@@ -21,9 +21,9 @@ public:
 	/// returns the bufferGroup name
 	QString bufferGroupName() const;
 	/// appends a list of dataHolder to the bufferGroup
-	void append(const AMDSDataHolderList &dataHolderList, double elapsedDwellTime=0);
+	void append(const AMDSDataHolderList &dataHolderList);
 	/// appends a data to the bufferGroup
-	void append(AMDSDataHolder *value, double elapsedDwellTime=0);
+	void append(AMDSDataHolder *value);
 
 	/// returns the buffergroup
 	inline AMDSBufferGroup *bufferGroup() { return bufferGroup_; }
@@ -35,8 +35,7 @@ signals:
 public slots:
 	/// to clear the data of the buffer group
 	void clearBufferGroup();
-	/// slot to finish dwell data update
-	void finishDwellDataUpdate(double elapsedTime=0);
+
 	/// slot to forward clientRequest to the bufferGroup
 	void forwardClientRequest(AMDSClientRequest *clientRequest);
 

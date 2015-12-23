@@ -56,14 +56,13 @@ public:
 signals:
 	/// signal to request clear histrogram data
 	void clearHistrogramData(const QString &detectorName);
-	/// signal to request clear dwell histrogram data
-	void clearDwellHistrogramData(const QString &detectorName);
 	/// signal to indicate new histrogram data
 	void newHistrogramReceived(const QString &detectorName, AMDSDataHolder *);
-	/// signal to indicate new dwell histrogram data
-	void newDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder * dataHolder, double elapsedDwellTime);
-	/// signal to indicate dwell finished updating data
-	void dwellFinishedUpdate(const QString &detectorName, double elapsedTime);
+
+	/// signal to start dwell
+	void dwellStarted(const QString &detectorName);
+	/// signal to stop dwell
+	void dwellStopped(const QString &detectorName);
 
 	/// signal to indicate that configuration value is updated
 	void configurationValuesUpdate(const AmptekConfigurationData &configurationData);
@@ -116,9 +115,9 @@ public slots:
 
 protected slots:
 	/// slot to handle continuous data update
-	virtual void onContinuousAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime) = 0;
+	virtual void onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
 	/// slot to handle dwell data update
-	virtual void onDwellFinishedAllDataUpdate(AMDSDataHolder *spectrum, const AMDSDwellStatusData &statusData, int count, double elapsedTime) = 0;
+	virtual void onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
 
 protected:
 	/// helper function to handle the incoming SpectrumEvent
@@ -149,16 +148,13 @@ protected:
 	int dwellTime_;
 	/// the current dwell mode
 	AmptekSDD123DetectorManager::DwellMode dwellMode_;
+
+	/// flat to indicate whether we need to start to track dwelling
+	bool setDwellTimeOnNextEvent_;
 	/// flag to indicate whether dwell is actived or not
 	bool dwellActive_;
-	/// flag to indicate whether to end preset dwell on next event
-	bool setPresetDwellEndTimeOnNextEvent_;
-	/// the expected preset dwell end time
-	QTime presetDwellEndTime_;
-	/// the start time of presetdwell
-	QTime presetDwellLocalStartTime_;
-	/// the preset dwell end time of the latest event
-	QTime presetDwellLocalEndTime_;
+	/// the expected time to end the preset dwell
+	QTime expectedDwellEndTime_;
 
 	/// the configuration data received via configuration value event
 	AmptekConfigurationData configurationData_;

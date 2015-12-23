@@ -51,6 +51,8 @@ signals:
 	void clientRequestRead(AMDSClientRequest*);
 
 public slots:
+	/// slot to start the timers
+	void onStartTimer();
 	/// Outputs to console a list of the currently connected clients' IP and ports. If no clients are connected
 	/// then displays "No clients connected"
 	void displayClients();

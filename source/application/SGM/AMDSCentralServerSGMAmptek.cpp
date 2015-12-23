@@ -1,7 +1,5 @@
 #include "AMDSCentralServerSGMAmptek.h"
 
-#include <QTimer>
-
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
@@ -37,11 +35,6 @@ AMDSCentralServerSGMAmptek::~AMDSCentralServerSGMAmptek()
 	}
 	amptekConfigurationMaps_.clear();
 
-	foreach (AMDSThreadedBufferGroup *bufferGroup, dwellBufferGroupManagers_) {
-		bufferGroup->deleteLater();
-	}
-	dwellBufferGroupManagers_.clear();
-
 	amptekThreadedDataServerGroup_->deleteLater();
 	amptekThreadedDataServerGroup_ = 0;
 
@@ -70,15 +63,12 @@ void AMDSCentralServerSGMAmptek::initializeBufferGroup()
 		QList<AMDSAxisInfo> amptekBufferGroupAxes;
 		amptekBufferGroupAxes << AMDSAxisInfo("Energy", amptekConfiguration->spectrumCountSize(), "Energy Axis", "eV");
 
-		AMDSBufferGroupInfo amptekBufferGroupInfo(amptekConfiguration->detectorName(), amptekConfiguration->localAddress().toString(), "Counts", amptekConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, amptekBufferGroupAxes);
+		AMDSBufferGroupInfo amptekBufferGroupInfo(amptekConfiguration->detectorName(), amptekConfiguration->localAddress().toString(), "Counts", amptekConfiguration->dataType(), AMDSBufferGroupInfo::Summary, amptekBufferGroupAxes);
 
-		AMDSThreadedBufferGroup *amptekThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_, false);
-		connect(amptekThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+		AMDSThreadedBufferGroup *amptekBufferGroupManager = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_);
+		connect(amptekBufferGroupManager->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
-		AMDSThreadedBufferGroup *amptekDwellThreadedBufferGroup = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_, true);
-
-		bufferGroupManagers_.insert(amptekThreadedBufferGroup->bufferGroupName(), amptekThreadedBufferGroup);
-		dwellBufferGroupManagers_.insert(amptekDwellThreadedBufferGroup->bufferGroupName(), amptekDwellThreadedBufferGroup);
+		bufferGroupManagers_.insert(amptekBufferGroupManager->bufferGroupName(), amptekBufferGroupManager);
 	}
 }
 
@@ -88,10 +78,10 @@ void AMDSCentralServerSGMAmptek::initializeDetectorManager()
 	amptekDetectorGroup_ = new AmptekSDD123DetectorGroupSGM(amptekConfigurationMaps_);
 	foreach (AmptekSDD123DetectorManager * detectorManager, amptekDetectorGroup_->detectorManagers()) {
 		connect(detectorManager, SIGNAL(clearHistrogramData(QString)), this, SLOT(onClearHistrogramData(QString)));
-		connect(detectorManager, SIGNAL(clearDwellHistrogramData(QString)), this, SLOT(onClearDwellHistrogramData(QString)));
 		connect(detectorManager, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder*)), this, SLOT(onNewHistrogramReceived(QString, AMDSDataHolder*)));
-		connect(detectorManager, SIGNAL(newDwellHistrogramReceived(QString, AMDSDataHolder*, double)), this, SLOT(onNewDwellHistrogramReceived(QString, AMDSDataHolder*, double)));
-		connect(detectorManager, SIGNAL(dwellFinishedUpdate(QString,double)), this, SLOT(onDwellFinishedUpdate(QString,double)));
+
+		connect(detectorManager, SIGNAL(dwellStarted(QString)), this, SLOT(onDwellStarted(QString)));
+		connect(detectorManager, SIGNAL(dwellStopped(QString)), this, SLOT(onDwellStopped(QString)));
 	}
 }
 
@@ -108,25 +98,25 @@ void AMDSCentralServerSGMAmptek::wrappingUpInitialization()
 {
 	QList<AmptekSDD123DetectorManager*> amptekDetectorManagerList = amptekDetectorGroup_->detectorManagers();
 
-	// connect the event among the amptek data servers and the detectors
+	// connect the events among the amptek data servers and the detectors
 	for(int x = 0, size = amptekDetectorManagerList.count(); x < size; x++){
 		AmptekSDD123DetectorManager *amptekDetectorManager = amptekDetectorManagerList.at(x);
 		AmptekSDD123Server *amptekServer = amptekThreadedDataServerGroup_->serverAt(x);
-//		AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroupManagers_.value(amptekDetectorManager->detectorName());
-		AMDSThreadedBufferGroup *threadedBufferGroup = dwellBufferGroupManagers_.value(amptekDetectorManager->detectorName());
+		AMDSThreadedBufferGroup *bufferGroupManager = bufferGroupManagers_.value(amptekDetectorManager->detectorName());
 
 		amptekServer->setSpectrumPacketReceiver((QObject *)amptekDetectorManager->detector());
 		amptekServer->setConfirmationPacketReceiver(amptekDetectorManager);
 
 		amptekDetectorManager->setRequestEventReceiver(amptekServer);
 
-		connect(threadedBufferGroup->bufferGroup(), SIGNAL(continuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onContinuousAllDataUpdate(AMDSDataHolder*,AMDSDwellStatusData,int,double)));
-		connect(threadedBufferGroup->bufferGroup(), SIGNAL(dwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)), amptekDetectorManager, SLOT(onDwellFinishedAllDataUpdate(AMDSDataHolder *,AMDSDwellStatusData,int,double)));
+		connect(bufferGroupManager->bufferGroup(), SIGNAL(continuousDwellDataUpdate(AMDSDataHolder*,int,double)), amptekDetectorManager, SLOT(onContinuousDwellDataUpdate(AMDSDataHolder*,int,double)));
+		connect(bufferGroupManager->bufferGroup(), SIGNAL(finalDwellDataUpdate(AMDSDataHolder *,int,double)), amptekDetectorManager, SLOT(onFinalDwellDataUpdate(AMDSDataHolder *,int,double)));
 	}
 }
 
 void AMDSCentralServerSGMAmptek::fillConfigurationCommandForClientRequest(const QString &bufferName, AMDSClientConfigurationRequest *clientRequest)
 {
+	Q_UNUSED(bufferName) Q_UNUSED(clientRequest)
 }
 
 void AMDSCentralServerSGMAmptek::onServerChangedToConfigurationState(int index){
@@ -139,19 +129,9 @@ void AMDSCentralServerSGMAmptek::onServerChangedToDwellState(int index){
 
 void AMDSCentralServerSGMAmptek::onClearHistrogramData(const QString &detectorName)
 {
-	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
-	if (bufferGroup) {
-		bufferGroup->clearBufferGroup();
-	} else {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
-	}
-}
-
-void AMDSCentralServerSGMAmptek::onClearDwellHistrogramData(const QString &detectorName)
-{
-	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
-	if (bufferGroup) {
-		bufferGroup->clearBufferGroup();
+	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
+	if (bufferGroupManager) {
+		bufferGroupManager->clearBufferGroup();
 	} else {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
@@ -159,29 +139,29 @@ void AMDSCentralServerSGMAmptek::onClearDwellHistrogramData(const QString &detec
 
 void AMDSCentralServerSGMAmptek::onNewHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder)
 {
-	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(detectorName);
-	if (bufferGroup) {
-		bufferGroup->append(dataHolder);
+	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
+	if (bufferGroupManager) {
+		bufferGroupManager->append(dataHolder);
 	} else {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
-void AMDSCentralServerSGMAmptek::onNewDwellHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder, double elapsedTime)
+void AMDSCentralServerSGMAmptek::onDwellStarted(const QString &detectorName)
 {
-	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
-	if (bufferGroup) {
-		bufferGroup->append(dataHolder, elapsedTime);
+	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
+	if (bufferGroupManager) {
+		bufferGroupManager->bufferGroup()->onDwellStarted();
 	} else {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
-void AMDSCentralServerSGMAmptek::onDwellFinishedUpdate(const QString &detectorName, double elapsedTime)
+void AMDSCentralServerSGMAmptek::onDwellStopped(const QString &detectorName)
 {
-	AMDSThreadedBufferGroup * bufferGroup = dwellBufferGroupManagers_.value(detectorName);
-	if (bufferGroup) {
-		bufferGroup->finishDwellDataUpdate(elapsedTime);
+	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
+	if (bufferGroupManager) {
+		bufferGroupManager->bufferGroup()->onDwellStopped();
 	} else {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}

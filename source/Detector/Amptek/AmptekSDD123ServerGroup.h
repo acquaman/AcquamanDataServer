@@ -56,6 +56,8 @@ public:
 	AmptekSDD123Server* serverAt(int index) const;
 
 public slots:
+	/// slot to start the timer
+	void onStartTimer();
 	/// slot to set the state of one server
 	void setServerState(int index, AmptekSDD123ServerGroup::ServerState serverState);
 

@@ -10,13 +10,12 @@
 
 #include "util/AMDSRunTimeSupport.h"
 
-AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, bool enableCumulative, QObject *parent) :
+AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 maxSize, QObject *parent) :
 	QObject(parent), dataHolders_(maxSize)
 {
 	bufferGroupInfo_ = bufferGroupInfo;
 
-	enableCumulative_ = enableCumulative;
-	cumulativeDataHolder_ = 0;
+	initializeDwellControls();
 }
 
 AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
@@ -24,20 +23,12 @@ AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
 {
 	bufferGroupInfo_ = other.bufferGroupInfo();
 
-	enableCumulative_ = other.enableCumulative_;
-	cumulativeDataHolder_ = other.cumulativeDataHolder_;
+	initializeDwellControls(other.dwellActive_, other.dwellDataCount_, other.dwellStartTime_, other.dwellCumulativeDataHolder_);
 }
 
 AMDSBufferGroup::~AMDSBufferGroup()
 {
 	clear();
-}
-
-
-AMDSDataHolder * AMDSBufferGroup::cumulativeDataHolder() const
-{
-	QReadLocker readLock(&lock_);
-	return cumulativeDataHolder_;
 }
 
 int AMDSBufferGroup::count() const
@@ -55,21 +46,21 @@ void AMDSBufferGroup::clear()
 	}
 	dataHolders_.clear();
 
-	if (enableCumulative_ && cumulativeDataHolder_) {
-		cumulativeDataHolder_->deleteLater();
-		cumulativeDataHolder_ = 0;
+	if (dwellCumulativeDataHolder_) {
+		dwellCumulativeDataHolder_->deleteLater();
+		dwellCumulativeDataHolder_ = 0;
 	}
 }
 
-void AMDSBufferGroup::append(const AMDSDataHolderList &dataHolderList, double elapsedDwellTime)
+void AMDSBufferGroup::append(const AMDSDataHolderList &dataHolderList)
 {
 	//!!! IMPORTANT: don't put the write lock here ... ...
 	foreach (AMDSDataHolder *dataHolder, dataHolderList) {
-		append(dataHolder, elapsedDwellTime);
+		append(dataHolder);
 	}
 }
 
-void AMDSBufferGroup::append(AMDSDataHolder *newData, double elapsedDwellTime)
+void AMDSBufferGroup::append(AMDSDataHolder *newData)
 {
 	QWriteLocker writeLock(&lock_);
 
@@ -77,45 +68,50 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData, double elapsedDwellTime)
 	if(dataHolderRemoved)
 		dataHolderRemoved->deleteLater();
 
-	if (enableCumulative_) {
-		if (cumulativeDataHolder_) {
-			AMDSDataHolder *tempDataHolder = cumulativeDataHolder_;
+	if (dwellActive_) {
+		dwellDataCount_ ++;
 
-			cumulativeDataHolder_ = (*cumulativeDataHolder_) + (*newData);
+		if (dwellCumulativeDataHolder_) {
+			AMDSDataHolder *tempDataHolder = dwellCumulativeDataHolder_;
+
+			dwellCumulativeDataHolder_ = (*dwellCumulativeDataHolder_) + (*newData);
 			tempDataHolder->deleteLater();
 		} else {
-			cumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromClassName(newData->metaObject()->className());
-			cumulativeDataHolder_->cloneData(newData);
+			dwellCumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromInstance(newData);
+			dwellCumulativeDataHolder_->cloneData(newData);
 		}
 
-		AMDSDwellSpectralDataHolder *specturalCumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(cumulativeDataHolder_);
-		if (specturalCumulativeDataHolder) {
-			AMDSDwellStatusData cumulativeStatusData = specturalCumulativeDataHolder->dwellStatusData();
-
-//			emit continuousDataUpdate(specturalCumulativeDataHolder);
-//			emit continuousStatusDataUpdate(cumulativeStatusData, count());
-//			emit continuousAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedDwellTime);
-		}
-//		} else {
-//			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder_->metaObject()->className()));
-//		}
+		emit continuousDwellDataUpdate(dwellCumulativeDataHolder_, dwellDataCount_, dwellStartTime_.elapsed());
 	}
 }
 
-void AMDSBufferGroup::finishDwellDataUpdate(double elapsedTime)
+void AMDSBufferGroup::onDwellStarted()
 {
-	if (cumulativeEnabled()) {
-		AMDSDwellSpectralDataHolder *specturalCumulativeDataHolder = qobject_cast<AMDSDwellSpectralDataHolder *>(cumulativeDataHolder());
-		if (specturalCumulativeDataHolder) {
-			AMDSDwellStatusData cumulativeStatusData = specturalCumulativeDataHolder->dwellStatusData();
+	if (dwellActive_) {
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_BUFFER_GROUP_ALREADY_DWELL_STARTED, "Received dwellStarted signal when already in dwell active mode.");
+	} else {
+		initializeDwellControls();
 
-			emit dwellFinishedTimeUpdate(elapsedTime);
-			emit dwellFinishedDataUpdate(specturalCumulativeDataHolder);
-			emit dwellFinishedStatusDataUpdate(cumulativeStatusData, count());
-			emit dwellFinishedAllDataUpdate(specturalCumulativeDataHolder, cumulativeStatusData, count(), elapsedTime);
+		dwellActive_ = true;
+	}
+}
+
+void AMDSBufferGroup::onDwellStopped()
+{
+	if (dwellActive_) {
+		dwellActive_ = false;
+
+		AMDSDataHolder *dwellDataHolder;
+		if (bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::Average) {
+			dwellDataHolder = (*dwellCumulativeDataHolder_) / dwellDataCount_;
 		} else {
-			AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_ALERT_DATA_HOLDER_TYPE_NOT_SUPPORT, QString("The cumulative dataHolder type (%1) is NOT supported at this moment.").arg(cumulativeDataHolder()->metaObject()->className()));
+			dwellDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dwellCumulativeDataHolder_);
+			dwellDataHolder->cloneData(dwellCumulativeDataHolder_);
 		}
+
+		emit finalDwellDataUpdate(dwellDataHolder, dwellDataCount_, dwellStartTime_.elapsed());
+	} else {
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_BUFFER_GROUP_ALREADY_DWELL_STOPPED, "Received dwellStop signal when already in dwell stop mode.");
 	}
 }
 
@@ -369,4 +365,25 @@ int AMDSBufferGroup::getDataIndexByDateTime(const QDateTime &dwellTime)
 	}
 
 	return middle;
+}
+
+void AMDSBufferGroup::initializeDwellControls(bool activateDwell, int dataCount, const QTime &startTime, AMDSDataHolder *dataHolder)
+{
+	dwellActive_ = activateDwell;
+	dwellDataCount_ = dataCount;
+
+	dwellStartTime_.restart();
+	if (startTime.isValid() && !startTime.isNull()) {
+		dwellStartTime_.addMSecs(startTime.elapsed());
+	}
+
+	if (dwellCumulativeDataHolder_) {
+		dwellCumulativeDataHolder_->deleteLater();
+		dwellCumulativeDataHolder_ = 0;
+	}
+
+	if (dataHolder) {
+		dwellCumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dataHolder);
+		dwellCumulativeDataHolder_->cloneData(dataHolder);
+	}
 }
