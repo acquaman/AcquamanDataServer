@@ -193,8 +193,6 @@ void AmptekSDD123EPICSDetectorManager::setFlattenedData(AMDSDataHolder *dataHold
 	double elapsedTime = dwellTimeControl_->value();
 	double count = elapsedTime*1000/50;
 	dataHelper(dataHolder, count, elapsedTime);
-
-	dataHolder->deleteLater();
 }
 
 //void AmptekSDD123EPICSDetectorManager::onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime)

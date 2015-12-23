@@ -152,7 +152,7 @@ void AMDSCentralServerSGMAmptek::onNewHistrogramReceived(const QString &detector
 //			qDebug() << "New data received and need to generate internal request for " << detectorName << " with dwell " << dwellSecondsRequested;
 			dwellSecondsRequestedForDetector_.remove(detectorName);
 
-			QDateTime endTime = QDateTime::currentDateTime();
+			QDateTime endTime = QDateTime::currentDateTimeUtc();
 			quint64 asMsecs = quint64(dwellSecondsRequested*1000);
 			QDateTime startTime = endTime.addMSecs(-asMsecs);
 			AMDSClientStartTimeToEndTimeDataRequest *localRequest = new AMDSClientStartTimeToEndTimeDataRequest(AMDSClientRequest::Binary, endTime, "", bufferGroupManager->bufferGroupName(), false, true, startTime, endTime, bufferGroupManager->bufferGroupInfo(), this);
@@ -208,4 +208,6 @@ void AMDSCentralServerSGMAmptek::onInternalRequestProcessed(AMDSClientRequest *c
 					amptekDetectorGroup_->detectorManager(returnedRequest->bufferName())->setFlattenedData(spectralDataHolder);
 			}
 		}
+
+		returnedRequest->deleteLater();
 }
