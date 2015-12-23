@@ -43,14 +43,14 @@ public:
 
 	/// Returns the data dimension and other information included in the bufferGroupInfo
 	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
-	/// returns whether Cumulative is enabled or not
-	inline bool cumulativeEnabled() const { return dwellActive_; }
+//	/// returns whether Cumulative is enabled or not
+//	inline bool cumulativeEnabled() const { return dwellActive_; }
 
 public slots:
-	/// slot to start dwelling recording
-	void onDwellStarted();
-	/// slot to stop dwelling recording
-	void onDwellStopped();
+//	/// slot to start dwelling recording
+//	void onDwellStarted();
+//	/// slot to stop dwelling recording
+//	void onDwellStopped();
 	/// Slot which handles a request for data. The buffer group will attempt to populate the request
 	/// based on the instructions it includes. When the data request is ready the dataRequestReady signal is emitted
 	void processClientRequest(AMDSClientRequest *clientRequest, bool internalRequest = false);
@@ -62,11 +62,11 @@ signals:
 	/// Handles clientRequests that have been requested internally and don't need to be routed out of the server (flattening request for trigger/dwell)
 	void internalRequestProcessed(AMDSClientRequest *clientRequest);
 
-	/// signal to indicate that the new update for conitunous monitor
-	void continuousDwellDataUpdate(AMDSDataHolder *continuousDataHolder, int count, double elapsedTime);
-	/// signal to indicate that dwell update is finished, with all data
-	/// slot to handle this signal should release the dataholder
-	void finalDwellDataUpdate(AMDSDataHolder *dwellDataHolder, int count, double elapsedTime);
+//	/// signal to indicate that the new update for conitunous monitor
+//	void continuousDwellDataUpdate(AMDSDataHolder *continuousDataHolder, int count, double elapsedTime);
+//	/// signal to indicate that dwell update is finished, with all data
+//	/// slot to handle this signal should release the dataholder
+//	void finalDwellDataUpdate(AMDSDataHolder *dwellDataHolder, int count, double elapsedTime);
 
 protected:
 	/// calculate the delta between the client time and the server time i(in ms)
@@ -91,8 +91,8 @@ protected:
 	int getDataIndexByDateTime(const QDateTime& dwellTime);
 
 private:
-	/// helper function to clear the dwell status
-	void initializeDwellControls(bool activeDwell=false, int dataCount=0, const QTime &startTime= QTime(), AMDSDataHolder *dataHolder=0);
+//	/// helper function to clear the dwell status
+//	void initializeDwellControls(bool activeDwell=false, int dataCount=0, const QTime &startTime= QTime(), AMDSDataHolder *dataHolder=0);
 
 protected:
 	mutable QReadWriteLock lock_;
@@ -102,14 +102,14 @@ protected:
 	/// A buffer which contains histogram data collection, sorted by time
 	AMDSBuffer<AMDSDataHolder*> dataHolders_;
 
-	/// the flag to indicate whether we enabled the cumultive feature
-	bool dwellActive_;
-	/// the dwell start time
-	QTime dwellStartTime_;
-	/// the total cumulatived data count
-	int dwellDataCount_;
-	/// the Dataholder to holder the cumulative data
-	AMDSDataHolder *dwellCumulativeDataHolder_;
+//	/// the flag to indicate whether we enabled the cumultive feature
+//	bool dwellActive_;
+//	/// the dwell start time
+//	QTime dwellStartTime_;
+//	/// the total cumulatived data count
+//	int dwellDataCount_;
+//	/// the Dataholder to holder the cumulative data
+//	AMDSDataHolder *dwellCumulativeDataHolder_;
 };
 
 #endif // AMDSBUFFERGROUP_H

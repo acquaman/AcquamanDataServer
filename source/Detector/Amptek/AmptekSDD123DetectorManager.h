@@ -61,10 +61,10 @@ signals:
 	/// signal to indicate new histrogram data
 	void newHistrogramReceived(const QString &detectorName, AMDSDataHolder *);
 
-	/// signal to start dwell
-	void dwellStarted(const QString &detectorName);
-	/// signal to stop dwell
-	void dwellStopped(const QString &detectorName);
+//	/// signal to start dwell
+//	void dwellStarted(const QString &detectorName);
+//	/// signal to stop dwell
+//	void dwellStopped(const QString &detectorName);
 
 	/// signal to indicate that configuration value is updated
 	void configurationValuesUpdate(const AmptekConfigurationData &configurationData);
@@ -122,10 +122,10 @@ public slots:
 	virtual void setFlattenedData(AMDSDataHolder *dataHolder) = 0;
 
 protected slots:
-	/// slot to handle continuous data update
-	virtual void onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
-	/// slot to handle dwell data update
-	virtual void onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
+//	/// slot to handle continuous data update
+//	virtual void onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
+//	/// slot to handle dwell data update
+//	virtual void onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
 
 	/// Called to actually request the flattened data from the server by emitting the signal
 	virtual void onTriggerDwellTimerTimeout() = 0;

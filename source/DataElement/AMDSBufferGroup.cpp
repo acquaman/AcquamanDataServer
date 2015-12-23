@@ -15,7 +15,7 @@ AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 ma
 {
 	bufferGroupInfo_ = bufferGroupInfo;
 
-	initializeDwellControls();
+//	initializeDwellControls();
 }
 
 AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
@@ -23,7 +23,7 @@ AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
 {
 	bufferGroupInfo_ = other.bufferGroupInfo();
 
-	initializeDwellControls(other.dwellActive_, other.dwellDataCount_, other.dwellStartTime_, other.dwellCumulativeDataHolder_);
+//	initializeDwellControls(other.dwellActive_, other.dwellDataCount_, other.dwellStartTime_, other.dwellCumulativeDataHolder_);
 }
 
 AMDSBufferGroup::~AMDSBufferGroup()
@@ -46,10 +46,10 @@ void AMDSBufferGroup::clear()
 	}
 	dataHolders_.clear();
 
-	if (dwellCumulativeDataHolder_) {
-		dwellCumulativeDataHolder_->deleteLater();
-		dwellCumulativeDataHolder_ = 0;
-	}
+//	if (dwellCumulativeDataHolder_) {
+//		dwellCumulativeDataHolder_->deleteLater();
+//		dwellCumulativeDataHolder_ = 0;
+//	}
 }
 
 void AMDSBufferGroup::append(const AMDSDataHolderList &dataHolderList)
@@ -68,52 +68,52 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData)
 	if(dataHolderRemoved)
 		dataHolderRemoved->deleteLater();
 
-	if (dwellActive_) {
-		dwellDataCount_ ++;
+//	if (dwellActive_) {
+//		dwellDataCount_ ++;
 
-		if (dwellCumulativeDataHolder_) {
-			AMDSDataHolder *tempDataHolder = dwellCumulativeDataHolder_;
+//		if (dwellCumulativeDataHolder_) {
+//			AMDSDataHolder *tempDataHolder = dwellCumulativeDataHolder_;
 
-			dwellCumulativeDataHolder_ = (*dwellCumulativeDataHolder_) + (*newData);
-			tempDataHolder->deleteLater();
-		} else {
-			dwellCumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromInstance(newData);
-			dwellCumulativeDataHolder_->cloneData(newData);
-		}
+//			dwellCumulativeDataHolder_ = (*dwellCumulativeDataHolder_) + (*newData);
+//			tempDataHolder->deleteLater();
+//		} else {
+//			dwellCumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromInstance(newData);
+//			dwellCumulativeDataHolder_->cloneData(newData);
+//		}
 
-		emit continuousDwellDataUpdate(dwellCumulativeDataHolder_, dwellDataCount_, dwellStartTime_.elapsed());
-	}
+//		emit continuousDwellDataUpdate(dwellCumulativeDataHolder_, dwellDataCount_, dwellStartTime_.elapsed());
+//	}
 }
 
-void AMDSBufferGroup::onDwellStarted()
-{
-	if (dwellActive_) {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_BUFFER_GROUP_ALREADY_DWELL_STARTED, "Received dwellStarted signal when already in dwell active mode.");
-	} else {
-		initializeDwellControls();
+//void AMDSBufferGroup::onDwellStarted()
+//{
+//	if (dwellActive_) {
+//		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_BUFFER_GROUP_ALREADY_DWELL_STARTED, "Received dwellStarted signal when already in dwell active mode.");
+//	} else {
+//		initializeDwellControls();
 
-		dwellActive_ = true;
-	}
-}
+//		dwellActive_ = true;
+//	}
+//}
 
-void AMDSBufferGroup::onDwellStopped()
-{
-	if (dwellActive_) {
-		dwellActive_ = false;
+//void AMDSBufferGroup::onDwellStopped()
+//{
+//	if (dwellActive_) {
+//		dwellActive_ = false;
 
-		AMDSDataHolder *dwellDataHolder;
-		if (bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::Average) {
-			dwellDataHolder = (*dwellCumulativeDataHolder_) / dwellDataCount_;
-		} else {
-			dwellDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dwellCumulativeDataHolder_);
-			dwellDataHolder->cloneData(dwellCumulativeDataHolder_);
-		}
+//		AMDSDataHolder *dwellDataHolder;
+//		if (bufferGroupInfo_.flattenMethod() == AMDSBufferGroupInfo::Average) {
+//			dwellDataHolder = (*dwellCumulativeDataHolder_) / dwellDataCount_;
+//		} else {
+//			dwellDataHolder = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dwellCumulativeDataHolder_);
+//			dwellDataHolder->cloneData(dwellCumulativeDataHolder_);
+//		}
 
-		emit finalDwellDataUpdate(dwellDataHolder, dwellDataCount_, dwellStartTime_.elapsed());
-	} else {
+//		emit finalDwellDataUpdate(dwellDataHolder, dwellDataCount_, dwellStartTime_.elapsed());
+//	} else {
 //		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_BUFFER_GROUP_ALREADY_DWELL_STOPPED, "Received dwellStop signal when already in dwell stop mode.");
-	}
-}
+//	}
+//}
 
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest, bool internalRequest){
 	QReadLocker readLock(&lock_);
@@ -367,23 +367,23 @@ int AMDSBufferGroup::getDataIndexByDateTime(const QDateTime &dwellTime)
 	return middle;
 }
 
-void AMDSBufferGroup::initializeDwellControls(bool activateDwell, int dataCount, const QTime &startTime, AMDSDataHolder *dataHolder)
-{
-	dwellActive_ = activateDwell;
-	dwellDataCount_ = dataCount;
+//void AMDSBufferGroup::initializeDwellControls(bool activateDwell, int dataCount, const QTime &startTime, AMDSDataHolder *dataHolder)
+//{
+//	dwellActive_ = activateDwell;
+//	dwellDataCount_ = dataCount;
 
-	dwellStartTime_.restart();
-	if (startTime.isValid() && !startTime.isNull()) {
-		dwellStartTime_.addMSecs(startTime.elapsed());
-	}
+//	dwellStartTime_.restart();
+//	if (startTime.isValid() && !startTime.isNull()) {
+//		dwellStartTime_.addMSecs(startTime.elapsed());
+//	}
 
-	if (dwellCumulativeDataHolder_) {
-		dwellCumulativeDataHolder_->deleteLater();
-		dwellCumulativeDataHolder_ = 0;
-	}
+//	if (dwellCumulativeDataHolder_) {
+//		dwellCumulativeDataHolder_->deleteLater();
+//		dwellCumulativeDataHolder_ = 0;
+//	}
 
-	if (dataHolder) {
-		dwellCumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dataHolder);
-		dwellCumulativeDataHolder_->cloneData(dataHolder);
-	}
-}
+//	if (dataHolder) {
+//		dwellCumulativeDataHolder_ = AMDSDataHolderSupport::instantiateDataHolderFromInstance(dataHolder);
+//		dwellCumulativeDataHolder_->cloneData(dataHolder);
+//	}
+//}
