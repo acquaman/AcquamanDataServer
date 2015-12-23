@@ -65,9 +65,6 @@ protected slots:
 	void onAllControlsConnected(bool connected);
 	void onAllControlsTimedOut();
 
-	/// Called to actually request the flattened data from the server by emitting the signal
-	virtual void onTriggerDwellTimerTimeout();
-
 protected:
 	/// helper function to handle continuous spectrum data update
 	void dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime);

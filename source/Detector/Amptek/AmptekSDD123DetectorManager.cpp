@@ -33,6 +33,11 @@ AmptekSDD123DetectorManager::~AmptekSDD123DetectorManager()
 {
 	detector_->deleteLater();
 	detector_ = 0;
+
+	if (triggerDwellTimer_->isActive()) {
+		triggerDwellTimer_->stop();
+	}
+	triggerDwellTimer_->deleteLater();
 }
 
 bool AmptekSDD123DetectorManager::event(QEvent *e){
@@ -213,6 +218,27 @@ void AmptekSDD123DetectorManager::setDetectorFastPeakingTime(AmptekSDD123Detecto
 	}
 
 	postConfigurationInitiateRequestEvent();
+}
+
+void AmptekSDD123DetectorManager::onTriggerDwellTimerTimeout(){
+//	qDebug() << "Trigger Dwell Timer Timed Out";
+	if(dwellMode_ == AmptekSDD123DetectorManager::PresetDwell)
+		triggerDwellTimer_->stop();
+
+	emit requestFlattenedData(detectorName(), triggerDwellTimer_->interval() / 1000);
+}
+
+bool AmptekSDD123DetectorManager::startTriggerDwellTimer(quint32 seconds)
+{
+	if(seconds > 0 && seconds < 100 && !triggerDwellTimer_->isActive()){
+		int asMSecs = seconds*1000;
+		triggerDwellTimer_->setInterval(asMSecs);
+		triggerDwellTimer_->start();
+
+		return true;
+	}
+
+	return false;
 }
 
 void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent){

@@ -335,14 +335,8 @@ void AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange(double new
 		startDwellControl_->move(0);
 
 //		qDebug() << "Dwell start changed to 1.0";
-		double seconds = dwellTimeControl_->value();
-		if(seconds > 0 && seconds < 100){
-//			qDebug() << "And dwell time within range";
-			int asMSecs = seconds*1000;
-			triggerDwellTimer_->setInterval(asMSecs);
+		if (startTriggerDwellTimer(dwellTimeControl_->value()))
 			dwellStateControl_->move(1);
-			triggerDwellTimer_->start();
-		}
 
 //		startDwell();
 	}
@@ -669,12 +663,4 @@ void AmptekSDD123EPICSDetectorManager::onAllControlsTimedOut(){
 	connected_ = false;
 	if(isAvailableControl_->isConnected())
 		isAvailableControl_->move(0);
-}
-
-void AmptekSDD123EPICSDetectorManager::onTriggerDwellTimerTimeout(){
-//	qDebug() << "Trigger Dwell Timer Timed Out";
-	if(dwellMode_ == AmptekSDD123DetectorManager::PresetDwell)
-		triggerDwellTimer_->stop();
-
-	emit requestFlattenedData(detectorName(), dwellTimeControl_->value());
 }

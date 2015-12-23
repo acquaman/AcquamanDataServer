@@ -128,9 +128,11 @@ protected slots:
 //	virtual void onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
 
 	/// Called to actually request the flattened data from the server by emitting the signal
-	virtual void onTriggerDwellTimerTimeout() = 0;
+	void onTriggerDwellTimerTimeout();
 
 protected:
+	/// Called to actually request the flattened data from the server by emitting the signal
+	bool startTriggerDwellTimer(quint32 seconds);
 	/// helper function to handle the incoming SpectrumEvent
 	void onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent);
 	/// helper function to handle the incoming ConfigurationValuesEvent
