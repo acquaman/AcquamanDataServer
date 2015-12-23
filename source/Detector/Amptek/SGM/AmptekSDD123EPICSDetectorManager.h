@@ -73,8 +73,8 @@ protected:
 	void dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime);
 
 protected:
-	QTime lastEPICSSpectrumUpdateTime_;
-	int EPICSSpectrumUpdateMSecs_;
+//	QTime lastEPICSSpectrumUpdateTime_;
+//	int EPICSSpectrumUpdateMSecs_;
 	bool connected_;
 	bool receivedConfigurationDataOnce_;
 

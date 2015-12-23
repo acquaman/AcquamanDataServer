@@ -25,8 +25,8 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 
 	isAvailableControl_ = new AMSinglePVControl("Detector Available", QString("%1:spectrum:isAvailable").arg(detectorBasePVName), this, 0.5);
 
-	EPICSSpectrumUpdateMSecs_ = 249;
-	lastEPICSSpectrumUpdateTime_ = QTime::currentTime().addMSecs(-EPICSSpectrumUpdateMSecs_-100);
+//	EPICSSpectrumUpdateMSecs_ = 249;
+//	lastEPICSSpectrumUpdateTime_ = QTime::currentTime().addMSecs(-EPICSSpectrumUpdateMSecs_-100);
 	spectrumControl_ = new AMWaveformBinningSinglePVControl("Amptek Array", QString("%1:spectrum").arg(detectorBasePVName), 0, 1023, this);
 	spectrumControl_->setAttemptDouble(true);
 
