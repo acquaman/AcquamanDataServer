@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QMap>
-#include <QThread>
 
 class AmptekSDD123ConfigurationMap;
 class AmptekSDD123DetectorManager;
@@ -22,9 +21,6 @@ public:
 protected:
 	/// the mapping of detector names with detector managers
 	QMap<QString, AmptekSDD123DetectorManager*> detectorManagers_;
-
-	/// the mapping of detector names with detector manager threads
-	QMap<QString, QThread*> detectorManagerThreads_;
 };
 
 #endif // AMPTEKSDD123DETECTORGROUPSGM_H

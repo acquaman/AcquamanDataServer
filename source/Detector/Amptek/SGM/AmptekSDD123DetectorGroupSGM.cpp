@@ -7,33 +7,19 @@
 AmptekSDD123DetectorGroupSGM::AmptekSDD123DetectorGroupSGM(const QList<AmptekSDD123ConfigurationMap *> &configurationMaps, QObject *parent) :
 	QObject(parent)
 {
-	QThread *amptekDetectorManagerThread;
 	AmptekSDD123DetectorManager *amptekDetectorManager;
 	for(int x = 0, size = configurationMaps.count(); x < size; x++){
-		amptekDetectorManagerThread = new QThread;
-
 		amptekDetectorManager = new AmptekSDD123EPICSDetectorManager(configurationMaps.at(x));
-		amptekDetectorManager->moveToThread(amptekDetectorManagerThread);
-
-		connect(amptekDetectorManagerThread, SIGNAL(finished()), amptekDetectorManager, SLOT(deleteLater()));
-
-		detectorManagerThreads_.insert(amptekDetectorManager->detectorName(), amptekDetectorManagerThread);
 		detectorManagers_.insert(amptekDetectorManager->detectorName(), amptekDetectorManager);
-
-		amptekDetectorManagerThread->start();
 	}
 }
 
 AmptekSDD123DetectorGroupSGM::~AmptekSDD123DetectorGroupSGM()
 {
-	foreach (QThread *thread, detectorManagerThreads_.values()) {
-		if (thread->isRunning())
-			thread->quit();
-
-		thread->deleteLater();
+	foreach(QString detectorName, detectorManagers_.keys()) {
+		detectorManagers_.value(detectorName)->deleteLater();
 	}
 
-	detectorManagerThreads_.clear();
 	detectorManagers_.clear();
 }
 
