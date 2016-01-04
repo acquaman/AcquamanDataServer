@@ -19,13 +19,9 @@ public:
 
 public slots:
 	/// Called to set the flattened data once the request has been processed
-	virtual void setFlattenedData(AMDSDataHolder *dataHolder);
+	virtual void setFlattenedSpectrumData(AMDSDataHolder *dataHolder);
 
 protected slots:
-//	/// slot to handle continuous data update
-//	virtual void onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) ;
-//	/// slot to handle dwell finish data update
-//	virtual void onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime);
 	/// slot to handle configuration value update signal
 	void onConfigurationValuesUpdate(const AmptekConfigurationData &configurationData);
 
@@ -67,7 +63,7 @@ protected slots:
 
 protected:
 	/// helper function to handle continuous spectrum data update
-	void dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime);
+	void dataHelper(AMDSDataHolder *spectrum, double count, double elapsedTime);
 
 protected:
 //	QTime lastEPICSSpectrumUpdateTime_;

@@ -20,7 +20,6 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	detector_->setSpectrumReceiver(this);
 
 	dwellMode_ = AmptekSDD123DetectorManager::PresetDwell;
-//	dwellActive_ = false;
 	dwellTime_ = 2;
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
@@ -63,26 +62,6 @@ bool AmptekSDD123DetectorManager::event(QEvent *e){
 void AmptekSDD123DetectorManager::setRequestEventReceiver(QObject *requestEventReceiver){
 	requestEventReceiver_ = requestEventReceiver;
 }
-
-//void AmptekSDD123DetectorManager::startDwell(){
-//	setDwellActive(true);
-
-//	if (isPresetDwell()) {
-//		setDwellTimeOnNextEvent_ = true;
-//	} else {
-//		emit dwellStarted(detectorName());
-//	}
-//}
-
-//void AmptekSDD123DetectorManager::stopDwell(){
-//	setDwellActive(false);
-
-//	emit dwellStopped(detectorName());
-//}
-
-//void AmptekSDD123DetectorManager::setDwellActive(bool dwellActive){
-//	dwellActive_ = dwellActive;
-//}
 
 void AmptekSDD123DetectorManager::setDwellTime(int dwellTime){
 	dwellTime_ = dwellTime;
@@ -220,18 +199,18 @@ void AmptekSDD123DetectorManager::setDetectorFastPeakingTime(AmptekSDD123Detecto
 	postConfigurationInitiateRequestEvent();
 }
 
-void AmptekSDD123DetectorManager::onTriggerDwellTimerTimeout(){
-//	qDebug() << "Trigger Dwell Timer Timed Out";
+void AmptekSDD123DetectorManager::onTriggerDwellTimerTimeout()
+{
 	if(dwellMode_ == AmptekSDD123DetectorManager::PresetDwell)
 		triggerDwellTimer_->stop();
 
-	emit requestFlattenedData(detectorName(), triggerDwellTimer_->interval() / 1000);
+	emit requestFlattenedSpectrumData(detectorName(), dwellTime_);
 }
 
-bool AmptekSDD123DetectorManager::startTriggerDwellTimer(quint32 seconds)
+bool AmptekSDD123DetectorManager::startTriggerDwellTimer()
 {
-	if(seconds > 0 && seconds < 100 && !triggerDwellTimer_->isActive()){
-		int asMSecs = seconds*1000;
+	if(dwellTime_ > 0 && dwellTime_ < 100 && !triggerDwellTimer_->isActive()){
+		int asMSecs = dwellTime_*1000;
 		triggerDwellTimer_->setInterval(asMSecs);
 		triggerDwellTimer_->start();
 
@@ -249,21 +228,6 @@ void AmptekSDD123DetectorManager::onSpectrumEventReceived(AmptekSpectrumEvent *s
 
 	AMDSFlatArray *spectrumData = spectrumEvent->spectrum_;
 	AMDSDwellStatusData statusData = spectrumEvent->statusData_;
-
-//	if (isPresetDwell()) {
-//		if (setDwellTimeOnNextEvent_) {
-//			setDwellTimeOnNextEvent_ = false;
-//			expectedDwellEndTime_ = statusData.dwellStartTime().addMSecs(dwellTime_ * 1000);
-
-//			emit dwellStarted(detectorName());
-//		}
-
-//		if (dwellActive_ ) {
-//			if (expectedDwellEndTime_.isValid() && expectedDwellEndTime_ <= statusData.dwellStartTime()) {
-//				stopDwell();
-//			}
-//		}
-//	}
 
 	// generate the spectrum data holder and notice the bufferGroup new data is ready
 	AMDSDwellSpectralDataHolder *oneHistogram = new AMDSDwellSpectralDataHolder(detector_->dataType(), detector_->bufferSize(), this);

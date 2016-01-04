@@ -39,9 +39,6 @@ protected slots:
 	/// slot to handle new histrogramData request  for a given buffer (detector)
 	void onNewHistrogramReceived(const QString &detectorName, AMDSDataHolder *);
 
-//	void onDwellStarted(const QString &detectorName);
-//	void onDwellStopped(const QString &detectorName);
-
 	/// Called when the scaler requests flattened data. Sets the latches for internalRequestActive_ and dwellSecondsRequested
 	void onAmptekDetectorRequestFlattenedData(const QString &detectorName, double seconds);
 	/// Handles the internal requests that are processed and send data back to detector
