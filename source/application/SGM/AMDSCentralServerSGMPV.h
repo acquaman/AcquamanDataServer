@@ -17,7 +17,7 @@ class AMDSCentralServerSGMPV : public AMDSCentralServer
 	Q_OBJECT
 public:
 	/// Constructor: to initialize the TCP Data server thread and the timers for buffer groups
-	AMDSCentralServerSGMPV(QObject *parent = 0);
+	AMDSCentralServerSGMPV(const QString &configurationFile, QObject *parent = 0);
 	~AMDSCentralServerSGMPV();
 
 signals:
@@ -28,7 +28,7 @@ protected slots:
 
 protected:
 	/// function to initialize the system configurations
-	void initializeConfiguration();
+	void initializeConfiguration(const QString &configurationFileName);
 	/// function to initialize the buffer groups, with the given buffer size, by default we will host 10 hours of 1kHz signal
 	virtual void initializeBufferGroup();
 	/// function to initialize the detector manager
