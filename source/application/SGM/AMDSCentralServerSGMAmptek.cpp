@@ -172,5 +172,5 @@ void AMDSCentralServerSGMAmptek::onInternalRequestProcessed(AMDSClientRequest *c
 			}
 		}
 
-		returnedRequest->deleteLater();
+		clientRequest->deleteLater();
 }
