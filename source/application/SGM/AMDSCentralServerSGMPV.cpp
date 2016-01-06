@@ -98,7 +98,7 @@ void AMDSCentralServerSGMPV::initializeBufferGroup()
 		pvBufferGroupAxes << AMDSAxisInfo(pvConfiguration->pvName(), 1, pvConfiguration->pvDescription(), pvConfiguration->pvUnits());
 		AMDSBufferGroupInfo pvBufferGroupInfo(pvConfiguration->pvName(), pvConfiguration->pvDescription(), pvConfiguration->pvUnits(), pvConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, pvBufferGroupAxes);
 
-		AMDSThreadedBufferGroup *pvThreadedBufferGroup = new AMDSThreadedBufferGroup(pvBufferGroupInfo, maxBufferSize_, false);
+		AMDSThreadedBufferGroup *pvThreadedBufferGroup = new AMDSThreadedBufferGroup(pvBufferGroupInfo, maxBufferSize_);
 		connect(pvThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
 		bufferGroupManagers_.insert(pvThreadedBufferGroup->bufferGroupName(), pvThreadedBufferGroup);
