@@ -190,7 +190,7 @@ void AmptekSDD123EPICSDetectorManager::setFlattenedSpectrumData(AMDSDataHolder *
 
 	double elapsedTime = dwellTime();
 	double count = elapsedTime*1000/50;
-	dataHelper(dataHolder, count, elapsedTime);
+	dataHelper(dataHolder, (int)count, elapsedTime);
 }
 
 void AmptekSDD123EPICSDetectorManager::onSpectrumControlValueChanged(){
@@ -256,7 +256,7 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(const AmptekC
 	/**/
 }
 
-void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, double count, double elapsedTime){
+void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime){
 
 	AMDSFlatArray spectrumData;
 	spectrum->data(&spectrumData);

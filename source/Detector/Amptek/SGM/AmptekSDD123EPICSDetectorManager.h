@@ -63,7 +63,7 @@ protected slots:
 
 protected:
 	/// helper function to handle continuous spectrum data update
-	void dataHelper(AMDSDataHolder *spectrum, double count, double elapsedTime);
+	void dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime);
 
 protected:
 //	QTime lastEPICSSpectrumUpdateTime_;
