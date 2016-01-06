@@ -25,8 +25,8 @@ AmptekSDD123EPICSDetectorManager::AmptekSDD123EPICSDetectorManager(AmptekSDD123C
 
 	isAvailableControl_ = new AMSinglePVControl("Detector Available", QString("%1:spectrum:isAvailable").arg(detectorBasePVName), this, 0.5);
 
-	EPICSSpectrumUpdateMSecs_ = 249;
-	lastEPICSSpectrumUpdateTime_ = QTime::currentTime().addMSecs(-EPICSSpectrumUpdateMSecs_-100);
+//	EPICSSpectrumUpdateMSecs_ = 249;
+//	lastEPICSSpectrumUpdateTime_ = QTime::currentTime().addMSecs(-EPICSSpectrumUpdateMSecs_-100);
 	spectrumControl_ = new AMWaveformBinningSinglePVControl("Amptek Array", QString("%1:spectrum").arg(detectorBasePVName), 0, 1023, this);
 	spectrumControl_->setAttemptDouble(true);
 
@@ -184,20 +184,13 @@ AmptekSDD123EPICSDetectorManager::~AmptekSDD123EPICSDetectorManager()
 {
 }
 
-void AmptekSDD123EPICSDetectorManager::onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime)
-{
-	if(lastEPICSSpectrumUpdateTime_.addMSecs(EPICSSpectrumUpdateMSecs_) <= QTime::currentTime()){
-		lastEPICSSpectrumUpdateTime_ = QTime::currentTime();
-		dataHelper(dwellSpectrum, count, elapsedTime);
-	}
-}
-
-void AmptekSDD123EPICSDetectorManager::onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime)
+void AmptekSDD123EPICSDetectorManager::setFlattenedSpectrumData(AMDSDataHolder *dataHolder)
 {
 	connect(spectrumControl_, SIGNAL(valueChanged(double)), this, SLOT(onSpectrumControlValueChanged()));
 
-	dataHelper(dwellSpectrum, count, elapsedTime);
-	dwellSpectrum->deleteLater(); // we need to release the memory, otherwise, there will be memory leak
+	double elapsedTime = dwellTime();
+	double count = elapsedTime*1000/50;
+	dataHelper(dataHolder, (int)count, elapsedTime);
 }
 
 void AmptekSDD123EPICSDetectorManager::onSpectrumControlValueChanged(){
@@ -264,8 +257,6 @@ void AmptekSDD123EPICSDetectorManager::onConfigurationValuesUpdate(const AmptekC
 }
 
 void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, int count, double elapsedTime){
-	if(!connected_)
-		return;
 
 	AMDSFlatArray spectrumData;
 	spectrum->data(&spectrumData);
@@ -309,7 +300,6 @@ void AmptekSDD123EPICSDetectorManager::dataHelper(AMDSDataHolder *spectrum, int 
 		int dwellReplySeconds = statusData.dwellReplyTime().second();
 		int dwellReplyMSecs = statusData.dwellReplyTime().msec();
 		int totalMSecs = dwellReplyMSecs + dwellReplySeconds*1000 + dwellReplyMinutes*1000*60 + dwellReplyHours*1000*60*60;
-		qDebug() << "totalMSecs is " << totalMSecs << " so average is " << totalMSecs/count;
 		if(!replyTimeAverageControl_->withinTolerance(totalMSecs/count))
 			replyTimeAverageControl_->move(totalMSecs/count);
 		if(!temperatureControl_->withinTolerance(statusData.detectorTemperature()/count))
@@ -322,9 +312,9 @@ void AmptekSDD123EPICSDetectorManager::onStartDwellControlValueChange(double new
 	Q_UNUSED(newValue)
 	if(startDwellControl_->withinTolerance(1)){
 		startDwellControl_->move(0);
-		dwellStateControl_->move(1);
 
-		startDwell();
+		if (startTriggerDwellTimer())
+			dwellStateControl_->move(1);
 	}
 }
 
@@ -333,8 +323,6 @@ void AmptekSDD123EPICSDetectorManager::onStopDwellControlValueChange(double newV
 	if(stopDwellControl_->withinTolerance(1)){
 		stopDwellControl_->move(0);
 		dwellStateControl_->move(0);
-
-		stopDwell();
 	}
 }
 

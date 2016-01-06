@@ -18,6 +18,8 @@ public:
 	/// returns the list of AmptekDetectorManager
 	QList<AmptekSDD123DetectorManager*> detectorManagers() const;
 
+	AmptekSDD123DetectorManager* detectorManager(const QString &detectorName) const;
+
 protected:
 	/// the mapping of detector names with detector managers
 	QMap<QString, AmptekSDD123DetectorManager*> detectorManagers_;
