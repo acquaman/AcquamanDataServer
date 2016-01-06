@@ -100,9 +100,9 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 
 void AMDSCentralServer::onDetectorServerStartDwelling(const QString &bufferName)
 {
-	AMDSThreadedBufferGroupManager* threadedBufferGroup = bufferGroupManagers_.value(bufferName);
-	if (threadedBufferGroup) {
-		threadedBufferGroup->clearBufferGroup();
+	AMDSThreadedBufferGroupManager* threadedBufferGroupManager = bufferGroupManagers_.value(bufferName);
+	if (threadedBufferGroupManager) {
+		threadedBufferGroupManager->clearBufferGroup();
 	}
 }
 
@@ -162,9 +162,9 @@ void AMDSCentralServer::processClientDataRequest(AMDSClientRequest *clientReques
 			QStringList requestedBufferNames = continuousDataRequest->bufferNames();
 			foreach (QString bufferName, requestedBufferNames) {
 				AMDSClientDataRequest *continuousBufferDataRequest = continuousDataRequest->bufferDataRequest(bufferName);
-				AMDSThreadedBufferGroupManager *threadedBufferGroup = bufferGroupManagers_.value(bufferName, 0);
-				if (threadedBufferGroup) {
-					threadedBufferGroup->forwardClientRequest(continuousBufferDataRequest);
+				AMDSThreadedBufferGroupManager *threadedBufferGroupManager = bufferGroupManagers_.value(bufferName, 0);
+				if (threadedBufferGroupManager) {
+					threadedBufferGroupManager->forwardClientRequest(continuousBufferDataRequest);
 				} else {
 					AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_REQUEST, QString("Invalid client data request with buffer name: %1").arg(continuousBufferDataRequest->bufferName()));
 					emit clientRequestProcessed(continuousBufferDataRequest);
@@ -172,9 +172,9 @@ void AMDSCentralServer::processClientDataRequest(AMDSClientRequest *clientReques
 			}
 
 		} else {
-			AMDSThreadedBufferGroupManager *threadedBufferGroup = bufferGroupManagers_.value(clientDataRequest->bufferName(), 0);
-			if (threadedBufferGroup) {
-				threadedBufferGroup->forwardClientRequest(clientDataRequest);
+			AMDSThreadedBufferGroupManager *threadedBufferGroupManager = bufferGroupManagers_.value(clientDataRequest->bufferName(), 0);
+			if (threadedBufferGroupManager) {
+				threadedBufferGroupManager->forwardClientRequest(clientDataRequest);
 			} else {
 				errorMessage = QString("ERROR: %1 - Invalid client data request with buffer name: %2").arg(AMDS_SERVER_ALT_INVALID_REQUEST).arg(clientDataRequest->bufferName());
 				clientDataRequest->setErrorMessage(errorMessage);

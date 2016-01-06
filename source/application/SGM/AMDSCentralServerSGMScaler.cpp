@@ -50,12 +50,12 @@ void AMDSCentralServerSGMScaler::initializeBufferGroup()
 	scalerBufferGroupAxes << AMDSAxisInfo("Channel", scalerConfigurationMap_->enabledChannels().count(), "Channel Axis", "");
 	AMDSBufferGroupInfo scalerBufferGroupInfo(scalerConfigurationMap_->scalerName(), scalerConfigurationMap_->scalerName(), "Counts", scalerConfigurationMap_->dataType(), AMDSBufferGroupInfo::Summary, scalerBufferGroupAxes);
 
-	AMDSThreadedBufferGroupManager *scalerThreadedBufferGroup = new AMDSThreadedBufferGroupManager(scalerBufferGroupInfo, maxBufferSize_);
-	connect(scalerThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+	AMDSThreadedBufferGroupManager *scalerThreadedBufferGroupManager = new AMDSThreadedBufferGroupManager(scalerBufferGroupInfo, maxBufferSize_);
+	connect(scalerThreadedBufferGroupManager->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
-	connect(scalerThreadedBufferGroup->bufferGroup(), SIGNAL(internalRequestProcessed(AMDSClientRequest*)), this, SLOT(onInternalRequestProcessed(AMDSClientRequest*)));
+	connect(scalerThreadedBufferGroupManager->bufferGroup(), SIGNAL(internalRequestProcessed(AMDSClientRequest*)), this, SLOT(onInternalRequestProcessed(AMDSClientRequest*)));
 
-	bufferGroupManagers_.insert(scalerThreadedBufferGroup->bufferGroupName(), scalerThreadedBufferGroup);
+	bufferGroupManagers_.insert(scalerThreadedBufferGroupManager->bufferGroupName(), scalerThreadedBufferGroupManager);
 }
 
 void AMDSCentralServerSGMScaler::initializeDetectorManager()
@@ -115,9 +115,9 @@ void AMDSCentralServerSGMScaler::onServerChangedToDwellState(int index){
 #include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 void AMDSCentralServerSGMScaler::onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder)
 {
-	AMDSThreadedBufferGroupManager * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
-	if (bufferGroup) {
-		bufferGroup->append(scalerScanCountsDataHolder);
+	AMDSThreadedBufferGroupManager * bufferGroupManager = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
+	if (bufferGroupManager) {
+		bufferGroupManager->append(scalerScanCountsDataHolder);
 
 		if(internalRequestActive_){
 			internalRequestActive_ = false;
@@ -125,8 +125,8 @@ void AMDSCentralServerSGMScaler::onNewScalerScanDataReceivedd(const AMDSDataHold
 			QDateTime endTime = QDateTime::currentDateTime();
 			quint64 asMsecs = quint64(dwellSecondsRequested_*1000);
 			QDateTime startTime = endTime.addMSecs(-asMsecs);
-			AMDSClientStartTimeToEndTimeDataRequest *localRequest = new AMDSClientStartTimeToEndTimeDataRequest(AMDSClientRequest::Binary, endTime, "", scalerConfigurationMap_->scalerName(), false, true, startTime, endTime, bufferGroup->bufferGroupInfo(), this);
-			bufferGroup->bufferGroup()->processClientRequest(localRequest, true);
+			AMDSClientStartTimeToEndTimeDataRequest *localRequest = new AMDSClientStartTimeToEndTimeDataRequest(AMDSClientRequest::Binary, endTime, "", scalerConfigurationMap_->scalerName(), false, true, startTime, endTime, bufferGroupManager->bufferGroupInfo(), this);
+			bufferGroupManager->bufferGroup()->processClientRequest(localRequest, true);
 		}
 	} else {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(scalerConfigurationMap_->scalerName()));

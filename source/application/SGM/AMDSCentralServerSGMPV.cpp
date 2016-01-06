@@ -41,9 +41,9 @@ AMDSCentralServerSGMPV::~AMDSCentralServerSGMPV()
 
 void AMDSCentralServerSGMPV::onNewPVDataReceived(const QString &bufferName, AMDSDataHolder *newData)
 {
-	AMDSThreadedBufferGroupManager * bufferGroup = bufferGroupManagers_.value(bufferName);
-	if (bufferGroup) {
-		bufferGroup->append(newData);
+	AMDSThreadedBufferGroupManager * bufferGroupManager = bufferGroupManagers_.value(bufferName);
+	if (bufferGroupManager) {
+		bufferGroupManager->append(newData);
 	} else {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(bufferName));
 	}
@@ -98,10 +98,10 @@ void AMDSCentralServerSGMPV::initializeBufferGroup()
 		pvBufferGroupAxes << AMDSAxisInfo(pvConfiguration->pvName(), 1, pvConfiguration->pvDescription(), pvConfiguration->pvUnits());
 		AMDSBufferGroupInfo pvBufferGroupInfo(pvConfiguration->pvName(), pvConfiguration->pvDescription(), pvConfiguration->pvUnits(), pvConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, pvBufferGroupAxes);
 
-		AMDSThreadedBufferGroupManager *pvThreadedBufferGroup = new AMDSThreadedBufferGroupManager(pvBufferGroupInfo, maxBufferSize_);
-		connect(pvThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+		AMDSThreadedBufferGroupManager *pvThreadedBufferGroupManager = new AMDSThreadedBufferGroupManager(pvBufferGroupInfo, maxBufferSize_);
+		connect(pvThreadedBufferGroupManager->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
-		bufferGroupManagers_.insert(pvThreadedBufferGroup->bufferGroupName(), pvThreadedBufferGroup);
+		bufferGroupManagers_.insert(pvThreadedBufferGroupManager->bufferGroupName(), pvThreadedBufferGroupManager);
 	}
 }
 
