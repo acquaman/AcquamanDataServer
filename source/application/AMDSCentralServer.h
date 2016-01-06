@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMap>
 
-class AMDSThreadedBufferGroup;
+class AMDSThreadedBufferGroupManager;
 class AMDSThreadedTCPDataServer;
 class AMDSClientRequest;
 class AMDSClientConfigurationRequest;
@@ -70,7 +70,7 @@ protected:
 	AMDSThreadedTCPDataServer *tcpDataServer_;
 
 	/// the list of bufferGroup managers
-	QMap<QString, AMDSThreadedBufferGroup*> bufferGroupManagers_;
+	QMap<QString, AMDSThreadedBufferGroupManager*> bufferGroupManagers_;
 };
 
 Q_DECLARE_INTERFACE(AMDSCentralServer, "AMDS.AMDSCentralServer/1.0")

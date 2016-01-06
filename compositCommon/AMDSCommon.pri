@@ -48,7 +48,6 @@ HEADERS *= \
 	source/DataElement/AMDSFlatArray.h \
 	source/DataElement/AMDSBufferGroup.h \
 	source/DataElement/AMDSBufferGroupInfo.h \
-	source/DataElement/AMDSThreadedBufferGroup.h \
 	source/DataElement/AMDSDwellStatusData.h \
 	source/DataElement/AMDSCommandManager.h \
 	source/DataHolder/AMDSDataHolder.h \
@@ -59,7 +58,8 @@ HEADERS *= \
 	source/DataHolder/AMDSImageDataHolder.h  \
 	source/Detector/AMDSDwellDetector.h \
 	source/util/AMDSMetaObjectSupport.h \
-	source/util/AMDSRunTimeSupport.h
+	source/util/AMDSRunTimeSupport.h \
+    source/DataElement/AMDSThreadedBufferGroupManager.h
 
 SOURCES *= \
 	source/appController/AMDSAppController.cpp \
@@ -85,7 +85,6 @@ SOURCES *= \
 	source/DataElement/AMDSFlatArray.cpp \
 	source/DataElement/AMDSBufferGroupInfo.cpp \
 	source/DataElement/AMDSBufferGroup.cpp \
-	source/DataElement/AMDSThreadedBufferGroup.cpp \
 	source/DataElement/AMDSDwellStatusData.cpp \
 	source/DataElement/AMDSCommandManager.cpp \
 	source/DataHolder/AMDSDataHolder.cpp \
@@ -95,4 +94,9 @@ SOURCES *= \
 	source/DataHolder/AMDSSpectralDataHolder.cpp \
 	source/DataHolder/AMDSImageDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp \
-	source/util/AMDSRunTimeSupport.cpp
+	source/util/AMDSRunTimeSupport.cpp \
+    source/DataElement/AMDSThreadedBufferGroupManager.cpp
+
+
+
+

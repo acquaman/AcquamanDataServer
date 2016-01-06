@@ -12,7 +12,7 @@
 #include "DataElement/AMDSDwellStatusData.h"
 #include "DataElement/AMDSBufferGroup.h"
 #include "DataElement/AMDSBufferGroupInfo.h"
-#include "DataElement/AMDSThreadedBufferGroup.h"
+#include "DataElement/AMDSThreadedBufferGroupManager.h"
 #include "DataHolder/AMDSDataHolder.h"
 #include "util/AMDSRunTimeSupport.h"
 
@@ -33,7 +33,7 @@ AMDSCentralServer::AMDSCentralServer(QObject *parent) :
 
 AMDSCentralServer::~AMDSCentralServer()
 {
-	foreach (AMDSThreadedBufferGroup *bufferGroupManager, bufferGroupManagers_) {
+	foreach (AMDSThreadedBufferGroupManager *bufferGroupManager, bufferGroupManagers_) {
 		bufferGroupManager->deleteLater();
 	}
 	bufferGroupManagers_.clear();
@@ -100,7 +100,7 @@ void AMDSCentralServer::onDataServerClientRequestReady(AMDSClientRequest *client
 
 void AMDSCentralServer::onDetectorServerStartDwelling(const QString &bufferName)
 {
-	AMDSThreadedBufferGroup* threadedBufferGroup = bufferGroupManagers_.value(bufferName);
+	AMDSThreadedBufferGroupManager* threadedBufferGroup = bufferGroupManagers_.value(bufferName);
 	if (threadedBufferGroup) {
 		threadedBufferGroup->clearBufferGroup();
 	}
@@ -111,7 +111,7 @@ void AMDSCentralServer::processIntrospectionClientRequest(AMDSClientRequest *cli
 	AMDSClientIntrospectionRequest *clientIntrospectionRequest = qobject_cast<AMDSClientIntrospectionRequest*>(clientRequest);
 	if(clientIntrospectionRequest){
 		if(clientIntrospectionRequest->bufferName() == "All"){
-			QMap<QString, AMDSThreadedBufferGroup*>::const_iterator i = bufferGroupManagers_.constBegin();
+			QMap<QString, AMDSThreadedBufferGroupManager*>::const_iterator i = bufferGroupManagers_.constBegin();
 			while (i != bufferGroupManagers_.constEnd()) {
 				AMDSBufferGroupInfo oneInfo = i.value()->bufferGroupInfo();
 				AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::InformationMsg, this, AMDS_SERVER_INFO_BUFFER_DEF, QString("%1 definition is %2 %3 %4 %5 %6 %7").arg(i.key()).arg(oneInfo.name()).arg(oneInfo.description()).arg(oneInfo.units()).arg(oneInfo.size().toString()).arg(oneInfo.isFlattenEnabled()?"true":"false").arg(oneInfo.flattenMethod()));
@@ -162,7 +162,7 @@ void AMDSCentralServer::processClientDataRequest(AMDSClientRequest *clientReques
 			QStringList requestedBufferNames = continuousDataRequest->bufferNames();
 			foreach (QString bufferName, requestedBufferNames) {
 				AMDSClientDataRequest *continuousBufferDataRequest = continuousDataRequest->bufferDataRequest(bufferName);
-				AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroupManagers_.value(bufferName, 0);
+				AMDSThreadedBufferGroupManager *threadedBufferGroup = bufferGroupManagers_.value(bufferName, 0);
 				if (threadedBufferGroup) {
 					threadedBufferGroup->forwardClientRequest(continuousBufferDataRequest);
 				} else {
@@ -172,7 +172,7 @@ void AMDSCentralServer::processClientDataRequest(AMDSClientRequest *clientReques
 			}
 
 		} else {
-			AMDSThreadedBufferGroup *threadedBufferGroup = bufferGroupManagers_.value(clientDataRequest->bufferName(), 0);
+			AMDSThreadedBufferGroupManager *threadedBufferGroup = bufferGroupManagers_.value(clientDataRequest->bufferName(), 0);
 			if (threadedBufferGroup) {
 				threadedBufferGroup->forwardClientRequest(clientDataRequest);
 			} else {

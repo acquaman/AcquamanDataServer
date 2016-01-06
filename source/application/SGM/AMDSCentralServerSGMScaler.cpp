@@ -3,7 +3,7 @@
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
-#include "DataElement/AMDSThreadedBufferGroup.h"
+#include "DataElement/AMDSThreadedBufferGroupManager.h"
 #include "Detector/AMDSDetectorServer.h"
 #include "Detector/Scaler/AMDSScalerCommandManager.h"
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
@@ -50,7 +50,7 @@ void AMDSCentralServerSGMScaler::initializeBufferGroup()
 	scalerBufferGroupAxes << AMDSAxisInfo("Channel", scalerConfigurationMap_->enabledChannels().count(), "Channel Axis", "");
 	AMDSBufferGroupInfo scalerBufferGroupInfo(scalerConfigurationMap_->scalerName(), scalerConfigurationMap_->scalerName(), "Counts", scalerConfigurationMap_->dataType(), AMDSBufferGroupInfo::Summary, scalerBufferGroupAxes);
 
-	AMDSThreadedBufferGroup *scalerThreadedBufferGroup = new AMDSThreadedBufferGroup(scalerBufferGroupInfo, maxBufferSize_);
+	AMDSThreadedBufferGroupManager *scalerThreadedBufferGroup = new AMDSThreadedBufferGroupManager(scalerBufferGroupInfo, maxBufferSize_);
 	connect(scalerThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
 	connect(scalerThreadedBufferGroup->bufferGroup(), SIGNAL(internalRequestProcessed(AMDSClientRequest*)), this, SLOT(onInternalRequestProcessed(AMDSClientRequest*)));
@@ -115,7 +115,7 @@ void AMDSCentralServerSGMScaler::onServerChangedToDwellState(int index){
 #include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 void AMDSCentralServerSGMScaler::onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder)
 {
-	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
+	AMDSThreadedBufferGroupManager * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
 	if (bufferGroup) {
 		bufferGroup->append(scalerScanCountsDataHolder);
 

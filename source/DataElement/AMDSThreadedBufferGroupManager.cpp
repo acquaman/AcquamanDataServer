@@ -1,11 +1,11 @@
-#include "AMDSThreadedBufferGroup.h"
+#include "AMDSThreadedBufferGroupManager.h"
 
 #include "DataElement/AMDSBufferGroup.h"
 #include "DataHolder/AMDSSpectralDataHolder.h"
 #include "ClientRequest/AMDSClientDataRequest.h"
 #include "util/AMDSRunTimeSupport.h"
 
-AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, QObject *parent) :
+AMDSThreadedBufferGroupManager::AMDSThreadedBufferGroupManager(const AMDSBufferGroupInfo &bufferGroupInfo, quint64 maxCountSize, QObject *parent) :
 	QObject(parent)
 {
 	bufferGroupThread_= new QThread();
@@ -19,7 +19,7 @@ AMDSThreadedBufferGroup::AMDSThreadedBufferGroup(const AMDSBufferGroupInfo &buff
 	bufferGroupThread_->start();
 }
 
-AMDSThreadedBufferGroup::~AMDSThreadedBufferGroup()
+AMDSThreadedBufferGroupManager::~AMDSThreadedBufferGroupManager()
 {
 	if (bufferGroupThread_->isRunning())
 		bufferGroupThread_->quit();
@@ -27,29 +27,29 @@ AMDSThreadedBufferGroup::~AMDSThreadedBufferGroup()
 	bufferGroupThread_->deleteLater();
 }
 
-AMDSBufferGroupInfo AMDSThreadedBufferGroup::bufferGroupInfo() const{
+AMDSBufferGroupInfo AMDSThreadedBufferGroupManager::bufferGroupInfo() const{
 	QReadLocker readLock(&lock_);
 	return bufferGroup_->bufferGroupInfo();
 }
 
-QString AMDSThreadedBufferGroup::bufferGroupName() const
+QString AMDSThreadedBufferGroupManager::bufferGroupName() const
 {
 	return bufferGroupInfo().name();
 }
 
-void AMDSThreadedBufferGroup::append(const AMDSDataHolderList &dataHolderList)
+void AMDSThreadedBufferGroupManager::append(const AMDSDataHolderList &dataHolderList)
 {
 	QWriteLocker writeLock(&lock_);
 	bufferGroup_->append(dataHolderList);
 }
 
-void AMDSThreadedBufferGroup::append(AMDSDataHolder *value)
+void AMDSThreadedBufferGroupManager::append(AMDSDataHolder *value)
 {
 	QWriteLocker writeLock(&lock_);
 	bufferGroup_->append(value);
 }
 
-void AMDSThreadedBufferGroup::clearBufferGroup() {
+void AMDSThreadedBufferGroupManager::clearBufferGroup() {
 	QWriteLocker writeLock(&lock_);
 
 	if (bufferGroup_)
@@ -57,11 +57,11 @@ void AMDSThreadedBufferGroup::clearBufferGroup() {
 
 }
 
-void AMDSThreadedBufferGroup::onBufferGroupThreadStarted(){
+void AMDSThreadedBufferGroupManager::onBufferGroupThreadStarted(){
 	emit bufferGroupReady();
 }
 
-void AMDSThreadedBufferGroup::forwardClientRequest(AMDSClientRequest *clientRequest)
+void AMDSThreadedBufferGroupManager::forwardClientRequest(AMDSClientRequest *clientRequest)
 {
 	bufferGroup_->processClientRequest(clientRequest);
 }

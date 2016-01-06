@@ -7,7 +7,7 @@
 #include "ClientRequest/AMDSClientDataRequest.h"
 #include "ClientRequest/AMDSClientContinuousDataRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
-#include "DataElement/AMDSThreadedBufferGroup.h"
+#include "DataElement/AMDSThreadedBufferGroupManager.h"
 
 #include "Detector/AMDSDetectorServer.h"
 #include "Detector/PVController/AMDSPVCommandManager.h"
@@ -41,7 +41,7 @@ AMDSCentralServerSGMPV::~AMDSCentralServerSGMPV()
 
 void AMDSCentralServerSGMPV::onNewPVDataReceived(const QString &bufferName, AMDSDataHolder *newData)
 {
-	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(bufferName);
+	AMDSThreadedBufferGroupManager * bufferGroup = bufferGroupManagers_.value(bufferName);
 	if (bufferGroup) {
 		bufferGroup->append(newData);
 	} else {
@@ -98,7 +98,7 @@ void AMDSCentralServerSGMPV::initializeBufferGroup()
 		pvBufferGroupAxes << AMDSAxisInfo(pvConfiguration->pvName(), 1, pvConfiguration->pvDescription(), pvConfiguration->pvUnits());
 		AMDSBufferGroupInfo pvBufferGroupInfo(pvConfiguration->pvName(), pvConfiguration->pvDescription(), pvConfiguration->pvUnits(), pvConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, pvBufferGroupAxes);
 
-		AMDSThreadedBufferGroup *pvThreadedBufferGroup = new AMDSThreadedBufferGroup(pvBufferGroupInfo, maxBufferSize_);
+		AMDSThreadedBufferGroupManager *pvThreadedBufferGroup = new AMDSThreadedBufferGroupManager(pvBufferGroupInfo, maxBufferSize_);
 		connect(pvThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
 		bufferGroupManagers_.insert(pvThreadedBufferGroup->bufferGroupName(), pvThreadedBufferGroup);

@@ -80,6 +80,7 @@ protected:
 
 protected:
 	mutable QReadWriteLock lock_;
+
 	/// the buffergroup information about this buffer group
 	AMDSBufferGroupInfo bufferGroupInfo_;
 

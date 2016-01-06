@@ -4,7 +4,7 @@
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
 #include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
-#include "DataElement/AMDSThreadedBufferGroup.h"
+#include "DataElement/AMDSThreadedBufferGroupManager.h"
 #include "DataHolder/AMDSSpectralDataHolder.h"
 #include "Detector/AMDSDetectorServer.h"
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
@@ -67,7 +67,7 @@ void AMDSCentralServerSGMAmptek::initializeBufferGroup()
 
 		AMDSBufferGroupInfo amptekBufferGroupInfo(amptekConfiguration->detectorName(), amptekConfiguration->localAddress().toString(), "Counts", amptekConfiguration->dataType(), AMDSBufferGroupInfo::Summary, amptekBufferGroupAxes);
 
-		AMDSThreadedBufferGroup *amptekBufferGroupManager = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_);
+		AMDSThreadedBufferGroupManager *amptekBufferGroupManager = new AMDSThreadedBufferGroupManager(amptekBufferGroupInfo, maxBufferSize_);
 		connect(amptekBufferGroupManager->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 		connect(amptekBufferGroupManager->bufferGroup(), SIGNAL(internalRequestProcessed(AMDSClientRequest*)), this, SLOT(onInternalRequestProcessed(AMDSClientRequest*)));
 
@@ -126,7 +126,7 @@ void AMDSCentralServerSGMAmptek::onServerChangedToDwellState(int index){
 
 void AMDSCentralServerSGMAmptek::onClearHistrogramData(const QString &detectorName)
 {
-	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
+	AMDSThreadedBufferGroupManager * bufferGroupManager = bufferGroupManagers_.value(detectorName);
 	if (bufferGroupManager) {
 		bufferGroupManager->clearBufferGroup();
 	} else {
@@ -136,7 +136,7 @@ void AMDSCentralServerSGMAmptek::onClearHistrogramData(const QString &detectorNa
 
 void AMDSCentralServerSGMAmptek::onNewHistrogramReceived(const QString &detectorName, AMDSDataHolder *dataHolder)
 {
-	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
+	AMDSThreadedBufferGroupManager * bufferGroupManager = bufferGroupManagers_.value(detectorName);
 	if (bufferGroupManager) {
 		bufferGroupManager->append(dataHolder);
 

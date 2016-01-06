@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
 	QString interfaceType = "";
 	quint16 port = 28044;
-	QStrinf cfgFileName = "";
+	QString cfgFileName = "";
 
 	bool startServer = AMDSMain_Common::parseArgument("AcquamanDataServerSGMAmptek", args, &interfaceType, &port, &cfgFileName);
 	if (startServer) {
