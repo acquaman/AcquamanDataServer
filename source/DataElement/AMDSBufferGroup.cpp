@@ -14,12 +14,15 @@ AMDSBufferGroup::AMDSBufferGroup(AMDSBufferGroupInfo bufferGroupInfo, quint64 ma
 	QObject(parent), dataHolders_(maxSize)
 {
 	bufferGroupInfo_ = bufferGroupInfo;
+
+	setEnabled(True);
 }
 
 AMDSBufferGroup::AMDSBufferGroup(const AMDSBufferGroup& other):
 	QObject(other.parent()), dataHolders_(other.dataHolders_.maxSize())
 {
 	bufferGroupInfo_ = other.bufferGroupInfo();
+	setEnabled(other.isEnabled());
 }
 
 AMDSBufferGroup::~AMDSBufferGroup()
@@ -45,6 +48,9 @@ void AMDSBufferGroup::clear()
 
 void AMDSBufferGroup::append(const AMDSDataHolderList &dataHolderList)
 {
+	if (!isEnabled())
+		return;
+
 	//!!! IMPORTANT: don't put the write lock here ... ...
 	foreach (AMDSDataHolder *dataHolder, dataHolderList) {
 		append(dataHolder);
@@ -53,6 +59,9 @@ void AMDSBufferGroup::append(const AMDSDataHolderList &dataHolderList)
 
 void AMDSBufferGroup::append(AMDSDataHolder *newData)
 {
+	if (!isEnabled())
+		return;
+
 	QWriteLocker writeLock(&lock_);
 
 	AMDSDataHolder* dataHolderRemoved = dataHolders_.append(newData);
@@ -63,6 +72,9 @@ void AMDSBufferGroup::append(AMDSDataHolder *newData)
 
 void AMDSBufferGroup::processClientRequest(AMDSClientRequest *clientRequest, bool internalRequest){
 	QReadLocker readLock(&lock_);
+
+	if (clientRequest->isDataClientRequest() && !isEnabled())
+		return;
 
 	AMDSClientDataRequest *clientDataRequest = qobject_cast<AMDSClientDataRequest *>(clientRequest);
 	if (clientDataRequest)

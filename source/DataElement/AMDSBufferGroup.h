@@ -41,6 +41,10 @@ public:
 	/// of the passed AMDSDataHolder, becoming responsible for its destruction
 	void append(AMDSDataHolder* value);
 
+	/// Returns whether the bufferGroup is enabled or not
+	inline bool isEnabled() { return enabled_; }
+	/// enable/disable the bufferGroup
+	inline void setEnabled(bool enabled) { enabled_ = enabled; }
 	/// Returns the data dimension and other information included in the bufferGroupInfo
 	inline AMDSBufferGroupInfo bufferGroupInfo() const { return bufferGroupInfo_; }
 
@@ -81,6 +85,8 @@ protected:
 protected:
 	mutable QReadWriteLock lock_;
 
+	/// the flag to enable/disable bufferGroup update
+	bool enabled_;
 	/// the buffergroup information about this buffer group
 	AMDSBufferGroupInfo bufferGroupInfo_;
 

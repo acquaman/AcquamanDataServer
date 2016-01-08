@@ -59,7 +59,7 @@ HEADERS *= \
 	source/Detector/AMDSDwellDetector.h \
 	source/util/AMDSMetaObjectSupport.h \
 	source/util/AMDSRunTimeSupport.h \
-    source/DataElement/AMDSThreadedBufferGroupManager.h
+	source/DataElement/AMDSThreadedBufferGroupManager.h
 
 SOURCES *= \
 	source/appController/AMDSAppController.cpp \
@@ -95,8 +95,4 @@ SOURCES *= \
 	source/DataHolder/AMDSImageDataHolder.cpp \
 	source/util/AMDSMetaObjectSupport.cpp \
 	source/util/AMDSRunTimeSupport.cpp \
-    source/DataElement/AMDSThreadedBufferGroupManager.cpp
-
-
-
-
+	source/DataElement/AMDSThreadedBufferGroupManager.cpp

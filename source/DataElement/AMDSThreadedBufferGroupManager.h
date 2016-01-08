@@ -25,6 +25,10 @@ public:
 	/// appends a data to the bufferGroup
 	void append(AMDSDataHolder *value);
 
+	/// whether bufferGroup is enabled or not
+	inline void isBufferGroupEnabled() { return bufferGroup_->isEnabled(); }
+	/// enable bufferGroup update
+	inline void enableBufferGroup(bool enable) { bufferGroup_->setEnabled(enable); }
 	/// returns the buffergroup
 	inline AMDSBufferGroup *bufferGroup() { return bufferGroup_; }
 
