@@ -14,10 +14,14 @@ namespace AMDSMain_Common {
 	/*
 	 * Print the usage of the application
 	 */
-	void printUsage(const QString &appName)
+	void printUsage(const QString &appName, const QString &errMsg="")
 	{
+		if (errMsg != "") {
+			qDebug() << "\nERROR: " << errMsg << "\n";
+		}
+
 		qDebug() << "\nUsages:\n"
-				 << QString("	%1 --intf=[interface name] [--port=[portnumber]]\n").arg(appName)
+				 << QString("	%1 --intf=[interface name] [--port=[portnumber]] [--cfg=[cfgFileName]]\n").arg(appName)
 				 << QString("	%1 --help\n").arg(appName)
 				 << "\n";
 	}
@@ -25,20 +29,24 @@ namespace AMDSMain_Common {
 	/*
 	 * parse the argument, return TRUE if parsed the arugments successfully
 	 */
-	bool parseArgument(const QString &appName, QStringList args, QString *interfaceType, quint16 *port) {
-		QRegExp argInterfaceType("--intf=([a-z0-9]{1,})");
-		QRegExp argPortType("--port=([0-9]{1,})");
+	bool parseArgument(const QString &appName, QStringList args, QString *interfaceType, quint16 *port, QString *cfgFileName) {
+		QRegExp argInterfaceType("--intf=([a-zA-Z0-9]{1,})");
+		QRegExp argPortNumber("--port=([0-9]{1,})");
+		QRegExp argCfgFileName("--cfg=([[a-zA-Z0-9._/]{1,})");
 		QRegExp argHelp("--help");
 
 		*port = 28040;
+		*cfgFileName = "";
 
 		bool startServer = true;
 		for (int i = 1; i < args.size(); ++i) {
 			if (argInterfaceType.indexIn(args.at(i)) != -1) {
 				*interfaceType = argInterfaceType.cap(1);
-			} else if (argPortType.indexIn(args.at(i)) != -1) {
-				QString value = argPortType.cap(1);
+			} else if (argPortNumber.indexIn(args.at(i)) != -1) {
+				QString value = argPortNumber.cap(1);
 				*port = value.toUInt();
+			} else if (argCfgFileName.indexIn(args.at(i)) != -1) {
+				*cfgFileName = argCfgFileName.cap(1);
 			} else if (argHelp.indexIn(args.at(i)) != -1) {
 				startServer = false;
 			}
@@ -48,8 +56,7 @@ namespace AMDSMain_Common {
 			startServer = false;
 
 		if (!startServer)  {
-			qDebug() << "\nERROR: Missing or invalid interface argument. \n";
-			printUsage(appName);
+			printUsage(appName, "Missing or invalid interface argument.");
 		}
 
 		return startServer;

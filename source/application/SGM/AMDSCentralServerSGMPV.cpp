@@ -17,12 +17,12 @@
 
 #include "util/AMDSRunTimeSupport.h"
 
-AMDSCentralServerSGMPV::AMDSCentralServerSGMPV(QObject *parent) :
+AMDSCentralServerSGMPV::AMDSCentralServerSGMPV(const QString &configurationFile, QObject *parent) :
 	AMDSCentralServer(parent)
 {
 	maxBufferSize_ = 20 * 60 * 1000; // 20 minuntes
 
-	initializeConfiguration();
+	initializeConfiguration(configurationFile);
 }
 
 AMDSCentralServerSGMPV::~AMDSCentralServerSGMPV()
@@ -49,14 +49,14 @@ void AMDSCentralServerSGMPV::onNewPVDataReceived(const QString &bufferName, AMDS
 	}
 }
 
-void AMDSCentralServerSGMPV::initializeConfiguration()
+void AMDSCentralServerSGMPV::initializeConfiguration(const QString &configurationFileName)
 {
 	// initialize the configurations of the PVs
 	QRegExp rx("(\\,|\\t)"); //RegEx for ',' or '\t'
 	int totalParameters = 6;
 //	int dataTypeParamIndex = totalParameters - 1;
 
-	QFile configurationFile("../db/AMDSPVConfiguration.txt");
+	QFile configurationFile(configurationFileName);
 
 	if (configurationFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		QTextStream dataStream(&configurationFile);
@@ -85,6 +85,8 @@ void AMDSCentralServerSGMPV::initializeConfiguration()
 		}
 
 		configurationFile.close();
+	} else {
+		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::ErrorMsg, this, 0, QString("AMDS PV: Failed to opent he configuration file (%1).").arg(configurationFileName));
 	}
 }
 
@@ -96,7 +98,7 @@ void AMDSCentralServerSGMPV::initializeBufferGroup()
 		pvBufferGroupAxes << AMDSAxisInfo(pvConfiguration->pvName(), 1, pvConfiguration->pvDescription(), pvConfiguration->pvUnits());
 		AMDSBufferGroupInfo pvBufferGroupInfo(pvConfiguration->pvName(), pvConfiguration->pvDescription(), pvConfiguration->pvUnits(), pvConfiguration->dataType(), AMDSBufferGroupInfo::NoFlatten, pvBufferGroupAxes);
 
-		AMDSThreadedBufferGroup *pvThreadedBufferGroup = new AMDSThreadedBufferGroup(pvBufferGroupInfo, maxBufferSize_, false);
+		AMDSThreadedBufferGroup *pvThreadedBufferGroup = new AMDSThreadedBufferGroup(pvBufferGroupInfo, maxBufferSize_);
 		connect(pvThreadedBufferGroup->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
 
 		bufferGroupManagers_.insert(pvThreadedBufferGroup->bufferGroupName(), pvThreadedBufferGroup);
