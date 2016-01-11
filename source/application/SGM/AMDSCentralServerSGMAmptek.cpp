@@ -3,7 +3,10 @@
 #include "Connection/AMDSThreadedTCPDataServer.h"
 #include "ClientRequest/AMDSClientRequest.h"
 #include "ClientRequest/AMDSClientConfigurationRequest.h"
+#include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
 #include "DataElement/AMDSThreadedBufferGroup.h"
+#include "DataHolder/AMDSSpectralDataHolder.h"
+#include "Detector/AMDSDetectorServer.h"
 #include "Detector/Amptek/AmptekSDD123ConfigurationMap.h"
 #include "Detector/Amptek/AmptekSDD123DetectorManager.h"
 #include "Detector/Amptek/AmptekSDD123ServerGroup.h"
@@ -12,12 +15,11 @@
 #include "Detector/Scaler/AMDSScalerConfigurationMap.h"
 #include "Detector/Scaler/AMDSScalerDetector.h"
 #include "Detector/Scaler/AMDSScalerDetectorServer.h"
-#include "Detector/AMDSDetectorServer.h"
-
 #include "util/AMDSRunTimeSupport.h"
 
 #include "Detector/Amptek/SGM/AmptekCommandManagerSGM.h"
 #include "Detector/Amptek/SGM/AmptekSDD123DetectorGroupSGM.h"
+
 
 AMDSCentralServerSGMAmptek::AMDSCentralServerSGMAmptek(QObject *parent) :
 	AMDSCentralServer(parent)
@@ -67,6 +69,7 @@ void AMDSCentralServerSGMAmptek::initializeBufferGroup()
 
 		AMDSThreadedBufferGroup *amptekBufferGroupManager = new AMDSThreadedBufferGroup(amptekBufferGroupInfo, maxBufferSize_);
 		connect(amptekBufferGroupManager->bufferGroup(), SIGNAL(clientRequestProcessed(AMDSClientRequest*)), tcpDataServer_->server(), SLOT(onClientRequestProcessed(AMDSClientRequest*)));
+		connect(amptekBufferGroupManager->bufferGroup(), SIGNAL(internalRequestProcessed(AMDSClientRequest*)), this, SLOT(onInternalRequestProcessed(AMDSClientRequest*)));
 
 		bufferGroupManagers_.insert(amptekBufferGroupManager->bufferGroupName(), amptekBufferGroupManager);
 	}
@@ -79,9 +82,7 @@ void AMDSCentralServerSGMAmptek::initializeDetectorManager()
 	foreach (AmptekSDD123DetectorManager * detectorManager, amptekDetectorGroup_->detectorManagers()) {
 		connect(detectorManager, SIGNAL(clearHistrogramData(QString)), this, SLOT(onClearHistrogramData(QString)));
 		connect(detectorManager, SIGNAL(newHistrogramReceived(QString, AMDSDataHolder*)), this, SLOT(onNewHistrogramReceived(QString, AMDSDataHolder*)));
-
-		connect(detectorManager, SIGNAL(dwellStarted(QString)), this, SLOT(onDwellStarted(QString)));
-		connect(detectorManager, SIGNAL(dwellStopped(QString)), this, SLOT(onDwellStopped(QString)));
+		connect(detectorManager, SIGNAL(requestFlattenedSpectrumData(QString,double)), this, SLOT(onAmptekDetectorRequestFlattenedData(QString,double)));
 	}
 }
 
@@ -102,15 +103,11 @@ void AMDSCentralServerSGMAmptek::wrappingUpInitialization()
 	for(int x = 0, size = amptekDetectorManagerList.count(); x < size; x++){
 		AmptekSDD123DetectorManager *amptekDetectorManager = amptekDetectorManagerList.at(x);
 		AmptekSDD123Server *amptekServer = amptekThreadedDataServerGroup_->serverAt(x);
-		AMDSThreadedBufferGroup *bufferGroupManager = bufferGroupManagers_.value(amptekDetectorManager->detectorName());
 
 		amptekServer->setSpectrumPacketReceiver((QObject *)amptekDetectorManager->detector());
 		amptekServer->setConfirmationPacketReceiver(amptekDetectorManager);
 
 		amptekDetectorManager->setRequestEventReceiver(amptekServer);
-
-		connect(bufferGroupManager->bufferGroup(), SIGNAL(continuousDwellDataUpdate(AMDSDataHolder*,int,double)), amptekDetectorManager, SLOT(onContinuousDwellDataUpdate(AMDSDataHolder*,int,double)));
-		connect(bufferGroupManager->bufferGroup(), SIGNAL(finalDwellDataUpdate(AMDSDataHolder *,int,double)), amptekDetectorManager, SLOT(onFinalDwellDataUpdate(AMDSDataHolder *,int,double)));
 	}
 }
 
@@ -142,27 +139,38 @@ void AMDSCentralServerSGMAmptek::onNewHistrogramReceived(const QString &detector
 	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
 	if (bufferGroupManager) {
 		bufferGroupManager->append(dataHolder);
+
+		if(dwellSecondsRequestedForDetector_.contains(detectorName)){
+			double dwellSecondsRequested = dwellSecondsRequestedForDetector_.value(detectorName);
+			dwellSecondsRequestedForDetector_.remove(detectorName);
+
+			QDateTime endTime = QDateTime::currentDateTimeUtc();
+			quint64 asMsecs = quint64(dwellSecondsRequested*1000);
+			QDateTime startTime = endTime.addMSecs(-asMsecs);
+			AMDSClientStartTimeToEndTimeDataRequest *localRequest = new AMDSClientStartTimeToEndTimeDataRequest(AMDSClientRequest::Binary, endTime, "", bufferGroupManager->bufferGroupName(), false, true, startTime, endTime, bufferGroupManager->bufferGroupInfo(), this);
+			bufferGroupManager->bufferGroup()->processClientRequest(localRequest, true);
+		}
+
 	} else {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
 	}
 }
 
-void AMDSCentralServerSGMAmptek::onDwellStarted(const QString &detectorName)
+void AMDSCentralServerSGMAmptek::onAmptekDetectorRequestFlattenedData(const QString &detectorName, double seconds)
 {
-	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
-	if (bufferGroupManager) {
-		bufferGroupManager->bufferGroup()->onDwellStarted();
-	} else {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
-	}
+	dwellSecondsRequestedForDetector_.insert(detectorName, seconds);
 }
 
-void AMDSCentralServerSGMAmptek::onDwellStopped(const QString &detectorName)
+void AMDSCentralServerSGMAmptek::onInternalRequestProcessed(AMDSClientRequest *clientRequest)
 {
-	AMDSThreadedBufferGroup * bufferGroupManager = bufferGroupManagers_.value(detectorName);
-	if (bufferGroupManager) {
-		bufferGroupManager->bufferGroup()->onDwellStopped();
-	} else {
-		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_SERVER_ALT_INVALID_BUFFERGROUP_NAME, QString("Failed to find bufferGroup for %1").arg(detectorName));
-	}
+		AMDSClientStartTimeToEndTimeDataRequest *returnedRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
+		if(returnedRequest && returnedRequest->data().count() > 0){
+			AMDSDwellSpectralDataHolder *spectralDataHolder = qobject_cast<AMDSDwellSpectralDataHolder*>(returnedRequest->data().at(0));
+			if(spectralDataHolder){
+				if(amptekDetectorGroup_->detectorManager(returnedRequest->bufferName()))
+					amptekDetectorGroup_->detectorManager(returnedRequest->bufferName())->setFlattenedSpectrumData(spectralDataHolder);
+			}
+		}
+
+		clientRequest->deleteLater();
 }

@@ -5,6 +5,8 @@
 
 #include "Detector/Amptek/AmptekSDD123Detector.h"
 
+class QTimer;
+
 class AMDSDataHolder;
 class AmptekSDD123Detector;
 class AmptekSDD123ConfigurationMap;
@@ -59,25 +61,16 @@ signals:
 	/// signal to indicate new histrogram data
 	void newHistrogramReceived(const QString &detectorName, AMDSDataHolder *);
 
-	/// signal to start dwell
-	void dwellStarted(const QString &detectorName);
-	/// signal to stop dwell
-	void dwellStopped(const QString &detectorName);
-
 	/// signal to indicate that configuration value is updated
 	void configurationValuesUpdate(const AmptekConfigurationData &configurationData);
+
+	/// Signal to request flattened data from the central server
+	void requestFlattenedSpectrumData(const QString &detectorName, double seconds);
 
 public slots:
 	/// function to set the event receiver to handle the request
 	void setRequestEventReceiver(QObject *requestEventReceiver);
 
-	/// function to start dwell
-	void startDwell();
-	/// function to stop dwell
-	void stopDwell();
-
-	/// function to active dwell
-	void setDwellActive(bool dwellActive);
 	/// function to set Dwell Time
 	void setDwellTime(int dwellTime);
 	/// function to set dwell mode
@@ -113,13 +106,16 @@ public slots:
 	/// slot to request set detector fast pearking time
 	void setDetectorFastPeakingTime(AmptekSDD123DetectorManager::FastPeakingTimeValue fastPeakingTimeValue);
 
+	/// Called to set the flattened data once the request has been processed
+	virtual void setFlattenedSpectrumData(AMDSDataHolder *dataHolder) = 0;
+
 protected slots:
-	/// slot to handle continuous data update
-	virtual void onContinuousDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
-	/// slot to handle dwell data update
-	virtual void onFinalDwellDataUpdate(AMDSDataHolder *dwellSpectrum, int count, double elapsedTime) = 0;
+	/// Called to actually request the flattened data from the server by emitting the signal
+	void onTriggerDwellTimerTimeout();
 
 protected:
+	/// Called to actually request the flattened data from the server by emitting the signal
+	bool startTriggerDwellTimer();
 	/// helper function to handle the incoming SpectrumEvent
 	void onSpectrumEventReceived(AmptekSpectrumEvent *spectrumEvent);
 	/// helper function to handle the incoming ConfigurationValuesEvent
@@ -149,19 +145,15 @@ protected:
 	/// the current dwell mode
 	AmptekSDD123DetectorManager::DwellMode dwellMode_;
 
-	/// flat to indicate whether we need to start to track dwelling
-	bool setDwellTimeOnNextEvent_;
-	/// flag to indicate whether dwell is actived or not
-	bool dwellActive_;
-	/// the expected time to end the preset dwell
-	QTime expectedDwellEndTime_;
-
 	/// the configuration data received via configuration value event
 	AmptekConfigurationData configurationData_;
 	/// the current reason of configuration
 	AmptekSDD123DetectorManager::ConfigurationModeReason configurationRequestReason_;
 	/// the current command of setting configuration
 	QString configurationSetCommand_;
+
+	/// Timer in control of emitting signal to request flattened data
+	QTimer *triggerDwellTimer_;
 };
 
 #endif // AMPTEKSDD123DETECTORMANAGER_H

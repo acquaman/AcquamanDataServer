@@ -13,8 +13,9 @@ int main(int argc, char *argv[])
 
 	QString interfaceType = "";
 	quint16 port = 28044;
+	QString cfgFileName = "";
 
-	bool startServer = AMDSMain_Common::parseArgument("AcquamanDataServerSGMScaler", args, &interfaceType, &port);
+	bool startServer = AMDSMain_Common::parseArgument("AcquamanDataServerSGMScaler", args, &interfaceType, &port, &cfgFileName);
 	if (startServer) {
 		AMDSMain_Common::initializeAppSettings(interfaceType, port);
 		AMDSMain_Common::initializeRegisteredClasses();
