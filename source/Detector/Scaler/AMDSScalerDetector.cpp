@@ -49,7 +49,9 @@ AMDSScalerDetector::AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfigu
 	defaultTotalNumberOfScans_ = 0;
 	totalNumberOfScans_ = 0;
 
-	triggerDwellTimer_ = new QTimer();
+	channelValueChangedSignalMapper_ = new QSignalMapper(this);
+
+	triggerDwellTimer_ = new QTimer(this);
 	connect(triggerDwellTimer_, SIGNAL(timeout()), this, SLOT(onTriggerDwellTimerTimeout()));
 
 	initializePVControls();
@@ -59,6 +61,10 @@ AMDSScalerDetector::~AMDSScalerDetector()
 {
 	configuredChannelControlSet_.clear();
 	pvControlSet_->clear();
+
+	if (triggerDwellTimer_->isActive()) {
+		triggerDwellTimer_->stop();
+	}
 }
 
 void AMDSScalerDetector::onServerGoingToStartDwelling()
@@ -83,9 +89,6 @@ void AMDSScalerDetector::onDisableChannel(int channelId)
 
 void AMDSScalerDetector::setFlattenedData(const QVector<double> &data)
 {
-	if(triggerDwellInterfaceStartControl_->withinTolerance(0.0))
-		triggerDwellInterfaceDwellStateControl_->move(0);
-
 	QMap<quint8, int> channelToIndexMap;
 	for(int x = 0, size = scalerConfiguration_->configuredChannels().count(); x < size; x++)
 		channelToIndexMap.insert(scalerConfiguration_->configuredChannels().at(x), x);
@@ -126,6 +129,7 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 		triggerDwellInterfaceStartControl_->move(0.0);
 		triggerDwellInterfaceDwellStateControl_->move(0.0);
 		triggerDwellInterfaceDwellModeControl_->move(0.0);
+
 
 		QMap<int, AMSinglePVControl*>::const_iterator i = triggerDwellInterfaceChannelEnableControls_.constBegin();
 		while(i != triggerDwellInterfaceChannelEnableControls_.constEnd()){
@@ -229,25 +233,25 @@ void AMDSScalerDetector::onFetchScanBuffer()
 	}
 }
 
+void AMDSScalerDetector::onTriggerDwellInterfaceDwellModeControlValueChanged(double value)
+{
+	Q_UNUSED(value)
+
+	if(triggerDwellInterfaceDwellModeControl_->withinTolerance(1.0) && triggerDwellInterfaceStartControl_->withinTolerance(1.0)) {
+		stopScalerDwellAcquisition(true);
+	}
+}
+
 void AMDSScalerDetector::onTriggerDwellInterfaceStartControlValueChanged(double value)
 {
 	Q_UNUSED(value)
 
 	if(connected_){
-
 		if(triggerDwellInterfaceStartControl_->withinTolerance(1.0)){
-			double seconds = triggerDwellInterfaceDwellTimeControl_->value();
-			if(seconds > 0 && seconds < 100){
-				int asMsecs = (int)(seconds*1000);
-				triggerDwellTimer_->setInterval(asMsecs);
-				triggerDwellInterfaceDwellStateControl_->move(1.0);
-				triggerDwellTimer_->start();
-			}
+			startScalerDwellAcquisition();
 		}
 		else if(triggerDwellInterfaceStartControl_->withinTolerance(0.0) && triggerDwellInterfaceDwellModeControl_->withinTolerance(1.0) && triggerDwellTimer_->isActive()){
-			triggerDwellTimer_->stop();
-			triggerDwellInterfaceStartControl_->move(0);
-			triggerDwellInterfaceDwellStateControl_->move(0);
+			stopScalerDwellAcquisition(true);
 		}
 	}
 }
@@ -265,9 +269,77 @@ void AMDSScalerDetector::onTriggerDwellTimerTimeout()
 {
 	if(triggerDwellInterfaceDwellModeControl_->withinTolerance(0.0)){
 		triggerDwellTimer_->stop();
-		triggerDwellInterfaceStartControl_->move(0);
 	}
 	emit requestFlattenedData(triggerDwellInterfaceDwellTimeControl_->value());
+}
+
+void AMDSScalerDetector::startScalerDwellAcquisition()
+{
+	double seconds = triggerDwellInterfaceDwellTimeControl_->value();
+	if(seconds > 0 && seconds < 100) {
+		if (triggerDwellInterfaceDwellModeControl_->withinTolerance(0.0)) {
+			// set the mapping of value changed. NOTE: This should be in a more graceful way
+			waitingChannels_.clear();
+
+			QMap<quint8, int> channelToIndexMap;
+			for(int x = 0, size = scalerConfiguration_->configuredChannels().count(); x < size; x++)
+				channelToIndexMap.insert(scalerConfiguration_->configuredChannels().at(x), x);
+
+
+			for(int x = 0, size = triggerDwellInterfaceChannelFeedbackControls_.count(); x < size; x++){
+				QString controlPVName = triggerDwellInterfaceChannelFeedbackControls_.value(x)->readPVName();
+
+				QMap<quint8, int>::const_iterator i = channelToIndexMap.constBegin();
+				while(i != channelToIndexMap.constEnd()){
+					QString channelIdTemplate = i.key() < 10 ? QString("0%1").arg(i.key()) : QString("%1").arg(i.key()); // when channel id is 0 ~ 9, the PV is "0" + channelId
+					if(controlPVName.remove("BL1611-ID-1:AMDS:scaler").contains(channelIdTemplate)) {
+						waitingChannels_.append(x);
+						channelValueChangedSignalMapper_->setMapping(triggerDwellInterfaceChannelFeedbackControls_.value(x), x);
+					}
+
+					i++;
+				}
+			}
+			connect(channelValueChangedSignalMapper_, SIGNAL(mapped(int)), this, SLOT(onScalerChannelValueChanged(int)));
+		}
+
+		// start the time
+		int asMsecs = (int)(seconds*1000);
+		triggerDwellTimer_->setInterval(asMsecs);
+		triggerDwellInterfaceDwellStateControl_->move(1.0);
+		triggerDwellTimer_->start();
+	}
+}
+
+void AMDSScalerDetector::stopScalerDwellAcquisition(bool forceStop)
+{
+	if (forceStop) {
+		if (triggerDwellTimer_->isActive())
+			triggerDwellTimer_->stop();
+
+		foreach(int channelIndex, waitingChannels_) {
+			waitingChannels_.removeAll(channelIndex);
+			channelValueChangedSignalMapper_->removeMappings(triggerDwellInterfaceChannelFeedbackControls_.value(channelIndex));
+		}
+	}
+
+	if(waitingChannels_.count() == 0) {
+		disconnect(channelValueChangedSignalMapper_, SIGNAL(mapped(int)), this, SLOT(onScalerChannelValueChanged(int)));
+
+		triggerDwellInterfaceStartControl_->move(0);
+		triggerDwellInterfaceDwellStateControl_->move(0);
+	}
+}
+
+void AMDSScalerDetector::onScalerChannelValueChanged(int channelIndex)
+{
+	if(waitingChannels_.contains(channelIndex)){
+
+		waitingChannels_.removeAll(channelIndex);
+		channelValueChangedSignalMapper_->removeMappings(triggerDwellInterfaceChannelFeedbackControls_.value(channelIndex));
+	}
+
+	stopScalerDwellAcquisition();
 }
 
 void AMDSScalerDetector::initializePVControls()
@@ -320,6 +392,8 @@ void AMDSScalerDetector::initializePVControls()
 
 		pvControlSet_->addControl(channelFeedbackControl);
 		pvControlSet_->addControl(channelEnableControl);
+
+		connect(channelFeedbackControl, SIGNAL(valueChanged(double)), channelValueChangedSignalMapper_, SLOT(map()));
 	}
 
 	pvControlSet_->addControl(scanControl_);
@@ -337,6 +411,7 @@ void AMDSScalerDetector::initializePVControls()
 	connect(totalNumberOfScansControl_, SIGNAL(valueChanged(double)), this, SLOT(onTotalNumberOfScansControlValueChanged(double)));
 	connect(scanBufferControl_, SIGNAL(valueChanged(double)), this, SLOT(onFetchScanBuffer()));
 
+	connect(triggerDwellInterfaceDwellModeControl_, SIGNAL(valueChanged(double)), this, SLOT(onTriggerDwellInterfaceDwellModeControlValueChanged(double)));
 	connect(triggerDwellInterfaceStartControl_, SIGNAL(valueChanged(double)), this, SLOT(onTriggerDwellInterfaceStartControlValueChanged(double)));
 	connect(triggerDwellInterfaceDwellTimeControl_, SIGNAL(valueChanged(double)), this, SLOT(onTriggerDwellInterfaceDwellTimeControlValueChanged(double)));
 }

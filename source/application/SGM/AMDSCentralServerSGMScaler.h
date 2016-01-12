@@ -32,7 +32,7 @@ protected slots:
 
 
 	/// slot to handle new scaler data request to add the data to buffergroup
-	void onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder);
+	void onNewScalerScanDataReceived(const AMDSDataHolderList &scalerScanCountsDataHolder);
 
 	/// Called when the scaler requests flattened data. Sets the latches for internalRequestActive_ and dwellSecondsRequested
 	void onScalerDetectorRequestFlattenedData(double seconds);

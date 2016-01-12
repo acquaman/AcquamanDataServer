@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include <QThread>
+#include <QSignalMapper>
 
 #include "DataHolder/AMDSDataHolder.h"
 #include "Detector/AMDSDwellDetector.h"
@@ -106,12 +107,21 @@ protected slots:
 	void onFetchScanBuffer();
 
 	/// Listen to changes on the trigger/dwell start PV
+	void onTriggerDwellInterfaceDwellModeControlValueChanged(double value);
+	/// Listen to changes on the trigger/dwell start PV
 	void onTriggerDwellInterfaceStartControlValueChanged(double value);
 	/// Listen to changes on the trigger/dwell dwell time PV
 	void onTriggerDwellInterfaceDwellTimeControlValueChanged(double value);
 
 	/// Called to actually request the flattened data from the server by emitting the signal
 	void onTriggerDwellTimerTimeout();
+
+	/// slot to start scaler dwell acquisition
+	void startScalerDwellAcquisition();
+	/// slot to stop scaler dwell acquisition
+	void stopScalerDwellAcquisition(bool forceStop=false);
+	/// slot to handle the value changed signal from the scaler channel
+	void onScalerChannelValueChanged(int channelIndex);
 
 protected:
 	/// helper function to initialize the PV controls of the scaler
@@ -156,8 +166,7 @@ protected:
 	/// The enable controls for the channels of the new trigger/dwell interface
 	QMap<int, AMSinglePVControl*> triggerDwellInterfaceChannelEnableControls_;
 
-
-	/// the dwell time to read the scaler buffer (in ms, default 1ms)
+        /// the dwell time to read the scaler buffer (in ms, default 1ms)
 	int defaultDwellTime_;
 	int dwellTime_;
 	/// the number of scans in a single buffer (default 1000)
@@ -167,6 +176,10 @@ protected:
 	int defaultTotalNumberOfScans_;
 	int totalNumberOfScans_;
 
+	/// The list of channels we are still waiting to get their monitor before emitting that the scaler acquisition has finished.
+	QList<int> waitingChannels_;
+	/// Holds the mapping of the value changed signal of enabled channels during an acquisition.
+	QSignalMapper *channelValueChangedSignalMapper_;
 	/// Timer in control of emitting signal to request flattened data
 	QTimer *triggerDwellTimer_;
 };

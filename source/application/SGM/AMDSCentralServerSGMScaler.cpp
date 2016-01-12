@@ -62,7 +62,7 @@ void AMDSCentralServerSGMScaler::initializeDetectorManager()
 {
 	// initialize the detector manager for SGM scaler
 	scalerDetectorManager_ = new AMDSScalerDetectorManager(scalerConfigurationMap_);
-	connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(AMDSDataHolderList)), this, SLOT(onNewScalerScanDataReceivedd(AMDSDataHolderList)));
+        connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(AMDSDataHolderList)), this, SLOT(onNewScalerScanDataReceived(AMDSDataHolderList)));
 }
 
 void AMDSCentralServerSGMScaler::initializeAndStartDetectorServer()
@@ -113,7 +113,7 @@ void AMDSCentralServerSGMScaler::onServerChangedToDwellState(int index){
 }
 
 #include "ClientRequest/AMDSClientStartTimeToEndTimeDataRequest.h"
-void AMDSCentralServerSGMScaler::onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder)
+void AMDSCentralServerSGMScaler::onNewScalerScanDataReceived(const AMDSDataHolderList &scalerScanCountsDataHolder)
 {
 	AMDSThreadedBufferGroup * bufferGroup = bufferGroupManagers_.value(scalerConfigurationMap_->scalerName());
 	if (bufferGroup) {
@@ -142,7 +142,6 @@ void AMDSCentralServerSGMScaler::onScalerDetectorRequestFlattenedData(double sec
 #include "DataHolder/AMDSScalarDataHolder.h"
 void AMDSCentralServerSGMScaler::onInternalRequestProcessed(AMDSClientRequest *clientRequest)
 {
-//	qDebug() << "Internal request was just processed " << clientRequest->metaObject()->className();
 	AMDSClientStartTimeToEndTimeDataRequest *returnedRequest = qobject_cast<AMDSClientStartTimeToEndTimeDataRequest*>(clientRequest);
 	if(returnedRequest && returnedRequest->data().count() > 0){
 //		qDebug() << "It's the right type, what is the count " << returnedRequest->data().count();
