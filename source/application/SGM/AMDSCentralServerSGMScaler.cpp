@@ -25,7 +25,7 @@ AMDSCentralServerSGMScaler::AMDSCentralServerSGMScaler(QObject *parent) :
 AMDSCentralServerSGMScaler::~AMDSCentralServerSGMScaler()
 {
 	scalerConfigurationMap_->deleteLater();
-	scalerDetectorManager_->deleteLater();
+	threadedScalerDetector_->deleteLater();
 	scalerDetectorServerManager_->deleteLater();
 	AMDSScalerCommandManager::releaseScalerCommandManager();
 }
@@ -61,8 +61,8 @@ void AMDSCentralServerSGMScaler::initializeBufferGroup()
 void AMDSCentralServerSGMScaler::initializeDetectorManager()
 {
 	// initialize the detector manager for SGM scaler
-	scalerDetectorManager_ = new AMDSScalerDetectorManager(scalerConfigurationMap_);
-        connect(scalerDetectorManager_->scalerDetector(), SIGNAL(newScalerScanDataReceived(AMDSDataHolderList)), this, SLOT(onNewScalerScanDataReceived(AMDSDataHolderList)));
+	threadedScalerDetector_ = new AMDSThreadedScalerDetector(scalerConfigurationMap_);
+	connect(threadedScalerDetector_->scalerDetector(), SIGNAL(newScalerScanDataReceived(AMDSDataHolderList)), this, SLOT(onNewScalerScanDataReceived(AMDSDataHolderList)));
 }
 
 void AMDSCentralServerSGMScaler::initializeAndStartDetectorServer()
@@ -83,14 +83,14 @@ void AMDSCentralServerSGMScaler::wrappingUpInitialization()
 		// when we start/restart dwelling, we need to clear the exiting buffer since the existing data might NOT match the current configuration
 		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), this, SLOT(onDetectorServerStartDwelling(QString)));
 
-		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerGoingToStartDwelling()));
-		connect(scalerServer, SIGNAL(serverChangedToConfigurationMode(QString)), scalerDetectorManager_->scalerDetector(), SLOT(onServerStopDwelling()));
-		connect(scalerServer, SIGNAL(enableScalerChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onEnableChannel(int)));
-		connect(scalerServer, SIGNAL(disableScalerChannel(int)), scalerDetectorManager_->scalerDetector(), SLOT(onDisableChannel(int)));
+		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), threadedScalerDetector_->scalerDetector(), SLOT(onServerGoingToStartDwelling()));
+		connect(scalerServer, SIGNAL(serverChangedToConfigurationMode(QString)), threadedScalerDetector_->scalerDetector(), SLOT(onServerStopDwelling()));
+		connect(scalerServer, SIGNAL(enableScalerChannel(int)), threadedScalerDetector_->scalerDetector(), SLOT(onEnableChannel(int)));
+		connect(scalerServer, SIGNAL(disableScalerChannel(int)), threadedScalerDetector_->scalerDetector(), SLOT(onDisableChannel(int)));
 
-		connect(scalerDetectorManager_->scalerDetector(), SIGNAL(detectorScanModeChanged(int)), scalerServer, SLOT(onDetectorServerModeChanged(int)));
+		connect(threadedScalerDetector_->scalerDetector(), SIGNAL(detectorScanModeChanged(int)), scalerServer, SLOT(onDetectorServerModeChanged(int)));
 
-		connect(scalerDetectorManager_->scalerDetector(), SIGNAL(requestFlattenedData(double)), this, SLOT(onScalerDetectorRequestFlattenedData(double)));
+		connect(threadedScalerDetector_->scalerDetector(), SIGNAL(requestFlattenedData(double)), this, SLOT(onScalerDetectorRequestFlattenedData(double)));
 	}
 }
 
@@ -151,7 +151,7 @@ void AMDSCentralServerSGMScaler::onInternalRequestProcessed(AMDSClientRequest *c
 //			qDebug() << "It's the right type of data holder with count " << scalarDataHolder->dataArray().asConstVectorDouble().count();
 //			qDebug() << scalarDataHolder->dataArray().asConstVectorDouble();
 
-			scalerDetectorManager_->scalerDetector()->setFlattenedData(scalarDataHolder->dataArray().asConstVectorDouble());
+			threadedScalerDetector_->scalerDetector()->setFlattenedData(scalarDataHolder->dataArray().asConstVectorDouble());
 		}
 	}
 }

@@ -7,7 +7,7 @@
 #include "DataHolder/AMDSDataHolder.h"
 
 class AMDSScalerConfigurationMap;
-class AMDSScalerDetectorManager;
+class AMDSThreadedScalerDetector;
 class AMDSDetectorServerManager;
 
 class AMDSCentralServerSGMScaler : public AMDSCentralServer
@@ -58,7 +58,7 @@ protected:
 	/// the scaler detector configruation map
 	AMDSScalerConfigurationMap *scalerConfigurationMap_;
 	/// the Scaler detector manager
-	AMDSScalerDetectorManager *scalerDetectorManager_;
+	AMDSThreadedScalerDetector *threadedScalerDetector_;
 	/// the scaler server manager
 	AMDSDetectorServerManager *scalerDetectorServerManager_;
 

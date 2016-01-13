@@ -13,28 +13,29 @@
 
 #include "util/AMDSRunTimeSupport.h"
 
-/// ==================== implementation of AMDSScalerDetectorManager ============================
-AMDSScalerDetectorManager::AMDSScalerDetectorManager(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent)
+/// ==================== implementation of AMDSThreadedScalerDetector ============================
+AMDSThreadedScalerDetector::AMDSThreadedScalerDetector(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent)
 	: QObject(parent)
 {
-	detectorManagerThread_ = new QThread();
+	detectorThread_ = new QThread();
 
 	scalerDetector_ = new AMDSScalerDetector(scalerConfiguration);
-	scalerDetector_->moveToThread(detectorManagerThread_);
+	scalerDetector_->moveToThread(detectorThread_);
 
-	connect(detectorManagerThread_, SIGNAL(finished()), scalerDetector_, SLOT(deleteLater()));
+	connect(detectorThread_, SIGNAL(finished()), scalerDetector_, SLOT(deleteLater()));
 
-	detectorManagerThread_->start();
+	detectorThread_->start();
 }
 
-AMDSScalerDetectorManager::~AMDSScalerDetectorManager()
+AMDSThreadedScalerDetector::~AMDSThreadedScalerDetector()
 {
-	if (detectorManagerThread_->isRunning())
-		detectorManagerThread_->quit();
+	if (detectorThread_->isRunning())
+		detectorThread_->quit();
 
-	detectorManagerThread_->deleteLater();
-	detectorManagerThread_ = 0;
+	detectorThread_->deleteLater();
+	detectorThread_ = 0;
 }
+
 
 /// ==================== implementation of AMDSScalerDetector ============================
 AMDSScalerDetector::AMDSScalerDetector(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent)

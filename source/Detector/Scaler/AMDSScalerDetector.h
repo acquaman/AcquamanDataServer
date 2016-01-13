@@ -27,22 +27,23 @@ class AMDSScalerDetector ;
 #define AMDS_SCALER_DETECTOR_ALT_FAILED_TO_CONFIG_CHANNEL  50107
 
 
-class AMDSScalerDetectorManager : public QObject
+class AMDSThreadedScalerDetector : public QObject
 {
 	Q_OBJECT
 public:
-	explicit AMDSScalerDetectorManager(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent = 0);
-	~AMDSScalerDetectorManager();
+	explicit AMDSThreadedScalerDetector(AMDSScalerConfigurationMap *scalerConfiguration, QObject *parent = 0);
+	~AMDSThreadedScalerDetector();
 
 	/// returns the instance of scaler detector
 	inline AMDSScalerDetector *scalerDetector() const { return scalerDetector_; }
 
 protected:
 	/// the instance of detector manager thread
-	QThread *detectorManagerThread_;
+	QThread *detectorThread_;
 	/// the instance of scaler detector
 	AMDSScalerDetector *scalerDetector_;
 };
+
 
 class AMDSScalerDetector : public AMDSDwellDetector
 {
