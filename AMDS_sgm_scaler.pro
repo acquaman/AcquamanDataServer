@@ -22,7 +22,9 @@ HEADERS *= \
 	source/Detector/Scaler/AMDSScalerCommandManager.h \
 	source/Detector/Scaler/AMDSScalerDetector.h \
 	source/Detector/Scaler/AMDSScalerDetectorServer.h \
-	source/Detector/Scaler/AMDSScalerConfigurationMap.h
+	source/Detector/Scaler/AMDSScalerConfigurationMap.h \
+    source/Detector/Scaler/AMDSScalerDetectorManager.h \
+    source/Detector/Scaler/AMDSDwellScalerDetector.h
 
 SOURCES *= \
 	source/AMDSMainSGMScaler.cpp \
@@ -32,7 +34,13 @@ SOURCES *= \
 	source/Detector/Scaler/AMDSScalerCommandManager.cpp \
 	source/Detector/Scaler/AMDSScalerDetector.cpp \
 	source/Detector/Scaler/AMDSScalerDetectorServer.cpp \
-	source/Detector/Scaler/AMDSScalerConfigurationMap.cpp
+	source/Detector/Scaler/AMDSScalerConfigurationMap.cpp \
+    source/Detector/Scaler/AMDSScalerDetectorManager.cpp \
+    source/Detector/Scaler/AMDSDwellScalerDetector.cpp
 
 OTHER_FILES *= \
 	db/AMDSScaler.db
+
+
+
+

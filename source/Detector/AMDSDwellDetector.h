@@ -3,20 +3,36 @@
 
 #include <QObject>
 
+
+#define AMDS_DWELL_DETECTOR_ALT_PV_NOT_CONNECTED 50101
+#define AMDS_DWELL_DETECTOR_ALT_SWITCH_TO_DWELLING  50102
+#define AMDS_DWELL_DETECTOR_ALT_SWITCH_TO_CONFIGURATION  50103
+#define AMDS_DWELL_DETECTOR_ALT_DWELL_TIME_CHANGED  50104
+#define AMDS_DWELL_DETECTOR_ALT_SCAN_IN_BUFFER_CHANGED  50105
+#define AMDS_DWELL_DETECTOR_ALT_TOTAL_NUM_SCANS  50106
+#define AMDS_DWELL_DETECTOR_ALT_FAILED_TO_CONFIG_CHANNEL  50107
+#define AMDS_DWELL_DETECTOR_ALT_INCORRECT_DWELL_TIME 50108
+
+
 class AMDSDwellDetector : public QObject
 {
     Q_OBJECT
 public:
-	enum DwellScanStatus {
-		Configuration = 0,
+	enum DetectorMode {
+		Normal = 0,
 		Dwelling = 1
+	};
+
+	enum DwellMode {
+		SingleShot = 0,
+		Continuous = 1
 	};
 
 	explicit AMDSDwellDetector(QObject *parent = 0) : QObject(parent)
 	{
 		initialized_ = false;
 		connected_ = false;
-		currentScanMode_ = AMDSDwellDetector::Configuration;
+		currentScanMode_ = AMDSDwellDetector::Normal;
 	}
 
 signals:
@@ -29,7 +45,7 @@ protected:
 	/// flag to indicate whether all PVs are connected
 	bool connected_;
 	/// the current scan mode of the scaler
-	AMDSDwellDetector::DwellScanStatus currentScanMode_;
+	AMDSDwellDetector::DetectorMode currentScanMode_;
 
 };
 
