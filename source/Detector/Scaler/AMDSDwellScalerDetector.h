@@ -13,6 +13,8 @@ class QTimer;
 class AMControlSet;
 class AMSinglePVControl;
 
+
+/// This class is designed for the softIOC scaler detector
 class AMDSDwellScalerDetector : public AMDSDwellDetector
 {
 	Q_OBJECT

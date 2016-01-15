@@ -15,6 +15,7 @@ class AMSinglePVControl;
 class AMWaveformBinningSinglePVControl;
 
 
+/// This class is designed for the physical scaler detector
 class AMDSScalerDetector : public AMDSDwellDetector
 {
 	Q_OBJECT
