@@ -71,11 +71,11 @@ protected:
 	void initializePVControls();
 
 	/// helper function to check whether the detetor start data acquiring or not
-	bool isDwellStarted();
+	const bool isDwellStarted();
 	/// helper function to check whether the detector is working in continuous mode or not
-	bool isContinuousDwell();
+	const bool isContinuousDwell();
 	/// helper function to check whether the detector is acquiring data or not
-	bool isAcquiring();
+	const bool isAcquiring();
 
 protected:
 	/// the dwellTime in second
