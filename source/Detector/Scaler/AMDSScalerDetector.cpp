@@ -61,6 +61,8 @@ void AMDSScalerDetector::onAllControlsConnected(bool connected)
 		return;
 	}
 
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_DWELL_DETECTOR_ALT_PV_CONNECTED, "PV controls are connected.");
+
 	// to initialize the list of enabled/disabled channel ids
 	if (!initialized_) {
 		onScanControlValueChanged(scanControl_->value());

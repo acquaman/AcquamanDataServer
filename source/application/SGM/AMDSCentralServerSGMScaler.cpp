@@ -83,10 +83,10 @@ void AMDSCentralServerSGMScaler::wrappingUpInitialization()
 		// when we start/restart dwelling, we need to clear the exiting buffer since the existing data might NOT match the current configuration
 		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), this, SLOT(onDetectorServerStartDwelling(QString)));
 
-		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onServerGoingToStartDwelling()));
-		connect(scalerServer, SIGNAL(serverChangedToConfigurationMode(QString)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onServerStopDwelling()));
-		connect(scalerServer, SIGNAL(enableScalerChannel(int)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onEnableChannel(int)));
-		connect(scalerServer, SIGNAL(disableScalerChannel(int)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onDisableChannel(int)));
+		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onStartScalerDwelling()));
+		connect(scalerServer, SIGNAL(serverChangedToConfigurationMode(QString)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onScalertStopDwelling()));
+		connect(scalerServer, SIGNAL(enableScalerChannel(int)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onEnableScalerChannel(int)));
+		connect(scalerServer, SIGNAL(disableScalerChannel(int)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onDisableScalerChannel(int)));
 
 		connect(threadedScalerDetectorManager_->scalerDetectorManager(), SIGNAL(detectorScanModeChanged(int)), scalerServer, SLOT(onDetectorServerModeChanged(int)));
 

@@ -37,34 +37,24 @@ AMDSDwellScalerDetector::~AMDSDwellScalerDetector()
 
 void AMDSDwellScalerDetector::setFlattenedData(const QVector<double> &data)
 {
-	QMap<quint8, int> channelToIndexMap;
-	for(int x = 0, size = scalerConfiguration_->configuredChannels().count(); x < size; x++)
-		channelToIndexMap.insert(scalerConfiguration_->configuredChannels().at(x), x);
-
-
-	for(int x = 0, size = dwellScalerChannelFeedbackControls_.count(); x < size; x++){
-		QString controlPVName = dwellScalerChannelFeedbackControls_.value(x)->readPVName();
-
-		QMap<quint8, int>::const_iterator i = channelToIndexMap.constBegin();
-		while(i != channelToIndexMap.constEnd()){
-			QString channelIdTemplate = i.key() < 10 ? QString("0%1").arg(i.key()) : QString("%1").arg(i.key()); // when channel id is 0 ~ 9, the PV is "0" + channelId
-			if(controlPVName.remove("BL1611-ID-1:AMDS:scaler").contains(channelIdTemplate))
-				dwellScalerChannelFeedbackControls_.value(x)->move(data.at(i.value()));
-
-			i++;
-		}
+	int dataIndex = 0;
+	foreach (int channelId, scalerConfiguration_->enabledChannels()) {
+		dwellScalerChannelFeedbackControls_.value(channelId)->move(data.at(dataIndex));
+		dataIndex++;
 	}
 }
 
 void AMDSDwellScalerDetector::onAllControlsConnected(bool connected)
 {
-	if(connected_ == connected)
+	if(connected_ != connected)
 		connected_ = connected;
 
 	if (!connected_) {
 		AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_DWELL_DETECTOR_ALT_PV_NOT_CONNECTED, "PV control is NOT connected.");
 		return;
 	}
+
+	AMDSRunTimeSupport::debugMessage(AMDSRunTimeSupport::AlertMsg, this, AMDS_DWELL_DETECTOR_ALT_PV_CONNECTED, "PV controls are connected.");
 
 	// to initialize the list of enabled/disabled channel ids
 	if (!initialized_) {
