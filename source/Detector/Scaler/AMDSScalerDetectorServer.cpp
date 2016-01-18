@@ -43,7 +43,7 @@ void AMDSScalerDetectorServer::performConfiguration(int commandId, const QString
 {
 	switch (commandId) {
 	case AMDSScalerCommandManager::RequestStopDwell:
-		setDetectorServerMode(AMDSDwellDetector::Configuration);
+		setDetectorServerMode(AMDSDwellDetector::Normal);
 		break;
 	case AMDSScalerCommandManager::RequestEnableChannel:
 		emit enableScalerChannel(value.toInt());

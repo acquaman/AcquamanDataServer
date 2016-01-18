@@ -10,7 +10,14 @@ AMDSScalerConfigurationMap::AMDSScalerConfigurationMap(const QString &scalerName
 
 	enabledChannels_.clear();
 	disabledChannels_.clear();
+
 	enabledChannels_.append(configuredChannels_);
+	// all the other channels are disabled
+	for (int channelId=0, size=32; channelId < size; channelId++) {
+		if (!configuredChannels_.contains(channelId)) {
+			disabledChannels_.append(channelId);
+		}
+	}
 }
 
 AMDSScalerConfigurationMap::~AMDSScalerConfigurationMap()

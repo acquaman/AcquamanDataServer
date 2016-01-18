@@ -34,7 +34,7 @@ AMDSDetectorServer::AMDSDetectorServer(const QString &detectorName, QObject *par
 {
 	detectorName_ = detectorName;
 
-	setDetectorServerMode(AMDSDwellDetector::Configuration);
+	setDetectorServerMode(AMDSDwellDetector::Normal);
 }
 
 AMDSDetectorServer::~AMDSDetectorServer()
@@ -46,15 +46,15 @@ void AMDSDetectorServer::onConfigurationRequestReceived(AMDSClientRequest *confi
 {
 	Q_UNUSED(configurationRequest)
 
-	setDetectorServerMode(AMDSDwellDetector::Configuration);
+	setDetectorServerMode(AMDSDwellDetector::Normal);
 }
 
 
-void AMDSDetectorServer::setDetectorServerMode(AMDSDwellDetector::DwellScanStatus detectorMode)
+void AMDSDetectorServer::setDetectorServerMode(AMDSDwellDetector::DetectorMode detectorMode)
 {
 	if (detectorMode_ != detectorMode) {
 		detectorMode_ = detectorMode;
-		if (detectorMode_ == AMDSDwellDetector::Configuration) {
+		if (detectorMode_ == AMDSDwellDetector::Normal) {
 			emit serverChangedToConfigurationMode(detectorName());
 		} else {
 			emit serverChangedToDwellMode(detectorName());
@@ -64,6 +64,6 @@ void AMDSDetectorServer::setDetectorServerMode(AMDSDwellDetector::DwellScanStatu
 
 void AMDSDetectorServer::onDetectorServerModeChanged(int detectorMode)
 {
-	AMDSDwellDetector::DwellScanStatus asDwellDetector = AMDSDwellDetector::DwellScanStatus(detectorMode);
+	AMDSDwellDetector::DetectorMode asDwellDetector = AMDSDwellDetector::DetectorMode(detectorMode);
 	setDetectorServerMode(asDwellDetector);
 }
