@@ -51,7 +51,7 @@ void AMDSScalerDetectorManager::onStartScalerDwelling()
 	scalerDetector_->onStartDwelling();
 }
 
-void AMDSScalerDetectorManager::onScalertStopDwelling()
+void AMDSScalerDetectorManager::onScalerStopDwelling()
 {
 	scalerDetector_->onStopDwelling();
 }

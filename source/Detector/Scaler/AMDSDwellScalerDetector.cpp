@@ -235,17 +235,17 @@ void AMDSDwellScalerDetector::initializePVControls()
 	connect(dwellScalerDwellTimeControl_, SIGNAL(valueChanged(double)), this, SLOT(onDwellScalerDwellTimeControlValueChanged(double)));
 }
 
-const bool AMDSDwellScalerDetector::isDwellStarted()
+bool AMDSDwellScalerDetector::isDwellStarted() const
 {
 	return dwellScalerStartControl_->withinTolerance(1.0);
 }
 
-const bool AMDSDwellScalerDetector::isContinuousDwell()
+bool AMDSDwellScalerDetector::isContinuousDwell() const
 {
 	return dwellScalerDwellModeControl_->withinTolerance(1.0);
 }
 
-const bool AMDSDwellScalerDetector::isAcquiring()
+bool AMDSDwellScalerDetector::isAcquiring() const
 {
 	return dwellScalerDwellStateControl_->withinTolerance(1.0);
 }

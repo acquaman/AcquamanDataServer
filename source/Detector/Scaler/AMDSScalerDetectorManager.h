@@ -49,7 +49,7 @@ public slots:
 	/// slot to start dwelling
 	void onStartScalerDwelling();
 	/// slot to stop dwelling
-	void onScalertStopDwelling();
+	void onScalerStopDwelling();
 	/// slot to enable a given channel
 	void onEnableScalerChannel(int channelId);
 	/// slot to disable a given channel

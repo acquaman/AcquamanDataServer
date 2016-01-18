@@ -84,7 +84,7 @@ void AMDSCentralServerSGMScaler::wrappingUpInitialization()
 		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), this, SLOT(onDetectorServerStartDwelling(QString)));
 
 		connect(scalerServer, SIGNAL(serverGoingToStartDwelling(QString)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onStartScalerDwelling()));
-		connect(scalerServer, SIGNAL(serverChangedToConfigurationMode(QString)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onScalertStopDwelling()));
+		connect(scalerServer, SIGNAL(serverChangedToConfigurationMode(QString)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onScalerStopDwelling()));
 		connect(scalerServer, SIGNAL(enableScalerChannel(int)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onEnableScalerChannel(int)));
 		connect(scalerServer, SIGNAL(disableScalerChannel(int)), threadedScalerDetectorManager_->scalerDetectorManager(), SLOT(onDisableScalerChannel(int)));
 
