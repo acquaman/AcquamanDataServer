@@ -12,15 +12,24 @@ public:
 	explicit AMDSScalerConfigurationMap(const QString &scalerName, const QString &basePVName, AMDSDataTypeDefinitions::DataType dataType, const QList<quint8> &configuredChannelIds, QObject *parent = 0);
 	~AMDSScalerConfigurationMap();
 
-	bool enableChannel(int channelId);
-	bool disableChannel(int channelId);
-
+	/// returns the name of the scaler
 	inline QString scalerName() const { return scalerName_; }
+	/// returns the base PV name of the scaler
 	inline QString scalerBasePVName() const { return scalerBasePVName_; }
+	/// returns the datatype of the scaler
 	inline AMDSDataTypeDefinitions::DataType dataType() const { return dataType_; }
+	/// returns the list of configured channel IDs
 	inline QList<quint8> configuredChannels() const { return configuredChannels_; }
+	/// returns the list of enabled channel IDs
 	inline QList<quint8> enabledChannels() const { return enabledChannels_; }
+	/// returns the list of disabled channel IDs
 	inline QList<quint8> disabledChannels() const { return disabledChannels_; }
+
+public slots:
+	/// slot to enable a CONFIGURED channel
+	bool enableChannel(int channelId);
+	/// slot to disable a CONFIGURED channel
+	bool disableChannel(int channelId);
 
 protected:
 	/// the name of the scaler

@@ -11,7 +11,7 @@ class AmptekSDD123ThreadedDataServerGroup;
 class AmptekSDD123DetectorGroupSGM;
 
 class AMDSScalerConfigurationMap;
-class AMDSScalerDetectorManager;
+class AMDSThreadedScalerDetector;
 class AMDSDetectorServerManager;
 
 class AMDSCentralServerSGMAmptek : public AMDSCentralServer

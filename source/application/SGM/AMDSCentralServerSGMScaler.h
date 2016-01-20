@@ -7,7 +7,7 @@
 #include "DataHolder/AMDSDataHolder.h"
 
 class AMDSScalerConfigurationMap;
-class AMDSScalerDetectorManager;
+class AMDSThreadedScalerDetectorManager;
 class AMDSDetectorServerManager;
 
 class AMDSCentralServerSGMScaler : public AMDSCentralServer
@@ -32,7 +32,7 @@ protected slots:
 
 
 	/// slot to handle new scaler data request to add the data to buffergroup
-	void onNewScalerScanDataReceivedd(const AMDSDataHolderList &scalerScanCountsDataHolder);
+	void onNewScalerScanDataReceived(const AMDSDataHolderList &scalerScanCountsDataHolder);
 
 	/// Called when the scaler requests flattened data. Sets the latches for internalRequestActive_ and dwellSecondsRequested
 	void onScalerDetectorRequestFlattenedData(double seconds);
@@ -58,7 +58,7 @@ protected:
 	/// the scaler detector configruation map
 	AMDSScalerConfigurationMap *scalerConfigurationMap_;
 	/// the Scaler detector manager
-	AMDSScalerDetectorManager *scalerDetectorManager_;
+	AMDSThreadedScalerDetectorManager *threadedScalerDetectorManager_;
 	/// the scaler server manager
 	AMDSDetectorServerManager *scalerDetectorServerManager_;
 
