@@ -335,7 +335,7 @@ void AmptekSDD123EPICSDetectorManager::onClearSpectrumControlValueChange(double 
 
 void AmptekSDD123EPICSDetectorManager::onDwellTimeControlValueChange(double newValue){
 	if(!dwellTimeControl_->withinTolerance(dwellTime()))
-		setDwellTime((int)newValue);
+		setDwellTime(newValue);
 }
 
 void AmptekSDD123EPICSDetectorManager::onDwellModeControlValueChange(double newValue){
