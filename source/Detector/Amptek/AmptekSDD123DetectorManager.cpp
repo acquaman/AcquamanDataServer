@@ -20,7 +20,7 @@ AmptekSDD123DetectorManager::AmptekSDD123DetectorManager(AmptekSDD123Configurati
 	detector_->setSpectrumReceiver(this);
 
 	dwellMode_ = AmptekSDD123DetectorManager::PresetDwell;
-	dwellTime_ = 2;
+	dwellTime_ = 2.0;
 
 	configurationRequestReason_ = AmptekSDD123DetectorManager::InvalidReason;
 
@@ -63,7 +63,7 @@ void AmptekSDD123DetectorManager::setRequestEventReceiver(QObject *requestEventR
 	requestEventReceiver_ = requestEventReceiver;
 }
 
-void AmptekSDD123DetectorManager::setDwellTime(int dwellTime){
+void AmptekSDD123DetectorManager::setDwellTime(double dwellTime){
 	dwellTime_ = dwellTime;
 }
 
@@ -210,7 +210,7 @@ void AmptekSDD123DetectorManager::onTriggerDwellTimerTimeout()
 bool AmptekSDD123DetectorManager::startTriggerDwellTimer()
 {
 	if(dwellTime_ > 0 && dwellTime_ < 100 && !triggerDwellTimer_->isActive()){
-		int asMSecs = dwellTime_*1000;
+		int asMSecs = int(dwellTime_*1000);
 		triggerDwellTimer_->setInterval(asMSecs);
 		triggerDwellTimer_->start();
 
