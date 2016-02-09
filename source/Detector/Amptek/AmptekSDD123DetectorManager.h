@@ -72,7 +72,7 @@ public slots:
 	void setRequestEventReceiver(QObject *requestEventReceiver);
 
 	/// function to set Dwell Time
-	void setDwellTime(int dwellTime);
+	void setDwellTime(double dwellTime);
 	/// function to set dwell mode
 	void setDwellMode(AmptekSDD123DetectorManager::DwellMode dwellMode);
 
@@ -141,7 +141,7 @@ protected:
 	/// flag to indicate whether the data is initialized or not (whether the coming package is the first package)
 	bool initialized_;
 	/// the default dwell time
-	int dwellTime_;
+	double dwellTime_;
 	/// the current dwell mode
 	AmptekSDD123DetectorManager::DwellMode dwellMode_;
 
